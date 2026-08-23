@@ -74,6 +74,7 @@ or a trust-store representation.
 It defines the mandatory baseline package-signature container and algorithm
 and Package Manager's responsibility to verify signed package material
 before producing installed records or Runtime handoffs.
+It also defines selection and enforcement boundaries for the optional SLSA package-provenance profile.
 The excluded responsibilities belong to LOGOS-MODULE-RUNTIME, Module Loader,
 Capability Authority, or security profiles.
 
@@ -87,6 +88,7 @@ This specification defines:
 - the expanded installed package record derived by Package Manager;
 - the LGX package structure used for prebuilt package material;
 - the mandatory baseline package-signature container and algorithm;
+- protected selection and fail-closed enforcement of the optional SLSA package-provenance profile;
 - the LGX and Nix realization profiles;
 - compatible platform-variant selection and local artifact materialization;
 - package catalog query records;
@@ -145,6 +147,8 @@ It does not expose Nix evaluation or store internals through ordinary Package Ma
 
 Package Manager MUST NOT run package-provided installation scripts
 while inspecting, resolving, installing, updating, or removing a package.
+Package-controlled Nix work permitted by Section 7.3 is realization work rather than an installation script.
+It is permitted only under that section's pre-verification rules.
 It MUST materialize selected artifacts under Package Manager or deployment control
 before Runtime or Module Loader uses them.
 
@@ -344,7 +348,8 @@ The schema root already commits to the contract namespace.
 Package release versions do not form part of contract identity.
 
 Within one module declaration, implemented contract commitments, required contract commitments, and requested permission names MUST each be unique.
-Each module implementation artifact MUST have kind `module-binary` in every variant.
+The implementation artifact referenced by each module declaration MUST occur in at least one package variant
+and MUST have kind `module-binary` wherever it occurs.
 The `constraints` field contains the exact deterministic-CBOR encoding of one value owned by the named permission definition.
 
 Variant order is significant because it determines platform selection.
@@ -400,18 +405,25 @@ The active package-signing profile consumes protected trust input
 supplied by the runtime host or deployment environment.
 That input MUST bind each accepted trust-anchor identifier
 to its public key or other profile-defined verification material.
+It MUST also bind each accepted signer to a non-empty set of exact package names for which that signer is authorized.
+Package-name authorization uses byte-for-byte equality of the package-name UTF-8 encoding.
+It MUST NOT use case folding, Unicode normalization, prefixes, wildcard patterns, or an authorization covering every package name.
 A bare identifier, package field, catalog entry, or downloaded key does not establish a trust anchor.
 The concrete key encoding, signature algorithms, and signature-container processing
 are defined by the selected package-signing profile.
 
-Package Manager MUST verify each package against the currently accepted package-signing trust anchors.
+Package Manager MUST verify each package against the currently accepted package-signing trust anchors
+and require the authenticated signer to be authorized for the exact package name in the signed manifest.
 If no accepted anchor validates the signer and signature,
+or if that signer is not authorized for the exact package name,
 Package Manager MUST reject the package with `signature-verification-failed`.
 Package Manager MAY cache successful signature verification.
 It MUST invalidate an affected cache entry when the corresponding signature profile,
-trust anchor, or signer is no longer accepted.
+trust anchor, signer, or exact-name authorization is no longer accepted.
 
-Trust-anchor rotation MAY accept old and new anchors during a configured overlap period.
+One signer MAY be authorized for multiple exact package names,
+and multiple signers MAY be authorized for the same exact package name.
+Trust-anchor or signer rotation MAY accept old and new identities for that exact package name during a configured overlap period.
 After an anchor is removed or revoked,
 Package Manager MUST NOT use it for a new successful resolution, installation, update, or Runtime handoff.
 Whether an already-running module is stopped is a separate Runtime and active-authority decision.
@@ -513,6 +525,7 @@ to exactly one 32-byte Ed25519 public key encoded according to RFC 8032.
 Two accepted trust anchors MUST NOT use the same `kid`.
 The `kid` selects candidate verification material;
 it does not establish trust without that protected mapping.
+For this profile, the authenticated `kid` identifies the signer whose exact-name authorization is required by Section 4.1.
 The signing private key is not package content or a Package Manager input.
 Package producers MUST generate the 32-byte Ed25519 private seed with a cryptographically secure random generator
 and MUST protect it against disclosure and unauthorized signing.
@@ -559,6 +572,125 @@ must select a catalog profile satisfying Section 4.2.
 That additional profile does not replace the baseline package signature,
 materialized-byte verification, or Runtime's load-boundary digest check.
 
+### 4.5 Optional Package-Provenance Enforcement
+
+The baseline package signature and artifact checks do not establish how package artifacts were built.
+This specification defines `logos.package-provenance.slsa-v1.2`,
+an optional package-provenance profile based on [SLSA v1.2].
+A Package Manager MAY implement this profile.
+
+For an LGX source accepted under this profile, `provenance_object` MUST be present.
+Package Manager MUST retrieve the identified object from the Logos Storage provider named by `storage`
+and MUST use that detached object as the profile's provenance evidence.
+It MUST NOT use an attestation embedded in the LGX archive to satisfy this profile.
+An absent locator, an unavailable object, a retrieval failure, or an object that does not satisfy every profile requirement
+MUST cause rejection without baseline-only fallback.
+
+The provenance object for this profile MUST be a standard DSSE v1 JSON envelope [DSSE v1]
+whose `payloadType` is exactly `application/vnd.in-toto+json`.
+Its decoded `payload` MUST be one UTF-8 JSON in-toto Statement [in-toto Attestation v1]
+whose `_type` is exactly `https://in-toto.io/Statement/v1`,
+whose `predicateType` is exactly `https://slsa.dev/provenance/v1`,
+and whose predicate conforms to SLSA Build Provenance v1 [SLSA v1.2].
+
+The envelope and decoded Statement MUST each be valid UTF-8 JSON containing exactly one value,
+contain no duplicate object member names, and have no trailing data.
+The `payload` and every `sig` value MUST use a base64 form permitted by DSSE v1,
+the `signatures` array MUST be nonempty,
+and every decoded `sig` value MUST be nonempty.
+Package Manager MUST apply the DSSE and in-toto rules for unrecognized fields.
+
+Package Manager MUST verify each signature over the DSSE pre-authentication encoding of the exact `payloadType` and decoded `payload` bytes.
+It MUST parse and evaluate the same payload bytes whose signature it verified.
+It MUST NOT normalize, reserialize, translate, or substitute the payload before signature verification.
+This profile uses native DSSE and in-toto evidence so Package Manager can verify producer attestations without translation.
+A translated or re-encoded representation does not retain the DSSE authentication and MUST NOT satisfy this profile.
+Another envelope or encoding requires a distinct package-provenance profile.
+
+Protected provenance trust input MUST bind each accepted provenance signer identity to a nonempty set of exact builder identifiers.
+Protected deployment policy MUST select every accepted provenance-signing profile.
+Each provenance-signing profile MUST define its signature algorithms, authenticated signer-identity construction,
+certificate or key requirements, revocation processing, and any required transparency verification.
+The envelope, Statement, `keyid`, builder, package, source, catalog, or caller MUST NOT select or weaken a provenance-signing profile.
+
+DSSE `keyid` is an unauthenticated key-selection hint and MUST NOT establish signer identity or trust.
+Package Manager MUST evaluate each signature independently.
+The signature boundary succeeds only when at least one signature verifies under an accepted provenance-signing profile
+and its authenticated signer identity is authorized for the Statement's exact `builder.id`.
+An additional invalid or unaccepted signature neither grants trust nor invalidates an otherwise accepted signer-builder pair.
+Builder-identifier comparison is case-sensitive exact string equality.
+A prefix, wildcard, redirect, case folding, Unicode normalization, or URI normalization MUST NOT establish equality.
+Failure to obtain an accepted signer-builder pair MUST cause package rejection without baseline-only fallback.
+
+For this profile, at least one entry in the Statement's `subject` array MUST identify the complete gzip-compressed LGX archive bytes obtained from the package source.
+That entry's `digest` map MUST contain a `sha256` entry equal to SHA-256 [RFC 6234] over those exact bytes.
+Package Manager MUST determine this subject match only from that `sha256` entry.
+Subject `name`, `uri`, and digest entries using other algorithms MUST NOT establish the match.
+Additional conforming subject entries are permitted and MUST NOT prevent a match established by any entry's required `sha256` digest.
+Package Manager MUST compute that digest before decompression, extraction, normalization, or any other transformation.
+The digest identifies one distributed LGX object;
+it is not the package identity or manifest identity.
+A manifest commitment, decompressed-archive digest, artifact digest, or module-binary digest MUST NOT substitute for the exact LGX digest.
+
+Conforming LGX writers may produce different DEFLATE bitstreams for the same archive content.
+A recompressed LGX is therefore a different SLSA subject even when its manifest and artifacts are unchanged.
+Provenance naming the digest of one LGX object MUST NOT authorize another LGX object.
+This profile requires no additional whole-LGX digest;
+the existing Logos BLAKE3 manifest commitments and artifact hashes remain independently mandatory.
+
+Build provenance for this profile MUST bind the LGX subject to the package source.
+Protected deployment policy MUST associate each exact package name with a nonempty set of accepted `buildType` definitions.
+Each accepted `buildType` definition MUST bind one exact `buildType` identifier to the external parameter that supplies the package source.
+It MUST define a deterministic mapping from that parameter to exactly one `resolvedDependencies` resource descriptor.
+The provenance predicate's `buildDefinition.buildType` value MUST equal the identifier of one definition associated with the exact package name in the signed manifest.
+Matching MUST use case-sensitive exact string equality.
+A prefix, wildcard, redirect, case folding, Unicode normalization, or URI normalization MUST NOT establish equality.
+Only protected deployment policy may supply or select an accepted `buildType` definition and its mapping.
+The provenance object, Statement, package, manifest, catalog, source, and caller MUST NOT do so.
+Package Manager MUST apply the associated definition's mapping.
+It MUST reject provenance when the mapping selects no descriptor or more than one descriptor.
+An otherwise accepted repository appearing only as another resolved dependency does not satisfy source binding.
+
+Protected deployment policy MUST associate each exact package name with a nonempty set of accepted source repository identifiers and accepted immutable source-identity rules.
+The selected source descriptor's `uri` MUST equal one of those identifiers as an exact case-sensitive string.
+A redirect, repository mirror, alternate transport URI, case folding, Unicode normalization, or other alias does not establish equality unless protected policy lists that exact identifier separately.
+
+The selected source descriptor's `digest` MUST contain at least one entry that protected policy recognizes as either a complete immutable source revision identifier or a source-tree digest.
+For Git, a `gitCommit` value MUST be the complete Git object identifier;
+an abbreviated object name does not satisfy this profile.
+A source-tree digest is accepted only when protected policy or a selected source-evidence profile defines its algorithm and canonical tree construction.
+A mutable branch or tag name MAY be retained as diagnostic information but MUST NOT substitute for an accepted immutable source identity.
+
+The exact source repository identifier and immutable source identity form the binding for additional source evidence.
+This profile does not require a source-evidence format.
+An additional protected source-evidence profile MAY require a Git commit signature,
+a SLSA Source Verification Summary Attestation [SLSA Source v1.2], or other independently authenticated evidence.
+Such a profile MUST bind the evidence to exactly the same source repository identifier and immutable source identity,
+verify it under trust rules distinct from build-provenance and package-signing trust,
+and fail closed when required evidence is absent or invalid.
+Source evidence MUST NOT replace build provenance or the package signature.
+The source-evidence signer or issuer, build-provenance signer, builder identity, and package signer are distinct identities,
+even when protected policy authorizes the same credential for more than one role.
+
+Source binding establishes only what source the accepted provenance claims the builder used.
+It does not prove source safety, prove compliance with a source-control process without independently verified source evidence,
+or protect against a malicious or compromised accepted build platform.
+
+Only protected deployment policy may select an active package-provenance profile.
+A manifest, package sidecar, catalog, Storage object, Nix metadata, provenance object, or caller MUST NOT select, disable, or weaken that profile.
+
+When no package-provenance profile is selected,
+Package Manager applies the mandatory package-signature and artifact-verification baseline
+and MUST NOT claim that package provenance was verified.
+When protected deployment policy selects a package-provenance profile,
+Package Manager MUST enforce every requirement of that profile before a successful inspection, resolution, installation, update, or Runtime handoff.
+An implementation that does not support the selected profile MUST reject the protected policy configuration before accepting package material under it.
+
+Missing, malformed, untrusted, stale, revoked, or otherwise non-qualifying provenance evidence
+MUST NOT cause fallback to baseline-only acceptance while a package-provenance profile remains selected.
+Successful provenance verification does not replace the baseline package signature,
+artifact-hash verification, signer authorization, or Runtime's load-boundary digest check.
+
 ## 5. Package Records
 
 The package manifest is the small author-facing Logos package object.
@@ -602,6 +734,7 @@ logos.package_manager.package_source =
     kind: "lgx",
     storage: tstr .size (1..128),
     object: bstr .size (1..4096),
+    ? provenance_object: bstr .size (1..4096),
   } /
   {
     kind: "nix",
@@ -620,6 +753,10 @@ logos.package_manager.manifest_commitment = {
 }
 
 ```
+
+The `modules` array contains only module declarations whose implementation artifact occurs in the selected variant,
+in manifest declaration order.
+It MUST NOT contain a module declaration whose implementation artifact is absent from the selected variant.
 
 The source record gives Package Manager enough information to locate or realize
 the package.
@@ -647,6 +784,10 @@ logos.package_manager.package_inspect_record = {
 ```
 
 An LGX source's `storage` and `object` fields identify the Storage object containing the package archive.
+Its optional `provenance_object` field identifies one detached package-provenance object in the same Logos Storage provider.
+When present, `provenance_object` MUST differ from `object`.
+The field is untrusted location data only;
+its presence neither selects a package-provenance profile nor establishes that provenance was verified.
 A Nix source identifies the input consumed by the Nix realization profile.
 When `locked_ref` is present,
 it identifies the concrete locked input selected from `flake_ref`.
@@ -721,7 +862,11 @@ The selected variant id is recorded in the installed package record.
 Artifact paths are relative to the selected variant directory.
 Every regular file in a variant directory MUST be declared by exactly one artifact record in that variant.
 Every declared artifact path MUST identify one regular file.
-Every artifact referenced by a module declaration MUST occur exactly once in the selected variant.
+A module declaration whose implementation artifact occurs in the selected variant is a selected module declaration.
+Every artifact referenced by a selected module declaration MUST occur exactly once in the selected variant.
+A module declaration whose implementation artifact is absent from the selected variant is not selected.
+Package Manager MUST omit it from the installed package record
+and MUST NOT produce a Runtime handoff for it.
 Package Manager MUST verify required artifact hashes before exposing or installing the package.
 It MUST extract selected artifacts into a Package Manager or deployment-controlled location
 before Runtime or Module Loader uses them.
@@ -749,6 +894,36 @@ Before installation, Package Manager MUST resolve the source to an immutable rea
 The installed package source MUST record `locked_ref`
 unless `flake_ref` already identifies an immutable realized output.
 
+For this profile, package-controlled Nix work means evaluating the selected flake or an input it controls,
+or executing a builder, hook, or evaluation-triggered derivation selected or influenced by that material,
+before Package Manager has accepted the embedded package signature.
+
+Package Manager MAY obtain the exact immutable realized output without a pre-verification isolation boundary
+only when protected deployment input selects that exact output and obtaining it performs no package-controlled Nix work.
+A substituter configuration, cache hit, locked flake input, or immutable flake reference does not by itself establish this condition.
+
+When obtaining the output requires package-controlled Nix work,
+Package Manager MUST establish a deployment-defined pre-verification isolation boundary before any such work begins.
+The boundary MUST contain the evaluator, every induced builder or hook,
+and every Nix service or store operation influenced by the unaccepted material.
+Protected deployment input MUST define and enforce the boundary's filesystem, process, network, credential, IPC,
+CPU, memory, storage, and time access.
+The work MUST NOT read or modify package-signing or provenance trust input,
+Package Manager installed state, deployment credentials, Runtime, Capability Authority, or Module Loader control surfaces,
+or other protected host state.
+It MUST NOT modify state outside its isolated store and disposable working state.
+Only an immutable realized output and bounded non-sensitive diagnostics may leave the boundary.
+
+Package Manager MUST treat the realized output as untrusted candidate material.
+It MUST verify the package signature, manifest, selected variant, and artifact hashes
+before reporting successful inspection, resolution, installation, update, or Runtime handoff.
+Nix store-object authentication may support protected output selection,
+but it does not verify the Logos package signature or make the output accepted package material.
+
+If no protected pre-resolved output is available and the required isolation boundary cannot be established,
+Package Manager MUST return `package-unavailable` before starting package-controlled Nix work.
+It MUST NOT fall back to unconfined local or remote evaluation or building.
+
 The realized output MUST contain the canonical manifest at:
 
 ```text
@@ -775,6 +950,7 @@ It MUST produce the same installed package and Runtime handoff records required 
 Nix evaluation, dependency closures, builders, substituters, store layout,
 profiles, generations, and garbage collection are backend internals.
 They MUST NOT appear in ordinary Package Manager results.
+Their status as backend internals does not weaken the pre-verification requirements above.
 
 Package Manager MUST NOT install packages into the user's ordinary Nix profile.
 It MUST maintain the roots or equivalent reachability needed to keep installed artifacts available
@@ -802,7 +978,8 @@ A package MUST be rejected with `invalid-package` when the manifest:
   permitted `package_version`;
 - declares duplicate variant ids;
 - declares duplicate artifact ids within a variant;
-- refers to an artifact id that is not present exactly once in every manifest variant;
+- references a module implementation artifact that is absent from every manifest variant;
+- references a schema or default artifact that is not present exactly once in every manifest variant containing the referencing module's implementation artifact;
 - declares duplicate package dependency names;
 - declares duplicate module identities;
 - assigns one artifact to more than one module declaration;
@@ -848,7 +1025,7 @@ Two module declarations in one manifest MUST NOT identify the same module or art
 `primary_contract`, when present, identifies the module's primary concrete contract.
 `implements` lists exact implemented interface contracts.
 A module declaration may omit `primary_contract`, `implements`, or both.
-A module with neither field declares no callable contract and requires no
+A module with neither field declares no contract and requires no
 provider behavior merely because it is a module.
 A module may implement interface contracts without declaring a primary concrete contract.
 When `implements` is present, its schema commitments MUST be unique.
@@ -900,6 +1077,7 @@ It is not a schema or value root produced by the Logos Hash Profile.
 
 An artifact id identifies the same logical artifact role across variants.
 It may occur once in each variant, with a different path and hash for that variant.
+Module scope is variant-specific and is determined by the presence of the module's implementation artifact.
 The installed artifact list contains only artifacts from the selected variant.
 Platform profiles define the registered `os`, `architecture`, and `abi` values and their matching rules.
 Variant ids do not define platform compatibility.
@@ -936,6 +1114,43 @@ The `0.0.0` minimum accepts only `0.0.0`.
 A `compatible` requirement MUST NOT contain a pre-release version.
 An `exact` requirement may select a pre-release version.
 
+Protected deployment policy MUST supply a resolver-limit set containing positive integer limits for:
+
+- distinct package names in one partial closure;
+- dependency depth;
+- candidate records considered for one package name; and
+- candidate-assignment attempts in one root operation.
+
+A deployment may provision those values as one preset or policy bundle.
+The resolved values are protected policy input,
+not another named Core profile.
+Package Manager MUST reject a protected policy configuration that omits a limit or supplies a non-positive value.
+A package, manifest, catalog, source, or caller MUST NOT select, raise, or disable a resolver limit.
+
+The root package counts toward the partial-closure limit and has dependency depth zero.
+Dependency depth is the number of manifest dependency edges from the root.
+Before adding a package name to a partial closure or inspecting a manifest at a greater depth,
+Package Manager MUST verify that the corresponding limit permits the operation.
+
+A candidate consideration occurs when Package Manager examines one satisfying candidate in the required order
+for possible assignment and dependency exploration.
+Each candidate record is charged at most once for that package name in one root operation,
+including when a cached result is reused after backtracking.
+Package Manager MUST consider candidates in the order defined below
+and MUST NOT consider another candidate for that package name after its limit is reached.
+The existence of additional unexamined catalog versions does not itself cause failure
+when an examined candidate produces a complete closure.
+
+A candidate-assignment attempt occurs whenever Package Manager tentatively binds a package name to a candidate,
+including an assignment retained in the final closure and a repeated assignment after backtracking.
+The attempt counter spans the complete root operation and MUST NOT decrease during backtracking.
+
+If resolution would exceed any resolver limit before finding a complete closure,
+Package Manager MUST terminate the root operation with `dependency-unavailable`.
+It MUST NOT install a partial closure or modify installed package state.
+Limit exhaustion and all counter values are determined by the installed state, catalog inputs, and protected policy
+and MUST NOT depend on implementation-local resource thresholds.
+
 To resolve, install, or update a root package,
 Package Manager MUST recursively inspect the selected dependency manifests
 and construct the transitive package closure.
@@ -946,6 +1161,9 @@ A candidate is an installed package record or catalog package whose version
 satisfies every accumulated requirement for its package name.
 A candidate MUST also satisfy the applicable manifest-commitment,
 realization-profile, platform-variant, signature, and artifact rules for the requested operation.
+Its signature MUST validate under an accepted trust anchor,
+and its authenticated signer MUST be authorized for its exact package name.
+Package Manager MUST exclude a candidate that fails this requirement before ordering candidate versions by SemVer precedence or exploring its dependency closure.
 An installed candidate with matching exact identity and manifest commitment
 MAY satisfy a dependency without being materialized again.
 
@@ -1122,7 +1340,8 @@ logos.package_manager.package_error_code =
 `package-in-use` means another installed package's recorded dependency edge prevents removal or replacement.
 `invalid-package` covers an absent or invalid manifest, invalid archive or realized-output structure, and invalid package-carried configuration material.
 `incompatible-platform` permits selection of another package version or source with a compatible variant.
-`dependency-unavailable` means no valid complete dependency closure could be selected.
+`dependency-unavailable` means no valid complete dependency closure could be selected
+or resolution exhausted a protected resolver limit.
 `artifact-integrity-failed` means required artifact bytes were absent, escaped their realization root, or did not match the signed digest.
 `signature-verification-failed` means the signature container, signer trust, freshness requirement, or signed manifest commitment was not accepted.
 
@@ -1341,15 +1560,25 @@ permission-mapping, sandbox, or deployment requirements that they explicitly def
 
 ## References
 
+- [RFC 6234]: US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF).
 - [RFC 8032]: Edwards-Curve Digital Signature Algorithm (EdDSA).
 - [RFC 8949]: Concise Binary Object Representation (CBOR).
 - [RFC 9052]: CBOR Object Signing and Encryption (COSE): Structures and Process.
 - [RFC 9864]: Fully-Specified Algorithms for JOSE and COSE.
+- [DSSE v1]: Dead Simple Signing Envelope, version 1.
+- [in-toto Attestation v1]: in-toto Attestation Framework, version 1.
+- [SLSA v1.2]: Supply-chain Levels for Software Artifacts, version 1.2.
+- [SLSA Source v1.2]: Supply-chain Levels for Software Artifacts, Source Track, version 1.2.
 
+[RFC 6234]: https://www.rfc-editor.org/rfc/rfc6234
 [RFC 8032]: https://www.rfc-editor.org/rfc/rfc8032
 [RFC 8949]: https://www.rfc-editor.org/rfc/rfc8949
 [RFC 9052]: https://www.rfc-editor.org/rfc/rfc9052
 [RFC 9864]: https://www.rfc-editor.org/rfc/rfc9864
+[DSSE v1]: https://github.com/secure-systems-lab/dsse/blob/master/envelope.md
+[in-toto Attestation v1]: https://github.com/in-toto/attestation/blob/main/spec/v1/
+[SLSA v1.2]: https://slsa.dev/spec/v1.2/
+[SLSA Source v1.2]: https://slsa.dev/spec/v1.2/source-requirements
 
 ---
 

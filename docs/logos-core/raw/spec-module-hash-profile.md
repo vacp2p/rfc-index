@@ -673,6 +673,7 @@ It has no path label because the empty semantic path selects that whole node.
 Every other parent-child relation uses `child-record` with an explicit typed label.
 The schema identity is mandatory in both record shapes,
 so an implementation never infers it from a local schema traversal.
+Each record's schema identity MUST equal field `2` of the complete payload whose digest that record carries.
 
 The schema identity field is always present.
 It re-binds the child digest to its schema identity even when that identity

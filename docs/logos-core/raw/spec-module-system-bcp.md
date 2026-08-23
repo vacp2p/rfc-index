@@ -91,7 +91,7 @@ When a module performs an operation, Runtime binds that module instance as the c
 Presentation and consumer-only modules use the same identity, lifecycle, authority, routing, state, placement, and audit model as other modules.
 Their facets do not create separate participant classes.
 
-A presentation module may provide no callable contract.
+A presentation module may provide no provider contract.
 It can declare provider requirements or acquire authorized routes as a consumer without inventing a schema, provider record, or no-op dispatch surface.
 Runtime owns its module lifecycle and authority context.
 Its local realization follows the complete-system composition rule in Section 5.1 when that conformance is claimed.
@@ -291,6 +291,7 @@ The `Selection authority` column states who chooses the behavior for a concrete 
 | Module-boundary encoding | Logos deterministic CBOR rules in LOGOS-MODULE-INTERFACE | Mandatory for every implementation encoding module-boundary values. | Fixed by LOGOS-MODULE-INTERFACE; there is no implementation or deployment choice. |
 | Physical commitments | `logos.hash-profile.2026-08.choice-index` with `logos.hash-suite.blake3-256` | Mandatory for every implementation producing or verifying Logos commitments. | Fixed by LOGOS-MODULE-HASH-PROFILE; there is no implementation or deployment choice. |
 | Package signatures | `logos.package-signing.cose-sign1-ed25519` | Mandatory for every conforming Package Manager. | Fixed by LOGOS-MODULE-PACKAGE-MANAGER wherever that specification requires a package signature. |
+| Package provenance | `logos.package-provenance.slsa-v1.2` | Optional to implement. | Protected deployment policy may select it only when Package Manager supports it. Selection is explicit and fails closed without baseline-only fallback. |
 | Call evidence | `logos.call-evidence.cose-sign1-ed25519` | Mandatory for every conforming Runtime. | The format is fixed by LOGOS-MODULE-CAPABILITY-AUTHORITY. Audit policy selects whether call evidence is produced. |
 | Route tickets | `logos.route-ticket.random-256` | Mandatory for Runtime and Transport when using the protected local or production remote profiles below. | Fixed by LOGOS-MODULE-TRANSPORT after one of those transport profiles is selected. |
 | Protected local transport | `logos.local.unix-stream` | Mandatory for a conforming local-transport implementation on a system that supports Unix-domain stream sockets. | Runtime placement or deployment selects local transport; the profile is then fixed. |
@@ -316,14 +317,15 @@ For example, `logos.remote.tls-tcp` selects its transport, mutual authentication
 A complete deployment MUST document every applicable choice that the Core specifications assign to deployment.
 At minimum, that documentation MUST identify:
 
-- supported Package Manager source kinds;
+- supported Package Manager source kinds and optional package-provenance profiles;
 - enabled local and remote transport profiles;
-- protected trust inputs and provisioning rules for package signing, remote Runtime enrollment, and call-evidence signing;
+- protected trust inputs and provisioning rules for package signing, any selected package-provenance or source-evidence requirements, remote Runtime enrollment, and call-evidence signing;
 - Module Loader realization mappings and the concrete process, sandbox, or container mechanisms used;
 - permission definitions, constraint mappings, and the component that enforces each constraint;
 - isolation, filesystem, network, device, process, credential, and resource-control behavior;
 - Runtime directories, module state realization, retention, cleanup, and recovery policy;
-- concrete resource bounds required by Package Manager, Runtime, Transport, Module Loader, and schema processing;
+- concrete resource bounds required by Package Manager, including dependency-resolution limits,
+  and by Runtime, Transport, Module Loader, and schema processing;
 - any selected presentation profile and its platform integration.
 
 Documenting a deployment choice does not require another conforming implementation to recognize or support it.
@@ -365,7 +367,7 @@ The schema input can contain:
 The generator also uses the pinned Logos common schema surface when an input document references one of its definitions.
 These schema documents are the contract and configuration inputs to generation.
 Generation uses the models and mappings defined by their owning specifications.
-A module with no callable contract can use configuration and initialization generation without receiving provider ABI or dispatch output.
+A module with no provider contract can use configuration and initialization generation without receiving provider ABI or dispatch output.
 
 An authoring tool can accept CDDL module syntax or a local-namespace shorthand as non-normative input.
 That approach preserves interoperability only when the tool emits the complete ordinary CDDL documents with explicit qualified names before `cdCDDLe` canonicalization and commitment-model construction.
@@ -376,7 +378,7 @@ From those inputs, one generator can produce:
 
 - the canonical C declarations;
 - typed values and Logos deterministic CBOR codecs;
-- provider ABI and dispatch glue for callable contracts;
+- provider ABI and dispatch glue for provider contracts;
 - typed consumer call and event bindings;
 - call-surface descriptors, contract identities, and commitments;
 - structured initialization glue; and

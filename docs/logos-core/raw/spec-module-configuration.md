@@ -100,6 +100,15 @@ Runtime MAY retain the following records:
 - one **current value**, which is the value most recently applied by a successful startup or live reconfiguration; and
 - one **staged value**, which is the complete candidate for its next startup.
 
+A successful `get_configuration` result, enclosed in its Runtime Control result and Transport `Response`, MUST fit within a 16 MiB frame.
+For this check, Runtime MUST use maximum-length legal target identifiers and the maximum-size legal encoding of the call ID,
+so state admission does not depend on a particular caller or short identifier.
+Runtime MUST reject without mutation any source or state transition whose resulting complete state would violate this limit.
+While a startup or live-reconfiguration attempt is in flight,
+Runtime MUST admit a concurrent staged-value replacement only when a complete `get_configuration` response
+would fit for each possible resulting current record:
+the retained current record, when present, and the immutable attempted record.
+
 Each retained value record includes its configuration-schema commitment, value commitment, value revision, and provenance.
 Its configuration-schema commitment and value commitment MUST contain the same schema subtree root.
 The value revision is the configuration-state revision at which Runtime accepted that record's value and does not change when a staged record is promoted to current.
@@ -369,6 +378,7 @@ Within `schema_commitment`, `schema_root` commits to the complete document and `
 - LOGOS-MODULE-COMMITMENT-MODEL -- Schema and typed-value identity.
 - LOGOS-MODULE-HASH-PROFILE -- Schema and value commitment construction.
 - LOGOS-MODULE-RUNTIME -- Module-instance lifecycle, Runtime Control, concurrency, and readiness.
+- LOGOS-MODULE-TRANSPORT -- Mandatory stream-frame capacity and response envelope.
 
 ### Informative
 

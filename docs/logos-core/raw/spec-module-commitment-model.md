@@ -43,7 +43,7 @@ specified elsewhere.
 
 Logos schemas define module methods, responses, events, and named data types.
 The Interface specification defines concrete module schemas, interface contract schemas, supporting schemas, and their permitted dependencies.
-It also defines how callable contract schemas map to a C ABI and Logos deterministic CBOR transport values.
+It also defines how provider contract schemas map to a C ABI and Logos deterministic CBOR transport values.
 
 The commitment model adds a third view:
 a canonical semantic commitment view.
@@ -342,7 +342,8 @@ Construction proceeds as follows:
    request, method response, and event.
    Method declaration bodies use `method-declaration`.
    Type, request, response, and event declaration bodies use `schema-node`.
-   The `schema-node` body of every method request, method response, and event declaration MUST be a `map-schema`.
+   The `schema-node` body of every method request, method response, and event declaration MUST be either a `map-schema` or a `choice-schema`.
+   Every arm of such a `choice-schema` MUST be a `map-schema`.
    All emitted declarations MUST have distinct qualified names.
    A synthesized method name that collides with another declaration makes the contract invalid.
 6. Translate declaration bodies into `schema-node` values using the rules below.

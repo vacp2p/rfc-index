@@ -428,7 +428,7 @@ Caller                                  Callee
      In this transport specification, "module" includes ordinary modules,
      Logos-defined system modules, runtime-control surfaces, and runtime-host
      endpoints that expose a Logos interface.
-   - `token`: profile-defined authorization material for this connection
+   - `token`: authorization or consumer-binding material defined for this connection
    - `schema`: the selected contract for this provider session.
      Both peers MUST provide the same exact structural schema identity.
      For a runtime-control connection, it identifies the Runtime Control contract.
@@ -452,9 +452,9 @@ Caller                                  Callee
      If it is missing, malformed, or differs,
      the callee MUST send ProtocolError `INVALID_PARAMS` when the connection remains writable
      and MUST close the connection without consuming authorization material.
-   - The `token` field MUST be present and satisfy the selected transport profile.
-     A protected route profile requires non-empty authorization material
-     and the validation defined in Section 8.1.
+   - The `token` field MUST be present and satisfy the selected endpoint and transport profile.
+     A remote intrinsic Runtime Control endpoint uses the consumer-binding rules in LOGOS-MODULE-RUNTIME Section 9.
+     An ordinary protected provider route uses the route-ticket validation defined in Section 8.1.
      If validation fails,
      the callee MUST send ProtocolError `NOT_AUTHORISED` when the connection remains writable
      and MUST close the connection.
@@ -477,8 +477,8 @@ Caller                                  Callee
      A caller's use of the selected contract does not claim that the caller implements that contract
      and does not grant provider or method authority.
    - After all preceding checks succeed,
-     the callee MUST atomically redeem authorization material as required by the selected profile.
-     A concurrent redemption that has already consumed the ticket produces `NOT_AUTHORISED`.
+     the callee MUST atomically redeem authorization material when required by the selected profile.
+     A concurrent redemption that has already consumed an ordinary provider route ticket produces `NOT_AUTHORISED`.
 
 4. **Callee sends Hello response.** Fields:
    - `module`: the callee's selected flat runtime module or endpoint name
@@ -813,7 +813,7 @@ The base envelope permits an empty value only for a profile
 that explicitly does not claim protected route authorization.
 An empty value MUST NOT establish a protected local-transport or remote-transport session.
 
-The protected route profile uses a non-empty, opaque, one-time route ticket
+The protected ordinary-provider route profile uses a non-empty, opaque, one-time route ticket
 issued or bound by the Runtime that owns the target provider.
 The ticket is consumed once to establish one transport session;
 it is not consumed separately for each call on that session.
@@ -872,8 +872,9 @@ Capability Authority does not issue the final provider-session credential or par
 The baseline ticket encoding, proof of possession, issuer validation, and lifetime
 are defined by the profile below.
 Another selected security profile MUST define equivalent behavior and a maximum authorization-material size.
-Operating-system peer credentials and TLS authentication may strengthen the profile,
-but they do not replace route-ticket validation.
+Operating-system peer credentials and TLS authentication may strengthen the ordinary provider profile,
+but they do not replace route-ticket validation for an ordinary provider session.
+Remote Runtime Control connections use the consumer-bound rule defined by LOGOS-MODULE-RUNTIME instead.
 
 LOGOS-MODULE-TRANSPORT defines no provider-enumeration request on an ordinary module endpoint.
 Without a valid route ticket bound to one selected provider and contract,
@@ -884,7 +885,8 @@ The diagnostic MUST NOT reveal which condition occurred.
 #### 8.1.1 Random 256-Bit Route-Ticket Profile
 
 `logos.route-ticket.random-256` is the mandatory route-ticket profile
-for `logos.local.unix-stream`, `logos.remote.tls-tcp`, and `logos.remote.quic`.
+for ordinary provider sessions over `logos.local.unix-stream`,
+`logos.remote.tls-tcp`, and `logos.remote.quic`.
 The ticket is an opaque 32-byte string carried directly in the first Hello `token` field.
 It is not CBOR, COSE, a Capability Authority decision, or a self-contained authorization claim.
 
@@ -941,12 +943,15 @@ for systems that support Unix-domain stream sockets.
 It uses the stream framing in Section 2 and the route-ticket profile in Section 8.1.1.
 
 The invocation descriptor carries the exact socket path and one 32-byte route ticket.
-The selected realization mechanism MUST create the socket inside a Runtime-controlled per-instance directory
-that is accessible only to the Runtime and explicitly launched or authorized consumers.
+Runtime MUST create a per-instance directory accessible only to Runtime and explicitly launched or authorized consumers.
 The directory mode MUST be `0700` on POSIX filesystems.
-The selected realization mechanism MUST reject a pre-existing non-socket path, a symbolic link, or a socket not owned by the expected Runtime operating-system identity.
+Runtime MUST reject a pre-existing endpoint path and MUST NOT follow, remove, or replace a symbolic link or another filesystem object at that path.
+Under the expected Runtime operating-system identity,
+Runtime MUST create and bind the Unix socket and place it in the listening state before transferring its open descriptor through the selected realization mechanism.
+The Module Host MUST serve only that inherited listener and MUST NOT bind or substitute another endpoint.
 Before accepting the endpoint or marking the provider ready,
-Runtime MUST validate that the endpoint satisfies these directory, path-type, symbolic-link, and ownership requirements.
+Runtime MUST validate the exact inherited listener and its directory, path type, symbolic-link absence, ownership, and listening state.
+Failure to transfer the listener securely through a selected placement MUST fail that placement and MUST NOT cause an isolation downgrade.
 
 The protected Runtime context that supplies the invocation descriptor MUST establish the expected Runtime operating-system identity for the caller.
 The caller MUST connect to the exact path from the descriptor and verify the connected peer as that identity through `SO_PEERCRED`, `getpeereid()`, or an equivalent operating-system mechanism.

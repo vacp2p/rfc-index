@@ -83,7 +83,8 @@ This specification uses the following terms:
   A module has identity independent of any provided contract.
   It may provide no primary contract, or one primary concrete contract with zero or more exact implemented interface contracts.
 - **Module implementation:** Code, resources, or built-in behavior that realizes a module's executable or presentation behavior.
-  Provider ABI requirements apply only when the module provides callable contracts.
+  Provider ABI requirements apply only when the module provides at least one provider contract.
+- **Provider contract:** A concrete module or interface contract classified as a provider contract by LOGOS-MODULE-INTERFACE Section 2.6.
 - **Module instance:** One Runtime-known realization of a module owned by exactly one Runtime.
   It has one Runtime-scoped instance identity, one Runtime-owned lifecycle, and optional persistent-state, placement, presentation, and provider state.
   The owning Runtime controls its Logos lifecycle semantics.
@@ -92,7 +93,7 @@ This specification uses the following terms:
   It identifies the binding between a module instance and its assigned persistent state.
   It does not define the concrete storage realization or grant authority to allocate, inspect, share, retain, delete, or migrate that storage.
   Runtime or deployment implementation mechanisms realize the assignment as concrete storage according to active policy.
-- **Module provider:** The Runtime-known, route-facing exposure of callable behavior from a module instance.
+- **Module provider:** The Runtime-known, route-facing exposure of schema-defined method or event behavior from a module instance.
   One provider record may expose the module's primary concrete contract and exact implemented interface contract views.
   Every route selects exactly one of those contracts.
   A local provider is backed by a local module instance.
@@ -109,13 +110,13 @@ This specification uses the following terms:
   Runtime MUST preserve the addressed module-instance identity while it is needed to keep active routes and retained authority or audit material unambiguous.
 - **Presentation module:** A module that contributes one or more presentation surfaces through a selected presentation profile.
   Presentation is a module facet, not a separate participant class.
-- **Consumer-only module:** A module that provides no callable contract.
+- **Consumer-only module:** A module that provides no provider contract.
   It retains ordinary module identity, lifecycle, requirements, routes, authority, state, placement, and audit attribution without a provider or dispatch implementation.
 - **System service provider:** An ordinary local module provider that Runtime or deployment policy binds to a runtime-adjacent responsibility.
   The role does not create another entity, provider kind, lifecycle, route model, or source of authority.
 - **Remote Runtime:** Another Runtime instance reachable over a transport boundary and authorized or enrolled according to active Runtime policy.
   Its enrolled Runtime identity authenticates that Runtime boundary according to the selected remote profile.
-- **Remote module facade:** A local provider record that represents callable behavior of a module instance owned by a remote Runtime.
+- **Remote module facade:** A local provider record that represents schema-defined method or event behavior of a module instance owned by a remote Runtime.
   The facade is routing state, not another local module instance or lifecycle owner.
 - **Route:** A Runtime-authorized binding between a consumer and a provider invocation endpoint.
   Runtime Control establishes, tracks, and revokes routes.
@@ -237,7 +238,7 @@ The ABI code may be bound statically,
 loaded dynamically into a direct caller,
 or loaded dynamically by a process-local invocation boundary that exposes hosted calls through Transport.
 These realization choices do not change the module contract or ABI.
-A module may provide no callable contract, one primary concrete contract,
+A module may declare no contract, one primary concrete contract,
 one or more exact interface contracts, or a primary contract plus exact implemented interfaces.
 
 ### 1.2 Required Exports
@@ -246,10 +247,10 @@ LOGOS-MODULE-INTERFACE is the normative owner of the native module C
 ABI.
 A runtime implementation MUST require every identity and lifecycle symbol that
 LOGOS-MODULE-INTERFACE makes mandatory for native implementations.
-When resolved module input declares at least one callable contract,
+When resolved module input declares at least one provider contract,
 Runtime MUST also require the provider symbols and schema-derived per-method
 symbols applicable to that declared call surface.
-When resolved input declares no callable contract,
+When resolved input declares no provider contract,
 Runtime MUST NOT reject the module merely because provider-only symbols are absent.
 If an applicable mandatory symbol is missing, Runtime MUST reject the module
 with a descriptive error.
@@ -265,6 +266,7 @@ Runtime MUST NOT require or invoke post-initialization callback setters.
 
 Module names are non-empty UTF-8 strings matching `[a-z][a-z0-9_]*`, with a
 maximum length of 64 bytes.
+Module names MUST NOT contain `_call_` or `_publish_`; those substrings are reserved as separators in schema-derived method symbols and generated event-publication helper symbols.
 Examples: `storage_module`, `delivery_module`, `search_module`.
 
 This revision intentionally uses flat runtime module names.
@@ -396,8 +398,8 @@ LOGOS-MODULE-CAPABILITY-AUTHORITY for the selected provider.
 If any exact contract view may not be disclosed,
 Runtime MUST fail the module-selected object request rather than return a filtered surface.
 Presenting that metadata does not establish or authorize any route.
-Each callable contract view uses its own exact-contract route rather than one multi-contract route.
-Its primary and interface methods remain bound to their respective route,
+Each provider contract view uses its own exact-contract route rather than one multi-contract route.
+Its primary and interface methods and events remain bound to their respective route,
 contract root, access scope, expiry, revocation, and audit records.
 
 A consumer may call `logos.schema` only on a ready route
@@ -846,6 +848,8 @@ its process-local invocation boundary remains part of the same logical Runtime r
 Runtime MUST make the consumer-bound Runtime Control binding available to the hosted module instance.
 That binding MUST invoke the owning Runtime's intrinsic Runtime Control contract through a protected local invocation path.
 The process-local invocation boundary MUST preserve the hosted module instance as consumer and MUST NOT permit consumer substitution.
+Any carrier between a Module Host and the owning Runtime is realization-internal machinery rather than an ordinary provider route.
+Runtime MUST derive its consumer association from protected launch and realization state rather than caller-supplied identity or a fabricated route ticket.
 
 Runtime retains ownership of registry state, routing selection, provider selection, authority enforcement, and route creation.
 The process-local invocation boundary MUST NOT use a copied registry or routing-policy snapshot to make those decisions independently.
@@ -935,8 +939,10 @@ the applicable ABI caller binds or maps the implementation in the process that p
 For a hosted dynamic realization,
 the Module Host maps the accepted implementation and retains the implementation binding and context inside its execution envelope.
 That process-local invocation boundary uses the same context for every instance-dependent ABI call for the initialized module instance.
-When local Transport applies,
-Runtime MUST ensure that the selected endpoint is bound after successful initialization.
+When hosted local Transport applies,
+Runtime MUST create the protected directory and listening endpoint before starting the hosted realization
+and supply the listener through the private realization handoff defined by LOGOS-MODULE-LOADER.
+The Module Host begins accepting connections only after successful initialization.
 Runtime completes contract validation before marking the provider ready.
 The invocation boundary schedules independent synchronous `logos_<module>_dispatch(context, ...)`
 calls and correlates their Transport responses.
@@ -1042,8 +1048,8 @@ complete the LOGOS-MODULE-TRANSPORT Hello handshake for the hosted module.
 If readiness is not reached before the startup timeout, Runtime MUST move the module instance to `error` and MUST NOT treat the provider or any dependent route as ready.
 For a locally realized instance,
 Runtime MUST initiate release through the same mechanism that established the realization.
-That mechanism owns concrete termination and cleanup of provider-endpoint material that it prepared.
-Runtime owns cleanup only for endpoint material that Runtime prepared.
+That mechanism owns concrete termination and cleanup of its inherited listener references.
+Runtime owns closure and removal of the listener and endpoint path that it prepared.
 
 The provider-side invocation boundary MAY schedule independent synchronous dispatch calls separately.
 Regardless of its scheduling mechanism,
@@ -1242,7 +1248,7 @@ it MUST NOT use an unvalidated `implements` claim to satisfy a provider
 requirement.
 
 An accepted input may omit `primary_contract`, `implements`, or both.
-When both are absent, the record declares no callable contract,
+When both are absent, the record declares no contract,
 and Runtime MUST NOT create a provider record merely because it creates the module instance.
 Such a module may still declare provider requirements, requested permissions, and persistent-state needs.
 When `implements` is present without `primary_contract`,
@@ -1562,6 +1568,18 @@ The target Runtime then authorizes the requested operation for the consumer.
 The authenticated source Runtime identity establishes provenance for the consumer assertion but does not make the source Runtime the consumer.
 The consumer reference does not independently authenticate the module instance.
 Acceptance trusts the enrolled source Runtime to authenticate module instances it owns.
+For a remote Runtime Control connection,
+the source Runtime MUST place the exact Logos deterministic-CBOR encoding of that consumer's `logos.runtime.module_instance_address`
+in the first Transport Hello `token` field.
+The target Runtime MUST decode that single value,
+apply the ownership and forwarding checks above,
+and bind every Runtime Control invocation on the connection to that consumer.
+The source Runtime MUST use the connection only for that consumer
+and close it when it no longer authenticates that module instance as the consumer.
+A missing, empty, malformed, non-deterministic, trailing-byte, or ownership-mismatched value
+MUST produce Transport ProtocolError `NOT_AUTHORISED`, establish no session, and execute no Runtime Control method.
+The token is a consumer reference protected by source-Runtime authentication;
+it is not a route ticket or grant of authority, and the Hello response token MUST be empty.
 No additional per-module remote credential is required by this revision.
 
 Runtime-to-Runtime coordination that is not performed for a module is an internal protocol concern.
@@ -2021,7 +2039,7 @@ Runtime-control methods use the ordinary Logos method error channel defined by
 LOGOS-MODULE-INTERFACE.
 Method-specific failure conditions are described with each method.
 
-`expected_contract` carries a `logos.schema_commitment` for a complete selected callable contract, whereas `expected_schema_commitment` carries a `logos.module_configuration.schema_commitment` for a complete configuration schema document and its selected configuration root; the two record shapes MUST NOT be substituted for one another.
+`expected_contract` carries a `logos.schema_commitment` for a complete selected provider contract, whereas `expected_schema_commitment` carries a `logos.module_configuration.schema_commitment` for a complete configuration schema document and its selected configuration root; the two record shapes MUST NOT be substituted for one another.
 
 The four configuration methods and `configuration_state_changed_event` reference the canonical types owned by LOGOS-MODULE-CONFIGURATION.
 Their method and event identities belong to the Runtime Control schema root, while the referenced configuration types retain their own schema identities and semantics.
@@ -2647,12 +2665,13 @@ reported or proven by the runtime that owns the remote module instance.
 A facade provider MUST NOT be treated as ready for ordinary calls unless both
 the local facade provider is usable and the reflected remote target state is
 compatible with readiness for the selected contract.
-When a local runtime refreshes reflected remote state through a remote Runtime
-Control endpoint, it uses the remote runtime's Runtime Control contract over
-LOGOS-MODULE-TRANSPORT.
-The local runtime may query the remote runtime's `list_modules` or
-`get_readiness` methods, or observe remote runtime-control events, subject to
-authority accepted by the remote runtime.
+When a local Runtime refreshes reflected remote state through a remote Runtime Control endpoint,
+it MUST do so for an authenticated module consumer through that consumer's bound connection.
+Consumerless Runtime-to-Runtime synchronization is internal coordination
+and MUST NOT invoke Runtime Control using a fabricated consumer.
+The local Runtime may query the remote Runtime's `list_modules` or `get_readiness` methods,
+or observe remote Runtime Control events,
+subject to authority accepted by the remote Runtime for that consumer.
 The returned remote records are interpreted as remote runtime-control records.
 They do not become local provider records until the local runtime maps them into
 local facade provider state.

@@ -504,8 +504,9 @@ If an occurrence marker is absent, the occurrence is exactly one.
 The value `1` for key `2` represents the optional `?` form, and `"unbounded"` represents the variable-length `*` form.
 A map member MUST contain a member key, and an array member MUST NOT contain one.
 An optional map member MUST use the `?` occurrence, and no other occurrence is valid on a map member.
-A homogeneous variable-length array member MUST use the `*` occurrence,
-and no other occurrence is valid on an array member.
+An array group MUST either contain only members without occurrences, defining a fixed-length array,
+or contain exactly one member with the `*` occurrence, defining a homogeneous variable-length array.
+No other occurrence is valid on an array member.
 
 Choice, range, and `.size` control nodes have these shapes:
 

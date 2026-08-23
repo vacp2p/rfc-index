@@ -227,6 +227,7 @@ Reserved Logos names:
   specification explicitly allows their use.
 - `_module` values beginning with `logos_` are reserved for Logos-defined
   runtime and system modules.
+- `_module` values containing `_call_` or `_publish_` are invalid under the Runtime module-name grammar.
 - Exact flat module names assigned by a Logos specification, package catalog,
   or registry are reserved for that assigned module.
   For example, a Logos-defined module named `delivery` owns the flat runtime
@@ -260,18 +261,26 @@ names.
 The metadata names `_module`, `_interface`, and `_implements`, the underscore-based runtime module name carried in `_module`, prelude aliases such as `uint64`, and exported C ABI symbols are not Logos module schema identifiers.
 The complete schema namespace, including its dot separators, MUST contain at most 128 ASCII bytes.
 
+A schema field name MUST NOT begin with `has_`.
+This reservation applies to request, response, event, named-map, and inline-map fields.
+It preserves the canonical C presence convention by ensuring that a generated `has_<field>` identifier cannot also represent schema data.
+
 A supporting schema MUST NOT declare a local named definition whose name ends in `_request`, `_response`, or `_event`.
 Those suffixes are reserved for callable declarations in concrete module and interface contract schemas.
 
 ### 1.4 Methods as Request/Response Pairs
 
-Methods are declared as pairs of named CDDL maps using the convention:
+Methods are declared as pairs of named request and response declarations using the convention:
 
 - `<module>.<method>_request` — the method input
 - `<module>.<method>_response` — the method output
 
-Each method request and response declaration MUST have a CDDL map body.
+A map-valued body is either a CDDL map or a CDDL choice whose every arm is a CDDL map.
+Each method request and response declaration MUST have a map-valued body.
 The bare method name formed by removing the namespace prefix and the `_request` or `_response` suffix MUST contain at most 128 ASCII bytes.
+A concrete module or interface contract MUST NOT declare a method whose bare method name equals a well-known method from the pinned Logos common schema.
+In this revision, `schema`, derived from `logos.schema`, is the only such reserved bare method name.
+Such a declaration makes the contract invalid.
 
 The `<module>.` prefix is the schema namespace for the module's own
 schema-defined methods, events, and types.
@@ -329,7 +338,7 @@ used directly as C parameter names and deterministic CBOR map keys.
 ### 1.5 Event Declarations
 
 Events are one-way notifications published by a module.
-Each event declaration MUST have a CDDL map body and the suffix `_event`:
+Each event declaration MUST have a map-valued body and the suffix `_event`:
 
 ```cddl
 storage.upload_progress_event = {
@@ -609,6 +618,31 @@ The wire method name remains the bare schema method name, for example
 Aggregate struct tags additionally use `logos_<kind>_<namespace>_<name>`, where `<kind>` is `map`, `bstr`, `list`, `tuple`, `choice`, or `event`.
 The tag lets the reverse mapper distinguish an aggregate representation from a map that happens to use the same member names.
 
+**Inline composite names.** An inline composite is a map or choice schema node that is not itself a named declaration body.
+Its owner is the nearest containing named schema declaration.
+Its inline path contains every schema step from that owner's body to the inline composite, in traversal order.
+Each step contributes one C identifier component:
+
+- a map field contributes its exact field name;
+- a list element contributes `list_item`;
+- a tuple position contributes `tuple_<index>`, using its zero-based position; and
+- a choice arm contributes `arm_<index>`, using its canonical zero-based arm index.
+
+The inline stem is the C projection of the owner's complete qualified name followed by every path component,
+joined in order with single underscores.
+An inline map uses aggregate tag `logos_map_<stem>` and typedef `logos_<stem>_map_t`.
+An inline choice uses enum `logos_<stem>_choice_kind_t`,
+aggregate tag `logos_choice_<stem>`, and typedef `logos_<stem>_choice_t`.
+Its enumerators use `LOGOS_<STEM>_ARM_<index>`,
+and its literal-macro prefix is `LOGOS_<STEM>`.
+The uppercase stem uses the same components as the lowercase stem.
+An anonymous map arm therefore includes its containing choice's `arm_<index>` path component before the `map` suffix.
+
+If two named declarations or inline composites in one schema set derive the same C identifier,
+the schema set is invalid.
+This includes collisions caused by underscore joining, structural path-component text, or namespace projection.
+The generic collision rule below does not permit a generator to choose another spelling.
+
 Types from the Logos common schema surface are prefixed with `logos_` (no module):
 
 | CDDL type           | C type                      |
@@ -722,6 +756,9 @@ typedef struct logos_map_storage_peer_info {
 } logos_storage_peer_info_t;
 ```
 
+The generated presence flag is not a schema field.
+In canonical C, an identifier beginning with `has_` is valid only as the exact `bool` presence flag for its adjacent field.
+
 **Arrays.** Variable-length arrays map to pointer + count:
 
 | CDDL type       | C type                                 |
@@ -748,7 +785,7 @@ An implementation MUST treat a pointer-and-length pair as one schema field and M
 - A named tuple uses a struct with `item_<index>` members.
 - A named choice uses the enum-and-union form below.
 
-An inline map or choice receives a deterministic path-derived type name using the same representation.
+An inline map or choice uses the owner, path, tag, enum, and typedef derivation defined in Section 2.1.
 A named aggregate or inline map-or-choice method input is passed as `const <type>*`;
 its output is passed as caller-allocated `<type>*`.
 
@@ -806,13 +843,32 @@ storage.entry =
   { kind: "dir", path: tstr, entries: [* tstr] }
 ```
 
+After canonical arm ordering,
+the two anonymous arm maps use typedefs `logos_storage_entry_arm_0_map_t`
+and `logos_storage_entry_arm_1_map_t`,
+with aggregate tags `logos_map_storage_entry_arm_0`
+and `logos_map_storage_entry_arm_1`.
+For the nested inline schema:
+
+```cddl
+storage.record = {
+  sub: {
+    inner: uint64 / tstr,
+  },
+}
+```
+
+the map at field path `sub` uses `logos_storage_record_sub_map_t`,
+and the choice at field path `sub.inner` uses `logos_storage_record_sub_inner_choice_t`
+with enum `logos_storage_record_sub_inner_choice_kind_t`.
+
 The tag field is normal schema data.
 It is encoded as part of the selected map alternative and is not an extra
 transport wrapper.
 Generated bindings MAY represent a required literal tag field through the generated choice discriminant instead of exposing it as a writable C field.
 Encoders MUST still emit the literal tag field in the CBOR map.
 
-A choice used inline receives the deterministic C type name formed from its enclosing qualified definition name and field path followed by `_choice_t`.
+An inline choice uses the deterministic name derived in Section 2.1.
 Choice arms and union members use `ARM_<index>` and `arm_<index>`, where the zero-based index is the canonical arm position.
 Each literal choice arm or literal tag field in a map arm additionally generates a C `#define` whose replacement value is the exact C scalar literal.
 The macro name is the choice type prefix followed by `ARM_<index>`, the tag field name when applicable, and `_LITERAL`.
@@ -863,7 +919,9 @@ logos_result_t logos_storage_module_call_storage_exists(
    Names are derived directly from the CDDL key.
 3. Response map fields expand to output parameters in canonical field-name order, appended after all input parameters and prefixed with `out_`.
 4. A scalar response field uses a pointer to its canonical C scalar type.
-   A `tstr` response field uses `const char** out_<name>` and transfers the returned string under Section 2.7.
+   An unconstrained `tstr` response field uses `const char** out_<name>`.
+   An exact-size or ranged `tstr` response field uses a pointer to its canonical constrained typedef, such as `logos_tstr_size_1_64_t* out_<name>`.
+   Both forms transfer the returned string under Section 2.7.
 5. If the response map is empty (`{}`), there are no output parameters.
    `result.code == LOGOS_OK` indicates that the invocation produced the valid empty response.
 6. Unbounded and ranged `bstr` fields expand to adjacent pointer-and-length parameters.
@@ -889,6 +947,14 @@ This is the function-parameter form of the same `has_<field>` convention used by
 
 Schema-defined outcomes, including expected failures, use the response output parameters
 and require `result.code == LOGOS_OK`.
+
+Before invoking a per-method provider function,
+the ABI caller MUST initialize the object designated by every response output parameter as if by a C `{0}` initializer.
+A return with `result.code == LOGOS_OK` requires every response output to contain the complete canonical C representation of the response map.
+A return with a nonzero result code requires every response output to remain at its caller-initialized value and transfers no output ownership.
+Before returning such a failure, the provider MUST release every allocation or other output resource created while processing the call.
+The ABI caller MUST treat any other result/output combination as a module failure
+and MUST NOT dereference or free an output pointer written by the failing call.
 
 **Note on authoring convenience:** Module authors using a module kit may write
 simpler implementation functions with native return types, existing state
@@ -1044,7 +1110,9 @@ The identity and lifecycle symbols do not make the module a provider.
 A specification that assigns configuration semantics determines when the hook is required and defines its payload and outcome semantics.
 A module that is not required to support live configuration application need not export it.
 
-A native module that exposes at least one callable contract MUST additionally make these provider symbols available to its ABI caller:
+For native ABI classification, a provider contract is a concrete module or interface contract that declares at least one schema-defined method or event.
+
+A native module that exposes at least one provider contract MUST additionally make these provider symbols available to its ABI caller:
 
 - `logos_<module>_call_surface()` returns one deterministic-CBOR provider
   call-surface descriptor containing the module's optional primary contract
@@ -1062,7 +1130,9 @@ It accepts a bare method name and deterministic-CBOR request bytes
 and returns the final method result and response.
 Provider modules MUST expose both surfaces,
 which MUST implement the same request, response, error, and selected-contract semantics.
-A module with no callable contract MUST NOT be required to export
+An events-only provider contract generates no schema-derived per-method functions.
+For a provider whose complete contract set declares no methods, `_dispatch()` MUST return `LOGOS_ERR_METHOD_NOT_FOUND` for every method argument.
+A module with no provider contract MUST NOT be required to export
 `_call_surface()`, `_free()`, `_dispatch()`, or a schema-derived per-method function.
 
 If a concrete module declares `_implements`,
@@ -1230,7 +1300,8 @@ recompute every schema root,
 and compare each result with its descriptor commitment before the provider is registered or invoked.
 It MUST reject an unknown profile identifier, a root mismatch, duplicate
 contract identity, duplicate interface namespace, missing or unused supporting schema,
-invalid schema-role metadata, a bare method-name collision across the described contracts,
+invalid schema-role metadata, a reserved common-schema bare method name,
+a bare method-name collision across the described contracts,
 or an interface list that is not ordered by derived namespace UTF-8 bytes and then schema-root bytes.
 The interface entries provide the exact resolved `_implements` set used when
 constructing and validating the primary contract.
@@ -1250,7 +1321,12 @@ For dispatch calls, `method` is the bare schema method name after the target
 module has already been selected.
 `params_cbor` is the deterministic CBOR request map for that method, not the
 full Transport Request envelope.
-On success, `out_response_cbor` receives the deterministic CBOR response map for that method.
+Before calling `_dispatch()`, the ABI caller MUST set `*out_response_cbor` to `NULL` and `*out_response_len` to zero.
+Success requires `result.code == LOGOS_OK`, a non-null response buffer, and a nonzero length containing exactly one valid deterministic-CBOR response map for the selected method.
+Failure requires a nonzero result code, a null response buffer, and a zero response length.
+Before returning such a failure, the module MUST release any response allocation created while processing the call.
+The ABI caller MUST treat any other result/output combination as a module failure
+and MUST NOT dereference or free an output pointer written by the failing call.
 The returned response buffer is released with
 `logos_<module>_free(module, out_response_cbor)`.
 
@@ -1315,19 +1391,24 @@ void logos_<module>_free(logos_module_context_t* module, void* ptr);
   The ABI caller MUST NOT begin another call using that context until any required copy is complete.
   A call already in progress when the result is returned does not shorten this lifetime.
 - The corresponding storage returned by `_init()` remains valid until the next `_init()` call for the same implementation binding begins or until that binding is released, whichever occurs first.
+  The ABI caller MUST copy `message` and `detail` before that point if it needs to retain, encode, or forward them.
+  The ABI caller MUST NOT begin another `_init()` call for the same implementation binding until every required copy from a returned `_init()` result is complete.
+  An `_init()` call already in progress when the result is returned does not shorten this lifetime.
 - A successful dispatch transfers ownership of `out_response_cbor` to the caller.
   The caller releases it with the same module instance's `logos_<module>_free(module, ptr)`.
+  A failed dispatch transfers no output ownership.
 - For caller-side runtime handles or generated caller helpers,
   `logos_result_t.message` and `.detail` are valid until the next Logos call on
   the same handle or helper-owned call state.
   Callers MUST copy these fields to retain them.
-- Output pointers (`out_*`) for dynamically-sized data (`tstr`, `bstr`,
+- On a successful typed provider call, output pointers (`out_*`) for dynamically-sized data (`tstr`, `bstr`,
   arrays) are allocated by the typed provider.
   Callers MUST free them with the same module instance's
   `logos_<module>_free(module, ptr)`.
+  A failed typed provider call transfers no output ownership.
 - Output structs are caller-allocated.
-  The typed provider fills them in.
-  Any dynamic fields within the struct are provider-allocated and freed with
+  On a successful call, the typed provider fills them in.
+  Any dynamic fields within a successfully returned struct are provider-allocated and freed with
   the same module instance's `logos_<module>_free(module, ptr)`.
 - `_name()` returns a static string, and `_call_surface()` returns static bytes.
   Callers MUST NOT free any of them.
@@ -1351,6 +1432,7 @@ The implementation MUST make those calls safe without caller-side serialization.
 Distinct `_init()` calls for the same implementation binding MAY execute concurrently.
 Each successful call creates an independent context.
 The implementation MUST synchronize state shared across contexts.
+This concurrency permission does not shorten the diagnostic-result lifetime or relax the caller-side copy sequencing defined in Section 2.7.
 
 After successful initialization,
 the ABI caller MAY invoke schema-derived provider functions and `_dispatch()` concurrently with the same live context.
@@ -1538,8 +1620,8 @@ logos_result_t logos_<module>_call_<namespace>_<method>(
 - Input parameters (no `out_` prefix) become request map fields.
 - Output parameters (`out_` prefix, pointer types) become response map fields.
 - `logos_result_t` return is stripped (invocation status, not CDDL data).
-- An adjacent `has_<field>` and value pair makes a request field optional.
-- An adjacent `out_has_<field>` and output-value pair makes a response field optional.
+- An adjacent `bool has_<field>` and ordinary input representation of `<field>` makes that request field optional.
+- An adjacent `bool* out_has_<field>` and ordinary output representation of `out_<field>` makes that response field optional.
 - Adjacent `_len` and `_count` parameters are consumed as part of their byte-string or list field.
 - The namespace and method components identify the request/response qualified names.
 
@@ -1574,6 +1656,8 @@ storage.upload_url_response = {
 
 Parameters MUST appear in the canonical field order required by Section 2.1.
 The mapper MUST reject an unmatched presence, length, count, or output parameter.
+A parameter identifier beginning with `has_` or `out_has_` MUST form the exact typed and adjacent presence pair above.
+The mapper MUST reject any other such parameter and MUST NOT reconstruct it as a schema field.
 
 ### 3.4 Named Type and Struct Recognition
 
@@ -1603,13 +1687,23 @@ Optional fields (those with a preceding `bool has_<field>`) generate
 `? key: type` in CDDL.
 Adjacent pointer-and-length or pointer-and-count members generate one byte-string or list field.
 Members MUST appear in canonical field-name order, with each presence, length, or count member adjacent to the value it qualifies.
+A struct member identifier beginning with `has_` MUST have type `bool`
+and MUST immediately precede the member whose exact name follows the prefix.
+The mapper MUST reject any other such member and MUST NOT reconstruct it as a schema field.
 A canonical `logos_bstr_`, `logos_list_`, or `logos_tuple_` tag MUST contain only its corresponding `data` and `len`, `data[N]`, `items` and `count`, or `item_<index>` members.
 
 ### 3.5 Choice and Literal Recognition
 
 A canonical `logos_<namespace>_<name>_kind_t` enum followed by its matching union-bearing `logos_<namespace>_<name>_t` reconstructs one choice.
 Enum order MUST equal canonical choice-arm order.
-An inline choice type name reconstructs its enclosing field path rather than a new named CDDL declaration.
+An inline choice type name reconstructs its owner and complete inline path rather than a new named CDDL declaration.
+For every inline map or choice,
+the reverse mapper MUST reconstruct the candidate owner and path from aggregate containment and type use,
+derive the exact canonical names under Section 2.1, and require every tag, typedef, enum, enumerator, macro, and use site to match.
+It MUST NOT recover a path merely by splitting a flattened identifier on underscores.
+If containment yields no candidate path, more than one candidate path,
+or two paths with the same derived identifier,
+the mapper MUST reject the header set.
 
 A canonical `_LITERAL` macro supplies the exact scalar value for every literal node,
 including a choice arm or tagged-map tag field.
@@ -1695,6 +1789,7 @@ meter.read_request = {
 }
 
 meter.read_response = {
+  label: tstr .size (1..64),
   reading: meter.reading,
 }
 ```
@@ -1702,6 +1797,8 @@ meter.read_response = {
 Its canonical module-specific C declarations are:
 
 ```c
+typedef const char* logos_tstr_size_1_64_t;
+
 typedef struct logos_event_meter_changed_event {
     uint64_t value;
 } logos_meter_changed_event_t;
@@ -1713,15 +1810,17 @@ typedef struct logos_map_meter_reading {
 } logos_meter_reading_t;
 
 typedef logos_result_t (*logos_meter_call_read_fn)(
-    logos_module_context_t* module,
-    uint32_t                channel,
-    logos_meter_reading_t* out_reading
+    logos_module_context_t*    module,
+    uint32_t                   channel,
+    logos_tstr_size_1_64_t*   out_label,
+    logos_meter_reading_t*    out_reading
 );
 
 logos_result_t logos_meter_module_call_meter_read(
-    logos_module_context_t* module,
-    uint32_t                channel,
-    logos_meter_reading_t* out_reading
+    logos_module_context_t*    module,
+    uint32_t                   channel,
+    logos_tstr_size_1_64_t*   out_label,
+    logos_meter_reading_t*    out_reading
 );
 
 const char* logos_meter_module_name(void);
@@ -1878,6 +1977,8 @@ The required condition identifies the normative reason for rejection; diagnostic
 
 | Case | Input | Mutation | Required rejection condition |
 | --- | --- | --- | --- |
+| `C-DECL-WRONG-PRESENCE-TYPE` | Section 3.9.1 | Replace `bool has_label` with `uint32_t has_label`. | An identifier beginning with `has_` is not the exact `bool` presence flag required for the adjacent field. |
+| `C-DECL-UNMATCHED-PRESENCE-MEMBER` | Section 3.9.1 | Delete the `label` member following `has_label`. | The presence member has no adjacent field whose name exactly matches the suffix after `has_`. |
 | `C-DECL-REDUNDANT-ROLE` | Section 3.9.1 | Add `#define LOGOS_METER_MODULE_PRIMARY_NAMESPACE "meter"`. | The document role and simple namespace are already recoverable, so the schema-metadata constant is unnecessary. |
 | `C-EXT-MISSING-PRIMARY` | Section 3.9.2 | Delete `LOGOS_SENSOR_MODULE_PRIMARY_NAMESPACE`. | A multi-document header set requires a document-role namespace constant for every non-common document. |
 | `C-EXT-BAD-PRIMARY-PROJECTION` | Section 3.9.2 | Replace the primary-namespace value with `"sensor.runtime"`. | The value projects to `sensor_runtime`, which does not match the `sensor_control` declaration group. |
@@ -1984,7 +2085,8 @@ It requires:
 
 1. Map keys MUST be sorted by bytewise lexicographic comparison of the complete deterministic CBOR encoding of each map key.
    Sorting by key length before key byte content MUST NOT be used.
-2. Integers MUST use the shortest possible encoding.
+2. The argument in the initial byte sequence of every CBOR data item MUST use the shortest possible encoding.
+   This includes integer values and the lengths of byte strings, text strings, arrays, and maps.
 3. Indefinite-length encodings MUST NOT be used.
 4. Duplicate map keys MUST NOT appear.
 5. Floating-point values are not part of Logos module schemas in this
@@ -2005,6 +2107,10 @@ Implementations MUST:
 3. Reject unknown method names -> error code `METHOD_NOT_FOUND`.
 4. Reject wrong parameter types or missing required fields ->
    error code `INVALID_PARAMS`.
+
+An incoming CBOR major-type-3 item whose content bytes are not well-formed UTF-8 MUST be rejected with error code `INVALID_PARAMS`.
+When `logos.invalid_params_detail` is returned for this failure, its `reason` MUST be `schema-mismatch`.
+The rejected bytes MUST NOT be passed to provider code as a C text value.
 
 For module method payloads, schema validation is owned by the module dispatch
 layer generated from or implemented against the module's CDDL schema.
@@ -2126,7 +2232,8 @@ The schema root already commits to the schema namespace.
 A separate namespace field is not part of schema identity.
 
 `logos.schema` is the well-known selected-contract introspection method.
-Module authors do not declare it.
+Concrete module and interface contract schemas MUST NOT declare its bare method name `schema`, as required by Section 1.4.
+The provider-side Runtime boundary supplies this method rather than dispatching it to module code.
 It is callable only through a ready route whose method access includes the
 `logos.schema` declaration root from the pinned Logos common schema surface.
 
@@ -2399,7 +2506,7 @@ The `runtime_control` pointer MUST be non-null and identify the Runtime Control 
 The module MAY invoke authorized Runtime Control methods through that binding during `_init()` and throughout the live context.
 The `publish_user_data` value is opaque callback-provider state.
 The module MUST pass it back unchanged to `publish`.
-When the provider call surface declares any event,
+When the validated provider call surface declares any event, including when it declares no methods,
 the initialization input MUST contain a non-null `publish` callback.
 The Runtime Control binding, callback, and opaque state are process-local and MUST NOT cross a Transport boundary.
 

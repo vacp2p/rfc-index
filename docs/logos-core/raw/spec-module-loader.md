@@ -18,7 +18,7 @@ direct dynamic loading, or hosted dynamic loading.
 Hosted dynamic loading starts one Module Host in a process, sandbox, or container.
 The Module Host loads the selected dynamic library,
 applies the native ABI for one Runtime-owned module instance,
-and exposes a provider through the protected local Transport profile when the module provides a callable contract.
+and exposes a provider through the protected local Transport profile when the module provides a provider contract.
 
 Every Module Loader provider MUST be a local module provider backed by a local module instance.
 Runtime MUST maintain ordinary provider and lifecycle records for that instance.
@@ -190,8 +190,10 @@ No Transport endpoint is created for a direct realization.
 
 `hosted_dynamic` starts one Module Host in the selected hosted placement.
 The Module Host loads the same form of dynamic library used by `direct_dynamic`.
-When the module provides a callable contract,
-the Module Host exposes it through `logos.local.unix-stream` and dispatches requests through the generic native ABI.
+When the module provides a provider contract,
+the Module Host exposes it through `logos.local.unix-stream`.
+It dispatches requests for declared schema methods through the generic native ABI
+and serves subscriptions and Event delivery for declared schema events.
 
 A language implementation that cannot directly export the canonical C ABI
 MUST include generated or handwritten adapter code that exports that ABI.
@@ -309,10 +311,12 @@ logos.module_loader.provider_endpoint = {
 }
 ```
 
-Module Loader creates the endpoint only for a hosted realization whose validated ABI exposes a callable contract.
-The endpoint MUST implement the protected `logos.local.unix-stream` profile
-and MUST identify the exact endpoint prepared for that Module Host.
-Runtime MUST use that exact endpoint and perform every Transport and Runtime readiness check before exposing the provider.
+For a hosted realization expected to expose a provider contract,
+Runtime creates the protected endpoint and supplies its address and open listening socket as a private realization handoff.
+Module Loader MUST convey that exact listener to the Module Host without rebinding or replacing it.
+The returned `provider_endpoint` MUST identify the address of that Runtime-created listener.
+Runtime MUST perform every Transport and Runtime readiness check before exposing the provider.
+Module Loader MUST NOT advertise a hosted placement unless it can convey the listener through that placement without weakening its isolation.
 
 A direct realization MUST omit `provider_endpoint`.
 A consumer-only realization MUST omit `provider_endpoint`.
@@ -351,7 +355,10 @@ container, endpoint, static binding, artifact, or realization identifier.
 Module Loader MUST maintain at most one active or failed realization for one module instance.
 If the same descriptor and private handoffs are already active for the instance,
 `realize` MUST succeed and return that active realization without creating another context or Module Host.
-If the instance has a different active realization or any failed realization,
+If a failed realization created from the same descriptor and private handoffs is retained for the instance,
+`realize` MUST return a failed response containing that same failed realization
+without retrying realization or creating another context or Module Host.
+If the instance has a different active or failed realization,
 `realize` MUST return `instance-conflict`.
 A failed realization must be released before another realization can be created for that module instance.
 
@@ -384,17 +391,21 @@ A successful initialization creates one distinct live module context for the mod
 The ABI caller MUST retain the accepted binding and use that same context for every instance-dependent ABI operation.
 
 For hosted provider realization,
-the Module Host MUST establish the protected provider endpoint after successful initialization
-and before Module Loader returns an active realization.
-The host applies the generic dispatch ABI to Transport requests
-and applies the Interface concurrency and memory-ownership requirements.
+the Module Host MUST retain the inherited listener without accepting connections until initialization succeeds.
+It then serves that listener through the protected local Transport profile
+and MUST NOT create, bind, or substitute another provider endpoint.
+Module Loader MUST NOT return an active realization until the Module Host confirms that it is serving the inherited listener.
+For declared schema methods, the host applies the generic dispatch ABI to Transport Requests.
+For declared schema events, it applies the subscription and delivery rules in LOGOS-MODULE-INTERFACE and LOGOS-MODULE-TRANSPORT.
+The host applies the Interface concurrency and memory-ownership requirements.
 
 `realize` is complete when it returns.
 Success MUST return an active realization that satisfies every requested Loader-owned handoff.
 The operation MUST NOT return an intermediate state.
 
 If realization fails before becoming active,
-Module Loader MUST clean every partial context, binding, endpoint, and execution envelope that it can safely clean.
+Module Loader MUST clean every partial context, binding, inherited-listener reference, and execution envelope that it can safely clean.
+Runtime retains ownership of final listener and endpoint-path cleanup.
 When cleanup completes, it returns the error without a realization record.
 When cleanup remains necessary,
 it retains and returns a failed realization so Runtime can invoke `release`.
@@ -526,6 +537,10 @@ logos.module_loader.release_response =
   { status: "succeeded" } /
   {
     status: "failed",
+    error: logos.module_loader.error,
+  } /
+  {
+    status: "failed",
     realization: logos.module_loader.failed_realization,
   }
 ```
@@ -541,12 +556,20 @@ Beginning destruction consumes the live context.
 A later cleanup attempt MUST NOT invoke destruction again for that context.
 
 `force` is valid only when the Loader advertised `force_release`.
+A request containing `force` when the Loader did not advertise `force_release`
+MUST return a failed response with `invalid-request`.
+It MUST NOT begin cleanup or mutate a retained realization.
 It requests the strongest available local termination and cleanup path.
 Successful force release establishes only that the Loader retains no realization.
 It does not prove that module code completed cooperative cleanup or that destruction returned.
 
+Module Loader MUST match a retained realization against both `realization` and `module_instance`.
+If `realization` identifies a retained record whose `module_instance` does not match the request,
+Module Loader MUST return a failed response with `realization-not-found`
+and MUST NOT affect that record or any other realization.
 Successful release removes the realization record and establishes absence.
-Releasing an already absent matching realization is successful and MUST NOT affect another realization.
+A release request whose `realization` identifies no retained record is idempotently successful
+and MUST NOT affect another realization.
 If cleanup cannot establish absence,
 Module Loader MUST retain and return a failed realization.
 
@@ -580,7 +603,7 @@ A failure variant contains either one error or one failed realization whose `fai
 `artifact-integrity-failed` means its exact bytes did not match the accepted digest.
 `abi-invalid` means verified bytes did not expose the required ABI or valid declared call surface.
 `realization-failed` covers initialization, Module Host creation,
-state delivery, endpoint establishment, indeterminate configuration,
+state delivery, endpoint handoff or activation, indeterminate configuration,
 unexpected realization failure, and incomplete release.
 `instance-conflict` requires release of the retained realization before replacement.
 `realization-not-found` identifies a stale or nonmatching pair of identifiers without disclosing another realization.
@@ -623,6 +646,7 @@ Module Loader MUST establish every control required by the selected security pro
 and MUST fail rather than silently use a weaker mechanism.
 
 The hosted Unix-stream endpoint MUST be protected according to the local Transport profile.
+The Module Host MUST serve only the Runtime-created listener conveyed by Module Loader.
 Endpoint possession alone MUST NOT grant provider, route, or method authority.
 Runtime remains responsible for peer authentication,
 route-ticket handling, contract validation, and provider readiness.

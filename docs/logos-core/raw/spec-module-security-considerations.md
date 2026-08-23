@@ -117,7 +117,15 @@ A deployment can derive several decisions from the same protected configuration,
 
 ### 3.1 Package And Executable Acceptance
 
-For a dynamically loaded artifact obtained from a package,
+Obtaining candidate package material is not package acceptance.
+The LGX profile obtains prebuilt archive data without evaluating package-controlled build definitions.
+The Nix profile may need to evaluate package-controlled input or execute builders
+before the embedded manifest and package signature are available.
+LOGOS-MODULE-PACKAGE-MANAGER therefore permits such work only inside its pre-verification isolation boundary,
+unless protected deployment input supplies the exact immutable realized output without package-controlled evaluation or building.
+
+After candidate material is obtained under the owning realization-profile rules,
+for a dynamically loaded artifact obtained from a package,
 the baseline package-authentication chain is:
 
 1. protected package-signing trust input identifies an accepted Ed25519 public key;
@@ -128,6 +136,8 @@ the baseline package-authentication chain is:
 
 Catalog records, archive names, paths, package metadata, module names, and downloaded keys do not replace any step in this chain.
 The baseline does not require a separate artifact signature because the signed manifest already authenticates the artifact hash.
+Pre-verification isolation does not authenticate a Nix output or establish package trust.
+It prevents unaccepted package-controlled work from inheriting Package Manager authority while the baseline checks remain pending.
 
 Protected bootstrap input may instead supply an accepted digest for a dynamic artifact without claiming package acceptance.
 Runtime still completes execution authorization,
@@ -355,6 +365,7 @@ Conformance reduces ambiguity, unauthorized access, substitution, replay, and do
 - **Time-of-check/time-of-use mismatch:** mutable paths, replaced files, symlinks, or external resources can differ between verification and use unless the deployment preserves the exact-byte and resource bindings.
 - **Audit-window exhaustion:** malicious activity can move an older record outside the bounded audit-query result even when deployment storage retains it.
 - **Resource exhaustion:** frame-size and event-buffering limits do not by themselves bound connection, call, route, ticket, subscription, or queued-response state.
+- **Pre-verification realization compromise:** Package-controlled Nix evaluation or building can exploit defects in the selected isolation mechanism or consume resources permitted within that boundary before the package signature is available.
 - **Configuration or state disclosure:** authorization protects the Logos operations that expose configuration and persistent-state assignments, but confidentiality and integrity also depend on the selected storage, handoff, isolation, and operating-system controls.
 - **Incorrect computation:** schema and value roots identify what was supplied and returned; they do not prove that the result is correct.
 
