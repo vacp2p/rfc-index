@@ -1953,7 +1953,7 @@ To see what the payloads represent, refer to [Mantle Transaction Encoding](mantl
 
 ### Declaration Id
 
-The `declaration_id` ([Declaration Storage](bedrock-service-declaration-protocol.md#declaration-storage)) is `Hash(service||provider_id||zk_id||locators)` (BLAKE2b, 256-bit output, no DST), where `service` is the one-byte `ServiceType` discriminant and `locators` is the element count followed by each `Locator`'s binary form prefixed with its 2-byte little-endian byte length. Note that the preimage field order differs from the `SDP_DECLARE` wire order and excludes `locked_note_id`. This vector reuses the fields of the `SDP_DECLARE` payload from [Operation Id](#operation-id).
+The `declaration_id` ([Declaration Storage](bedrock-service-declaration-protocol.md#declaration-storage)) is `Hash(service||provider_id||zk_id||locators)` (BLAKE2b, 256-bit output, no DST), where `service` is the one-byte `ServiceType` discriminant and `locators` is the `Locators` production ([Mantle Transaction Encoding](mantle-transaction-encoding.md#sdp-operations)): the element count followed by each `Locator`'s binary form prefixed with its 2-byte little-endian byte length. Note that the preimage field order differs from the `SDP_DECLARE` wire order and excludes `locked_note_id`. This vector reuses the fields of the `SDP_DECLARE` payload from [Operation Id](#operation-id).
 
 | Field | Value |
 | - | - |
