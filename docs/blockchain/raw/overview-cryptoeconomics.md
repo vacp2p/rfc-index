@@ -23,6 +23,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-25 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
+| 1.0.2 | Changing from burning/minting to pooling/distributing/releasing | 2026-06-22 |
 | 1.1.0 | Reflect the upward rounding of the fee market price updates | 2026-07-28 |
 | 1.2.0 | Reflect the downward rounding of the leader share | 2026-08-05 |
 
