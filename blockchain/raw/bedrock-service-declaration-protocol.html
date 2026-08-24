@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-07-30</strong> — <a href="https://github.com/logos-co/logos-lips/blob/87d9ae5c65f304bc4f87ae06a8000a91b070734b/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>87d9ae5</code></a> — docs(blockchain): length-prefix the locators in the declaration_id preimage (#386)</li>
 <li><strong>2026-07-13</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d064449307d28a76b3555dc7b5064d15ee19d7f5/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>d064449</code></a> — RFC-Bedrock-SDP: Per-Service Uniqueness of <code>provider_id</code> and <code>zk_id</code> (#371)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -207,6 +208,7 @@
 <tr><td>1.1.0</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
 <tr><td>1.2.0</td><td>[RFC] Per-service uniqueness of <code>provider_id</code> and <code>zk_id</code></td><td>2026-07-08</td></tr>
 <tr><td>1.3.0</td><td>Length-prefix the <code>locators</code> list in the <code>declaration_id</code> preimage</td><td>2026-07-30</td></tr>
+<tr><td>1.4.0</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code></td><td>2026-08-14</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -247,9 +249,10 @@
 <li><code>BN</code>: for Blend Network service.</li>
 </ul>
 <pre><code class="language-python">class ServiceType(Enum):
-    BN="BN" # Blend Network
+    BN=0 # Blend Network
 </code></pre>
 <p>A declaration can be generated for any of the services above. Any declaration that is not one of the above must be rejected. The number of services might grow in the future.</p>
+<p>Each service type is assigned a one-byte discriminant, given by the enum value above. This byte is the canonical encoding of a <code>ServiceType</code> and is used wherever a <code>ServiceType</code> is serialized or hashed: the transaction wire form (<a href="mantle-transaction-encoding.html">Mantle Transaction Encoding</a>), the <code>declaration_id</code> preimage (<a href="#declaration-storage">Declaration Storage</a>), and the reward <code>op_id</code> preimage (<a href="bedrock-service-reward-distribution.html">Service Reward Distribution</a>).</p>
 <h3 id="minimum-stake"><a class="header" href="#minimum-stake">Minimum Stake</a></h3>
 <p>The minimum stake is a global value that defines the minimum stake a node must have to perform any service.</p>
 <p>The <code>MinStake</code> is a structure that holds the value of the stake <code>stake_threshold</code> and the <code>epoch</code>, which is an epoch number at which the threshold was set; it is <code>uint64</code>.</p>
@@ -287,9 +290,10 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <h3 id="locators"><a class="header" href="#locators"><strong>Locators</strong></a></h3>
 <p>A <code>Locator</code> is the address of a validator which is used to establish secure communication between validators. It follows the <a href="https://docs.libp2p.io/concepts/fundamentals/addressing/">multiaddr addressing scheme from libp2p</a>, but it must contain only the location part and must not contain the node identity (<code>peer_id</code>).</p>
 <p>The <code>provider_id</code> must be used as the node identity. Therefore, the <code>Locator</code> must be completed by adding the <code>provider_id</code> at the end of it, which makes the <code>Locator</code> usable in the context of libp2p.</p>
-<p>The length of the <code>Locator</code> is restricted to 329 characters.</p>
-<p><strong>The common formatting of every</strong> <code>Locator</code> <strong>must be applied to maintain its unambiguity, to make deterministic ID generation work consistently.</strong> The <code>Locator</code> must at least contain only lowercase letters and every part of the address must be explicit (no implicit defaults).</p>
-<p>Canonical formatting makes a single <code>Locator</code> unambiguous, but it does not make a <em>list</em> of them unambiguous. The byte form of a multiaddr is self-describing, so concatenating two <code>Locator</code>s yields the byte form of a single longer one: <code>[/ip4/203.0.113.10/tcp/4001]</code> and <code>[/ip4/203.0.113.10, /tcp/4001]</code> are the same byte string. Wherever a list of <code>Locator</code>s is hashed it must therefore be serialized as the <a href="mantle-transaction-encoding.html">Mantle Transaction Encoding</a> defines it, prefixed with its element count and with each element prefixed by its byte length.</p>
+<p>The canonical form of a <code>Locator</code> is the multiaddr <strong>binary (byte) form</strong>. Wherever a <code>Locator</code> is serialized or hashed — the transaction wire form (<a href="mantle-transaction-encoding.html">Mantle Transaction Encoding</a>) and the <code>declaration_id</code> preimage (<a href="#declaration-storage">Declaration Storage</a>) — its binary form is used. The human-readable string form (e.g. <code>/ip4/203.0.113.10/tcp/4001</code>) is presentational only and must never appear in an encoding.</p>
+<p>The length of the binary form of a <code>Locator</code> is restricted to 329 bytes.</p>
+<p><strong>The canonical form makes deterministic ID generation work consistently.</strong> The binary form carries no letter case and no textual shorthand, so two equal multiaddrs always share one byte representation; the string-form ambiguities (case, implicit defaults) cannot arise. Implementations that accept the string form as input must parse it into the binary form before any serialization or hashing, and every part of the address must be explicit (no implicit defaults).</p>
+<p>The canonical form makes a single <code>Locator</code> unambiguous, but it does not make a <em>list</em> of them unambiguous. The byte form of a multiaddr is self-describing, so concatenating two <code>Locator</code>s yields the byte form of a single longer one: <code>[/ip4/203.0.113.10/tcp/4001]</code> and <code>[/ip4/203.0.113.10, /tcp/4001]</code> are the same byte string. Wherever a list of <code>Locator</code>s is hashed it must therefore be serialized as the <code>Locators</code> production of the <a href="mantle-transaction-encoding.html#sdp-operations">Mantle Transaction Encoding</a>: prefixed with its element count and with each element prefixed by its byte length.</p>
 <h3 id="declaration-message"><a class="header" href="#declaration-message"><strong>Declaration Message</strong></a></h3>
 <p>The construction of the declaration message is as follows.</p>
 <pre><code class="language-python">class DeclarationMessage:
@@ -331,7 +335,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <p>We also define the <code>declaration_id</code> (of a <code>DeclarationId</code> type) that is the unique identifier of <code>DeclarationInfo</code> calculated as a hash of the concatenation of <code>service</code>, <code>provider_id</code>, <code>zk_id</code> and <code>locators</code>. The implementation of the hash function is <code>blake2b</code> using 256 bits of the output.</p>
 <pre><code class="language-python">declaration_id = Hash(service||provider_id||zk_id||locators)
 </code></pre>
-<p><code>locators</code> is serialized as its element count followed by each <code>Locator</code> prefixed with its byte length. Concatenating the locators without those lengths would leave the <code>declaration_id</code> not binding the locator list, for the reason given in <a href="#locators">Locators</a>.</p>
+<p>Each component of the preimage is serialized in its canonical encoding, as defined by the <a href="mantle-transaction-encoding.html#sdp-operations">Mantle Transaction Encoding</a> for the <code>SDP_DECLARE</code> operation: <code>service</code> as the one-byte <code>ServiceType</code> discriminant (<a href="#service-types">Service Types</a>), and <code>locators</code> as the <code>Locators</code> production, its element count followed by each <code>Locator</code>'s binary form prefixed with its byte length (<a href="#locators">Locators</a>). Concatenating the locators without those lengths would leave the <code>declaration_id</code> not binding the locator list, for the reason given in <a href="#locators">Locators</a>.</p>
 <p>The <code>declaration_id</code> is not stored as part of the <code>DeclarationInfo</code> but it is used to index it.</p>
 <p>All <code>DeclarationInfo</code> references are stored in the <code>declarations</code> and are indexed by <code>declaration_id</code>.</p>
 <pre><code class="language-python">declarations: list[declaration_id]

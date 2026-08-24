@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-08-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/91e5486791d2ad854029d3fb8ec16b1c5426b059/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>91e5486</code></a> — docs(blockchain): assert all inputs to be non empty (#399)</li>
 <li><strong>2026-08-07</strong> — <a href="https://github.com/logos-co/logos-lips/blob/4c22190fd0df0e7b10018fe6774a772fd7578c39/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>4c22190</code></a> — docs(blockchain): require checked arithmetic in Mantle spec (#369)</li>
 <li><strong>2026-08-05</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b4388aae3549e5ebf0307258b825e766efcb9c38/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>b4388aa</code></a> — docs(blockchain): round the leader reward share down and align the voucher DST (#395)</li>
@@ -220,6 +221,7 @@
 <tr><td>1.9.1</td><td>Rename the excess balance left after the mandatory fees into <code>tx_priority_tip</code> and convert it back into a <code>TokenValue</code> explicitly</td><td>2026-08-05</td></tr>
 <tr><td>1.9.2</td><td>Required checked arithmetic for all token value, balance, gas, and fee computations.</td><td>2026-08-06</td></tr>
 <tr><td>1.10.0</td><td>Enforce non empty inputs for every operation not only transfer moving the assertion in the validation of input spendability</td><td>2026-08-11</td></tr>
+<tr><td>1.10.1</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code>: <code>ServiceType</code> is its one-byte discriminant and <code>Locator</code> is the multiaddr binary form. Added a <code>declaration_id</code> test vector</td><td>2026-08-14</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -971,9 +973,11 @@ class LockedNote:
 </code></pre>
 <h3 id="common-sdp-structures"><a class="header" href="#common-sdp-structures">Common SDP Structures</a></h3>
 <pre><code class="language-python">class ServiceType(Enum):
-    BN="BN" # Blend Network
+    BN=0 # Blend Network; the one-byte discriminant is the canonical encoding
 
-class Locator(str):
+class Locator(bytes):
+    # multiaddr binary form; the canonical encoding
+    # (see SDP: Locators)
     def validate(self):
         assert len(self) &lt;= 329
         assert validate_multiaddr(self)
@@ -1748,6 +1752,17 @@ threshold: u16                     # the number of required signatures
 <div class="table-wrapper"><table><thead><tr><th>Transaction</th><th>Payload</th><th>Transaction Hash</th></tr></thead><tbody>
 <tr><td>Empty transaction</td><td>0x00</td><td>0x2eba3f667b80a508f3d44d149a1c27a90ea365a51e4fc8209289088142b364e5</td></tr>
 <tr><td>Transaction with one of each operation</td><td>0x0a00020100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002030000000000000004000000000000000000000000000000000000000000000000000000000000000500000000000000060000000000000000000000000000000000000000000000000000000000000010070707070707070707070707070707070707070707070707070707070707070702001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00110e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c121010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d6574616461746113121212121212121212121212121212121212121212121212121212121212121201130000000000000000000000000000000000000000000000000000000000000014141414141414141414141414141414141414141414141414141414141414141401150000000000000000000000000000000000000000000000000000000000000001160000000000000017000000000000000000000000000000000000000000000000000000000000002000010b00047f00000191020bb8cd0353470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000211b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d000000000000001c00000000000000000000000000000000000000000000000000000000000000221e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030330200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000</td><td>0x5d3ff950e0752dc4ebf8c8d73a8cc7b22445b9245ea317f7ebdaa8d6fd881589</td></tr>
+</tbody></table>
+</div>
+<h3 id="declaration-id"><a class="header" href="#declaration-id">Declaration Id</a></h3>
+<p>The <code>declaration_id</code> (<a href="bedrock-service-declaration-protocol.html#declaration-storage">Declaration Storage</a>) is <code>Hash(service||provider_id||zk_id||locators)</code> (BLAKE2b, 256-bit output, no DST), where <code>service</code> is the one-byte <code>ServiceType</code> discriminant and <code>locators</code> is the <code>Locators</code> production (<a href="mantle-transaction-encoding.html#sdp-operations">Mantle Transaction Encoding</a>): the element count followed by each <code>Locator</code>'s binary form prefixed with its 2-byte little-endian byte length. Note that the preimage field order differs from the <code>SDP_DECLARE</code> wire order and excludes <code>locked_note_id</code>. This vector reuses the fields of the <code>SDP_DECLARE</code> payload from <a href="#operation-id">Operation Id</a>.</p>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td><code>service</code></td><td>0x00</td></tr>
+<tr><td><code>provider_id</code></td><td>0x53470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f3</td></tr>
+<tr><td><code>zk_id</code></td><td>0x1900000000000000000000000000000000000000000000000000000000000000</td></tr>
+<tr><td><code>locators</code></td><td>0x010b00047f00000191020bb8cd03</td></tr>
+<tr><td>Preimage</td><td>0x0053470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f31900000000000000000000000000000000000000000000000000000000000000010b00047f00000191020bb8cd03</td></tr>
+<tr><td><code>declaration_id</code></td><td>0x7fb647c069bade94e06685b0825299d220e7cc14752cfc474773b6c4040e37b5</td></tr>
 </tbody></table>
 </div>
                     </main>

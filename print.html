@@ -22087,6 +22087,7 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 </div><!-- timeline:start -->
 <h2 id="timeline-84"><a class="header" href="#timeline-84">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-08-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/91e5486791d2ad854029d3fb8ec16b1c5426b059/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>91e5486</code></a> — docs(blockchain): assert all inputs to be non empty (#399)</li>
 <li><strong>2026-08-07</strong> — <a href="https://github.com/logos-co/logos-lips/blob/4c22190fd0df0e7b10018fe6774a772fd7578c39/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>4c22190</code></a> — docs(blockchain): require checked arithmetic in Mantle spec (#369)</li>
 <li><strong>2026-08-05</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b4388aae3549e5ebf0307258b825e766efcb9c38/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>b4388aa</code></a> — docs(blockchain): round the leader reward share down and align the voucher DST (#395)</li>
@@ -22115,6 +22116,7 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 <tr><td>1.9.1</td><td>Rename the excess balance left after the mandatory fees into <code>tx_priority_tip</code> and convert it back into a <code>TokenValue</code> explicitly</td><td>2026-08-05</td></tr>
 <tr><td>1.9.2</td><td>Required checked arithmetic for all token value, balance, gas, and fee computations.</td><td>2026-08-06</td></tr>
 <tr><td>1.10.0</td><td>Enforce non empty inputs for every operation not only transfer moving the assertion in the validation of input spendability</td><td>2026-08-11</td></tr>
+<tr><td>1.10.1</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code>: <code>ServiceType</code> is its one-byte discriminant and <code>Locator</code> is the multiaddr binary form. Added a <code>declaration_id</code> test vector</td><td>2026-08-14</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-23"><a class="header" href="#introduction-23">Introduction</a></h1>
@@ -22866,9 +22868,11 @@ class LockedNote:
 </code></pre>
 <h3 id="common-sdp-structures"><a class="header" href="#common-sdp-structures">Common SDP Structures</a></h3>
 <pre><code class="language-python">class ServiceType(Enum):
-    BN="BN" # Blend Network
+    BN=0 # Blend Network; the one-byte discriminant is the canonical encoding
 
-class Locator(str):
+class Locator(bytes):
+    # multiaddr binary form; the canonical encoding
+    # (see SDP: Locators)
     def validate(self):
         assert len(self) &lt;= 329
         assert validate_multiaddr(self)
@@ -23644,6 +23648,17 @@ threshold: u16                     # the number of required signatures
 <tr><td>Empty transaction</td><td>0x00</td><td>0x2eba3f667b80a508f3d44d149a1c27a90ea365a51e4fc8209289088142b364e5</td></tr>
 <tr><td>Transaction with one of each operation</td><td>0x0a00020100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002030000000000000004000000000000000000000000000000000000000000000000000000000000000500000000000000060000000000000000000000000000000000000000000000000000000000000010070707070707070707070707070707070707070707070707070707070707070702001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00110e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c121010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d6574616461746113121212121212121212121212121212121212121212121212121212121212121201130000000000000000000000000000000000000000000000000000000000000014141414141414141414141414141414141414141414141414141414141414141401150000000000000000000000000000000000000000000000000000000000000001160000000000000017000000000000000000000000000000000000000000000000000000000000002000010b00047f00000191020bb8cd0353470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000211b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d000000000000001c00000000000000000000000000000000000000000000000000000000000000221e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030330200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000</td><td>0x5d3ff950e0752dc4ebf8c8d73a8cc7b22445b9245ea317f7ebdaa8d6fd881589</td></tr>
 </tbody></table>
+</div>
+<h3 id="declaration-id"><a class="header" href="#declaration-id">Declaration Id</a></h3>
+<p>The <code>declaration_id</code> (<a href="blockchain/raw/bedrock-service-declaration-protocol.html#declaration-storage">Declaration Storage</a>) is <code>Hash(service||provider_id||zk_id||locators)</code> (BLAKE2b, 256-bit output, no DST), where <code>service</code> is the one-byte <code>ServiceType</code> discriminant and <code>locators</code> is the <code>Locators</code> production (<a href="blockchain/raw/mantle-transaction-encoding.html#sdp-operations">Mantle Transaction Encoding</a>): the element count followed by each <code>Locator</code>'s binary form prefixed with its 2-byte little-endian byte length. Note that the preimage field order differs from the <code>SDP_DECLARE</code> wire order and excludes <code>locked_note_id</code>. This vector reuses the fields of the <code>SDP_DECLARE</code> payload from <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#operation-id">Operation Id</a>.</p>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td><code>service</code></td><td>0x00</td></tr>
+<tr><td><code>provider_id</code></td><td>0x53470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f3</td></tr>
+<tr><td><code>zk_id</code></td><td>0x1900000000000000000000000000000000000000000000000000000000000000</td></tr>
+<tr><td><code>locators</code></td><td>0x010b00047f00000191020bb8cd03</td></tr>
+<tr><td>Preimage</td><td>0x0053470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f31900000000000000000000000000000000000000000000000000000000000000010b00047f00000191020bb8cd03</td></tr>
+<tr><td><code>declaration_id</code></td><td>0x7fb647c069bade94e06685b0825299d220e7cc14752cfc474773b6c4040e37b5</td></tr>
+</tbody></table>
 </div><div style="break-before: page; page-break-before: always;"></div><h1 id="mantle-transaction-encoding"><a class="header" href="#mantle-transaction-encoding">MANTLE-TRANSACTION-ENCODING</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
 <tr><td>Name</td><td>Mantle Transaction Encoding</td></tr>
@@ -23656,6 +23671,7 @@ threshold: u16                     # the number of required signatures
 </div><!-- timeline:start -->
 <h2 id="timeline-85"><a class="header" href="#timeline-85">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/mantle-transaction-encoding.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-07-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5b20a2d59691c12392d091a6d7352d3de719ad61/docs/blockchain/raw/mantle-transaction-encoding.md"><code>5b20a2d</code></a> — docs(blockchain) Channel Participation in PoS (#364)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/mantle-transaction-encoding.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-29</strong> — <a href="https://github.com/logos-co/logos-lips/blob/67e498e2d65e447d954e213ea89bbe3b9b285a8a/docs/blockchain/raw/mantle-transaction-encoding.md"><code>67e498e</code></a> — chore: fix math issues (#350)</li>
@@ -23671,6 +23687,7 @@ threshold: u16                     # the number of required signatures
 <tr><td>1.4.0</td><td><a href="blockchain/raw/mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html">[RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></td><td>2026-05-06</td></tr>
 <tr><td>1.4.1</td><td>Removed mention of DA. Updated KeyCount from Byte to UINT16 to follow Mantle.</td><td>2026-05-21</td></tr>
 <tr><td>1.5.0</td><td>Introduce the new Operation <code>CHANNEL_STAKE_ASSIGNATION</code> and update of the channel operations to reflect changes in Mantle</td><td>2026-06-24</td></tr>
+<tr><td>1.5.1</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code>: pin <code>Locator</code> bytes to the multiaddr binary form</td><td>2026-08-14</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-24"><a class="header" href="#introduction-24">Introduction</a></h1>
@@ -23733,10 +23750,11 @@ OutputCount       = Byte
 Inputs            = InputCount *NoteId
 </code></pre>
 <h3 id="sdp-operations"><a class="header" href="#sdp-operations">SDP Operations</a></h3>
-<pre><code class="language-schema">SDPDeclare    = ServiceType LocatorCount *Locator ProviderId ZkId LockedNoteId
+<pre><code class="language-schema">SDPDeclare    = ServiceType Locators ProviderId ZkId LockedNoteId
 ServiceType   = Byte          ; 0 = BN
+Locators      = LocatorCount *Locator
 LocatorCount  = Byte          ; Max 8
-Locator       = 2Byte *BYTE   ; Max 329 bytes, multiaddr format
+Locator       = 2Byte *BYTE   ; Max 329 bytes, multiaddr binary form
 ProviderId    = Ed25519PublicKey
 ZkId          = ZkPublicKey
 LockedNoteId  = NoteId
@@ -25212,6 +25230,7 @@ WithdrawThreshold = UINT16
 </div><!-- timeline:start -->
 <h2 id="timeline-86"><a class="header" href="#timeline-86">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-07-30</strong> — <a href="https://github.com/logos-co/logos-lips/blob/87d9ae5c65f304bc4f87ae06a8000a91b070734b/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>87d9ae5</code></a> — docs(blockchain): length-prefix the locators in the declaration_id preimage (#386)</li>
 <li><strong>2026-07-13</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d064449307d28a76b3555dc7b5064d15ee19d7f5/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>d064449</code></a> — RFC-Bedrock-SDP: Per-Service Uniqueness of <code>provider_id</code> and <code>zk_id</code> (#371)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -25227,6 +25246,7 @@ WithdrawThreshold = UINT16
 <tr><td>1.1.0</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
 <tr><td>1.2.0</td><td>[RFC] Per-service uniqueness of <code>provider_id</code> and <code>zk_id</code></td><td>2026-07-08</td></tr>
 <tr><td>1.3.0</td><td>Length-prefix the <code>locators</code> list in the <code>declaration_id</code> preimage</td><td>2026-07-30</td></tr>
+<tr><td>1.4.0</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code></td><td>2026-08-14</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-25"><a class="header" href="#introduction-25">Introduction</a></h1>
@@ -25267,9 +25287,10 @@ WithdrawThreshold = UINT16
 <li><code>BN</code>: for Blend Network service.</li>
 </ul>
 <pre><code class="language-python">class ServiceType(Enum):
-    BN="BN" # Blend Network
+    BN=0 # Blend Network
 </code></pre>
 <p>A declaration can be generated for any of the services above. Any declaration that is not one of the above must be rejected. The number of services might grow in the future.</p>
+<p>Each service type is assigned a one-byte discriminant, given by the enum value above. This byte is the canonical encoding of a <code>ServiceType</code> and is used wherever a <code>ServiceType</code> is serialized or hashed: the transaction wire form (<a href="blockchain/raw/mantle-transaction-encoding.html">Mantle Transaction Encoding</a>), the <code>declaration_id</code> preimage (<a href="blockchain/raw/bedrock-service-declaration-protocol.html#declaration-storage">Declaration Storage</a>), and the reward <code>op_id</code> preimage (<a href="blockchain/raw/bedrock-service-reward-distribution.html">Service Reward Distribution</a>).</p>
 <h3 id="minimum-stake"><a class="header" href="#minimum-stake">Minimum Stake</a></h3>
 <p>The minimum stake is a global value that defines the minimum stake a node must have to perform any service.</p>
 <p>The <code>MinStake</code> is a structure that holds the value of the stake <code>stake_threshold</code> and the <code>epoch</code>, which is an epoch number at which the threshold was set; it is <code>uint64</code>.</p>
@@ -25307,9 +25328,10 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <h3 id="locators"><a class="header" href="#locators"><strong>Locators</strong></a></h3>
 <p>A <code>Locator</code> is the address of a validator which is used to establish secure communication between validators. It follows the <a href="https://docs.libp2p.io/concepts/fundamentals/addressing/">multiaddr addressing scheme from libp2p</a>, but it must contain only the location part and must not contain the node identity (<code>peer_id</code>).</p>
 <p>The <code>provider_id</code> must be used as the node identity. Therefore, the <code>Locator</code> must be completed by adding the <code>provider_id</code> at the end of it, which makes the <code>Locator</code> usable in the context of libp2p.</p>
-<p>The length of the <code>Locator</code> is restricted to 329 characters.</p>
-<p><strong>The common formatting of every</strong> <code>Locator</code> <strong>must be applied to maintain its unambiguity, to make deterministic ID generation work consistently.</strong> The <code>Locator</code> must at least contain only lowercase letters and every part of the address must be explicit (no implicit defaults).</p>
-<p>Canonical formatting makes a single <code>Locator</code> unambiguous, but it does not make a <em>list</em> of them unambiguous. The byte form of a multiaddr is self-describing, so concatenating two <code>Locator</code>s yields the byte form of a single longer one: <code>[/ip4/203.0.113.10/tcp/4001]</code> and <code>[/ip4/203.0.113.10, /tcp/4001]</code> are the same byte string. Wherever a list of <code>Locator</code>s is hashed it must therefore be serialized as the <a href="blockchain/raw/mantle-transaction-encoding.html">Mantle Transaction Encoding</a> defines it, prefixed with its element count and with each element prefixed by its byte length.</p>
+<p>The canonical form of a <code>Locator</code> is the multiaddr <strong>binary (byte) form</strong>. Wherever a <code>Locator</code> is serialized or hashed — the transaction wire form (<a href="blockchain/raw/mantle-transaction-encoding.html">Mantle Transaction Encoding</a>) and the <code>declaration_id</code> preimage (<a href="blockchain/raw/bedrock-service-declaration-protocol.html#declaration-storage">Declaration Storage</a>) — its binary form is used. The human-readable string form (e.g. <code>/ip4/203.0.113.10/tcp/4001</code>) is presentational only and must never appear in an encoding.</p>
+<p>The length of the binary form of a <code>Locator</code> is restricted to 329 bytes.</p>
+<p><strong>The canonical form makes deterministic ID generation work consistently.</strong> The binary form carries no letter case and no textual shorthand, so two equal multiaddrs always share one byte representation; the string-form ambiguities (case, implicit defaults) cannot arise. Implementations that accept the string form as input must parse it into the binary form before any serialization or hashing, and every part of the address must be explicit (no implicit defaults).</p>
+<p>The canonical form makes a single <code>Locator</code> unambiguous, but it does not make a <em>list</em> of them unambiguous. The byte form of a multiaddr is self-describing, so concatenating two <code>Locator</code>s yields the byte form of a single longer one: <code>[/ip4/203.0.113.10/tcp/4001]</code> and <code>[/ip4/203.0.113.10, /tcp/4001]</code> are the same byte string. Wherever a list of <code>Locator</code>s is hashed it must therefore be serialized as the <code>Locators</code> production of the <a href="blockchain/raw/mantle-transaction-encoding.html#sdp-operations">Mantle Transaction Encoding</a>: prefixed with its element count and with each element prefixed by its byte length.</p>
 <h3 id="declaration-message"><a class="header" href="#declaration-message"><strong>Declaration Message</strong></a></h3>
 <p>The construction of the declaration message is as follows.</p>
 <pre><code class="language-python">class DeclarationMessage:
@@ -25351,7 +25373,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <p>We also define the <code>declaration_id</code> (of a <code>DeclarationId</code> type) that is the unique identifier of <code>DeclarationInfo</code> calculated as a hash of the concatenation of <code>service</code>, <code>provider_id</code>, <code>zk_id</code> and <code>locators</code>. The implementation of the hash function is <code>blake2b</code> using 256 bits of the output.</p>
 <pre><code class="language-python">declaration_id = Hash(service||provider_id||zk_id||locators)
 </code></pre>
-<p><code>locators</code> is serialized as its element count followed by each <code>Locator</code> prefixed with its byte length. Concatenating the locators without those lengths would leave the <code>declaration_id</code> not binding the locator list, for the reason given in <a href="blockchain/raw/bedrock-service-declaration-protocol.html#locators">Locators</a>.</p>
+<p>Each component of the preimage is serialized in its canonical encoding, as defined by the <a href="blockchain/raw/mantle-transaction-encoding.html#sdp-operations">Mantle Transaction Encoding</a> for the <code>SDP_DECLARE</code> operation: <code>service</code> as the one-byte <code>ServiceType</code> discriminant (<a href="blockchain/raw/bedrock-service-declaration-protocol.html#service-types">Service Types</a>), and <code>locators</code> as the <code>Locators</code> production, its element count followed by each <code>Locator</code>'s binary form prefixed with its byte length (<a href="blockchain/raw/bedrock-service-declaration-protocol.html#locators">Locators</a>). Concatenating the locators without those lengths would leave the <code>declaration_id</code> not binding the locator list, for the reason given in <a href="blockchain/raw/bedrock-service-declaration-protocol.html#locators">Locators</a>.</p>
 <p>The <code>declaration_id</code> is not stored as part of the <code>DeclarationInfo</code> but it is used to index it.</p>
 <p>All <code>DeclarationInfo</code> references are stored in the <code>declarations</code> and are indexed by <code>declaration_id</code>.</p>
 <pre><code class="language-python">declarations: list[declaration_id]
@@ -25482,6 +25504,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 </div><!-- timeline:start -->
 <h2 id="timeline-87"><a class="header" href="#timeline-87">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
 <li><strong>2026-05-18</strong> — <a href="https://github.com/logos-co/logos-lips/blob/58b56988429f4d69a9e10a9fc118725e229e37c5/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>58b5698</code></a> — chore(blockchain): migrate contributor emails to @logos.co (#338)</li>
@@ -25495,6 +25518,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <tr><td>1.1.0</td><td>Removed references to DA Replaced references to Nomos with Logos Blockchain</td><td>2026-04-17</td></tr>
 <tr><td>1.2.1</td><td><a href="blockchain/raw/mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.html">[RFC] Enforce NoteId uniqueness</a>.</td><td>2026-04-24</td></tr>
 <tr><td>1.3.0</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
+<tr><td>1.3.1</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code></td><td>2026-08-14</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-26"><a class="header" href="#introduction-26">Introduction</a></h1>
@@ -25528,7 +25552,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <div class="math-block" data-tex="Rewards^n := serviceReward(n,Rewards\_Epoch)"></div>
 <p>Where <span class="math-inline" data-tex="Rewards\_Epoch"></span> are the total rewards of epoch <strong>N</strong>. The <span class="math-inline" data-tex="Rewards\_Epoch"></span> is determined by the linked reference, which calculates how much each service receives based on fees burnt during epoch N and the blockchain's state. <span class="math-inline" data-tex="Rewards^n"></span> is stored as an array that maps each validator's <code>zk_id</code> to their allocated reward.</p>
 <h2 id="service-reward-distribution"><a class="header" href="#service-reward-distribution">Service Reward Distribution</a></h2>
-<p>Starting immediately after epoch <strong>N+1</strong>, service rewards are distributed in the first block of epoch <strong>N+2.</strong> The rewards are inserted directly in the ledger without triggering any Mantle validation. The <code>NoteId</code> is computed using the result of <code>hash(</code><a href="blockchain/raw/bedrock-service-declaration-protocol.html"><code>ServiceType</code></a><code>|| epoch_number)</code> as the <code>op_id</code>. The output number corresponds to the position of the <code>zk_id</code> when sorted in ascending order.</p>
+<p>Starting immediately after epoch <strong>N+1</strong>, service rewards are distributed in the first block of epoch <strong>N+2.</strong> The rewards are inserted directly in the ledger without triggering any Mantle validation. The <code>NoteId</code> is computed using the result of <code>hash(</code><a href="blockchain/raw/bedrock-service-declaration-protocol.html"><code>ServiceType</code></a><code>|| epoch_number)</code> as the <code>op_id</code>, where <code>ServiceType</code> is serialized as its canonical one-byte discriminant (<a href="blockchain/raw/bedrock-service-declaration-protocol.html#service-types">Service Types</a>). The output number corresponds to the position of the <code>zk_id</code> when sorted in ascending order.</p>
 <p>The reward must:</p>
 <ul>
 <li>Transfer the correct reward amount according to <a href="blockchain/raw/bedrock-service-reward-distribution.html#service-reward-calculation">Service Reward Calculation</a>.2</li>

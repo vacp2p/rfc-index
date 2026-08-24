@@ -536,7 +536,7 @@
     "title": "Mantle Transaction Encoding",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-07-20",
+    "updated": "2026-08-24",
     "path": "blockchain/raw/mantle-transaction-encoding.html"
   },
   {
@@ -878,7 +878,7 @@
     "title": "Service Reward Distribution Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-07-03",
+    "updated": "2026-08-24",
     "path": "blockchain/raw/bedrock-service-reward-distribution.html"
   },
   {
@@ -887,7 +887,7 @@
     "title": "Service Declaration Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-07-30",
+    "updated": "2026-08-24",
     "path": "blockchain/raw/bedrock-service-declaration-protocol.html"
   },
   {
@@ -986,7 +986,7 @@
     "title": "Mantle",
     "status": "raw",
     "category": "Informational",
-    "updated": "2026-08-11",
+    "updated": "2026-08-24",
     "path": "blockchain/raw/bedrock-v1.1-mantle-specification.html"
   },
   {
