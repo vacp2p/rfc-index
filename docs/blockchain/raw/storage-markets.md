@@ -23,7 +23,8 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-24 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
-| 1.0.2 | Fix invalid python indentation due to github migration | 2026-07-27 | 
+| 1.0.2 | Changing from burning/minting to pooling/distributing/releasing | 2026-06-22 |
+| 1.0.3 | Fix invalid python indentation due to github migration | 2026-07-27 | 
 | 1.1.0 | Round the price update upwards and align the reference code with the zero target guard | 2026-07-28 |
 
 > **Disclaimer:**
