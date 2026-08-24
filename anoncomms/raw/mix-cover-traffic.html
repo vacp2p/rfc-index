@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/19d6c887939d8be8fcc265ceec4604ffeb29a435/docs/anoncomms/raw/mix-cover-traffic.md"><code>19d6c88</code></a> — docs(anoncomms): apply sender pre-send delay to SURB replies and cover emission (#403)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/anoncomms/raw/mix-cover-traffic.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
 <li><strong>2026-05-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/mix-cover-traffic.md"><code>1ac7689</code></a> — chore: split ift ts specs (#334)</li>
 <li><strong>2026-05-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/2aa2bcd89c58ccc4453207edeb8269e66a631b48/docs/ift-ts/raw/mix-cover-traffic.md"><code>2aa2bcd</code></a> — feat: Mix Cover Traffic specification (#311)</li>
@@ -402,6 +403,10 @@ are loaded into the new pool.</p>
 <p>Cover packets emitted near epoch end may arrive at later hops in a subsequent epoch.
 The DoS protection mechanism is responsible for accepting proofs within a configurable epoch window
 (<em>e.g.,</em> the <code>max_epoch_gap</code> parameter in <a href="mix-spam-protection-rln.html">Mix RLN DoS Protection</a>).</p>
+<p>A cover packet whose pre-send delay (<a href="#62-cover-emission">§6.2</a>) is still elapsing at the boundary
+is discarded rather than transmitted:
+its slot was claimed from the previous epoch's pool,
+so transmitting it in the new epoch would exceed the fresh budget by one packet.</p>
 <h3 id="54-cover-packet-reception"><a class="header" href="#54-cover-packet-reception">5.4 Cover Packet Reception</a></h3>
 <p><strong>Trigger:</strong> The Mix Protocol completes <a href="mix.html#864-exit-processing">exit processing</a> on a received Sphinx packet
 and extracts the origin protocol codec from the decrypted payload.</p>
@@ -471,8 +476,9 @@ out of the current <code>acceptable_root_window_size</code> before the epoch end
 Implementations MUST therefore validate pre-computed proofs at send time
 (see <a href="#65-pre-computed-proof-validation-at-send-time">§6.5</a>).</p>
 <p><strong>Fallback caveat:</strong>
-On-demand generation when pre-computation falls behind introduces timing jitter,
-which shifts emissions off-grid for deterministic strategies (<em>e.g.,</em> <a href="#71-constant-rate-cover-traffic">§7.1</a>)
+On-demand generation when pre-computation falls behind adds load-dependent delay
+on top of the sampled pre-send delay (<a href="#62-cover-emission">§6.2</a>),
+skewing emission timing in a way that correlates with pre-computation load
 and weakens timing unobservability.
 Implementations SHOULD size the pre-computation pipeline (<a href="#91-pre-computation-scheduling">§9.1</a>)
 to avoid the fallback path in steady state.</p>
@@ -487,12 +493,23 @@ have already been deducted, so their slots are unavailable to any later claim.</
 <blockquote>
 <p>The following steps repeat continuously throughout each epoch:</p>
 <ol>
-<li>Wait for the next emission event as determined by the configured strategy.</li>
+<li>Wait for the next emission event as determined by the configured strategy.
+Emission events occur at fixed times independent of when previous transmissions completed;
+the pre-send delay of step 2.b MUST NOT shift subsequent emission events.</li>
 <li>If the strategy schedules an emission <strong>and</strong> <code>cover_queue</code> is non-empty:
 <ul>
 <li>a. Dequeue the head of <code>cover_queue</code> and decrement <code>slots_remaining</code>.</li>
-<li>b. Validate the proof per <a href="#65-pre-computed-proof-validation-at-send-time">§6.5</a>.</li>
-<li>c. Transmit the <code>packet</code> field of <a href="#55-data-structures"><code>PrebuiltCoverPacket</code></a> to the first hop
+<li>b. Sample a pre-send delay from the same distribution used for locally originated sends
+(<a href="mix.html#852-construction-steps">mix.md §8.5.2</a> Step 3.f)
+and schedule steps 2.c–2.e to run once it elapses, without blocking step 1.
+Otherwise, a delay longer than the emission interval would compress the gap
+between consecutive transmits to the delay itself — a cover timing signature.</li>
+<li>c. If the epoch changed while the delay elapsed, discard the packet:
+its slot was claimed from a pool that has since been discarded (<a href="#53-epoch-boundary">§5.3</a>),
+and transmitting would exceed the new epoch's budget by one packet.</li>
+<li>d. Validate the proof per <a href="#65-pre-computed-proof-validation-at-send-time">§6.5</a>.
+Validation happens after the delay so the staleness window between validation and transmission stays minimal.</li>
+<li>e. Transmit the <code>packet</code> field of <a href="#55-data-structures"><code>PrebuiltCoverPacket</code></a> to the first hop
 (other fields are internal and MUST NOT be sent).</li>
 </ul>
 </li>
@@ -501,6 +518,16 @@ have already been deducted, so their slots are unavailable to any later claim.</
 cover emission is suppressed until the next epoch boundary.</li>
 </ol>
 </blockquote>
+<p><strong>Pre-send delay:</strong>
+Locally originated packets and SURB replies apply a sampled pre-send delay before their first-hop write
+(<a href="mix.html#852-construction-steps">mix.md §8.5.2</a> Step 3.f).
+Cover transmissions MUST apply the same delay, sampled from the same distribution:
+a packet class that departs exactly on the strategy schedule while every other class jitters
+would be identifiable by the absence of jitter alone.
+This blurs individual emissions off the strategy grid,
+restoring the separability baseline from before non-cover traffic jittered;
+it does not provide timing unobservability
+(<a href="#104-timing-separability-of-cover-and-non-cover-packets">§10.4</a>).</p>
 <h3 id="63-locally-originated-message-sending"><a class="header" href="#63-locally-originated-message-sending">6.3 Locally Originated Message Sending</a></h3>
 <p><strong><a href="mix.html#85-packet-construction">During Sphinx packet construction</a>:</strong>
 When the Mix Entry Layer submits a locally originated message for mixification,
@@ -566,10 +593,12 @@ The originated cover emission rate is perfectly constant,
 so an adversary cannot distinguish epochs with heavy locally originated traffic from idle epochs
 by observing cover timing alone.</p>
 <p><strong>Tradeoff — timing separability:</strong>
-Cover packets fire on a fixed grid,
-while forwarded packets fire at arrival time plus mixing delay —
-always off-grid relative to the cover schedule.
-Over enough observations, an adversary can separate cover from non-cover by timing alone,
+Cover packets are scheduled on a fixed grid;
+the pre-send delay (<a href="#62-cover-emission">§6.2</a>) blurs each transmission off that grid,
+but the constant mean spacing remains.
+Forwarded packets fire at arrival time plus mixing delay,
+uncorrelated with the cover schedule.
+Over enough observations, an adversary can still separate cover from non-cover by timing alone,
 regardless of forwarding load.
 Constant-Rate therefore provides <strong>volume unobservability</strong>
 (the node's emission count does not leak non-cover activity)
@@ -669,8 +698,11 @@ would eliminate this concern entirely by fixing all emission times at epoch star
 making individual slot consumption events unobservable.</p>
 <h3 id="104-timing-separability-of-cover-and-non-cover-packets"><a class="header" href="#104-timing-separability-of-cover-and-non-cover-packets">10.4 Timing Separability of Cover and Non-Cover Packets</a></h3>
 <p>The default Constant-Rate strategy (<a href="#71-constant-rate-cover-traffic">§7.1</a>)
-emits cover packets on a fixed grid while forwarded packets are dispatched at arrival time plus mixing delay.
-With enough observations, a passive adversary can classify individual packets by timing alone,
+schedules cover packets on a fixed grid while forwarded packets are dispatched at arrival time plus mixing delay.
+The pre-send delay applied at emission (<a href="#62-cover-emission">§6.2</a>) removes exact grid alignment,
+but the constant underlying spacing survives averaging:
+with enough observations, a passive adversary can recover the emission schedule
+and classify packets near grid points with high confidence,
 regardless of forwarding load.</p>
 <p>Constant-Rate therefore provides volume unobservability but not timing unobservability.
 Under Constant-Rate, the pre-scheduled emission timing enhancement (<a href="#113-pre-scheduled-emission-timing">§11.3</a>)
@@ -719,7 +751,9 @@ which provides deterministic emission times known at epoch start.
 Poisson-Rate, where emission times are sampled at runtime, cannot support pre-scheduled slots.
 Note that pre-scheduled slots would require changes to the mixing delay strategy
 in the Mix Protocol, as forwarded packets would need to be held until their assigned slot time
-rather than forwarded after the sampled delay elapses.</p>
+rather than forwarded after the sampled delay elapses.
+The pre-send delays (<a href="mix.html#852-construction-steps">mix.md §8.5.2</a> Step 3.f, <a href="#62-cover-emission">§6.2</a>)
+would likewise be superseded by slot assignment.</p>
 <h3 id="114-budget-model-for-sender-generated-proofs"><a class="header" href="#114-budget-model-for-sender-generated-proofs">11.4 Budget Model for Sender-Generated Proofs</a></h3>
 <p>The rate-limit budget model in <a href="#4-rate-limit-budget-model">§4</a> assumes per-hop generated proofs,
 where forwarding consumes from the node's own <code>R</code> budget and the slot pool self-balances.

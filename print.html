@@ -57163,6 +57163,7 @@ Defining this threshold, or a rule that adapts it, is left to future work togeth
 </div><!-- timeline:start -->
 <h2 id="timeline-167"><a class="header" href="#timeline-167">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/19d6c887939d8be8fcc265ceec4604ffeb29a435/docs/anoncomms/raw/mix.md"><code>19d6c88</code></a> — docs(anoncomms): apply sender pre-send delay to SURB replies and cover emission (#403)</li>
 <li><strong>2026-05-25</strong> — <a href="https://github.com/logos-co/logos-lips/blob/f1017b9f30cfdf8cb4f53d5f3286e4bdf0bdfcd1/docs/anoncomms/raw/mix.md"><code>f1017b9</code></a> — Add LIONESS specification for Mix payload encryption (#329)</li>
 <li><strong>2026-05-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/1383661f9d566dde0d1b0de0e3ed01ed602ed34a/docs/anoncomms/raw/mix.md"><code>1383661</code></a> — Add SURB specification (§8.7) (#335)</li>
 <li><strong>2026-05-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/mix.md"><code>1ac7689</code></a> — chore: split ift ts specs (#334)</li>
@@ -58286,7 +58287,7 @@ Then each hop on the return path subsequently applies the normal payload-process
 </li>
 <li>
 <p><strong>Assemble and Transmit Reply Packet</strong></p>
-<p>Assemble the Sphinx packet using the SURB header <span class="math-inline" data-tex="(α, β, γ)"></span> and encrypted payload <span class="math-inline" data-tex="δ"></span> from step 2, following the packet format defined in <a href="anoncomms/raw/mix.html#852-construction-steps">Section 8.5.2</a> Step 3.e. Serialize and transmit packet to <span class="math-inline" data-tex="\mathrm{hop}_0"></span> (retrieved from the SURB) via a libp2p stream negotiated under the <code>"/mix/1.0.0"</code> protocol identifier.
+<p>Assemble the Sphinx packet using the SURB header <span class="math-inline" data-tex="(α, β, γ)"></span> and encrypted payload <span class="math-inline" data-tex="δ"></span> from step 2, following the packet format defined in <a href="anoncomms/raw/mix.html#852-construction-steps">Section 8.5.2</a> Step 3.e. Serialize the packet, then apply the randomized pre-send delay defined in <a href="anoncomms/raw/mix.html#852-construction-steps">Section 8.5.2</a> Step 3.f before transmitting it to <span class="math-inline" data-tex="\mathrm{hop}_0"></span> (retrieved from the SURB) via a libp2p stream negotiated under the <code>"/mix/1.0.0"</code> protocol identifier. Without this delay, reply transmissions would be distinguishable from locally originated transmissions, which jitter their first-hop writes.
 Discard the SURB.</p>
 </li>
 </ol>
@@ -58449,7 +58450,7 @@ However, SURBs are optional, and their usage for acknowledgments or retries must
 To improve reliability, the sender MAY:</p>
 <ul>
 <li>Use parallel transmission across <code>D</code> disjoint paths.</li>
-<li>Estimate end-to-end delay bounds based on chosen per-hop delays (defined in <a href="anoncomms/raw/mix.html#62-delay-strategy">Section 6.2</a>), and retry using different paths if a response is not received within the expected window.</li>
+<li>Estimate end-to-end delay bounds based on chosen per-hop delays (defined in <a href="anoncomms/raw/mix.html#62-delay-strategy">Section 6.2</a>) plus the pre-send delays applied at the initiating node (<a href="anoncomms/raw/mix.html#852-construction-steps">Section 8.5.2</a> Step 3.f) and at the exit for SURB replies (<a href="anoncomms/raw/mix.html#873-using-a-surb">Section 8.7.3</a>), and retry using different paths if a response is not received within the expected window.</li>
 </ul>
 <p>These strategies MUST be implemented at the origin protocol layer or through Mix integration logic and are not enforced by the Mix Protocol itself.</p>
 <h4 id="943-no-sybil-resistance"><a class="header" href="#943-no-sybil-resistance">9.4.3 No Sybil Resistance</a></h4>
@@ -58485,6 +58486,7 @@ Any such mechanism MUST preserve sender unlinkability and SHOULD be evaluated ca
 </div><!-- timeline:start -->
 <h2 id="timeline-168"><a class="header" href="#timeline-168">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/19d6c887939d8be8fcc265ceec4604ffeb29a435/docs/anoncomms/raw/mix-cover-traffic.md"><code>19d6c88</code></a> — docs(anoncomms): apply sender pre-send delay to SURB replies and cover emission (#403)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/anoncomms/raw/mix-cover-traffic.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
 <li><strong>2026-05-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/mix-cover-traffic.md"><code>1ac7689</code></a> — chore: split ift ts specs (#334)</li>
 <li><strong>2026-05-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/2aa2bcd89c58ccc4453207edeb8269e66a631b48/docs/ift-ts/raw/mix-cover-traffic.md"><code>2aa2bcd</code></a> — feat: Mix Cover Traffic specification (#311)</li>
@@ -58695,6 +58697,10 @@ are loaded into the new pool.</p>
 <p>Cover packets emitted near epoch end may arrive at later hops in a subsequent epoch.
 The DoS protection mechanism is responsible for accepting proofs within a configurable epoch window
 (<em>e.g.,</em> the <code>max_epoch_gap</code> parameter in <a href="anoncomms/raw/mix-spam-protection-rln.html">Mix RLN DoS Protection</a>).</p>
+<p>A cover packet whose pre-send delay (<a href="anoncomms/raw/mix-cover-traffic.html#62-cover-emission">§6.2</a>) is still elapsing at the boundary
+is discarded rather than transmitted:
+its slot was claimed from the previous epoch's pool,
+so transmitting it in the new epoch would exceed the fresh budget by one packet.</p>
 <h3 id="54-cover-packet-reception"><a class="header" href="#54-cover-packet-reception">5.4 Cover Packet Reception</a></h3>
 <p><strong>Trigger:</strong> The Mix Protocol completes <a href="anoncomms/raw/mix.html#864-exit-processing">exit processing</a> on a received Sphinx packet
 and extracts the origin protocol codec from the decrypted payload.</p>
@@ -58764,8 +58770,9 @@ out of the current <code>acceptable_root_window_size</code> before the epoch end
 Implementations MUST therefore validate pre-computed proofs at send time
 (see <a href="anoncomms/raw/mix-cover-traffic.html#65-pre-computed-proof-validation-at-send-time">§6.5</a>).</p>
 <p><strong>Fallback caveat:</strong>
-On-demand generation when pre-computation falls behind introduces timing jitter,
-which shifts emissions off-grid for deterministic strategies (<em>e.g.,</em> <a href="anoncomms/raw/mix-cover-traffic.html#71-constant-rate-cover-traffic">§7.1</a>)
+On-demand generation when pre-computation falls behind adds load-dependent delay
+on top of the sampled pre-send delay (<a href="anoncomms/raw/mix-cover-traffic.html#62-cover-emission">§6.2</a>),
+skewing emission timing in a way that correlates with pre-computation load
 and weakens timing unobservability.
 Implementations SHOULD size the pre-computation pipeline (<a href="anoncomms/raw/mix-cover-traffic.html#91-pre-computation-scheduling">§9.1</a>)
 to avoid the fallback path in steady state.</p>
@@ -58780,12 +58787,23 @@ have already been deducted, so their slots are unavailable to any later claim.</
 <blockquote>
 <p>The following steps repeat continuously throughout each epoch:</p>
 <ol>
-<li>Wait for the next emission event as determined by the configured strategy.</li>
+<li>Wait for the next emission event as determined by the configured strategy.
+Emission events occur at fixed times independent of when previous transmissions completed;
+the pre-send delay of step 2.b MUST NOT shift subsequent emission events.</li>
 <li>If the strategy schedules an emission <strong>and</strong> <code>cover_queue</code> is non-empty:
 <ul>
 <li>a. Dequeue the head of <code>cover_queue</code> and decrement <code>slots_remaining</code>.</li>
-<li>b. Validate the proof per <a href="anoncomms/raw/mix-cover-traffic.html#65-pre-computed-proof-validation-at-send-time">§6.5</a>.</li>
-<li>c. Transmit the <code>packet</code> field of <a href="anoncomms/raw/mix-cover-traffic.html#55-data-structures"><code>PrebuiltCoverPacket</code></a> to the first hop
+<li>b. Sample a pre-send delay from the same distribution used for locally originated sends
+(<a href="anoncomms/raw/mix.html#852-construction-steps">mix.md §8.5.2</a> Step 3.f)
+and schedule steps 2.c–2.e to run once it elapses, without blocking step 1.
+Otherwise, a delay longer than the emission interval would compress the gap
+between consecutive transmits to the delay itself — a cover timing signature.</li>
+<li>c. If the epoch changed while the delay elapsed, discard the packet:
+its slot was claimed from a pool that has since been discarded (<a href="anoncomms/raw/mix-cover-traffic.html#53-epoch-boundary">§5.3</a>),
+and transmitting would exceed the new epoch's budget by one packet.</li>
+<li>d. Validate the proof per <a href="anoncomms/raw/mix-cover-traffic.html#65-pre-computed-proof-validation-at-send-time">§6.5</a>.
+Validation happens after the delay so the staleness window between validation and transmission stays minimal.</li>
+<li>e. Transmit the <code>packet</code> field of <a href="anoncomms/raw/mix-cover-traffic.html#55-data-structures"><code>PrebuiltCoverPacket</code></a> to the first hop
 (other fields are internal and MUST NOT be sent).</li>
 </ul>
 </li>
@@ -58794,6 +58812,16 @@ have already been deducted, so their slots are unavailable to any later claim.</
 cover emission is suppressed until the next epoch boundary.</li>
 </ol>
 </blockquote>
+<p><strong>Pre-send delay:</strong>
+Locally originated packets and SURB replies apply a sampled pre-send delay before their first-hop write
+(<a href="anoncomms/raw/mix.html#852-construction-steps">mix.md §8.5.2</a> Step 3.f).
+Cover transmissions MUST apply the same delay, sampled from the same distribution:
+a packet class that departs exactly on the strategy schedule while every other class jitters
+would be identifiable by the absence of jitter alone.
+This blurs individual emissions off the strategy grid,
+restoring the separability baseline from before non-cover traffic jittered;
+it does not provide timing unobservability
+(<a href="anoncomms/raw/mix-cover-traffic.html#104-timing-separability-of-cover-and-non-cover-packets">§10.4</a>).</p>
 <h3 id="63-locally-originated-message-sending"><a class="header" href="#63-locally-originated-message-sending">6.3 Locally Originated Message Sending</a></h3>
 <p><strong><a href="anoncomms/raw/mix.html#85-packet-construction">During Sphinx packet construction</a>:</strong>
 When the Mix Entry Layer submits a locally originated message for mixification,
@@ -58859,10 +58887,12 @@ The originated cover emission rate is perfectly constant,
 so an adversary cannot distinguish epochs with heavy locally originated traffic from idle epochs
 by observing cover timing alone.</p>
 <p><strong>Tradeoff — timing separability:</strong>
-Cover packets fire on a fixed grid,
-while forwarded packets fire at arrival time plus mixing delay —
-always off-grid relative to the cover schedule.
-Over enough observations, an adversary can separate cover from non-cover by timing alone,
+Cover packets are scheduled on a fixed grid;
+the pre-send delay (<a href="anoncomms/raw/mix-cover-traffic.html#62-cover-emission">§6.2</a>) blurs each transmission off that grid,
+but the constant mean spacing remains.
+Forwarded packets fire at arrival time plus mixing delay,
+uncorrelated with the cover schedule.
+Over enough observations, an adversary can still separate cover from non-cover by timing alone,
 regardless of forwarding load.
 Constant-Rate therefore provides <strong>volume unobservability</strong>
 (the node's emission count does not leak non-cover activity)
@@ -58962,8 +58992,11 @@ would eliminate this concern entirely by fixing all emission times at epoch star
 making individual slot consumption events unobservable.</p>
 <h3 id="104-timing-separability-of-cover-and-non-cover-packets"><a class="header" href="#104-timing-separability-of-cover-and-non-cover-packets">10.4 Timing Separability of Cover and Non-Cover Packets</a></h3>
 <p>The default Constant-Rate strategy (<a href="anoncomms/raw/mix-cover-traffic.html#71-constant-rate-cover-traffic">§7.1</a>)
-emits cover packets on a fixed grid while forwarded packets are dispatched at arrival time plus mixing delay.
-With enough observations, a passive adversary can classify individual packets by timing alone,
+schedules cover packets on a fixed grid while forwarded packets are dispatched at arrival time plus mixing delay.
+The pre-send delay applied at emission (<a href="anoncomms/raw/mix-cover-traffic.html#62-cover-emission">§6.2</a>) removes exact grid alignment,
+but the constant underlying spacing survives averaging:
+with enough observations, a passive adversary can recover the emission schedule
+and classify packets near grid points with high confidence,
 regardless of forwarding load.</p>
 <p>Constant-Rate therefore provides volume unobservability but not timing unobservability.
 Under Constant-Rate, the pre-scheduled emission timing enhancement (<a href="anoncomms/raw/mix-cover-traffic.html#113-pre-scheduled-emission-timing">§11.3</a>)
@@ -59012,7 +59045,9 @@ which provides deterministic emission times known at epoch start.
 Poisson-Rate, where emission times are sampled at runtime, cannot support pre-scheduled slots.
 Note that pre-scheduled slots would require changes to the mixing delay strategy
 in the Mix Protocol, as forwarded packets would need to be held until their assigned slot time
-rather than forwarded after the sampled delay elapses.</p>
+rather than forwarded after the sampled delay elapses.
+The pre-send delays (<a href="anoncomms/raw/mix.html#852-construction-steps">mix.md §8.5.2</a> Step 3.f, <a href="anoncomms/raw/mix-cover-traffic.html#62-cover-emission">§6.2</a>)
+would likewise be superseded by slot assignment.</p>
 <h3 id="114-budget-model-for-sender-generated-proofs"><a class="header" href="#114-budget-model-for-sender-generated-proofs">11.4 Budget Model for Sender-Generated Proofs</a></h3>
 <p>The rate-limit budget model in <a href="anoncomms/raw/mix-cover-traffic.html#4-rate-limit-budget-model">§4</a> assumes per-hop generated proofs,
 where forwarding consumes from the node's own <code>R</code> budget and the slot pool self-balances.

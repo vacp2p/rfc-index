@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/19d6c887939d8be8fcc265ceec4604ffeb29a435/docs/anoncomms/raw/mix.md"><code>19d6c88</code></a> — docs(anoncomms): apply sender pre-send delay to SURB replies and cover emission (#403)</li>
 <li><strong>2026-05-25</strong> — <a href="https://github.com/logos-co/logos-lips/blob/f1017b9f30cfdf8cb4f53d5f3286e4bdf0bdfcd1/docs/anoncomms/raw/mix.md"><code>f1017b9</code></a> — Add LIONESS specification for Mix payload encryption (#329)</li>
 <li><strong>2026-05-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/1383661f9d566dde0d1b0de0e3ed01ed602ed34a/docs/anoncomms/raw/mix.md"><code>1383661</code></a> — Add SURB specification (§8.7) (#335)</li>
 <li><strong>2026-05-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/mix.md"><code>1ac7689</code></a> — chore: split ift ts specs (#334)</li>
@@ -1315,7 +1316,7 @@ Then each hop on the return path subsequently applies the normal payload-process
 </li>
 <li>
 <p><strong>Assemble and Transmit Reply Packet</strong></p>
-<p>Assemble the Sphinx packet using the SURB header <span class="math-inline" data-tex="(α, β, γ)"></span> and encrypted payload <span class="math-inline" data-tex="δ"></span> from step 2, following the packet format defined in <a href="#852-construction-steps">Section 8.5.2</a> Step 3.e. Serialize and transmit packet to <span class="math-inline" data-tex="\mathrm{hop}_0"></span> (retrieved from the SURB) via a libp2p stream negotiated under the <code>"/mix/1.0.0"</code> protocol identifier.
+<p>Assemble the Sphinx packet using the SURB header <span class="math-inline" data-tex="(α, β, γ)"></span> and encrypted payload <span class="math-inline" data-tex="δ"></span> from step 2, following the packet format defined in <a href="#852-construction-steps">Section 8.5.2</a> Step 3.e. Serialize the packet, then apply the randomized pre-send delay defined in <a href="#852-construction-steps">Section 8.5.2</a> Step 3.f before transmitting it to <span class="math-inline" data-tex="\mathrm{hop}_0"></span> (retrieved from the SURB) via a libp2p stream negotiated under the <code>"/mix/1.0.0"</code> protocol identifier. Without this delay, reply transmissions would be distinguishable from locally originated transmissions, which jitter their first-hop writes.
 Discard the SURB.</p>
 </li>
 </ol>
@@ -1478,7 +1479,7 @@ However, SURBs are optional, and their usage for acknowledgments or retries must
 To improve reliability, the sender MAY:</p>
 <ul>
 <li>Use parallel transmission across <code>D</code> disjoint paths.</li>
-<li>Estimate end-to-end delay bounds based on chosen per-hop delays (defined in <a href="#62-delay-strategy">Section 6.2</a>), and retry using different paths if a response is not received within the expected window.</li>
+<li>Estimate end-to-end delay bounds based on chosen per-hop delays (defined in <a href="#62-delay-strategy">Section 6.2</a>) plus the pre-send delays applied at the initiating node (<a href="#852-construction-steps">Section 8.5.2</a> Step 3.f) and at the exit for SURB replies (<a href="#873-using-a-surb">Section 8.7.3</a>), and retry using different paths if a response is not received within the expected window.</li>
 </ul>
 <p>These strategies MUST be implemented at the origin protocol layer or through Mix integration logic and are not enforced by the Mix Protocol itself.</p>
 <h4 id="943-no-sybil-resistance"><a class="header" href="#943-no-sybil-resistance">9.4.3 No Sybil Resistance</a></h4>
