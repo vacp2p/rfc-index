@@ -59,9 +59,9 @@ Below, we present a high-level description of the block lifecycle. The main focu
    3. They validate each transaction included in the block, in the order the transactions appear, each against the state the preceding ones left.
 
 6. The validators **execute** the block proposal.
-   1. They derive the new blockchain state from the previous one by executing transactions as defined in [Mantle](bedrock-v1.1-mantle-specification.md), in that same order and in that same pass, adopting the result only once the whole block has validated.
-   2. They update the different variables that need to be maintained over time.
-   3. They execute the [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally.
+   1. They append the `leader_voucher` of the block to the set of reward vouchers, which the following epoch starts with.
+   2. They execute the [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally and include them in the ledger.
+   3. They derive the new blockchain state from the previous one by executing transactions as defined in [Mantle](bedrock-v1.1-mantle-specification.md), in that same order and in that same pass, adopting the result only once the whole block has validated.
 
 # Constructions
 
@@ -277,13 +277,15 @@ If any of the above checks fail, the block proposal must be rejected and nothing
 
 This section specifies how a Logos Blockchain node executes a valid block proposal to update its local state.
 
-Given a `ValidBlock` that has successfully passed proposal validation, the node must:
+Given a `ValidBlock` that has successfully passed proposal validation, the node must, in this order:
 
 1. Append the `leader_voucher` contained in the block to the set of reward vouchers **when the following epoch starts**.
 2. Execute the reward distribution protocol defined in [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally and include them in the ledger.
 3. Execute the Mantle Transactions included in the block in the order they appear, each on the state the preceding one left, using the execution rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md).
 
-The three steps take effect together, on a block that has validated in full. A block that fails validation at any point is not executed at all.
+Steps 1 and 2 read the epoch and the state of the [Service Declaration Protocol](bedrock-service-declaration-protocol.md), never the transactions of the block, which is what lets them run before those transactions are validated and makes the reward notes of step 2 available to them.
+
+The three steps stand or fall together, on a block that has validated in full: a block that fails validation at any point is not executed at all. The voucher of step 1 is appended to the set the following epoch starts with, so it lands at the epoch boundary rather than with the other two.
 
 The carried `uncle_headers` are not executed. A referenced uncle is not part of the chain; therefore, its transactions have no effect on the ledger state. The uncles are used only as evidence of consensus participation for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference).
 
