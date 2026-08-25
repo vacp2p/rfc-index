@@ -433,8 +433,6 @@ Because block rewards affect consensus state, the implementation must be fully d
 
 The goal of this section is not to change the reward mechanism. It is only to restate the already-specified mechanism in a canonical deterministic form with explicit named constants. In particular, the reward logic remains driven by the same two KPI components described previously: the inferred total stake relative to its target, and the moving average of pooled fees over the look-back window. Likewise, the reward still interpolates between the reserve release and distribution from the pooled fees through the emission factor $`A_t`$.
 
-> Rederivation required: the integer steps below were written for the earlier reward equation, whose recycled term used the single-block pooled fee $`R_\text{block} = D_{1,t}`$. Equation (1) now distributes the average pooled reward $`\bar{R}_t = \frac{1}{T}\sum_{\tau=t-T+1}^{t} D_{1,\tau}`$ in the recycled term. To match the current model, replace $`(1-A_t)\cdot D_{1,t}`$ by $`(1-A_t)\cdot \bar{R}_t`$, reusing the window sum already maintained for $`\gamma_t`$ (the Rust reference already accumulates it as the fee window, so $`\bar{R}_t`$ is that sum divided by $`T`$). The derivation of $`A_t`$ and of the reserve-release term is unaffected.
-
 $$
 A_t = \min \lbrace 1, \max \lbrace 0, \dfrac{ \alpha_d \cdot \delta_t + \alpha_a \cdot \gamma_t + I_{min}}{I_{max}} \rbrace \rbrace.
 $$
