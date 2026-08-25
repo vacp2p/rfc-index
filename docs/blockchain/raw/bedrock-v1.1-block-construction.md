@@ -32,7 +32,7 @@
 | 1.1.3 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
 | 1.2.0 | Added the `uncle_headers` field — the signed headers of the referenced uncles — to the [Proposal](#block-proposal) and to the newly defined [Block](#block), and replaced `block_root` with `body_root` in the [Header](#header), which commits to them, signatures included, as well as to the transactions. Due to updated [Cryptarchia Protocol](cryptarchia-v1-protocol.md) (uncle references). | 2026-08-06 |
 | 1.3.0 | Compressed Block Proposal: 16-byte transaction reference prefixes and a variable-length `references` list, reducing the proposal from 34,574 bytes to at most 18,192. Added the [Canonical Encoding](#canonical-encoding) section. | 2026-08-18 |
-| 1.4.0 | Revised compression: replaced the 16-byte unkeyed hash prefixes with 8-byte keyed short transaction IDs — SipHash-2-4 under a per-proposal key derived from signed header fields — with a builder-side collision pre-check and a bounded-ambiguity reconstruction (`MAX_RECONSTRUCTION_COMBINATIONS`). The maximum proposal falls from 18,192 to 10,000 bytes. | 2026-08-20 |
+| 1.4.0 | Revised compression: replaced the 16-byte unkeyed hash prefixes with 8-byte keyed short transaction IDs — a truncated Blake2b under a per-proposal key derived from signed header fields — with a builder-side collision pre-check and a bounded-ambiguity reconstruction (`MAX_RECONSTRUCTION_COMBINATIONS`). The maximum proposal falls from 18,192 to 10,000 bytes. | 2026-08-20 |
 
 # Introduction
 
@@ -70,7 +70,7 @@ Below, we present a high-level description of the block lifecycle. The main focu
 
 We are using two hashing algorithms that have the same output length of 256 bits (32 bytes) that are [Poseidon2 and Blake2b](common-cryptographic-components.md).
 
-In addition to these cryptographic hashes, the short transaction IDs of the [References](#references) use SipHash-2-4 ([Aumasson–Bernstein, 2012](https://eprint.iacr.org/2012/351)) — a keyed 64-bit pseudorandom function for short inputs, not a general-purpose cryptographic hash. Its 128-bit key is derived per proposal from header fields using Blake2b, so Blake2b remains the only cryptographic hash in the construction; why a PRF suffices for the references is established in [Short ID keying and collision resistance](#short-id-keying-and-collision-resistance).
+The short transaction IDs of the [References](#references) introduce no further primitive: they are Blake2b, keyed by prefixing the key to the message and truncated to 8 bytes. What the short ID needs is pseudorandomness under an unpredictable key rather than collision resistance, and a keyed 64-bit function specialised for short inputs would evaluate faster — but reusing Blake2b keeps the construction to one hash and costs no new dependency. That trade, and why truncating Blake2b in this way is sound, is set out in [Short ID keying and collision resistance](#short-id-keying-and-collision-resistance).
 
 ## Block Proposal
 
@@ -122,24 +122,28 @@ Where:
 
 ### References
 
-Each reference is a keyed **short transaction ID** rather than the transaction hash or a prefix of it. A short ID is the full 64-bit output of SipHash-2-4 over the transaction hash, under a 128-bit key specific to this proposal:
+Each reference is a keyed **short transaction ID** rather than the transaction hash or a prefix of it. A short ID is the first 8 bytes of a Blake2b digest taken over the transaction hash under a 128-bit key specific to this proposal:
 
 ```python
-SHORT_ID_LENGTH = 8                   # bytes: the full SipHash-2-4 output
+SHORT_ID_LENGTH = 8                   # bytes retained from the digest
 MAX_RECONSTRUCTION_COMBINATIONS = 64  # see Reference Resolution
 
-def reference_key(header) -> (uint64, uint64):
-    material = hash(b"REFKEY_V1",
-                    header.parent_block,
-                    encode(header.slot),                  # UINT64, little-endian
-                    encode(header.proof_of_leadership))   # 224 bytes, wire order
-    return uint64_le(material[0:8]), uint64_le(material[8:16])
+def reference_key(header) -> bytes:                       # 16 bytes
+    return prefix(hash(b"REFKEY_V1",
+                       header.parent_block,
+                       encode(header.slot),               # UINT64, little-endian
+                       encode(header.proof_of_leadership)),  # 224 bytes, wire order
+                  16)
 
-def short_id(k0: uint64, k1: uint64, tx) -> bytes:
-    return encode(SipHash24(k0, k1, mantle_txhash(tx)))   # UINT64, little-endian
+def short_id(key: bytes, tx) -> bytes:                    # key is 16 bytes
+    return prefix(hash(key, mantle_txhash(tx)), SHORT_ID_LENGTH)
 ```
 
-Where `hash` is Blake2b as specified in [Common Cryptographic Components](common-cryptographic-components.md), `encode` is the canonical encoding of [Canonical Encoding](#canonical-encoding), `uint64_le` reads 8 bytes as a little-endian integer, and `SipHash24` is SipHash-2-4 ([Aumasson–Bernstein, 2012](https://eprint.iacr.org/2012/351)) keyed with `(k0, k1)`.
+Where `hash` is Blake2b as specified in [Common Cryptographic Components](common-cryptographic-components.md), `encode` is the canonical encoding of [Canonical Encoding](#canonical-encoding), and `prefix` takes the leading bytes of its argument.
+
+The key is applied by **prefixing it to the message**, not by Blake2b's native keyed mode. Both are secure here and the prefix form is the cheaper of the two: the 16-byte key and the 32-byte transaction hash together occupy a single 128-byte Blake2b block, whereas the native keyed mode spends an additional whole block on the padded key and so costs twice as much per transaction. Prefixing is sound because Blake2b is not vulnerable to length extension, and because both operands here are fixed-length — a 16-byte key and a 32-byte hash — so no two distinct `(key, hash)` pairs can produce the same preimage.
+
+Note that truncating a Blake2b-512 digest to 8 bytes is not the same function as a Blake2b configured for an 8-byte digest: the digest length is bound into Blake2b's parameter block. This specification means the former — compute the full digest, keep the first `SHORT_ID_LENGTH` bytes.
 
 The key is **derived, not carried**. Every field of its preimage is part of the signed header, so the key is authenticated by `signature` and by `block_id` exactly as the header is, adds no bytes to the wire, and cannot be tampered with separately from the header. The preimage deliberately excludes `body_root`, so the key is fixed before transaction selection begins and the builder can compute short IDs while selecting. And because the preimage contains the `ProofOfLeadership`, the key of a future proposal is unknowable to anyone but its — still secret — leader until the proposal is broadcast; [Short ID keying and collision resistance](#short-id-keying-and-collision-resistance) establishes why that is what makes 8-byte references safe.
 
@@ -148,7 +152,7 @@ class References:                            # 2..8194 bytes
     mempool_transactions: list[bytes]        # UINT16 count + len * SHORT_ID_LENGTH
 ```
 
-Where `mempool_transactions` is a variable-length list of up to `MAX_BLOCK_TXS` references to transactions, each being `short_id(k0, k1, tx)` for a selected transaction `tx`.
+Where `mempool_transactions` is a variable-length list of up to `MAX_BLOCK_TXS` references to transactions, each being `short_id(key, tx)` for a selected transaction `tx`.
 
 The list is not padded. As specified in [Canonical Encoding](#canonical-encoding), it is serialized as a 2-byte little-endian element count followed by that many `SHORT_ID_LENGTH`-byte entries, so its encoded size is `2 + len(mempool_transactions) * SHORT_ID_LENGTH` bytes — 2 bytes when the proposal references no transaction, and `2 + 1024 * 8 = 8194` bytes at `MAX_BLOCK_TXS`.
 
@@ -204,7 +208,7 @@ LeaderVoucher     = FieldElement
 
 References        = ReferenceCount *Reference
 ReferenceCount    = UINT16          ; MUST NOT exceed MAX_BLOCK_TXS
-Reference         = UINT64          ; short transaction ID: full SipHash-2-4 output
+Reference         = 8BYTE           ; short transaction ID: SHORT_ID_LENGTH digest bytes
 ```
 
 The terminals `Byte`, `UINT16`, `UINT64`, `Hash32`, `FieldElement`, `Groth16`, `Ed25519PublicKey` and `Ed25519Signature` are those defined in [Mantle Transaction Encoding](mantle-transaction-encoding.md#common-structures). Note in particular that `FieldElement` is a little-endian BN254 field element, which fixes the byte order of `entropy_contribution` and `leader_voucher`.
@@ -286,8 +290,8 @@ Only after the PoL is generated can the block proposal be constructed (see [Proo
 
 3. Derive the reference key and the short IDs, and clear the selection of collisions:
 ```python
-k0, k1 = reference_key(header)   # parent_block, slot and the PoL are already set
-references: list[bytes] = [short_id(k0, k1, tx) for tx in mempool_transactions]
+key = reference_key(header)      # parent_block, slot and the PoL are already set
+references: list[bytes] = [short_id(key, tx) for tx in mempool_transactions]
 ```
 
   The selection **must not** contain two transactions with the same short ID: on a duplicate, drop or replace one of the pair and recompute. Under an honestly derived key a duplicate occurs with probability ≈ $`N^2/2^{65}`$ per proposal — below $`2^{-45}`$ at `MAX_BLOCK_TXS` — so this rule fires essentially never, and its purpose is to let decoders treat a duplicate reference as proof of tampering or dishonest construction ([References](#references)). The builder **should** also avoid selecting a transaction whose short ID collides with any *other* transaction in its mempool: such a collision is visible to the builder, and would resolve ambiguously at every validator holding both transactions. This is best effort — the builder cannot see other mempools — and [Reference Resolution](#reference-resolution) handles what it cannot prevent.
@@ -338,14 +342,14 @@ A reference is the 8-byte keyed short ID of a transaction, as defined in [Refere
 
 ```python
 def resolve_candidates(proposal, mempool):
-    k0, k1 = reference_key(proposal.header)
+    key = reference_key(proposal.header)
     index = {}                                   # short ID -> local transactions
     for tx in mempool:
-        index.setdefault(short_id(k0, k1, tx), []).append(tx)
+        index.setdefault(short_id(key, tx), []).append(tx)
     return [index.get(r, []) for r in proposal.references]
 ```
 
-The rehash is per proposal — the key changes with every proposal, which is the point — and costs one SipHash evaluation per mempool transaction over its cached 32-byte hash. Nothing of it can be reused across proposals, and nothing needs to be: the index for one proposal is discarded with it.
+The rehash is per proposal — the key changes with every proposal, which is the point — and costs one Blake2b compression per mempool transaction over its cached 32-byte hash. Nothing of it can be reused across proposals, and nothing needs to be: the index for one proposal is discarded with it. This is the dominant cost the design adds, and it is the reason the per-slot bound on reconstruction attempts below is normative rather than advisory.
 
 Each reference then has a set of local candidates:
 
@@ -436,15 +440,21 @@ References are 8-byte short IDs, yet the design tolerates no grinding of collisi
 
 **Before the proposal exists, no useful work can be done.** The key preimage contains the `ProofOfLeadership`. Until the proposal is broadcast, the winning leader is unknown — leadership is anonymous by design — so no other party can evaluate `short_id` for the coming block at all. Collisions can be neither pre-ground nor pre-planted: transactions inserted into mempools in advance meet the eventual key as uniformly random 64-bit values, and a planted set of $`M`$ transactions collides with a selection of $`N`$ with expected count $`N \cdot M / 2^{64}`$ — at $`N = 2^{10}`$, one expected hit requires $`M = 2^{54}`$ resident transactions. An unkeyed prefix, by contrast, can be ground for as long as the attacker likes before the block exists: at 8 unkeyed bytes a birthday search finds colliding pairs within $`2^{32}`$ hashes — under a second on a GPU — which is why the previous revision of this specification had to spend 16 bytes per reference.
 
-**After the proposal is broadcast, the window is seconds and the birthday advantage is gone.** Once the key is public, only collisions against the $`N`$ *referenced* short IDs matter: a pair of attacker transactions colliding with each other but with no reference is never consulted by resolution. Hitting a fixed set of $`N`$ targets is a targeted search costing $`2^{64}/N`$ attempts — the birthday square-root shortcut does not apply — and every attempt must be a distinct valid transaction, so each costs at least one `mantle_txhash` evaluation of a fresh candidate. At $`N = 1024`$ that is $`2^{54}`$ transaction hashes, years of GPU time, against a window that closes when the proposal finishes propagating: seconds. The keying also charges attacker and defender asymmetrically — the attacker pays the cryptographic hash per candidate, while validators pay one SipHash per mempool transaction over a hash they already cache.
+**After the proposal is broadcast, the window is seconds and the birthday advantage is gone.** Once the key is public, only collisions against the $`N`$ *referenced* short IDs matter: a pair of attacker transactions colliding with each other but with no reference is never consulted by resolution. Hitting a fixed set of $`N`$ targets is a targeted search costing $`2^{64}/N`$ attempts — the birthday square-root shortcut does not apply — and every attempt must be a distinct valid transaction, so each costs at least one `mantle_txhash` evaluation of a fresh candidate. At $`N = 1024`$ that is $`2^{54}`$ transaction hashes, years of GPU time, against a window that closes when the proposal finishes propagating: seconds. The keying also charges attacker and defender asymmetrically, though less sharply than a function specialised for short inputs would: every attacker candidate is a whole `MantleTx` hashed from scratch — several Blake2b blocks each — while every validator evaluation is a single block over a 32-byte hash the mempool already holds.
 
 **The leader's advance knowledge of its own key is harmless.** A leader can know its winning slots — and therefore its own future keys — well in advance, and could grind colliding pairs under them at birthday cost. But a key is used only by its own proposal, so all such a leader can sabotage is its own block: referencing ground collisions past `MAX_RECONSTRUCTION_COMBINATIONS` makes every validator reject the proposal, which achieves exactly what not proposing achieves. The bound is what turns this from a validator-CPU attack into a self-DoS: the search a malicious leader can impose on each validator is capped at 64 body-root evaluations per proposal.
 
 **What remains is chance, and it is priced in.** Under a fresh key, a validator holding $`M`$ transactions sees an ambiguous reference with probability ≈ $`N \cdot M / 2^{64}`$ per proposal — about $`2^{-34}`$ at $`M = 10^6`$: of the order of one occurrence per year across a network of ten thousand validators, and that occurrence is one reference with two candidates, settled by trying both against `header.body_root`. Exceeding `MAX_RECONSTRUCTION_COMBINATIONS = 64` by chance requires simultaneous independent collisions on at least seven references — or improbably many candidates on fewer — and has no practical probability of occurring; a validator that nonetheless hits either failure rejects locally and provisionally, exactly as for a missing transaction ([Reference Resolution](#reference-resolution)).
 
-**Why SipHash-2-4, and why the full 64 bits.** The short ID needs pseudorandomness under an unpredictable key — PRF security — not collision resistance in the cryptographic sense. SipHash-2-4 is a keyed PRF designed for short inputs and for precisely this threat shape (it was built to stop hash-flood denial-of-service), and it evaluates a 32-byte input several times faster than a single Blake2b compression, which is what keeps the per-proposal mempool rehash cheap: about 34 ms per $`10^6`$ transactions on one core of validator-class hardware (a Raspberry Pi 5), or 13 ms across its four, against 217–426 ms for Blake2b variants on the same host (benchmarked in the research repository, `simulations/block-proposal/bench-shortid`). BIP-152's 48-bit IDs would not carry over safely: at $`b = 48`$ the post-broadcast targeted search is $`2^{48}/N = 2^{38}`$ — GPU-seconds, inside the propagation window — while at $`b = 64`$ it is $`2^{54}`$, out of reach by many orders of magnitude. The full SipHash output is used directly, so a reference is a native little-endian 64-bit integer on the wire and no truncation step exists to specify.
+**Why 64 bits.** BIP-152's 48-bit short IDs would not carry over safely. At $`b = 48`$ the post-broadcast targeted search is $`2^{48}/N = 2^{38}`$ — GPU-seconds, inside the propagation window — while at $`b = 64`$ it is $`2^{54}`$, out of reach by many orders of magnitude. Eight bytes is therefore the shortest reference this construction can carry, and the cost of the extra two bytes over BIP-152 is 2,048 bytes on a full proposal.
 
-The price of the revision is the collision machinery itself — the builder-side pre-check, the bounded search — in exchange for halving the references against the 16-byte unkeyed design: the maximum proposal falls from 18,192 to 10,000 bytes, 3.5× below the full-hash layout's 34,574. `header.body_root` remains the safety backstop in every case: no assignment of wrong transactions can reproduce it.
+**Why the short ID is a truncated Blake2b, and what that costs.** What the short ID must provide is pseudorandomness under an unpredictable key — PRF security — and *not* collision resistance in the cryptographic sense, which is carried entirely by `body_root` over the full hashes. That is a weaker requirement than Blake2b supplies, and a keyed function specialised for short inputs would satisfy it several times faster. SipHash-2-4 ([Aumasson–Bernstein, 2012](https://eprint.iacr.org/2012/351)) is the obvious candidate: it is what BIP-152 uses for exactly this role, it was designed against hash-flooding denial of service, and on validator-class hardware it evaluates the whole mempool in about 34 ms per $`10^6`$ transactions against 217 ms for this truncated Blake2b — a factor of 6.4, measured on a Raspberry Pi 5 and reproduced within half a percentage point on an unrelated microarchitecture (benchmarked in the research repository, `simulations/block-proposal/bench-shortid`).
+
+This specification nevertheless uses Blake2b, and accepts the factor of 6.4. The reason is that Blake2b is already the block layer's hash: reusing it keeps the construction to a single primitive, adds no dependency, and lets an implementation reach for the hasher it already has rather than introducing a second one with its own vectors, its own review surface and its own supply chain. At the resulting cost — 217 ms of rehash per proposal on one core of a Raspberry Pi 5, 54 ms across its four — the work fits within a slot with room to spare, so the simplification is affordable. Adopting SipHash-2-4 later is a contained change: it alters only `short_id`, which is a leaf of the construction, and it changes no size, no encoding and no validation rule. It is recorded here as the known optimisation to take if the rehash ever becomes the constraint — most plausibly under sustained equivocation, since each distinct `block_id` admitted past signature and proof-of-leadership verification costs one full rehash, which is what the per-slot bound in [Binding of the reference list](#binding-of-the-reference-list) exists to cap.
+
+Two details of the Blake2b construction are load-bearing and are fixed in [References](#references) rather than left to the implementation. The key is **prefixed to the message** rather than passed to Blake2b's native keyed mode, because the prefix form fits key and message into one 128-byte block while the native mode spends a second block on the padded key — twice the cost for no gain here, given that both operands are fixed-length and Blake2b is not length-extendable. And the digest is **computed in full and truncated**, which is not the same function as a Blake2b configured to emit 8 bytes, because the digest length is bound into Blake2b's parameter block; specifying which of the two is meant is necessary for interoperability.
+
+The price of the revision is the collision machinery itself — the builder-side pre-check, the bounded search — plus the per-proposal rehash, in exchange for halving the references against the 16-byte unkeyed design: the maximum proposal falls from 18,192 to 10,000 bytes, 3.5× below the full-hash layout's 34,574. `header.body_root` remains the safety backstop in every case: no assignment of wrong transactions can reproduce it.
 
 ## Why `body_root` alone binds the reference list
 
