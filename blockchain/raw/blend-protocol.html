@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-25</strong> — <a href="https://github.com/logos-co/logos-lips/blob/796baaac776146dbe6d11f858b41df2b0311af77/docs/blockchain/raw/blend-protocol.md"><code>796baaa</code></a> — docs(blockchain): fix blend token evaluation and active message encoding (#405)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/7c70a384516a0f223ba7b080772f8459ff9bf76a/docs/blockchain/raw/blend-protocol.md"><code>7c70a38</code></a> — docs(blockchain): fix CSPBRG/CSPRBG typos in Blend Proof of Selection (#414)</li>
 <li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/blend-protocol.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/blend-protocol.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -205,6 +206,7 @@
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-04-09</td></tr>
 <tr><td>1.1.0</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
 <tr><td>1.1.1</td><td>Updated the block proposal message size to 34574 bytes in the encapsulation-overhead calculation, following the addition of carried uncle headers in <a href="bedrock-v1.1-block-construction.html">Block Construction, Validation and Execution</a>.</td><td>2026-08-06</td></tr>
+<tr><td>1.2.0</td><td>Define the token evaluation under a low core quota, and specify the Active Message metadata layout.</td><td>2026-08-19</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -799,7 +801,7 @@
 <p>The quota limits the number of messages that can be generated during an epoch. This bound is necessary for the health of the network as it decreases the bandwidth usage and enables us to calculate rewards fairly.</p>
 <h3 id="core-quota"><a class="header" href="#core-quota">Core Quota</a></h3>
 <p>The core quota (<span class="math-inline" data-tex="Q_C"></span>) defines the messaging allowance that can be used by a core node during a single epoch. <strong>The purpose of</strong> <span class="math-inline" data-tex="Q_C"></span> <strong>is to limit the number of cover messages and the number of blending operations that can be used for a single message.</strong> We assume that the core quota is used for generating cover messages, but the core node is not limited by this assumption. We define it as follows:</p>
-<div class="math-block" data-tex="Q_C = \left\lfloor \dfrac{C \cdot (\beta_C+R_C \cdot \beta_C)}{N} \right\rfloor"></div>
+<div class="math-block" data-tex="Q_C = \left\lceil \dfrac{C \cdot (\beta_C+R_C \cdot \beta_C)}{N} \right\rceil"></div>
 <p>Where:</p>
 <ul>
 <li><span class="math-inline" data-tex="C = E \cdot F_C"></span> denotes an expected number of cover messages that are generated during an epoch by the core nodes;</li>
@@ -807,8 +809,11 @@
 <li><span class="math-inline" data-tex="R_C"></span> denotes a redundancy parameter for cover messages, increasing the number of core node messages a node can send;</li>
 <li><span class="math-inline" data-tex="N"></span> denote a number of core nodes providing the Blend service for the epoch returned by the SDP protocol (<a href="bedrock-service-declaration-protocol.html">Service Declaration Protocol</a>).</li>
 </ul>
+<p>The division must be rounded <strong>up</strong>. Rounding down would collapse <span class="math-inline" data-tex="Q_C"></span> to <span class="math-inline" data-tex="0"></span> as soon as <span class="math-inline" data-tex="N &gt; C \cdot (\beta_C + R_C \cdot \beta_C)"></span> — that is, as soon as the network outgrows the expected number of blending operations for cover messages. Every core node would then be issued an empty key pool and cover traffic would stop entirely, removing the protocol's anonymity guarantee exactly when the network is largest. Rounding up costs at most <span class="math-inline" data-tex="N-1"></span> additional messages network-wide per epoch.</p>
+<p>The parameters must additionally satisfy <span class="math-inline" data-tex="C \cdot \beta_C &gt; 0"></span>. Together with rounding up, this guarantees <span class="math-inline" data-tex="Q_C \geq 1"></span> for every epoch.</p>
 <p>Additionally, we introduce the total core quota, which defines the total number of generated cover messages that the whole network can emit (independently of the number of nodes):</p>
-<div class="math-block" data-tex="Q^{Total}_C = N \cdot Q_C = C \cdot (\beta_C+R_C \cdot \beta_C)"></div>
+<div class="math-block" data-tex="Q^{Total}_C = N \cdot Q_C \geq C \cdot (\beta_C+R_C \cdot \beta_C)"></div>
+<p>The equality holds only when <span class="math-inline" data-tex="N"></span> divides <span class="math-inline" data-tex="C \cdot (\beta_C + R_C \cdot \beta_C)"></span>; otherwise rounding up makes the total larger by at most <span class="math-inline" data-tex="N-1"></span> messages. From <span class="math-inline" data-tex="Q_C \geq 1"></span> it also follows that <span class="math-inline" data-tex="Q^{Total}_C \geq N"></span>, which is relied upon by the <a href="#activity-proof">Activity Proof</a> and the <a href="#activity-threshold">Activity Threshold</a>.</p>
 <h3 id="leadership-quota"><a class="header" href="#leadership-quota">Leadership Quota</a></h3>
 <p><strong>The leadership quota (</strong><span class="math-inline" data-tex="Q_L"></span><strong>) defines the number of blending operations a block proposer (consensus leader) node can perform within the network.</strong> A single quota is used per single proof of leadership. Therefore, a single node can use multiple leadership quotas during a single epoch. We assume that the leader is interested in using most of its quota to generate data messages; however, the leader is not limited by this assumption. We define the leadership quota as follows:</p>
 <div class="math-block" data-tex="Q_L = \beta_D + \beta_D \cdot R_D"></div>
@@ -1121,16 +1126,18 @@
 </ul>
 </li>
 <li>
-<p>The Hamming distance (<span class="math-inline" data-tex="\Delta_{\mathcal H}(a,b)"></span> — returns the number of different bits between <span class="math-inline" data-tex="a"></span> and <span class="math-inline" data-tex="b"></span> binary strings) between the blending token <span class="math-inline" data-tex="t"></span> and the next epoch randomness <span class="math-inline" data-tex="R_{e+1}"></span> is smaller than the node activity threshold <span class="math-inline" data-tex="\mathcal A _{\epsilon}"></span>. That is:</p>
+<p>The Hamming distance (<span class="math-inline" data-tex="\Delta_{\mathcal H}(a,b)"></span> — returns the number of different bits between <span class="math-inline" data-tex="a"></span> and <span class="math-inline" data-tex="b"></span> binary strings) between the blending token <span class="math-inline" data-tex="t"></span> and the next epoch randomness <span class="math-inline" data-tex="R_{e+1}"></span> is not greater than the node activity threshold <span class="math-inline" data-tex="\mathcal A _{\epsilon}"></span>. That is:</p>
 </li>
 </ul>
-<div class="math-block" data-tex="\Delta_{\mathcal H}(H(t)_{\epsilon},H(R_{e+1})_{\epsilon}) &lt; {\mathcal A}_{\epsilon}"></div>
+<div class="math-block" data-tex="\Delta_{\mathcal H}(H(t)_{\epsilon},H(R_{e+1})_{\epsilon}) \leq {\mathcal A}_{\epsilon}"></div>
 <p>Where:</p>
 <ul>
 <li><span class="math-inline" data-tex="H()"></span> is a hash function (the implementation of the hash function is <code>blake2b</code> returning <span class="math-inline" data-tex="\epsilon"></span> bits).</li>
 <li><span class="math-inline" data-tex="\epsilon"></span> is a number of bits that can represent an expected number of blending tokens generated during an epoch. The number is rounded up to full bytes as required by the <code>blake2b</code> hash algorithm:</li>
 </ul>
 <div class="math-block" data-tex="\epsilon = \left\lceil \log_2(Q_C^{Total}+1) \over 8\right\rceil\cdot8"></div>
+<p>The comparison is inclusive: a token whose distance equals <span class="math-inline" data-tex="{\mathcal A}_{\epsilon}"></span> satisfies the proof. The difficulty of the lottery is tuned through the sensitivity parameter <span class="math-inline" data-tex="\theta"></span> of the <a href="#activity-threshold">Activity Threshold</a>, not through the choice of comparison operator.</p>
+<p>The requirement <span class="math-inline" data-tex="C \cdot \beta_C &gt; 0"></span> (see <a href="#core-quota">Core Quota</a>) guarantees <span class="math-inline" data-tex="Q_C \geq 1"></span> and therefore <span class="math-inline" data-tex="Q^{Total}_C \geq N \geq 1"></span>. It follows that <span class="math-inline" data-tex="\log_2(Q^{Total}_C+1) \geq 1"></span> and hence <span class="math-inline" data-tex="\epsilon \geq 8"></span>: the digest is always at least one byte wide, which the <code>blake2b</code> algorithm requires.</p>
 <p>The Hamming distance verification prevents nodes from the grinding or pre-computation attacks due to the unpredictability of the randomness of the next epoch. Even if a node knows the value of the randomness in advance, it will not increase its chance for getting a reward as the node does not control the process of generating blending tokens. However, a dishonest node could use that knowledge to refrain from sending a message with a token that has a potential (probabilistic, not deterministic) of granting a premium reward for the recipient blend node.</p>
 <p>The node activity proof construction is:</p>
 <pre><code class="language-python">class ActivityProof:
@@ -1146,20 +1153,35 @@
 <li><code>ProofOfSelection</code> is defined in <a href="#proof-of-selection">Proof of Selection</a>.</li>
 <li><code>SigningKey</code> is the key used to sign the <code>ProofOfQuota</code>.</li>
 </ul>
+<p>The serialized form of these fields, together with the two header bytes that precede them, is defined in <a href="#active-message">Active Message</a>.</p>
 <h3 id="activity-threshold"><a class="header" href="#activity-threshold">Activity Threshold</a></h3>
-<p>The activity threshold <span class="math-inline" data-tex="{\mathcal A}_{\epsilon}"></span> defines the expected maximal Hamming distance from the epoch randomness to the blending token expressed as an integer smaller or equal <span class="math-inline" data-tex="\epsilon"></span>.</p>
+<p>The activity threshold <span class="math-inline" data-tex="{\mathcal A}_{\epsilon}"></span> defines the expected maximal Hamming distance from the epoch randomness to the blending token expressed as a non-negative integer smaller or equal <span class="math-inline" data-tex="\epsilon"></span>.</p>
 <p>We define the activity threshold as follows:</p>
-<div class="math-block" data-tex="{\mathcal A}_{\epsilon} = \chi - \nu- \theta"></div>
+<div class="math-block" data-tex="{\mathcal A}_{\epsilon} = \max(0, \chi - \nu - \theta)"></div>
 <p>Where:</p>
 <ul>
 <li><span class="math-inline" data-tex="\nu=\left\lceil \log_2(N + 1) \right\rceil"></span> represents the number of bits that are needed to express the number of nodes in the network <span class="math-inline" data-tex="N"></span>, it makes the lottery difficulty a function of the network size;</li>
-<li><span class="math-inline" data-tex="\chi=\left\lceil\log_2(Q_C^{Total}+1)\right\rceil"></span> represents the number of bits needed to express all blending tokens generated during an epoch, where <span class="math-inline" data-tex="Q_C^{Total}"></span> is the total number of cover messages generated by the network during an epoch (as defined <a href="blend-protocol.html">here</a>);</li>
+<li><span class="math-inline" data-tex="\chi=\left\lceil\log_2(Q_C^{Total}+1)\right\rceil"></span> represents the number of bits needed to express all blending tokens generated during an epoch, where <span class="math-inline" data-tex="Q_C^{Total}"></span> is the total number of cover messages generated by the network during an epoch (as defined <a href="#core-quota">here</a>);</li>
 <li><span class="math-inline" data-tex="\theta=1"></span> represents a sensitivity parameter that controls the winning conditions of the lottery.</li>
 </ul>
 <p>We assume that setting <span class="math-inline" data-tex="\theta = 1"></span> is enough to eliminate nodes that have not been active enough without too aggressively eliminating nodes that worked but had less luck with the lottery. However, we are going to revise this parameter in the future version of the protocol.</p>
+<p>The difference <span class="math-inline" data-tex="\chi - \nu - \theta"></span> is negative whenever <span class="math-inline" data-tex="\chi \leq \nu + \theta"></span>, which happens when the total number of blending tokens is small relative to the network size. Because <span class="math-inline" data-tex="\chi \approx \log_2(Q^{Total}_C)"></span> and <span class="math-inline" data-tex="\nu \approx \log_2(N)"></span>, this regime is reached when the per-node quota <span class="math-inline" data-tex="Q_C"></span> is of the order of <span class="math-inline" data-tex="2^{\theta}"></span> or smaller. A negative value is not a meaningful Hamming distance, so the threshold is clamped at <span class="math-inline" data-tex="0"></span>: the lottery becomes maximally difficult instead of undefined. At <span class="math-inline" data-tex="{\mathcal A}_{\epsilon} = 0"></span> an activity proof is still attainable, but only for a blending token whose <span class="math-inline" data-tex="\epsilon"></span>-bit digest matches the digest of the epoch randomness exactly.</p>
+<p>The clamped regime is a degenerate operating point rather than a target: it makes rewards nearly unreachable for honest nodes and, in the limit, admits every node at once. Parameters should therefore be chosen so that <span class="math-inline" data-tex="\chi &gt; \nu + \theta"></span>, which holds comfortably for the expected deployment values.</p>
 <h3 id="active-message"><a class="header" href="#active-message">Active Message</a></h3>
-<p>A node <span class="math-inline" data-tex="l"></span> for every epoch must construct an active message <span class="math-inline" data-tex="M_A= \{l, t, e, \pi_{A}^{l,t,e} \}"></span>, which must follow the <a href="bedrock-service-declaration-protocol.html#active-message">Active Message</a>.</p>
-<p>The active message <code>metadata</code> field must start with a header that contains a one byte <code>version</code> field which is fixed to <code>0x01</code> value, the rest of the <code>metadata</code> is populated by the <a href="#activity-proof">Activity Proof</a>.</p>
+<p>A node <span class="math-inline" data-tex="l"></span> for every epoch must construct an active message, which must follow the <a href="bedrock-service-declaration-protocol.html#active-message">Active Message</a> and is carried on the wire by the <code>SDP_ACTIVE</code> operation (<a href="mantle-transaction-encoding.html">Mantle Transaction Encoding</a>). The envelope fields (<code>declaration_id</code>, <code>nonce</code>) and their encoding are defined by those documents and are not restated here. This section defines only the service-specific <code>metadata</code> payload for the Blend service, which carries the <a href="#activity-proof">Activity Proof</a> <span class="math-inline" data-tex="\pi_{A}^{l,t,e}"></span> for a blending token <span class="math-inline" data-tex="t"></span> and an epoch <span class="math-inline" data-tex="e"></span>.</p>
+<p>The <code>metadata</code> field is the concatenation of the following fields, in order:</p>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Size (bytes)</th><th>Value</th></tr></thead><tbody>
+<tr><td><code>metadata_type</code></td><td>1</td><td><code>0x01</code>, identifying the payload as Blend service activity metadata</td></tr>
+<tr><td><code>version</code></td><td>1</td><td><code>0x01</code>, the version of the Blend <a href="#activity-proof">Activity Proof</a> format</td></tr>
+<tr><td><code>epoch_number</code></td><td>4</td><td>the epoch <span class="math-inline" data-tex="e"></span> the proof attests to, encoded as little-endian</td></tr>
+<tr><td><code>signing_key</code></td><td>32</td><td>the public key <span class="math-inline" data-tex="K^{n}_{l}"></span> used to verify the two proofs below</td></tr>
+<tr><td><code>proof_of_quota</code></td><td>160</td><td><span class="math-inline" data-tex="\pi_{Q}^{K^{n}_{l}}"></span>, serialized as defined in <a href="proof-of-quota.html">Proof of Quota</a></td></tr>
+<tr><td><code>proof_of_selection</code></td><td>32</td><td><span class="math-inline" data-tex="\pi_{S}^{K^{n}_{l},l}"></span></td></tr>
+</tbody></table>
+</div>
+<p>The total size of the <code>metadata</code> field is therefore <span class="math-inline" data-tex="230"></span> bytes.</p>
+<p>The two leading bytes serve distinct purposes and must not be conflated. The <code>metadata_type</code> byte selects how the service-specific <code>metadata</code> field is interpreted, so that the SDP active message can carry activity metadata for services other than Blend. The <code>version</code> byte versions the Blend Activity Proof format itself, independently of that selector.</p>
+<p>The <code>metadata_type</code> must be equal to <code>0x01</code>; if not, then discard the message. The <code>version</code> must be equal to <code>0x01</code>; if not, then discard the message.</p>
 <p>The active message is stored on the ledger.</p>
 <p>The active message is used for calculating the node reward.</p>
 <p>The active message is constructed after the current epoch, when the next epoch randomness is known.</p>
@@ -1198,7 +1220,7 @@
 <p>The reward is paid out to the node <span class="math-inline" data-tex="n"></span> based on the node's activity declaration and the above reward calculation.</p>
 <p>The rewards are distributed according to <a href="bedrock-service-reward-distribution.html">Service Reward Distribution Protocol</a>. Here we are briefly sketching the main idea of the reward distribution protocol. For more details refer to the above document.</p>
 <ol>
-<li>To receive a reward, a node must send an Active Message as described in the <a href="bedrock-service-declaration-protocol.html#active-message">Active Message</a>, where the <code>Metadata</code> field consists of a node activity proof. The node must point to a single declaration (<code>declaration_id</code>) and use a single provider identity (<code>provider_id</code>) for constructing the Active Message. Any reuse of the <code>provider_id</code> must make the Active Message invalid.</li>
+<li>To receive a reward, a node must send an Active Message as described in the <a href="bedrock-service-declaration-protocol.html#active-message">Active Message</a>, where the <code>metadata</code> field is encoded as defined in <a href="#active-message">Active Message</a>. The node must point to a single declaration (<code>declaration_id</code>) and use a single provider identity (<code>provider_id</code>) for constructing the Active Message. Any reuse of the <code>provider_id</code> must make the Active Message invalid.</li>
 <li>The Active Message must be sent after the end of an epoch (<span class="math-inline" data-tex="e"></span>), that is, during the next epoch (<span class="math-inline" data-tex="e+1"></span>), and after the epoch transition period as defined in the <a href="#transition-period">Transition Period</a> section. The delay allows nodes to include blending tokens collected during the epoch transition period for rewarding purposes.</li>
 <li>When the following epoch begins (<span class="math-inline" data-tex="e+2"></span>) Mantle distributes rewards (<a href="bedrock-service-reward-distribution.html">Service Reward Distribution Protocol</a>). This delay is required to calculate the partition of rewards as defined in the above section.</li>
 <li>If a node does not send the Active Message on time, then it will not receive a reward.</li>
