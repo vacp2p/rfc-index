@@ -163,17 +163,17 @@ Let us define the following variables:
 | Symbol | Definition | Default Value | Explanation |
 | --- | --- | --- | --- |
 | $`S_{cap}`$​ | Maximum token supply (hard cap) | 10 billion LGO | N.A. |
-| $T$​ | The number of periods in the look-back window for the moving average. | $120$​ | As the system is expected to produce 1 block every 30 seconds, this look-back window defines that the reward averages the fees pooled in the last hour. |
-| $`\alpha_a`$​ | Denotes the control responsiveness to KPI average metrics. | $1$​ | This parameter scales the reserve-release response to the pooling rate. It must be one-to-one. |
-| $`\alpha_d`$​ | Denotes the control responsiveness to KPI deviation metrics. | $1/4$​ | See [\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md), for details. |
-| $`w_i`$​ | Denotes the weight of the $i$-th KPI in the normalized deviation from target | $1$​ | There's only one KPI of this type in our system. |
-| $`D_{0,target}`$​ | Denotes the target value for the first KPI based on stake. | 3 billion LOGOS | $30\%$ of the maximum supply. |
+| $T$​ | The number of periods in the look-back window for the moving average. | $`120`$​ | As the system is expected to produce 1 block every 30 seconds, this look-back window defines that the reward averages the fees pooled in the last hour. |
+| $`\alpha_a`$​ | Denotes the control responsiveness to KPI average metrics. | $`1`$​ | This parameter scales the reserve-release response to the pooling rate. It must be one-to-one. |
+| $`\alpha_d`$​ | Denotes the control responsiveness to KPI deviation metrics. | $`1/4`$​ | See [\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md), for details. |
+| $`w_i`$​ | Denotes the weight of the $i$-th KPI in the normalized deviation from target | $`1`$​ | There's only one KPI of this type in our system. |
+| $`D_{0,target}`$​ | Denotes the target value for the first KPI based on stake. | 3 billion LOGOS | $`30\%`$ of the maximum supply. |
 | $`D_{1,target}`$​ | Denotes the target value for the second KPI based on fees. | $10$ billon LOGOS | In the context of this KPI, this value behaves as a normalizer |
 | $`I_{max}`$​ | The maximum emission rate per year | $1\%$​ | This value guarantees that, when the total inferred stake reaches $`D_{0,target}`$, then the APY for validation is ~3.33%. |
-| $`Y`$ | Lifetime of the rewards reserve at the maximum release rate ($`I_{max}`$ of $`S_{cap}`$ per year) | $10$ years | Sets the reserve size $`B_0 = I_{max} \cdot S_{cap} \cdot Y = 10^9`$ LGO ($10\%$ of $`S_{cap}`$). |
-| $`I_{min}`$​ | The minimum emission rate per year | $0\%$​ | This avoids inflationary token emissions. |
-| $f$​ | The average number of block proposal within $`\Delta_{t}`$ units | $1$​ | The time step $`\Delta_t`$ was chosen so that $f$ equals to $1$. |
-| $`\Delta_t`$​ | Time step, the fraction of year in one time step (per e.g., epoch, block, or day) | $1/(365 \times 2880)$​ | The time step is 1 block every $30$ seconds; there are 2880 blocks of 30 seconds in a day. |
+| $`Y`$ | Lifetime of the rewards reserve at the maximum release rate ($`I_{max}`$ of $`S_{cap}`$ per year) | $`10`$ years | Sets the reserve size $`B_0 = I_{max} \cdot S_{cap} \cdot Y = 10^9`$ LGO ($10\%$ of $`S_{cap}`$). |
+| $`I_{min}`$​ | The minimum emission rate per year | $`0\%`$​ | This avoids inflationary token emissions. |
+| $f$​ | The average number of block proposal within $`\Delta_{t}`$ units | $1$​ | The time step $`\Delta_t`$ was chosen so that $`f`$ equals to $`1`$. |
+| $`\Delta_t`$​ | Time step, the fraction of year in one time step (per e.g., epoch, block, or day) | $`1/(365 \times 2880)`$​ | The time step is 1 block every $`30`$ seconds; there are 2880 blocks of 30 seconds in a day. |
 
 The calibration of these parameters can be found in [\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md).
 
