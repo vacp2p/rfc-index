@@ -295,6 +295,13 @@ A cover packet whose pre-send delay ([§6.2](#62-cover-emission)) is still elaps
 is discarded rather than transmitted:
 its slot was claimed from the previous epoch's pool,
 so transmitting it in the new epoch would exceed the fresh budget by one packet.
+The message identifier bound to the discarded packet MAY be offered for reclaim
+where the DoS protection mechanism permits ([§6.5](#65-pre-computed-proof-validation-at-send-time)).
+The mechanism decides whether the identifier is reusable:
+one bound to the closed epoch is rejected,
+while one already generated against the new epoch
+(possible when generation completes after the boundary but before the epoch signal is processed)
+can be reused.
 
 ### 5.4 Cover Packet Reception
 
@@ -384,10 +391,15 @@ Implementations MUST therefore validate pre-computed proofs at send time
 (see [§6.5](#65-pre-computed-proof-validation-at-send-time)).
 
 **Fallback caveat:**
-On-demand generation when pre-computation falls behind adds load-dependent delay
-on top of the sampled pre-send delay ([§6.2](#62-cover-emission)),
-skewing emission timing in a way that correlates with pre-computation load
-and weakens timing unobservability.
+When a slot is selected for cover emission without a pre-built packet,
+on-demand generation SHOULD start at slot-claim time
+and run concurrently with the sampled pre-send delay ([§6.2](#62-cover-emission)),
+so the first-hop write occurs at the later of the two, not after their sum.
+Sequential composition (delay first, then generation) shifts every fallback emission
+by the full generation time, while pre-built emissions depart after the delay alone;
+the offset makes the two distinguishable and leaks pre-computation load.
+With concurrent generation the skew reduces to the excess of generation time over the delay,
+which still correlates with load when generation outlasts the delay.
 Implementations SHOULD size the pre-computation pipeline ([§9.1](#91-pre-computation-scheduling))
 to avoid the fallback path in steady state.
 
@@ -422,9 +434,18 @@ have already been deducted, so their slots are unavailable to any later claim.
 >      Validation happens after the delay so the staleness window between validation and transmission stays minimal.
 >    - e. Transmit the `packet` field of [`PrebuiltCoverPacket`](#55-data-structures) to the first hop
 >      (other fields are internal and MUST NOT be sent).
-> 3. If `cover_queue` is empty for the remainder of the epoch
->    (because pre-built packets were exhausted by emission or reclaimed under heavy non-cover load),
->    cover emission is suppressed until the next epoch boundary.
+> 3. If the strategy schedules an emission and `cover_queue` is empty
+>    (pre-built packets exhausted by emission, reclaimed under heavy non-cover load,
+>    or pre-computation disabled),
+>    the node MAY generate the packet on demand:
+>    if `slots_remaining > 0`, decrement it, begin generation immediately,
+>    and run it concurrently with the pre-send delay of step 2.b
+>    (see the fallback caveat in [§6.1](#61-at-epoch-boundary));
+>    once both complete, apply steps 2.c and 2.e.
+>    Step 2.d does not apply: the proof was generated within this emission, not pre-computed.
+>    If the node does not generate on demand,
+>    cover emission is suppressed until pre-built packets become available
+>    or the next epoch boundary refills the pool.
 
 **Pre-send delay:**
 Locally originated packets and SURB replies apply a sampled pre-send delay before their first-hop write
