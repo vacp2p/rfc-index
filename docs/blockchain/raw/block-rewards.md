@@ -22,7 +22,7 @@
 | Version | Changes | Date |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-24 |
-| 1.1.0 | Changing from burning/minting to pooling/distributing/releasing, removing $S_{tge}$ | 2026-06-22 |
+| 1.1.0 | Changing from burning/minting to pooling/distributing/releasing, removing $`S_{tge}`$ | 2026-08-25 |
 
 > Disclaimer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -43,8 +43,8 @@ The document references internal mathematical models and simulations that demons
 
 The conclusion of our analysis indicates that this KPI-based emission model should achieve several important outcomes:
 
-- Initially higher emission rates from the reserve (capped at $1\%$ of the max supply annually) to bootstrap network participation.
-- Gradual stabilization of token supply as the system matures, with our baseline simulation showing just $1.33\%$ total inflation after $10$ years.
+- Initially higher emission rates from the reserve (capped at $`1\%`$ of the max supply annually) to bootstrap network participation.
+- Gradual stabilization of token supply as the system matures, with our baseline simulation showing just $`1.33\%`$ total inflation after $`10`$ years.
 - Self-regulating mechanism where the reserve release naturally adjusts to complement pooled transaction fees.
 - Built-in safeguards against manipulation through moving averages and bounded functions.
 
@@ -76,7 +76,7 @@ Crucially, any metric-pegged reward system should aim toward a target value or e
 
 The system dynamically adjusts token emission based on two primary KPIs:
 
-- Inferred Total Stake: Measures network security by tracking the total amount staked against a target threshold (e.g., $30\%$ of the maximum supply).
+- Inferred Total Stake: Measures network security by tracking the total amount staked against a target threshold (e.g., $`30\%`$ of the maximum supply).
 - Average Pooling Rate: Tracks transaction fees (both Execution base fees and Permanent Storage) routed to the pending reward pool to maintain supply equilibrium.
 
 A control function combines these KPIs to determine the emission rate factor, bounded between a minimum and maximum annual reserve release. This ensures that:
@@ -98,7 +98,7 @@ where:
 - $`I_{max}`$ is the maximum emission rate per year.
 - $`S_{cap}`$ denotes the maximum allowable token supply (hard cap).
 - $`\Delta_t`$ denotes the fraction of year in one time step per e.g., epoch, block, or day.
-- $f$ be the average number of block proposal within $`\Delta_{t}`$ units.
+- $`f`$ be the average number of block proposal within $`\Delta_{t}`$ units.
 - $`R_\text{block}`$ denotes the total amount of Execution base fees and Permanent Storage fees that are routed to the pending reward pool when the block is proposed.
 - $`\bar{R}_t`$ denotes the average pooled reward: the moving average of $`R_\text{block}`$ over the look-back window $`T`$.
 
@@ -106,7 +106,7 @@ where:
 
 The system is designed to evolve through different phases:
 
-- Bootstrap Phase: Initially higher emission rates (up to $1\%$ annually) to incentivize network participation when stake is below target. As it is explained below, this is viable even when Logos Blockchain experiences low activity because the level of activity only plays a role when the network participation gets close to the predefined target.
+- Bootstrap Phase: Initially higher emission rates (up to $`1\%`$ annually) to incentivize network participation when stake is below target. As it is explained below, this is viable even when Logos Blockchain experiences low activity because the level of activity only plays a role when the network participation gets close to the predefined target.
 - Stabilization Phase: As Proof-of-Stake (PoS) participation approaches target levels, emission becomes primarily driven by the fee pooling rate.
 - Equilibrium Phase: Circulating supply stabilizes as distribution from the pool matches pooled fees and the reserve release approaches zero.
 - High-Adoption Phase: If the fee pooling rate exceeds the maximum reserve release rate, circulating supply contracts as the pool accumulates faster than tokens are released. Total supply is unchanged.
@@ -116,7 +116,7 @@ The system is designed to evolve through different phases:
 This KPI-based approach delivers several advantages:
 
 - Self-regulating mechanism that automatically adjusts to network conditions.
-- Long-term sustainability with projected net circulating-supply growth of just $1.33\%$ after $10$ years (assuming constant pooling rate of $0.5\%$ per year).
+- Long-term sustainability with projected net circulating-supply growth of just $`1.33\%`$ after $`10`$ years (assuming constant pooling rate of $`0.5\%`$ per year).
 - Built-in safeguards against manipulation through moving averages and bounded functions.
 - Predictable economic model that balances security incentives with controlled supply.
 

@@ -23,9 +23,9 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-24 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
-| 1.0.2 | Changing from burning/minting to pooling/distributing/releasing | 2026-06-22 |
 | 1.0.3 | Fix invalid python indentation due to github migration | 2026-07-27 | 
 | 1.1.0 | Round the price update upwards and align the reference code with the zero target guard | 2026-07-28 |
+| 1.1.1 | Changing from burning/minting to pooling/distributing/releasing | 2026-08-25 |
 
 > **Disclaimer:**
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
