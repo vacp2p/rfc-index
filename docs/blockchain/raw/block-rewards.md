@@ -530,31 +530,32 @@ So we propose a reference implementation that uses integers:
 
 ```python
 import numpy as np
+from numpy import int64
 
-A_SCALE = np.int64(120_000_000)            # denominator of 1/(I_max * D1_target * Delta_t * T)
-INFLATION_NUMERATOR = np.int64(62_500)     # numerator of I_max * S_CAP * DELTA_t / f
-INFLATION_DENOMINATOR = np.int64(657)      # denominator of I_max * S_CAP * DELTA_t / f
-FEE_AVG_NUMERATOR = np.int64(10_512)       # numerator of 1/(I_max * D1_target * Delta_t * T)
-STAKE_TARGET = np.int64(3_000_000_000)
+A_SCALE = int64(120_000_000)            # denominator of 1/(I_max * D1_target * Delta_t * T)
+INFLATION_NUMERATOR = int64(62_500)     # numerator of I_max * S_CAP * DELTA_t / f
+INFLATION_DENOMINATOR = int64(657)      # denominator of I_max * S_CAP * DELTA_t / f
+FEE_AVG_NUMERATOR = int64(10_512)       # numerator of 1/(I_max * D1_target * Delta_t * T)
+STAKE_TARGET = int64(3_000_000_000)
 
 
-def block_reward(total_stake: np.int64, burned_fees_window: list[np.int64]) -> tuple[np.int64, np.int64]:
-    sum_fees = np.sum(burned_fees_window, dtype=np.int64)
-    last_burned_fee = burned_fees_window[-1]
+def block_reward(total_stake: int64, pooled_fees_window: list[int64]) -> tuple[int64, int64]:
+    sum_fees = np.sum(pooled_fees_window, dtype=int64)
+    last_pooled_fee = pooled_fees_window[-1]
 
     a_numerator = np.minimum(
-        np.maximum(STAKE_TARGET + FEE_AVG_NUMERATOR * sum_fees - total_stake, np.int64(0)),
+        np.maximum(STAKE_TARGET + FEE_AVG_NUMERATOR * sum_fees - total_stake, int64(0)),
         A_SCALE,
     )
 
     reward_numerator = (
         INFLATION_NUMERATOR * a_numerator
-        + INFLATION_DENOMINATOR * (A_SCALE - a_numerator) * last_burned_fee
+        + INFLATION_DENOMINATOR * (A_SCALE - a_numerator) * last_pooled_fee
     )
     reward_denominator = INFLATION_DENOMINATOR * A_SCALE
 
-    blend_reward = reward_numerator * np.int64(6) // (reward_denominator * np.int64(10))
-    leader_reward = reward_numerator * np.int64(4) // (reward_denominator * np.int64(10))
+    blend_reward = reward_numerator * int64(6) // (reward_denominator * int64(10))
+    leader_reward = reward_numerator * int64(4) // (reward_denominator * int64(10))
 
     return blend_reward, leader_reward
 ```
