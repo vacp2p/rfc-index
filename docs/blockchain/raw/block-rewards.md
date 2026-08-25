@@ -84,7 +84,7 @@ A control function combines these KPIs to determine the emission rate factor, bo
 - When security participation is below target, a higher reserve release attracts more validators.
 - As usage increases and fees are pooled, the reserve release adjusts downward and distribution from the pool rises to stabilize circulating supply.
 
-![Block rewards high-level system design](block-rewards/assets/high-level-system-design.svg)
+![Block rewards high-level system design](block-rewards/assets/high-level-system-design.png)
 
 The equation that defines the amount of block rewards is given by:
 
