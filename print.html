@@ -59937,6 +59937,7 @@ communication.</p>
 </div><!-- timeline:start -->
 <h2 id="timeline-172"><a class="header" href="#timeline-172">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-25</strong> — <a href="https://github.com/logos-co/logos-lips/blob/6a27927b77c88db5e7380a376875214761a20c55/docs/anoncomms/raw/payment-streams.md"><code>6a27927</code></a> — docs(lip-155): split LEZ close into owner and provider ops (#401)</li>
 <li><strong>2026-08-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/435a6f183a92b871473d80a720b427f70cbf1b68/docs/anoncomms/raw/payment-streams.md"><code>435a6f1</code></a> — docs(anoncomms): Payment streams user and provider unlinkability (#397)</li>
 <li><strong>2026-08-07</strong> — <a href="https://github.com/logos-co/logos-lips/blob/f09f9e9ef12bf00b3da36729a8bdae339bedf1ad/docs/anoncomms/raw/payment-streams.md"><code>f09f9e9</code></a> — docs(anoncomms): Non-native token support for payment streams (#379)</li>
 <li><strong>2026-07-08</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b9b4160de40d011b0d8c80eb131e684310d6a3d4/docs/anoncomms/raw/payment-streams.md"><code>b9b4160</code></a> — Add on-chain part of payment streams spec (#299)</li>
@@ -60042,7 +60043,8 @@ Each stream MUST belong to exactly one vault.</p>
 a byte string designating the party authorized to claim accrued funds.
 Each chain integration MUST define that encoding
 and how it is stored as the on-chain claim account.
-On LEZ, <code>StreamConfig.provider</code> holds that <code>provider_id</code>.</p>
+On LEZ, <code>StreamConfig.provider</code> holds that <code>provider_id</code>.
+Stream create MUST NOT set <code>provider_id</code> equal to the vault owner account id.</p>
 <p>Each stream MUST specify a positive accrual rate per time unit.
 Each chain integration MUST define the time unit used by rates and accrual.</p>
 <p>To start using the protocol,
@@ -60160,21 +60162,19 @@ from the time of that operation.</p>
 <p>In the base streams protocol,
 close does not pay the provider.
 Accrued funds remain on a <code>CLOSED</code> stream until the provider claims them.</p>
-<p>The automatic claim on closure extension merges close and claim.
-Close MUST transfer all accrued funds to the provider in the same operation,
-so that the closed stream holds no funds afterward.</p>
-<p>This removes the need for the provider to track or claim balances on closed streams.
-Trade-offs include:</p>
+<p>The automatic claim on closure extension merges provider-initiated close and claim.
+Provider-initiated close MUST transfer all accrued funds to the provider in the same operation.
+This removes the need for the provider to track or claim balances
+on streams the provider closed.
+User-initiated close MUST keep base close semantics.</p>
+<p>Trade-offs include:</p>
 <ul>
-<li>The provider can no longer batch claims across streams.</li>
-<li>Close and payout happen in one transaction,
+<li>The provider can no longer batch claims across streams closed under this extension.</li>
+<li>Provider close and payout happen in one transaction,
 which can increase timing correlation for observers.</li>
-<li>When the user initiates close on a fee-charging chain,
-the same transaction runs the provider payout logic.
-The user pays transaction fees for that logic,
-instead of the provider paying via a separate claim.</li>
 <li>If the payout fails,
-close fails atomically and the stream does not transition to the <code>CLOSED</code> state.</li>
+the transaction fails atomically,
+and the stream does not transition to the <code>CLOSED</code> state.</li>
 </ul>
 <h4 id="activation-fee"><a class="header" href="#activation-fee">Activation fee</a></h4>
 <p>In the base streams protocol,
@@ -60616,11 +60616,16 @@ and the stream identifier assigned sequentially on stream creation.
 <p>Off-chain vault resolution derives the same <code>VaultConfig</code> PDA from
 <code>VaultProof.vault_id</code> and the LEZ account identifier for
 <code>VaultProof.owner_public_key</code>.</p>
-<h4 id="deposit-and-claim-asset-paths"><a class="header" href="#deposit-and-claim-asset-paths">Deposit and claim asset paths</a></h4>
-<p>Deposit, withdraw, and claim move vault funds
+<h4 id="deposit-claim-and-withdraw-asset-paths"><a class="header" href="#deposit-claim-and-withdraw-asset-paths">Deposit, claim, and withdraw asset paths</a></h4>
+<p><code>Deposit</code> MUST move funds into <code>VaultHolding</code>
 by composing with the platform program for the vault token:
 authenticated-transfer for native,
 Token program for non-native.</p>
+<p><code>Claim</code>, <code>WithdrawToOwner</code>, and <code>Withdraw</code> MUST debit <code>VaultHolding</code>
+and credit the destination in this guest
+(the stream provider, the vault owner, and <code>to</code>, respectively).
+These three instructions MUST NOT compose with authenticated-transfer
+or the Token program to credit the destination.</p>
 <p>For <code>PseudonymousFunding</code> vaults,
 <code>Deposit</code> MUST debit the vault owner private account.
 Wallets MUST NOT transfer directly into a <code>VaultHolding</code> for <code>PseudonymousFunding</code> vaults.</p>
@@ -60632,17 +60637,27 @@ On LEZ that account is a signing account.</p>
 <div class="table-wrapper"><table><thead><tr><th>On-chain operation</th><th>Reference instruction</th><th>Authorizer</th></tr></thead><tbody>
 <tr><td>Initialize vault</td><td><code>InitializeVault</code></td><td>Vault owner</td></tr>
 <tr><td>Deposit</td><td><code>Deposit</code></td><td>Vault owner</td></tr>
-<tr><td>Withdraw unallocated</td><td><code>Withdraw</code></td><td>Vault owner</td></tr>
+<tr><td>Withdraw unallocated to owner</td><td><code>WithdrawToOwner</code></td><td>Vault owner</td></tr>
+<tr><td>Withdraw unallocated (explicit <code>to</code>)</td><td><code>Withdraw</code></td><td>Vault owner</td></tr>
 <tr><td>Create stream</td><td><code>CreateStream</code></td><td>Vault owner</td></tr>
 <tr><td>Pause stream</td><td><code>PauseStream</code></td><td>Vault owner</td></tr>
 <tr><td>Resume stream</td><td><code>ResumeStream</code></td><td>Vault owner</td></tr>
 <tr><td>Top-up stream</td><td><code>TopUpStream</code></td><td>Vault owner</td></tr>
-<tr><td>Close stream</td><td><code>CloseStream</code></td><td>Vault owner or stream provider</td></tr>
+<tr><td>Close stream (owner)</td><td><code>CloseStreamByOwner</code></td><td>Vault owner</td></tr>
+<tr><td>Close stream (provider)</td><td><code>CloseStreamByProvider</code></td><td>Stream provider</td></tr>
 <tr><td>Claim accrued</td><td><code>Claim</code></td><td>Stream provider</td></tr>
 </tbody></table>
 </div>
-<p><code>CloseStream</code> and <code>Claim</code> MUST include <code>VaultConfig.owner</code> as an explicit
-non-signing account.</p>
+<p>Either the vault owner or the stream provider MAY close.
+LEZ encodes that policy as two reference instructions.
+<code>CloseStreamByOwner</code> uses the vault owner as the signing authorizer.
+<code>CloseStreamByProvider</code> and <code>Claim</code> MUST include <code>VaultConfig.owner</code> as an
+explicit non-signing account.</p>
+<p>When <code>to</code> is the vault owner, LEZ encodes a three-slot instruction
+that credits the owner slot (<code>WithdrawToOwner</code>).
+When <code>to</code> is a different account, LEZ encodes a four-slot instruction
+(<code>Withdraw</code>).
+The same account id MUST NOT appear twice in one instruction.</p>
 <p>When a private account is included in a transaction
 as a signing account or as a required non-signing account,
 LEZ requires a shielded transaction.
@@ -60774,7 +60789,7 @@ across vaults and streams that reuse those identifiers.</li>
 </ul>
 <p>Coarser <a href="anoncomms/raw/payment-streams.html#system-clock-accounts">System clock accounts</a> reveal less precise activity timing to observers.
 The <a href="anoncomms/raw/payment-streams.html#automatic-claim-on-closure">Automatic claim on closure</a> extension
-strengthens timing correlation by merging close and payout.</p>
+strengthens timing correlation by merging provider-initiated close and payout.</p>
 <h2 id="references-100"><a class="header" href="#references-100">References</a></h2>
 <h3 id="normative-12"><a class="header" href="#normative-12">Normative</a></h3>
 <ul>
@@ -60828,6 +60843,9 @@ and omits the main protocol's multi-vault support.</p>
 event Withdrawn(uint256 amount, address indexed to);
 
 function deposit(uint256 amount) external;
+/// @notice Withdraw unallocated vault funds to `to`
+/// @dev When `to` is the vault owner, LEZ maps this to WithdrawToOwner.
+///      A distinct `to` maps to Withdraw.
 function withdraw(uint256 amount, address to) external;
 </code></pre>
 <h3 id="a3-stream-lifecycle"><a class="header" href="#a3-stream-lifecycle">A.3 Stream lifecycle</a></h3>
@@ -60865,6 +60883,8 @@ function topUpStream(uint256 streamId, uint128 additionalAllocation) external;
 /// @notice Close stream permanently
 /// @dev Callable by user or provider. Unaccrued funds (allocation - accruedBalance)
 ///      MUST be returned to vaultBalance. Accrued funds remain claimable by provider.
+///      On LEZ the same either-party policy uses CloseStreamByOwner and
+///      CloseStreamByProvider reference instructions.
 function closeStream(uint256 streamId) external;
 
 /// @notice Provider claims accrued funds from a stream
