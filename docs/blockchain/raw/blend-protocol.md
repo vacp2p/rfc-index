@@ -28,6 +28,7 @@
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.1.1 | Updated the block proposal message size to 34574 bytes in the encapsulation-overhead calculation, following the addition of carried uncle headers in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md). | 2026-08-06 |
 | 1.2.0 | Define the token evaluation under a low core quota, and specify the Active Message metadata layout. | 2026-08-19 |
+| 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
 
 # Introduction
 
@@ -991,7 +992,7 @@ class ActivityProof:
 
 Where:
 
-- `EpochNumber` is the number of the epoch for which the activity proof is generated.
+- `EpochNumber` is the number of the epoch for which the activity proof is generated, as defined in [Epoch](cryptarchia-v1-protocol.md#epoch).
 - `ProofOfQuota` is defined as in [Proof of Quota](proof-of-quota.md).
 - `ProofOfSelection` is defined in [Proof of Selection](#proof-of-selection).
 - `SigningKey` is the key used to sign the `ProofOfQuota`.
