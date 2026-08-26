@@ -24,8 +24,8 @@
 | 1.0.0 | Initial revision | 2026-04-24 |
 | 1.0.1 | Fix base fee constants in pseudocode based on the correct $`G_{\mathrm{target}}`$ | 2026-07-27 |
 | 1.1.0 | Round the base fee update upwards | 2026-07-28 |
-| 1.1.1 | Changing from burning/minting to pooling/distributing | 2026-08-06 |
 | 1.1.1 | Precise that greedy inclusion selects a candidate only if it is valid in the state the already selected transactions leave | 2026-08-24 |
+| 1.1.2 | Changing from burning/minting to pooling/distributing | 2026-08-26 |
 
 > Disclaimer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
