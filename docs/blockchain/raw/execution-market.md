@@ -126,7 +126,7 @@ $$
 $$
 
 3. Sort Candidates: Sort the valid transactions in $`\mathcal{M}'`$ in descending order of revenue
-4. Greedy Inclusion: Initialize an empty block and a running total for Execution Gas used, current_block_gas = 0. Iterate through the sorted transactions and add them to the block one by one, as long as the block's total Execution Gas does not exceed the $`G_{\max}`$ limit and the transaction is valid in the state the already included ones leave.
+4. Greedy Inclusion: Initialize an empty block and a running total for Execution Gas used, current_block_gas = 0. Iterate through the sorted transactions and add them to the block one by one, as long as the block's total Execution Gas does not exceed the $`G_{\max}`$ limit and the transaction is valid in the state left by the previously selected transactions.
 
 Pseudocode for Block Construction:
 
@@ -146,7 +146,7 @@ def construct_block(mempool, base_fee, gt, G_max):
     return block_txs
 ```
 
-`applies(tx, block_txs)` holds when `tx` is valid in the state the already selected transactions leave, per [Block Proposal Validation](bedrock-v1.1-block-construction.md#block-proposal-validation).
+`applies(tx, block_txs)` holds when `tx` is valid in the state left by the previously selected transactions, per [Block Proposal Validation](bedrock-v1.1-block-construction.md#block-proposal-validation).
 
 ## On-Chain Rules: Fee Update and Revenue
 

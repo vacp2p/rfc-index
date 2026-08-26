@@ -73,7 +73,7 @@ Mantle Transaction fees are derived from a gas model. The Logos Blockchain has t
 
 # Mantle Transaction
 
-Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes the Operations in the order they appear in `ops`, atomically, while using the Mantle Transaction's excess balance, calculated as the difference between the consumed and created value, as the fee payment.
+Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes the Operations atomically, while using the Mantle Transaction's excess balance, calculated as the difference between the consumed and created value, as the fee payment.
 
 ```python
 class MantleTx:
@@ -181,7 +181,7 @@ Mantle validators will ensure the following:
     assert len(op_proofs) == len(ops)
     ```
 
-2. Each Operation is valid in the state the preceding Operations left, and takes effect before the next one is validated. The transaction balance is accumulated over the same pass, so a `TRANSFER` consuming a note an earlier Operation created contributes that note's value like any other.
+2. Each Operation is valid, and takes effect before the next one is validated. The transaction balance is accumulated over the same pass, so a `TRANSFER` consuming a note an earlier Operation created contributes that note's value like any other.
     ```python
     tx_balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
     for op, op_proof in zip(ops, op_proofs):
@@ -227,7 +227,7 @@ SignedMantleTx(
 )
 ```
 
-Mantle Validators execute each Operation in `ops` according to its opcode, in the order the Operations appear, each on the state the preceding one left. Execution is interleaved with [Validation](#validation): an Operation is executed only once it has been validated in that state, and the transaction takes effect only if every one of its Operations validated, so a failure anywhere leaves the state as it was before the transaction was reached. The subsections below define, for each opcode, what validating and executing an Operation amount to.
+Mantle Validators execute each Operation in `ops` according to its opcode, in the order the Operations appear and along the state progression [Validation](#validation) defines. The subsections below define, for each opcode, what validating and executing an Operation amount to.
 
 # Operations
 

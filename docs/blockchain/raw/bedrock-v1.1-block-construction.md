@@ -39,7 +39,7 @@ In this document, we present the specification defining the construction of the 
 
 # Overview
 
-For the consensus protocol to make progress, a new **leader** is elected through the leader lottery. The new leader is in possession of a proof of leadership (PoL) that confirms that it is indeed the leader. The main objective of the leader is to construct a new block, hence becoming a **block builder,** and share it with other members of the network as a **block proposer**. The block must be correctly constructed; otherwise, it will be rejected by the consensus nodes who are validating every block. Only a block that validates in full modifies the state of the chain: the transactions it includes are interpreted by all nodes, one after the other in the order they appear, and the state of the chain is modified according to the instructions embedded in them. A block that fails any check is executed by nobody, whichever of its transactions the check belongs to.
+For the consensus protocol to make progress, a new **leader** is elected through the leader lottery. The new leader is in possession of a proof of leadership (PoL) that confirms that it is indeed the leader. The main objective of the leader is to construct a new block, hence becoming a **block builder,** and share it with other members of the network as a **block proposer**. The block must be correctly constructed; otherwise, it will be rejected by the consensus nodes who are validating every block. Only a block that validates in full modifies the state of the chain: the transactions it includes are interpreted by all nodes, one after the other in the order they appear, and the state of the chain is modified according to the instructions embedded in them.
 
 ## High-level Flow
 
@@ -61,7 +61,7 @@ Below, we present a high-level description of the block lifecycle. The main focu
 6. The validators **execute** the block proposal.
    1. They append the `leader_voucher` of the block to the set of reward vouchers, which the following epoch starts with.
    2. They execute the [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally and include them in the ledger.
-   3. They derive the new blockchain state from the previous one by executing transactions as defined in [Mantle](bedrock-v1.1-mantle-specification.md), in that same order and in that same pass, adopting the result only once the whole block has validated.
+   3. They derive the new blockchain state from the previous one by executing transactions as defined in [Mantle](bedrock-v1.1-mantle-specification.md), in that same pass, adopting the result only once the whole block has validated.
 
 # Constructions
 
@@ -265,13 +265,13 @@ Given a `proposal`, a proposed block consisting of a `header`, `uncle_headers` a
   The `references` must refer to existing `mempool_transaction` entries that are retrievable from the node's local mempool.
 
 4. **Mempool Transactions Validation**
-  `mempool_transactions` must refer to a valid sequence of Mantle Transactions from the mempool. The transactions are validated in the order the `references` resolve them, against a state that advances with each of them: the first against the state the block inherits once the steps of [Block Execution](#block-execution) that precede it have been applied, and the transaction at index `N` against the state the transactions at indices `0` to `N-1` left. Each transaction must be valid in that state according to the rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md#validation), which validates and executes its Operations along that same progression. Validation and execution are therefore one pass over one state, not two.
+  `mempool_transactions` must refer to a valid sequence of Mantle Transactions from the mempool. The transactions are validated in the order the `references` resolve them, against a state that advances with them: each transaction is validated against the state the transactions preceding it left, the first one against the state the block inherits once the steps of [Block Execution](#block-execution) that precede it have been applied. Each transaction must be valid in that state according to the rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md#validation), which validates and executes its Operations along that same progression. Validation and execution are therefore one pass over one state, not two.
 
   Block validity is consequently order-dependent, and the order the transactions appear in is normative. Two transactions consuming the same note make the block invalid whatever their order, since the second consumption finds the note gone; a transaction consuming a note an earlier transaction created is valid in that order and invalid in the reverse one.
 
   In order to verify ZK proofs, they are batched for verification as explained in [Batch verification of ZK proofs](#batch-verification-of-zk-proofs) to get better performance. Batching covers the proof checks alone and does not change the state a transaction is validated in: the public inputs of every proof are taken from the state its transaction is reached in, and the state-dependent assertions still run in sequence.
 
-If any of the above checks fail, the block proposal must be rejected and nothing of it is executed. The state progression the pass builds is a working one, adopted as the new chain state only once the last transaction of the block has validated. No transaction is ever skipped over: a single failed check anywhere in the block, in any transaction, in any Operation of any transaction, invalidates the whole block, so the transactions that validated before the failing one leave no trace either and a node rejecting a block holds exactly the state it held before it started processing it.
+If any of the above checks fail, the block proposal must be rejected and nothing of it is executed. The state progression the pass builds is a working one, adopted as the new chain state only once the last transaction of the block has validated: a single failed check anywhere in the block, in any transaction, in any Operation of any transaction, invalidates the whole block, so a node rejecting it holds exactly the state it held before it started processing it.
 
 ## Block Execution
 
@@ -281,7 +281,7 @@ Given a `ValidBlock` that has successfully passed proposal validation, the node 
 
 1. Append the `leader_voucher` contained in the block to the set of reward vouchers **when the following epoch starts**.
 2. Execute the reward distribution protocol defined in [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally and include them in the ledger.
-3. Execute the Mantle Transactions included in the block in the order they appear, each on the state the preceding one left, using the execution rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md).
+3. Execute the Mantle Transactions included in the block in the order they appear, using the execution rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md).
 
 Steps 1 and 2 read the epoch and the state of the [Service Declaration Protocol](bedrock-service-declaration-protocol.md), never the transactions of the block, which is what lets them run before those transactions are validated and makes the reward notes of step 2 available to them.
 
