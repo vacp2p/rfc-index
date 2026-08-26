@@ -18940,6 +18940,7 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 </div><!-- timeline:start -->
 <h2 id="timeline-73"><a class="header" href="#timeline-73">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
 <li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
 <li><strong>2026-07-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5b20a2d59691c12392d091a6d7352d3de719ad61/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>5b20a2d</code></a> — docs(blockchain) Channel Participation in PoS (#364)</li>
@@ -18956,6 +18957,7 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 <tr><td>1.1.0</td><td>Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be &lt;= 1024</td><td>2026-07-27</td></tr>
 <tr><td>1.1.1</td><td>Corrected <code>MAX_BLOCK_SIZE</code> to 2 MiB, to match the implementation.</td><td>2026-08-05</td></tr>
 <tr><td>1.2.0</td><td>Added <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncle references</a>: a block carries the signed headers of the fork blocks it references, every carried entry must be valid for the block itself to be valid, and the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a> counts their slots. Replaced <code>block_root</code> with <code>body_root</code>, which commits to those headers as well as to the transactions.</td><td>2026-08-06</td></tr>
+<tr><td>1.2.1</td><td>Defined <code>EpochNumber</code>, the type of an epoch number, as a 32-bit unsigned integer encoded little-endian wherever it is serialized or hashed.</td><td>2026-08-25</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-12"><a class="header" href="#introduction-12">Introduction</a></h1>
@@ -19028,6 +19030,7 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 <li>Approximately constant block production rate achieved by dynamically adjusting the lottery difficulty based on observed participation levels.</li>
 </ul>
 <p>The order in which these variables are calculated is important and is done w.r.t. the epoch schedule.</p>
+<p>Epochs are numbered consecutively from <code>0</code>, the epoch the Genesis block belongs to. That number is an <code>EpochNumber</code>, a 32-bit unsigned integer, encoded little-endian over 4 bytes wherever it is serialized or hashed.</p>
 <h3 id="epoch-schedule"><a class="header" href="#epoch-schedule">Epoch Schedule</a></h3>
 <p>An epoch is divided into 3 phases, as outlined below.</p>
 <div class="table-wrapper"><table><thead><tr><th>Epoch Phase</th><th>Phase Length</th><th>Description</th></tr></thead><tbody>
@@ -25230,6 +25233,7 @@ WithdrawThreshold = UINT16
 </div><!-- timeline:start -->
 <h2 id="timeline-86"><a class="header" href="#timeline-86">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-07-30</strong> — <a href="https://github.com/logos-co/logos-lips/blob/87d9ae5c65f304bc4f87ae06a8000a91b070734b/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>87d9ae5</code></a> — docs(blockchain): length-prefix the locators in the declaration_id preimage (#386)</li>
 <li><strong>2026-07-13</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d064449307d28a76b3555dc7b5064d15ee19d7f5/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>d064449</code></a> — RFC-Bedrock-SDP: Per-Service Uniqueness of <code>provider_id</code> and <code>zk_id</code> (#371)</li>
@@ -25247,6 +25251,7 @@ WithdrawThreshold = UINT16
 <tr><td>1.2.0</td><td>[RFC] Per-service uniqueness of <code>provider_id</code> and <code>zk_id</code></td><td>2026-07-08</td></tr>
 <tr><td>1.3.0</td><td>Length-prefix the <code>locators</code> list in the <code>declaration_id</code> preimage</td><td>2026-07-30</td></tr>
 <tr><td>1.4.0</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code></td><td>2026-08-14</td></tr>
+<tr><td>1.4.1</td><td>Replaced the <code>uint64</code> width given to the <code>epoch</code> fields with a reference to <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a>, which is 32 bits</td><td>2026-08-25</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-25"><a class="header" href="#introduction-25">Introduction</a></h1>
@@ -25293,7 +25298,7 @@ WithdrawThreshold = UINT16
 <p>Each service type is assigned a one-byte discriminant, given by the enum value above. This byte is the canonical encoding of a <code>ServiceType</code> and is used wherever a <code>ServiceType</code> is serialized or hashed: the transaction wire form (<a href="blockchain/raw/mantle-transaction-encoding.html">Mantle Transaction Encoding</a>), the <code>declaration_id</code> preimage (<a href="blockchain/raw/bedrock-service-declaration-protocol.html#declaration-storage">Declaration Storage</a>), and the reward <code>op_id</code> preimage (<a href="blockchain/raw/bedrock-service-reward-distribution.html">Service Reward Distribution</a>).</p>
 <h3 id="minimum-stake"><a class="header" href="#minimum-stake">Minimum Stake</a></h3>
 <p>The minimum stake is a global value that defines the minimum stake a node must have to perform any service.</p>
-<p>The <code>MinStake</code> is a structure that holds the value of the stake <code>stake_threshold</code> and the <code>epoch</code>, which is an epoch number at which the threshold was set; it is <code>uint64</code>.</p>
+<p>The <code>MinStake</code> is a structure that holds the value of the stake <code>stake_threshold</code> and the <code>epoch</code>, which is an epoch number at which the threshold was set; it is an <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a>.</p>
 <pre><code class="language-python">class MinStake:
     stake_threshold: StakeThreshold
     epoch: EpochNumber
@@ -25306,7 +25311,7 @@ WithdrawThreshold = UINT16
 <p>The service parameters structure defines the parameters set necessary for correctly handling interaction between the protocol and services. Each of the service types defined above must be mapped to a set of the following parameters:</p>
 <ul>
 <li><code>inactivity_period</code> defines the maximum time (as a number of epochs) during which an activation message must be sent; otherwise, the declaration is considered inactive. It must be at least 2 epochs long due to finalization reasons.</li>
-<li><code>epoch</code> defines the epoch number at which the parameter was set; it is <code>uint64</code>.</li>
+<li><code>epoch</code> defines the epoch number at which the parameter was set; it is an <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a>.</li>
 </ul>
 <pre><code class="language-python">class ServiceParameters:
     inactivity_period: NumberOfEpochs
@@ -25504,6 +25509,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 </div><!-- timeline:start -->
 <h2 id="timeline-87"><a class="header" href="#timeline-87">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
@@ -25519,6 +25525,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <tr><td>1.2.1</td><td><a href="blockchain/raw/mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.html">[RFC] Enforce NoteId uniqueness</a>.</td><td>2026-04-24</td></tr>
 <tr><td>1.3.0</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
 <tr><td>1.3.1</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code></td><td>2026-08-14</td></tr>
+<tr><td>1.3.2</td><td>Pinned the encoding of <code>epoch_number</code> in the reward <code>op_id</code> preimage to the 4 bytes of an <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a></td><td>2026-08-25</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-26"><a class="header" href="#introduction-26">Introduction</a></h1>
@@ -25552,7 +25559,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <div class="math-block" data-tex="Rewards^n := serviceReward(n,Rewards\_Epoch)"></div>
 <p>Where <span class="math-inline" data-tex="Rewards\_Epoch"></span> are the total rewards of epoch <strong>N</strong>. The <span class="math-inline" data-tex="Rewards\_Epoch"></span> is determined by the linked reference, which calculates how much each service receives based on fees burnt during epoch N and the blockchain's state. <span class="math-inline" data-tex="Rewards^n"></span> is stored as an array that maps each validator's <code>zk_id</code> to their allocated reward.</p>
 <h2 id="service-reward-distribution"><a class="header" href="#service-reward-distribution">Service Reward Distribution</a></h2>
-<p>Starting immediately after epoch <strong>N+1</strong>, service rewards are distributed in the first block of epoch <strong>N+2.</strong> The rewards are inserted directly in the ledger without triggering any Mantle validation. The <code>NoteId</code> is computed using the result of <code>hash(</code><a href="blockchain/raw/bedrock-service-declaration-protocol.html"><code>ServiceType</code></a><code>|| epoch_number)</code> as the <code>op_id</code>, where <code>ServiceType</code> is serialized as its canonical one-byte discriminant (<a href="blockchain/raw/bedrock-service-declaration-protocol.html#service-types">Service Types</a>). The output number corresponds to the position of the <code>zk_id</code> when sorted in ascending order.</p>
+<p>Starting immediately after epoch <strong>N+1</strong>, service rewards are distributed in the first block of epoch <strong>N+2.</strong> The rewards are inserted directly in the ledger without triggering any Mantle validation. The <code>NoteId</code> is computed using the result of <code>hash(</code><a href="blockchain/raw/bedrock-service-declaration-protocol.html"><code>ServiceType</code></a><code>|| epoch_number)</code> as the <code>op_id</code>, where <code>ServiceType</code> is serialized as its canonical one-byte discriminant (<a href="blockchain/raw/bedrock-service-declaration-protocol.html#service-types">Service Types</a>) and <code>epoch_number</code> as the 4 bytes of an <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a>. The output number corresponds to the position of the <code>zk_id</code> when sorted in ascending order.</p>
 <p>The reward must:</p>
 <ul>
 <li>Transfer the correct reward amount according to <a href="blockchain/raw/bedrock-service-reward-distribution.html#service-reward-calculation">Service Reward Calculation</a>.2</li>
@@ -39965,6 +39972,7 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 </div><!-- timeline:start -->
 <h2 id="timeline-130"><a class="header" href="#timeline-130">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/blend-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
 <li><strong>2026-08-25</strong> — <a href="https://github.com/logos-co/logos-lips/blob/796baaac776146dbe6d11f858b41df2b0311af77/docs/blockchain/raw/blend-protocol.md"><code>796baaa</code></a> — docs(blockchain): fix blend token evaluation and active message encoding (#405)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/7c70a384516a0f223ba7b080772f8459ff9bf76a/docs/blockchain/raw/blend-protocol.md"><code>7c70a38</code></a> — docs(blockchain): fix CSPBRG/CSPRBG typos in Blend Proof of Selection (#414)</li>
 <li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/blend-protocol.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
@@ -39980,6 +39988,7 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 <tr><td>1.1.0</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
 <tr><td>1.1.1</td><td>Updated the block proposal message size to 34574 bytes in the encapsulation-overhead calculation, following the addition of carried uncle headers in <a href="blockchain/raw/bedrock-v1.1-block-construction.html">Block Construction, Validation and Execution</a>.</td><td>2026-08-06</td></tr>
 <tr><td>1.2.0</td><td>Define the token evaluation under a low core quota, and specify the Active Message metadata layout.</td><td>2026-08-19</td></tr>
+<tr><td>1.2.1</td><td>Pointed the <code>EpochNumber</code> of the activity proof at its definition in <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch">Epoch</a></td><td>2026-08-25</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-70"><a class="header" href="#introduction-70">Introduction</a></h1>
@@ -40921,7 +40930,7 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 </code></pre>
 <p>Where:</p>
 <ul>
-<li><code>EpochNumber</code> is the number of the epoch for which the activity proof is generated.</li>
+<li><code>EpochNumber</code> is the number of the epoch for which the activity proof is generated, as defined in <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch">Epoch</a>.</li>
 <li><code>ProofOfQuota</code> is defined as in <a href="blockchain/raw/proof-of-quota.html">Proof of Quota</a>.</li>
 <li><code>ProofOfSelection</code> is defined in <a href="blockchain/raw/blend-protocol.html#proof-of-selection">Proof of Selection</a>.</li>
 <li><code>SigningKey</code> is the key used to sign the <code>ProofOfQuota</code>.</li>

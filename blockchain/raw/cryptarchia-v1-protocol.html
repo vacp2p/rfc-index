@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
 <li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
 <li><strong>2026-07-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5b20a2d59691c12392d091a6d7352d3de719ad61/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>5b20a2d</code></a> — docs(blockchain) Channel Participation in PoS (#364)</li>
@@ -208,6 +209,7 @@
 <tr><td>1.1.0</td><td>Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be &lt;= 1024</td><td>2026-07-27</td></tr>
 <tr><td>1.1.1</td><td>Corrected <code>MAX_BLOCK_SIZE</code> to 2 MiB, to match the implementation.</td><td>2026-08-05</td></tr>
 <tr><td>1.2.0</td><td>Added <a href="#uncle-references">uncle references</a>: a block carries the signed headers of the fork blocks it references, every carried entry must be valid for the block itself to be valid, and the <a href="#total-stake-inference">Total Stake Inference</a> counts their slots. Replaced <code>block_root</code> with <code>body_root</code>, which commits to those headers as well as to the transactions.</td><td>2026-08-06</td></tr>
+<tr><td>1.2.1</td><td>Defined <code>EpochNumber</code>, the type of an epoch number, as a 32-bit unsigned integer encoded little-endian wherever it is serialized or hashed.</td><td>2026-08-25</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -280,6 +282,7 @@
 <li>Approximately constant block production rate achieved by dynamically adjusting the lottery difficulty based on observed participation levels.</li>
 </ul>
 <p>The order in which these variables are calculated is important and is done w.r.t. the epoch schedule.</p>
+<p>Epochs are numbered consecutively from <code>0</code>, the epoch the Genesis block belongs to. That number is an <code>EpochNumber</code>, a 32-bit unsigned integer, encoded little-endian over 4 bytes wherever it is serialized or hashed.</p>
 <h3 id="epoch-schedule"><a class="header" href="#epoch-schedule">Epoch Schedule</a></h3>
 <p>An epoch is divided into 3 phases, as outlined below.</p>
 <div class="table-wrapper"><table><thead><tr><th>Epoch Phase</th><th>Phase Length</th><th>Description</th></tr></thead><tbody>

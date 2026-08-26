@@ -878,7 +878,7 @@
     "title": "Service Reward Distribution Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-24",
+    "updated": "2026-08-26",
     "path": "blockchain/raw/bedrock-service-reward-distribution.html"
   },
   {
@@ -887,7 +887,7 @@
     "title": "Service Declaration Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-24",
+    "updated": "2026-08-26",
     "path": "blockchain/raw/bedrock-service-declaration-protocol.html"
   },
   {
@@ -932,7 +932,7 @@
     "title": "Cryptarchia Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-19",
+    "updated": "2026-08-26",
     "path": "blockchain/raw/cryptarchia-v1-protocol.html"
   },
   {
@@ -959,7 +959,7 @@
     "title": "Blend Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-25",
+    "updated": "2026-08-26",
     "path": "blockchain/raw/blend-protocol.html"
   },
   {
