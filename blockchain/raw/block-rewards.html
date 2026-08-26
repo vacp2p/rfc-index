@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b655e4b0285d2e0bc09a19b5292d46bacc44019b/docs/blockchain/raw/block-rewards.md"><code>b655e4b</code></a> — [RFC] Block Rewards: Replace Burning/Minting with Pooling/Distributing/Releasing (#375)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/block-rewards.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-29</strong> — <a href="https://github.com/logos-co/logos-lips/blob/67e498e2d65e447d954e213ea89bbe3b9b285a8a/docs/blockchain/raw/block-rewards.md"><code>67e498e</code></a> — chore: fix math issues (#350)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/block-rewards.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
@@ -200,6 +201,7 @@
 <h1 id="revisions-history"><a class="header" href="#revisions-history">Revisions History</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Version</th><th>Changes</th><th>Date</th></tr></thead><tbody>
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-04-24</td></tr>
+<tr><td>1.1.0</td><td>Changing from burning/minting to pooling/distributing/releasing, removing <span class="math-inline" data-tex="S_{tge}"></span></td><td>2026-08-25</td></tr>
 </tbody></table>
 </div>
 <blockquote>
@@ -211,13 +213,13 @@ This material, including any linked pages or documents, is provided for informat
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <p>This document outlines the specifications for Logos Blockchain's block rewards mechanism, a critical component of the network's economic model. The mechanism is designed to create a sustainable economic framework that incentivizes network participation while maintaining long-term stability.</p>
 <p>The objective is to develop a block rewards system that addresses key challenges specific to Logos Blockchain's architecture, including the unlinkability between block proposal and reward collection, and the inability to directly allocate transaction fees to specific block proposers. These constraints necessitate a carefully designed economic incentive structure.</p>
-<p>Building on previous work in blockchain economics, this specification proposes a dynamic token emission system that calibrates LGO issuance according to network Key Performance Indicators (KPIs). The system uses two primary metrics: inferred total stake (as a security indicator) and average burning rate (to maintain supply equilibrium).</p>
+<p>Building on previous work in blockchain economics, this specification proposes a dynamic token emission system that calibrates the release of the LGO genesis minted reserve according to network Key Performance Indicators (KPIs). The system uses two primary metrics: inferred total stake (as a security indicator) and average pooling rate (to maintain supply equilibrium).</p>
 <p>The document references internal mathematical models and simulations that demonstrate how the proposed mechanism would behave under various conditions. Key parameters include maximum annual emission rate (<span class="math-inline" data-tex="1\%"></span>), control responsiveness factors, and target metrics for network security.</p>
 <p>The conclusion of our analysis indicates that this KPI-based emission model should achieve several important outcomes:</p>
 <ul>
-<li>Initially higher emission rates (capped at <span class="math-inline" data-tex="1\%"></span> annually) to bootstrap network participation.</li>
+<li>Initially higher emission rates from the reserve (capped at <span class="math-inline" data-tex="1\%"></span> of the max supply annually) to bootstrap network participation.</li>
 <li>Gradual stabilization of token supply as the system matures, with our baseline simulation showing just <span class="math-inline" data-tex="1.33\%"></span> total inflation after <span class="math-inline" data-tex="10"></span> years.</li>
-<li>Self-regulating mechanism where token issuance naturally adjusts to compensate for burned transaction fees.</li>
+<li>Self-regulating mechanism where the reserve release naturally adjusts to complement pooled transaction fees.</li>
 <li>Built-in safeguards against manipulation through moving averages and bounded functions.</li>
 </ul>
 <p>This specification represents a comprehensive approach to creating a robust economic foundation for the Logos Blockchain network that balances security requirements with long-term economic sustainability.</p>
@@ -227,61 +229,61 @@ This material, including any linked pages or documents, is provided for informat
 <p>The design of the rewards system reflects three architectural constraints unique to Logos Blockchain:</p>
 <ul>
 <li>Unlinkability: Block proposal and reward collection are intentionally decoupled for privacy, meaning rewards cannot be assigned to a single proposer.</li>
-<li>Fee burning: All transaction fees (execution base fees and permanent storage fees) are burned, rather than directly given to block proposers.</li>
+<li>Fee pooling: All transaction fees (execution base fees and permanent storage fees) are collected into a pending rewards pool, rather than directly given to block proposers.</li>
 <li>Global metrics over local signals: Rewards are computed from network-wide KPIs at block production time, rather than from easily manipulated per-block data.</li>
 </ul>
 <p>These principles ensure that the system is censorship-resistant, manipulation-resistant, and aligned with long-term network incentives.</p>
 <h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
-<p>Building upon the requirements for Logos Blockchain's block rewards system, the implementation will establish that all transaction fees are burned while block rewards are tied to measurable global metrics that reflect network health and security. This mechanism ensures that if network activity surges substantially, the accelerated burning of tokens will be balanced by compensatory emissions over time.</p>
+<p>Building upon the requirements for Logos Blockchain's block rewards system, the implementation will establish that all transaction fees are pooled while block rewards are tied to measurable global metrics that reflect network health and security. This mechanism ensures that if network activity surges substantially, the accelerated pooling of tokens will be balanced by complementary distribution from the reserve over time.</p>
 <p>For optimal functionality, block rewards should be anchored to specific observable metrics rather than arbitrary values. Block numbers simply track time passage without indicating chain state. Transaction counts per block are vulnerable to manipulation. On the other hand, tracking the number of Blend nodes or inferring total stake provide more robust information about the chain state, specially when they can be compared with targets that are considered “healthy”.</p>
 <p>Crucially, any metric-pegged reward system should aim toward a target value or equilibrium point, creating predictability and stability in the token economics.</p>
 <h2 id="high-level-system-design"><a class="header" href="#high-level-system-design">High-level System Design</a></h2>
 <p>The system dynamically adjusts token emission based on two primary KPIs:</p>
 <ul>
-<li>Inferred Total Stake: Measures network security by tracking the total amount staked against a target threshold (e.g., <span class="math-inline" data-tex="30\%"></span> of TGE supply).</li>
-<li>Average Burning Rate: Tracks transaction fees (both Execution base fees and Permanent Storage) burned to maintain supply equilibrium.</li>
+<li>Inferred Total Stake: Measures network security by tracking the total amount staked against a target threshold (e.g., <span class="math-inline" data-tex="30\%"></span> of the maximum supply).</li>
+<li>Average Pooling Rate: Tracks transaction fees (both Execution base fees and Permanent Storage) routed to the pending reward pool to maintain supply equilibrium.</li>
 </ul>
-<p>A control function combines these KPIs to determine the emission rate factor, bounded between a minimum and maximum annual issuance. This ensures that:</p>
+<p>A control function combines these KPIs to determine the emission rate factor, bounded between a minimum and maximum annual reserve release. This ensures that:</p>
 <ul>
-<li>When security participation is below target, higher issuance attracts more validators.</li>
-<li>As usage increases and fees are burned, emissions adjust downward to stabilize supply.</li>
+<li>When security participation is below target, a higher reserve release attracts more validators.</li>
+<li>As usage increases and fees are pooled, the reserve release adjusts downward and distribution from the pool rises to stabilize circulating supply.</li>
 </ul>
-<p><img src="block-rewards/assets/high-level-system-design.svg" alt="Block rewards high-level system design" /></p>
+<p><img src="block-rewards/assets/high-level-system-design.png" alt="Block rewards high-level system design" /></p>
 <p>The equation that defines the amount of block rewards is given by:</p>
-<div class="math-block" data-tex="A_t \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block}"></div>
+<div class="math-block" data-tex="A_t \cdot \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f} + (1-A_t) \cdot \bar{R}_t"></div>
 <p>where:</p>
 <ul>
 <li><span class="math-inline" data-tex="A_t"></span> is the emission rate factor on a per year basis.</li>
 <li><span class="math-inline" data-tex="I_{max}"></span> is the maximum emission rate per year.</li>
-<li><span class="math-inline" data-tex="S_{tge}"></span> denotes the token supply at Token Generation Event (TGE).</li>
+<li><span class="math-inline" data-tex="S_{cap}"></span> denotes the maximum allowable token supply (hard cap).</li>
 <li><span class="math-inline" data-tex="\Delta_t"></span> denotes the fraction of year in one time step per e.g., epoch, block, or day.</li>
 <li><span class="math-inline" data-tex="f"></span> be the average number of block proposal within <span class="math-inline" data-tex="\Delta_{t}"></span> units.</li>
-<li><span class="math-inline" data-tex="R_\text{block}"></span> denotes the total amount of Execution base fees and Permanent Storage fees that are burned when the block is proposed.</li>
+<li><span class="math-inline" data-tex="R_\text{block}"></span> denotes the total amount of Execution base fees and Permanent Storage fees that are routed to the pending reward pool when the block is proposed.</li>
+<li><span class="math-inline" data-tex="\bar{R}_t"></span> denotes the average pooled reward: the moving average of <span class="math-inline" data-tex="R_\text{block}"></span> over the look-back window <span class="math-inline" data-tex="T"></span>.</li>
 </ul>
 <h2 id="lifecycle-phases"><a class="header" href="#lifecycle-phases">Lifecycle Phases</a></h2>
 <p>The system is designed to evolve through different phases:</p>
 <ul>
 <li>Bootstrap Phase: Initially higher emission rates (up to <span class="math-inline" data-tex="1\%"></span> annually) to incentivize network participation when stake is below target. As it is explained below, this is viable even when Logos Blockchain experiences low activity because the level of activity only plays a role when the network participation gets close to the predefined target.</li>
-<li>Stabilization Phase: As Proof-of-Stake (PoS) participation approaches target levels, emission becomes primarily driven by burning rate.</li>
-<li>Equilibrium Phase: Supply stabilizes with issuance matching burned fees.</li>
-<li>High-Adoption Phase: If burning exceeds maximum emission, supply becomes deflationary.</li>
+<li>Stabilization Phase: As Proof-of-Stake (PoS) participation approaches target levels, emission becomes primarily driven by the fee pooling rate.</li>
+<li>Equilibrium Phase: Circulating supply stabilizes as distribution from the pool matches pooled fees and the reserve release approaches zero.</li>
+<li>High-Adoption Phase: If the fee pooling rate exceeds the maximum reserve release rate, circulating supply contracts as the pool accumulates faster than tokens are released. Total supply is unchanged.</li>
 </ul>
 <h2 id="benefits"><a class="header" href="#benefits">Benefits</a></h2>
 <p>This KPI-based approach delivers several advantages:</p>
 <ul>
 <li>Self-regulating mechanism that automatically adjusts to network conditions.</li>
-<li>Long-term sustainability with projected total inflation of just <span class="math-inline" data-tex="1.33\%"></span> after <span class="math-inline" data-tex="10"></span> years (assuming constant burning rate of <span class="math-inline" data-tex="0.5\%"></span> per year).</li>
+<li>Long-term sustainability with projected net circulating-supply growth of just <span class="math-inline" data-tex="1.33\%"></span> after <span class="math-inline" data-tex="10"></span> years (assuming constant pooling rate of <span class="math-inline" data-tex="0.5\%"></span> per year).</li>
 <li>Built-in safeguards against manipulation through moving averages and bounded functions.</li>
 <li>Predictable economic model that balances security incentives with controlled supply.</li>
 </ul>
 <p>The overall design creates a robust economic foundation for the Logos Blockchain blockchain that effectively balances the need for strong security incentives with long-term token supply stability.</p>
 <h1 id="construction"><a class="header" href="#construction">Construction</a></h1>
-<p>The proposed mechanism implements a dynamic token emission system that precisely calibrates LGO issuance according to network performance metrics (KPIs). This adaptive model adjusts emission rates based on how KPIs perform relative to their predetermined targets, while maintaining strict adherence to supply parameters and economic boundaries.</p>
+<p>The proposed mechanism implements a dynamic token emission system that precisely calibrates the LGO reserve release according to network performance metrics (KPIs). This adaptive model adjusts release rates based on how KPIs perform relative to their predetermined targets, while maintaining strict adherence to supply parameters and economic boundaries.</p>
 <h2 id="core-variables"><a class="header" href="#core-variables">Core Variables</a></h2>
 <p>The following variables are input to the model:</p>
 <ul>
-<li><span class="math-inline" data-tex="S_{tge}"></span> denotes the token supply at Token Generation Event (TGE).</li>
-<li><span class="math-inline" data-tex="S_{cap}"></span> denotes the maximum allowable token supply (hard cap), if any.</li>
+<li><span class="math-inline" data-tex="S_{cap}"></span> denotes the maximum allowable token supply (hard cap).</li>
 <li><span class="math-inline" data-tex="\Delta_t"></span> denotes the fraction of year in one time step per e.g., epoch, block, or day:
 <ul>
 <li>if the time step is 1 day, then <span class="math-inline" data-tex="\Delta_t = 1/365"></span>.</li>
@@ -295,8 +297,9 @@ This material, including any linked pages or documents, is provided for informat
 <li>if the time step is 1 epoch, which lasts 7.5 days, and blocks are processed every 30 seconds, then <span class="math-inline" data-tex="f = 7.5 \times 2880 = 21600"></span> (the number of 30 seconds intervals in 7.5 day).</li>
 </ul>
 </li>
-<li><span class="math-inline" data-tex="I_{min}"></span> is the minimum emission rate per year (default: <span class="math-inline" data-tex="0\%"></span>).</li>
-<li><span class="math-inline" data-tex="I_{max}"></span> is the maximum emission rate per year (default: <span class="math-inline" data-tex="1\%"></span>).</li>
+<li><span class="math-inline" data-tex="I_{min}"></span> is the minimum emission rate per year (<span class="math-inline" data-tex="I_{min} = 0\%"></span> of <span class="math-inline" data-tex="S_{cap}"></span>).</li>
+<li><span class="math-inline" data-tex="I_{max}"></span> is the maximum emission rate per year (<span class="math-inline" data-tex="I_{min} = 1\%"></span> of <span class="math-inline" data-tex="S_{cap}"></span>).</li>
+<li><span class="math-inline" data-tex="Y"></span> denotes the lifetime, in years, of the rewards reserve at the maximum release rate <span class="math-inline" data-tex="I_{max}"></span> of <span class="math-inline" data-tex="S_{cap}"></span> per year (<span class="math-inline" data-tex="Y = 10"></span> years).</li>
 <li><span class="math-inline" data-tex="D_{i,target}"></span> denotes the target value for the <span class="math-inline" data-tex="i"></span>-th KPI.</li>
 <li><span class="math-inline" data-tex="w_i"></span> denotes the weight of the <span class="math-inline" data-tex="i"></span>-th KPI in the normalized deviation from target or in the normalized average; it satisfies <span class="math-inline" data-tex="\sum_i w_i = 1"></span>.</li>
 <li><span class="math-inline" data-tex="\alpha_d \gt 0"></span> denotes the control responsiveness to KPI deviation metrics.</li>
@@ -306,24 +309,28 @@ This material, including any linked pages or documents, is provided for informat
 <p>Let us define the following variables:</p>
 <ul>
 <li><span class="math-inline" data-tex="S_t"></span> denotes the token circulating supply at time <span class="math-inline" data-tex="t"></span>.</li>
+<li><span class="math-inline" data-tex="P_t"></span> denotes the pending rewards pool balance at time <span class="math-inline" data-tex="t"></span>. It collects the pooled fees and funds the distributed portion of the reward.</li>
+<li><span class="math-inline" data-tex="B_t"></span> denotes the rewards reserve balance at time <span class="math-inline" data-tex="t"></span>. It holds the pre-allocated tokens drawn down by the reserve release, with initial size <span class="math-inline" data-tex="B_0 = I_{max} \cdot S_{cap} \cdot Y"></span>.</li>
 <li><span class="math-inline" data-tex="A_t \in [0,1]"></span> denotes the emission rate factor on a per year basis.
 <ul>
 <li>This implies that <span class="math-inline" data-tex="A_t \cdot I_{max} \cdot \Delta_t"></span> denotes the emission within the time-step.</li>
 </ul>
 </li>
 <li><span class="math-inline" data-tex="D_{i,t}"></span> denotes the <span class="math-inline" data-tex="i"></span>-th key performance indicator at time <span class="math-inline" data-tex="t"></span> (e.g., TVL, staked amount, active users).</li>
-<li><span class="math-inline" data-tex="R_\text{block}"></span> denotes the total amount of Execution Gas and Permanent Storage fees burnt in a block. Refer to <a href="execution-market.html">Execution Market</a> and <a href="storage-markets.html">Storage Markets</a> for how to compute <span class="math-inline" data-tex="R_{block}"></span>.</li>
+<li><span class="math-inline" data-tex="R_\text{block}"></span> denotes the total amount of Execution Gas and Permanent Storage fees routed to the rewards pool in a block. Refer to <a href="execution-market.html">Execution Market</a> and <a href="storage-markets.html">Storage Markets</a> for how to compute <span class="math-inline" data-tex="R_{block}"></span>.</li>
+<li><span class="math-inline" data-tex="\bar{R}_t = \dfrac{1}{T} \sum_{\tau=t-T+1}^{t} D_{1,\tau}"></span> denotes the average pooled reward: the moving average of <span class="math-inline" data-tex="R_\text{block}"></span> over the look-back window <span class="math-inline" data-tex="T"></span>. It is the base distributed each block, topped up by the reserve release.</li>
 </ul>
 <h2 id="parametrization"><a class="header" href="#parametrization">Parametrization</a></h2>
 <div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Definition</th><th>Default Value</th><th>Explanation</th></tr></thead><tbody>
-<tr><td><span class="math-inline" data-tex="S_{tge}"></span>​</td><td>Token supply at TGE</td><td>10 billion LGO</td><td>N.A.</td></tr>
-<tr><td><span class="math-inline" data-tex="T"></span>​</td><td>The number of periods in the look-back window for the moving average.</td><td><span class="math-inline" data-tex="120"></span>​</td><td>As the system is expected to mint 1 block every 30 seconds, this look-back window defines that the minting averages the fees burned in the last hour.</td></tr>
-<tr><td><span class="math-inline" data-tex="\alpha_a"></span>​</td><td>Denotes the control responsiveness to KPI average metrics.</td><td><span class="math-inline" data-tex="1"></span>​</td><td>This parameter drives the token emission from the burn rate. It must be one-to-one.</td></tr>
+<tr><td><span class="math-inline" data-tex="S_{cap}"></span>​</td><td>Maximum token supply (hard cap)</td><td>10 billion LGO</td><td>N.A.</td></tr>
+<tr><td><span class="math-inline" data-tex="T"></span>​</td><td>The number of periods in the look-back window for the moving average.</td><td><span class="math-inline" data-tex="120"></span>​</td><td>As the system is expected to produce 1 block every 30 seconds, this look-back window defines that the reward averages the fees pooled in the last hour.</td></tr>
+<tr><td><span class="math-inline" data-tex="\alpha_a"></span>​</td><td>Denotes the control responsiveness to KPI average metrics.</td><td><span class="math-inline" data-tex="1"></span>​</td><td>This parameter scales the reserve-release response to the pooling rate. It must be one-to-one.</td></tr>
 <tr><td><span class="math-inline" data-tex="\alpha_d"></span>​</td><td>Denotes the control responsiveness to KPI deviation metrics.</td><td><span class="math-inline" data-tex="1/4"></span>​</td><td>See <a href="analysis-block-reward-parameter-calibration.html">[Analysis] Block Reward Parameter Calibration</a>, for details.</td></tr>
 <tr><td><span class="math-inline" data-tex="w_i"></span>​</td><td>Denotes the weight of the <span class="math-inline" data-tex="i"></span>-th KPI in the normalized deviation from target</td><td><span class="math-inline" data-tex="1"></span>​</td><td>There's only one KPI of this type in our system.</td></tr>
-<tr><td><span class="math-inline" data-tex="D_{0,target}"></span>​</td><td>Denotes the target value for the first KPI based on stake.</td><td>3 billion LOGOS</td><td><span class="math-inline" data-tex="30\%"></span> of the token supply.</td></tr>
+<tr><td><span class="math-inline" data-tex="D_{0,target}"></span>​</td><td>Denotes the target value for the first KPI based on stake.</td><td>3 billion LOGOS</td><td><span class="math-inline" data-tex="30\%"></span> of the maximum supply.</td></tr>
 <tr><td><span class="math-inline" data-tex="D_{1,target}"></span>​</td><td>Denotes the target value for the second KPI based on fees.</td><td><span class="math-inline" data-tex="10"></span> billon LOGOS</td><td>In the context of this KPI, this value behaves as a normalizer</td></tr>
 <tr><td><span class="math-inline" data-tex="I_{max}"></span>​</td><td>The maximum emission rate per year</td><td><span class="math-inline" data-tex="1\%"></span>​</td><td>This value guarantees that, when the total inferred stake reaches <span class="math-inline" data-tex="D_{0,target}"></span>, then the APY for validation is ~3.33%.</td></tr>
+<tr><td><span class="math-inline" data-tex="Y"></span></td><td>Lifetime of the rewards reserve at the maximum release rate (<span class="math-inline" data-tex="I_{max}"></span> of <span class="math-inline" data-tex="S_{cap}"></span> per year)</td><td><span class="math-inline" data-tex="10"></span> years</td><td>Sets the reserve size <span class="math-inline" data-tex="B_0 = I_{max} \cdot S_{cap} \cdot Y = 10^9"></span> LGO (<span class="math-inline" data-tex="10\%"></span> of <span class="math-inline" data-tex="S_{cap}"></span>).</td></tr>
 <tr><td><span class="math-inline" data-tex="I_{min}"></span>​</td><td>The minimum emission rate per year</td><td><span class="math-inline" data-tex="0\%"></span>​</td><td>This avoids inflationary token emissions.</td></tr>
 <tr><td><span class="math-inline" data-tex="f"></span>​</td><td>The average number of block proposal within <span class="math-inline" data-tex="\Delta_{t}"></span> units</td><td><span class="math-inline" data-tex="1"></span>​</td><td>The time step <span class="math-inline" data-tex="\Delta_t"></span> was chosen so that <span class="math-inline" data-tex="f"></span> equals to <span class="math-inline" data-tex="1"></span>.</td></tr>
 <tr><td><span class="math-inline" data-tex="\Delta_t"></span>​</td><td>Time step, the fraction of year in one time step (per e.g., epoch, block, or day)</td><td><span class="math-inline" data-tex="1/(365 \times 2880)"></span>​</td><td>The time step is 1 block every <span class="math-inline" data-tex="30"></span> seconds; there are 2880 blocks of 30 seconds in a day.</td></tr>
@@ -331,42 +338,63 @@ This material, including any linked pages or documents, is provided for informat
 </div>
 <p>The calibration of these parameters can be found in <a href="analysis-block-reward-parameter-calibration.html">[Analysis] Block Reward Parameter Calibration</a>.</p>
 <h2 id="block-rewards-1"><a class="header" href="#block-rewards-1">Block Rewards</a></h2>
-<p>The amount of tokens to be rewarded in a block depends on the emission rate factor <span class="math-inline" data-tex="A_t"></span>. This controls how much is minted from inflation and how much is diverted from transaction fees. The following behavior is expected:</p>
+<p>The amount of tokens rewarded in a block is anchored on the average pooled fees and topped up by the reserve release. The emission rate factor <span class="math-inline" data-tex="A_t"></span> sets the size of the top-up: it controls how much of the reward is newly released and how much is the recycled average of pooled fees. The following behavior is expected:</p>
 <ul>
-<li>When the aggregate KPI is far from the target, <span class="math-inline" data-tex="A_t \rightarrow 1"></span>, then the emission of new tokens  (inflation) is maximized, and most of the transaction fees aren't minted back. The amount of tokens burned does not impact the block rewards in this situation. This means that the system can burn more tokens than it mints.</li>
-<li>When the aggregate KPI is close to the target, <span class="math-inline" data-tex="A_t \rightarrow 0"></span>, then the emission from inflation is minimized, and most of <span class="math-inline" data-tex="R_{block}"></span> is minted back for leaders and Blend nodes.</li>
+<li>When the aggregate KPI is far from the target, <span class="math-inline" data-tex="A_t \rightarrow 1"></span>, the reserve release is maximized: it tops up the average pooled reward <span class="math-inline" data-tex="\bar{R}_t"></span>, raising the reward toward the per-block release cap <span class="math-inline" data-tex="\frac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f}"></span>.</li>
+<li>When the aggregate KPI is close to the target, <span class="math-inline" data-tex="A_t \rightarrow 0"></span>, the top-up vanishes and the reward settles at the average pooled fees <span class="math-inline" data-tex="\bar{R}_t"></span>, funded by recycling the pooled fees to leaders and Blend nodes.</li>
 </ul>
-<p>That is, what drives the source of minting is the KPI: if far from the target, the system mints new tokens; if close to the target, the system mints exactly what was burned (up to <span class="math-inline" data-tex="I_{max}"></span> of TGE).</p>
-<p>The emission from inflation within the time step <span class="math-inline" data-tex="\Delta_t"></span> is given by</p>
-<div class="math-block" data-tex="A_t \cdot I_{max} \cdot S_{tge} \cdot \Delta_t."></div>
-<p>The actual amount of tokens minted per block (because of inflation) also depends on how many blocks are expected to be proposed between <span class="math-inline" data-tex="\Delta_{t-1}"></span> and <span class="math-inline" data-tex="\Delta_{t}"></span>. This is expressed by the factor <span class="math-inline" data-tex="f"></span>, as defined <a href="#core-variables">above</a>.</p>
+<p>The reserve release within the time step <span class="math-inline" data-tex="\Delta_t"></span> is given by</p>
+<div class="math-block" data-tex="A_t \cdot I_{max} \cdot S_{cap} \cdot \Delta_t."></div>
+<p>The actual amount of tokens released from the reserve per block also depends on how many blocks are expected to be proposed between <span class="math-inline" data-tex="\Delta_{t-1}"></span> and <span class="math-inline" data-tex="\Delta_{t}"></span>. This is expressed by the factor <span class="math-inline" data-tex="f"></span>, as defined <a href="#core-variables">above</a>.</p>
 <p>The equation that implements the behavior above in terms of <span class="math-inline" data-tex="A_t"></span> is given by:</p>
-<div class="math-block" data-tex="\begin{equation}&#10;A_t \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block}&#10;\end{equation}"></div>
+<div class="math-block" data-tex="\begin{equation}&#10;R_t = A_t \cdot \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f} + (1-A_t) \cdot \bar{R}_t&#10;\end{equation}"></div>
 <p>where:</p>
 <ul>
 <li><span class="math-inline" data-tex="A_t"></span> is the emission rate factor on a per year basis.</li>
 <li><span class="math-inline" data-tex="I_{max}"></span> is the maximum emission rate per year.</li>
-<li><span class="math-inline" data-tex="S_{tge}"></span> denotes the token supply at Token Generation Event (TGE).</li>
+<li><span class="math-inline" data-tex="S_{cap}"></span> denotes the maximum allowable token supply (hard cap).</li>
 <li><span class="math-inline" data-tex="\Delta_t"></span> denotes the fraction of year in one time step per e.g., epoch, block, or day.</li>
 <li><span class="math-inline" data-tex="f"></span> be the average number of block proposal within <span class="math-inline" data-tex="\Delta_{t}"></span> units.</li>
-<li><span class="math-inline" data-tex="R_\text{block} = D_{1,t}"></span> denotes the total amount of Execution base fees and Storage fees that are burned when the block is proposed.</li>
+<li><span class="math-inline" data-tex="R_\text{block} = D_{1,t}"></span> denotes the per-block Execution base fees and Storage fees collected in the block and routed to the pending reward pool when the block is proposed.</li>
+<li><span class="math-inline" data-tex="\bar{R}_t = \dfrac{1}{T} \sum_{\tau=t-T+1}^{t} D_{1,\tau}"></span> denotes the average pooled reward: the moving average of <span class="math-inline" data-tex="R_\text{block}"></span> over the look-back window <span class="math-inline" data-tex="T"></span>.</li>
 </ul>
+<p>The recycled component distributes the average pooled reward <span class="math-inline" data-tex="\bar{R}_t"></span>, rather than the single-block fee <span class="math-inline" data-tex="R_\text{block}"></span>, which smooths it across the window <span class="math-inline" data-tex="T"></span>. Rearranging equation (1) isolates the role of the reserve release:</p>
+<div class="math-block" data-tex="\bar{R}_t + A_t \cdot \left( \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f} - \bar{R}_t \right)."></div>
+<p>The base distributed every block is the average pooled fees <span class="math-inline" data-tex="\bar{R}_t"></span>. The second term is the reserve release: when the aggregate KPI is far from the target, <span class="math-inline" data-tex="A_t \rightarrow 1"></span> and the reserve release tops up the reward from <span class="math-inline" data-tex="\bar{R}_t"></span> toward the per-block release cap <span class="math-inline" data-tex="\frac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f}"></span>. In the bootstrap regime, where activity is low and <span class="math-inline" data-tex="\bar{R}_t &lt; \frac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f}"></span>, the top-up is positive, so the reserve release raises the reward above the average pooled fees. If the average pooled fees already exceeds the release cap, the second term is non-positive, and therefore less tokens are released from the average pooled fees as rewards.</p>
 <pre><code class="language-python">def block_rewards(
-    S_tge:float,
-    emission_rate_factor:float,
-    I_max:float,
-    Delta_t:float,
-    f:float,
-    D_1_t: float
+    S_cap: float,
+    emission_rate_factor: float,
+    I_max: float,
+    Delta_t: float,
+    f: float,
+    R_bar_t: float,
 ) -&gt; float:
     """
-    Calculate the rewards per block.
-    It implements equation (1).
+    Calculate the rewards distributed per block. It implements equation (1).
     """
-    emission_from_inflation = emission_rate_factor * I_max * S_tge * Delta_t / f
-    emission_from_rewards = (1. - emission_rate_factor) * R_block_cur
-    return emission_from_inflation + emission_from_rewards
+    reserve_release = emission_rate_factor * I_max * S_cap * Delta_t / f
+    pool_distribution = (1.0 - emission_rate_factor) * R_bar_t
+    return reserve_release + pool_distribution
 </code></pre>
+<h2 id="pool-accounting-and-supply-dynamics"><a class="header" href="#pool-accounting-and-supply-dynamics">Pool Accounting and Supply Dynamics</a></h2>
+<p>The mechanism routes all transaction fees into a rewards pool. Let <span class="math-inline" data-tex="P_t"></span> denote the pool balance at time <span class="math-inline" data-tex="t"></span> and <span class="math-inline" data-tex="\bar{R}_t = \frac{1}{T}\sum_{\tau=t-T+1}^{t} D_{1,\tau}"></span> the average pooled reward over the look-back window. Each block routes its fees into the pool and distributes the average pooled reward, recycled in proportion <span class="math-inline" data-tex="(1 - A_t)"></span>. The distribution is topped up by a release from a rewards reserve, not by minting: the reserve holds tokens pre-allocated from the fixed cap <span class="math-inline" data-tex="S_{cap}"></span> at genesis. It is sized so that releasing at the maximum rate <span class="math-inline" data-tex="I_{max}"></span> of <span class="math-inline" data-tex="S_{cap}"></span> per year lasts <span class="math-inline" data-tex="Y"></span> years, giving an initial balance <span class="math-inline" data-tex="B_0 = I_{max} \cdot S_{cap} \cdot Y"></span>.</p>
+<p>The inflows and the outflow at step <span class="math-inline" data-tex="t"></span> are:</p>
+<ul>
+<li>Fee inflow: <span class="math-inline" data-tex="R_\text{block} = D_{1,t}"></span>.</li>
+<li>Reserve release (top-up): <span class="math-inline" data-tex="\iota_t = \min \lbrace A_t \cdot \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f}, \; B_{t-1} \rbrace"></span>, drawn from the reserve and added to the payout.</li>
+<li>Distribution outflow, equal to the block reward: <span class="math-inline" data-tex="R_t = (1 - A_t) \cdot \bar{R}_t + \iota_t"></span>.</li>
+</ul>
+<p>The reserve funds the release and is monotonically non-increasing, bounded below by zero:</p>
+<div class="math-block" data-tex="B_t = B_{t-1} - \iota_t, \qquad B_t \geq 0."></div>
+<p>Once the reserve is depleted, <span class="math-inline" data-tex="\iota_t = 0"></span> and the reward reduces to the recycled component <span class="math-inline" data-tex="(1 - A_t) \cdot \bar{R}_t"></span>, funded entirely by pooled fees. The cap on <span class="math-inline" data-tex="\iota_t"></span> makes the reserve last <span class="math-inline" data-tex="Y"></span> years at the maximum release rate, and longer whenever <span class="math-inline" data-tex="A_t &lt; 1"></span>.</p>
+<p>The pool collects every fee and pays out only the recycled component, so its balance evolves as</p>
+<div class="math-block" data-tex="P_t = P_{t-1} + R_\text{block} - (1 - A_t) \cdot \bar{R}_t."></div>
+<p>The increment <span class="math-inline" data-tex="R_\text{block} - (1 - A_t)\bar{R}_t"></span> can take either sign. Near target (<span class="math-inline" data-tex="A_t \rightarrow 0"></span>) the pool pays the average and banks the difference <span class="math-inline" data-tex="D_{1,t} - \bar{R}_t"></span>, acting as a buffer that smooths fee fluctuations; far from target (<span class="math-inline" data-tex="A_t \rightarrow 1"></span>) it retains the full fee while the reserve release carries the reward. The pool is redistributable, subject to <span class="math-inline" data-tex="P_t \geq 0"></span>.</p>
+<p>The mechanism conserves tokens across the three stocks it controls. Let the controlled total be <span class="math-inline" data-tex="S_t^{tot} = S_t + P_t + B_t"></span>, with <span class="math-inline" data-tex="S_t"></span> the circulating supply. Per step:</p>
+<div class="math-block" data-tex="\Delta S_t = R_t - R_\text{block} = (1 - A_t) \cdot \bar{R}_t + \iota_t - D_{1,t},"></div>
+<div class="math-block" data-tex="\Delta P_t = R_\text{block} - (1 - A_t) \cdot \bar{R}_t, \qquad \Delta B_t = -\iota_t,"></div>
+<div class="math-block" data-tex="\Delta S_t^{tot} = \Delta S_t + \Delta P_t + \Delta B_t = 0."></div>
+<p>The controlled total is constant: the mechanism never mints tokens. A reserve release moves tokens from <span class="math-inline" data-tex="B_t"></span> into circulation, routing a fee moves tokens from circulation into <span class="math-inline" data-tex="P_t"></span>, and recycling moves them back. Circulating supply <span class="math-inline" data-tex="S_t"></span> rises as the reserve drains, and contracts whenever the fee inflow exceeds the distributed reward, <span class="math-inline" data-tex="D_{1,t} &gt; R_t"></span>, when tokens accumulate in the pool faster than they are paid out. This removes tokens from circulation, not from existence, and reverses if the pool is later released. Net circulating growth over the reserve's life is bounded by <span class="math-inline" data-tex="B_0 = I_{max} \cdot S_{cap} \cdot Y"></span>.</p>
 <h2 id="emission-rate-factor-function"><a class="header" href="#emission-rate-factor-function">Emission Rate Factor Function</a></h2>
 <p>The emission rate factor <span class="math-inline" data-tex="A_t \in [0,1]"></span> determines the portion of <span class="math-inline" data-tex="I_{max}"></span> that should be emitted based on current values of <span class="math-inline" data-tex="\delta_t"></span> and <span class="math-inline" data-tex="\gamma_t"></span>:</p>
 <div class="math-block" data-tex="A_t = \min \lbrace 1, \max \lbrace 0, \dfrac{ \alpha_d \cdot \delta_t + \alpha_a \cdot \gamma_t + I_{min}}{I_{max}} \rbrace \rbrace."></div>
@@ -458,15 +486,15 @@ This material, including any linked pages or documents, is provided for informat
 <li><span class="math-inline" data-tex="\gamma_t \lt 0"></span> → should reduce the token emission by a factor of <span class="math-inline" data-tex="\alpha_a \gamma_t"></span>.</li>
 </ul>
 <blockquote>
-<p>To measure the average, only the average burning rate KPI is used in this part of the computation</p>
+<p>To measure the average, only the average pooling rate KPI is used in this part of the computation</p>
 </blockquote>
 <h2 id="key-performance-indicators"><a class="header" href="#key-performance-indicators">Key Performance Indicator(s)</a></h2>
 <h3 id="kpi-1---the-inferred-total-stake"><a class="header" href="#kpi-1---the-inferred-total-stake">KPI 1 - The Inferred Total Stake</a></h3>
-<p>Given the privacy features of Logos Blockchain and the fact that the token TGE supply is known, the inferred total stake is the most appropriate indicator of the system's security.</p>
+<p>Given the privacy features of Logos Blockchain and the fact that the token's maximum supply is known, the inferred total stake is the most appropriate indicator of the system's security.</p>
 <p>Let:</p>
 <ul>
 <li><span class="math-inline" data-tex="D_{0,t}"></span> denotes the evolution of the inferred total stake.</li>
-<li><span class="math-inline" data-tex="D_{0,target}"></span> denotes the total stake that is considered secure. For the blockchain to be secure, we aim for <span class="math-inline" data-tex="30\%"></span> of the TGE supply.</li>
+<li><span class="math-inline" data-tex="D_{0,target}"></span> denotes the total stake that is considered secure. For the blockchain to be secure, we aim for <span class="math-inline" data-tex="30\%"></span> of the maximum supply.</li>
 </ul>
 <p>The inferred total stake affects the emission rate through the "normalized deviation from target." The deviation implied by this KPI is characterized by the plot below.</p>
 <p><img src="block-rewards/assets/cc1261aa-09df-82f0-ace9-81b7dd81a13a.png" alt="Diagram" /></p>
@@ -475,21 +503,21 @@ This material, including any linked pages or documents, is provided for informat
 </blockquote>
 <p>This happens because, when the blockchain starts, <span class="math-inline" data-tex="D_{0,t} \vert_{t=0}"></span> is very likely a small number compared to the target. Therefore, the equation <a href="#kpi-deviation-from-target">above</a> tilts towards <span class="math-inline" data-tex="1"></span> (or <span class="math-inline" data-tex="100\%"></span>) at that moment. As time passes and more stake participates in the PoS, the difference between the current total stake and the target diminishes. The equation <a href="#kpi-deviation-from-target">above</a> oscillates around 0 (or <span class="math-inline" data-tex="0\%"></span>) when <span class="math-inline" data-tex="D_{0,t}"></span> oscillates around <span class="math-inline" data-tex="D_{0,target}"></span>.</p>
 <p>Let the Logos Blockchain’s security level be defined by:</p>
-<div class="math-block" data-tex="\text{Security Level} = \dfrac{D_{0,target}}{S_{tge}}."></div>
-<h3 id="kpi-2---the-average-burning-rate"><a class="header" href="#kpi-2---the-average-burning-rate">KPI 2 - The Average Burning Rate</a></h3>
-<p>In the long run, Logos Blockchain should mint only enough tokens to compensate for the burned transaction fees.</p>
+<div class="math-block" data-tex="\text{Security Level} = \dfrac{D_{0,target}}{S_{cap}}."></div>
+<h3 id="kpi-2---the-average-pooling-rate"><a class="header" href="#kpi-2---the-average-pooling-rate">KPI 2 - The Average Pooling Rate</a></h3>
+<p>In the long run, Logos Blockchain should release only enough tokens to complement the pooled transaction fees, so that block rewards are funded primarily by distribution from the pool.</p>
 <p>Let</p>
 <ul>
-<li><span class="math-inline" data-tex="D_{1,t}"></span> denote the amount of Storage fees and Execution base fees burned since <span class="math-inline" data-tex="t-1"></span>.</li>
-<li><span class="math-inline" data-tex="D_{1,target}=S_{tge}"></span> denote the "normalizing factor" (it is the TGE supply, in this case).</li>
+<li><span class="math-inline" data-tex="D_{1,t}"></span> denote the amount of Storage fees and Execution base fees pooled since <span class="math-inline" data-tex="t-1"></span>.</li>
+<li><span class="math-inline" data-tex="D_{1,target}=S_{cap}"></span> denote the "normalizing factor" (it is the maximum supply, in this case).</li>
 </ul>
-<p>This choice of "target" implies that <span class="math-inline" data-tex="\gamma_t"></span> evaluates the annualized average burning rate with respect to the TGE supply. This makes the equation <a href="#emission-rate-factor-function">above</a> consistent.</p>
+<p>This choice of "target" implies that <span class="math-inline" data-tex="\gamma_t"></span> evaluates the annualized average pooling rate with respect to the maximum supply. This makes the equation <a href="#emission-rate-factor-function">above</a> consistent.</p>
 <h1 id="float-precision-for-implementation"><a class="header" href="#float-precision-for-implementation">Float Precision for Implementation</a></h1>
 <p>Because block rewards affect consensus state, the implementation must be fully deterministic across all nodes. For that reason, the normative implementation of the reward function should not rely on floating-point arithmetic, machine-dependent rounding behavior, or comparisons against machine epsilon. Earlier sections use real-valued formulas to explain the mechanism and its economic meaning, but the consensus rule itself should be defined only in terms of integer arithmetic. This is especially important because the current document already notes floating-point concerns in the KPI helper functions and then introduces a final integer rewrite for the reward computation. The issue is therefore not whether integers should be used, but how to present that integer formulation in a way that remains auditable and clearly derived from the protocol parameters.</p>
-<p>The goal of this section is not to change the reward mechanism. It is only to restate the already-specified mechanism in a canonical deterministic form with explicit named constants. In particular, the reward logic remains driven by the same two KPI components described previously: the inferred total stake relative to its target, and the moving average of burned fees over the look-back window. Likewise, the reward still interpolates between inflationary issuance and burned-fee compensation through the emission factor <span class="math-inline" data-tex="A_t"></span>.</p>
+<p>The goal of this section is not to change the reward mechanism. It is only to restate the already-specified mechanism in a canonical deterministic form with explicit named constants. In particular, the reward logic remains driven by the same two KPI components described previously: the inferred total stake relative to its target, and the moving average of pooled fees over the look-back window. Likewise, the reward still interpolates between the reserve release and distribution from the pooled fees through the emission factor <span class="math-inline" data-tex="A_t"></span>.</p>
 <div class="math-block" data-tex="A_t = \min \lbrace 1, \max \lbrace 0, \dfrac{ \alpha_d \cdot \delta_t + \alpha_a \cdot \gamma_t + I_{min}}{I_{max}} \rbrace \rbrace."></div>
 <p>Because we have</p>
-<div class="math-block" data-tex="\alpha_d=\frac{1}{4},\quad&#10;\alpha_a=1,\quad&#10;I_{\max}=10^{-2},\qquad&#10;T=120,\quad&#10;f=1,\quad R_\text{block} = D_{1,t}\\&#10;D_{0,\mathrm{target}}=3\cdot 10^9,\qquad&#10;D_{1,\mathrm{target}}=S_{\mathrm{tge}}=10^{10},\qquad&#10;\Delta_t=\frac{1}{365\cdot 2880},"></div>
+<div class="math-block" data-tex="\alpha_d=\frac{1}{4},\quad&#10;\alpha_a=1,\quad&#10;I_{\max}=10^{-2},\qquad&#10;T=120,\quad&#10;f=1,\quad R_\text{block} = D_{1,t}\\&#10;D_{0,\mathrm{target}}=3\cdot 10^9,\qquad&#10;D_{1,\mathrm{target}}=S_{\mathrm{cap}}=10^{10},\qquad&#10;\Delta_t=\frac{1}{365\cdot 2880},"></div>
 <div class="math-block" data-tex="\delta_t = \sum_i w_i \times &#10;\dfrac{D_{i,target} - D_{i,t}}{D_{i,target}},"></div>
 <div class="math-block" data-tex="\gamma_t = \dfrac{1}{\Delta_t} \sum_i w_i \cdot \Bigl(\dfrac{1}{T}  \sum_{\tau=t-T+1}^t \dfrac{ D_{i,\tau}}{D_{i,target}} \Bigr),"></div>
 <p>and <span class="math-inline" data-tex="w_i"></span> denotes the weight of the <span class="math-inline" data-tex="i"></span>-th KPI in the normalized deviation from target or in the normalized average; it satisfies <span class="math-inline" data-tex="\sum_i w_i = 1"></span>.</p>
@@ -502,33 +530,39 @@ This material, including any linked pages or documents, is provided for informat
 <p>And by denoting</p>
 <div class="math-block" data-tex="\begin{aligned}&#10;A_t&#x27;&#10;&amp;=&#10;\min\!\lbrace12\cdot 10^7,\max\!\lbrace0,\quad3\cdot 10^9-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}\rbrace\rbrace,&#10;\\&#10;A_t&amp;=\frac{A_t&#x27;}{12\cdot 10^7}.&#10;\end{aligned}"></div>
 <p>We can compute the block reward using only integers:</p>
-<div class="math-block" data-tex="\text{Rewards}_t= A_t \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block} =\\&#10;\frac{A_t&#x27;}{12\cdot 10^7} \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-\frac{A_t&#x27;}{12\cdot 10^7}) \cdot D_{1,t}"></div>
+<div class="math-block" data-tex="\text{Rewards}_t= A_t \cdot \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block} =\\&#10;\frac{A_t&#x27;}{12\cdot 10^7} \cdot \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f} + (1-\frac{A_t&#x27;}{12\cdot 10^7}) \cdot D_{1,t}"></div>
 <p>and</p>
-<div class="math-block" data-tex="\frac{I_{\max} \cdot S_{\mathrm{tge}}\cdot \Delta_t}{f}=\frac{10^{-2}\cdot 10^{10}}{365\cdot 2880}=\frac{10^8}{1051200}=\frac{62500}{657}."></div>
+<div class="math-block" data-tex="\frac{I_{\max} \cdot S_{\mathrm{cap}}\cdot \Delta_t}{f}=\frac{10^{-2}\cdot 10^{10}}{365\cdot 2880}=\frac{10^8}{1051200}=\frac{62500}{657}."></div>
 <p>So:</p>
 <div class="math-block" data-tex="\text{Rewards}_t=&#10;\frac{A_t&#x27;}{12\cdot 10^7} \cdot \frac{62500}{657} + (1-\frac{A_t&#x27;}{12\cdot 10^7})\cdot D_{1,t} =\\&#10;\frac{62500\cdot A_t&#x27; + 657\cdot(12\cdot 10^7-A_t&#x27;)\cdot D_{1,t}}{657\cdot 12\cdot 10^7}&#10;."></div>
 <p>So we propose a reference implementation that uses integers:</p>
-<pre><code class="language-python">A_SCALE = 120_000_000            # denominator of 1/(I_max * D1_target * Delta_t * T) 
-INFLATION_NUMERATOR = 62_500     # numerator of I_max * S_TGE * DELTA_t / f
-INFLATION_DENOMINATOR = 657      # denominator of I_max * S_TGE * DELTA_t / f
-FEE_AVG_NUMERATOR = 10_512       # numerator of 1/(I_max * D1_target * Delta_t * T) 
-STAKE_TARGET = int(3e9)
+<pre><code class="language-python">import numpy as np
+from numpy import int64
 
-def block_reward(total_stake: int, burned_fees_window: list[int]) -&gt; tuple[int, int]:
-    sum_fees = sum(burned_fees_window)
-    last_burned_fee = burned_fees_window[-1]
+A_SCALE = int64(120_000_000)            # denominator of 1/(I_max * D1_target * Delta_t * T)
+INFLATION_NUMERATOR = int64(62_500)     # numerator of I_max * S_CAP * DELTA_t / f
+INFLATION_DENOMINATOR = int64(657)      # denominator of I_max * S_CAP * DELTA_t / f
+FEE_AVG_NUMERATOR = int64(10_512)       # numerator of 1/(I_max * D1_target * Delta_t * T)
+STAKE_TARGET = int64(3_000_000_000)
 
-    a_numerator = min(
-        max(STAKE_TARGET + FEE_AVG_NUMERATOR * sum_fees - total_stake, 0),
-        A_SCALE
+
+def block_reward(total_stake: int64, pooled_fees_window: list[int64]) -&gt; tuple[int64, int64]:
+    sum_fees = np.sum(pooled_fees_window, dtype=int64)
+    last_pooled_fee = pooled_fees_window[-1]
+
+    a_numerator = np.minimum(
+        np.maximum(STAKE_TARGET + FEE_AVG_NUMERATOR * sum_fees - total_stake, int64(0)),
+        A_SCALE,
     )
 
-    reward_numerator = INFLATION_NUMERATOR * a_numerator
-									   + INFLATION_DENOMINATOR * (A_SCALE - a_num) * last_burned_fee
+    reward_numerator = (
+        INFLATION_NUMERATOR * a_numerator
+        + INFLATION_DENOMINATOR * (A_SCALE - a_numerator) * last_pooled_fee
+    )
     reward_denominator = INFLATION_DENOMINATOR * A_SCALE
 
-    blend_reward = reward_numerator * 6 // (reward_denominator * 10)
-    leader_reward = reward_numerator * 4 // (reward_denominator * 10)
+    blend_reward = reward_numerator * int64(6) // (reward_denominator * int64(10))
+    leader_reward = reward_numerator * int64(4) // (reward_denominator * int64(10))
 
     return blend_reward, leader_reward
 </code></pre>

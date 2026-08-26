@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b655e4b0285d2e0bc09a19b5292d46bacc44019b/docs/blockchain/raw/execution-market.md"><code>b655e4b</code></a> — [RFC] Block Rewards: Replace Burning/Minting with Pooling/Distributing/Releasing (#375)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/execution-market.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-07-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/38916aa474164ac4acd81e62d19715e17626be17/docs/blockchain/raw/execution-market.md"><code>38916aa</code></a> — docs(blockchain): prevent execution and storage fees from rounding down to zero (#384)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/ff40ae99c8e76a2bb36dcd83184434625a8daeb5/docs/blockchain/raw/execution-market.md"><code>ff40ae9</code></a> — docs(blockchain): TKE: fix base fees in the pseudocode based on G_target (#380)</li>
@@ -206,6 +207,7 @@
 <tr><td>1.0.1</td><td>Fix base fee constants in pseudocode based on the correct <span class="math-inline" data-tex="G_{\mathrm{target}}"></span></td><td>2026-07-27</td></tr>
 <tr><td>1.1.0</td><td>Round the base fee update upwards</td><td>2026-07-28</td></tr>
 <tr><td>1.1.1</td><td>Precise that greedy inclusion selects a candidate only if it is valid in the state the already selected transactions leave</td><td>2026-08-24</td></tr>
+<tr><td>1.1.2</td><td>Changing from burning/minting to pooling/distributing</td><td>2026-08-26</td></tr>
 </tbody></table>
 </div>
 <blockquote>
@@ -226,14 +228,14 @@ This material, including any linked pages or documents, is provided for informat
 <h2 id="design-rationale"><a class="header" href="#design-rationale">Design Rationale</a></h2>
 <p>The design is founded on a target-based mechanism, philosophically aligned with Ethereum's EIP-1559. This model is crucial for long-term network health and security, as it actively steers execution utilization around a predefined target. This ensures the network remains performant and accessible for nodes with minimal hardware specifications, thereby promoting decentralization.</p>
 <p>To further enhance security, this specification addresses a known vulnerability in the classic EIP-1559 design. As demonstrated by recent research (<a href="https://arxiv.org/pdf/2304.11478">Cachin et al., 2023</a>), EIP-1559 is susceptible to base fee manipulation by rational, non-myopic block builders. Our design incorporates a direct mitigation for this threat, as proposed in <a href="https://arxiv.org/pdf/2304.11478">Cachin et al., 2023</a>: an Exponential Moving Average (EMA) based update rule for the base fee. Given the EMA nature of this update, these enhancements smooth fluctuations in execution gas consumption, making the protocol significantly more resilient to strategic manipulation without compromising its core benefits of responsiveness and predictability</p>
-<p>Furthermore, as opposed to the standard EIP-1559 mechanism, where base fee is burned and tips are immediately given to miners, in our setting we burn fees, and later, we mint rewards to which we add tips which are given to the block builders at a later block through the <a href="bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>, for privacy preservation.</p>
+<p>Furthermore, as opposed to the standard EIP-1559 mechanism, where the base fee is burned and tips are immediately given to miners, in our setting we route fees into a rewards pool, and later we distribute rewards from that pool given to the block builders at a later block through the <a href="bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>, for privacy preservation.</p>
 <h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
 <p>Our fee mechanism adapts Ethereum's EIP-1559 to the specific economic and security goals of the Logos Blockchain network. It provides predictable execution gas costs for users while creating a robust incentive structure for block builders and Blend nodes that minimizes harmful emergent strategies.</p>
 <p>The mechanism operates on four core principles:</p>
 <ul>
 <li>Dynamic Base Fee: A protocol-defined base_fee for Execution Gas must be paid for a transaction to be included in a block. This fee adjusts automatically based on a smoothed average of recent network demand relative to a predefined capacity target, ensuring sustainable network load. This base_fee is the minimal threshold to be paid for the transaction to be accepted by the block builder.</li>
 <li>Priority Fee (Tip): To incentivize faster inclusion by block builders, users add a priority_fee on top of the base fee. This creates a simple and transparent auction for block space during periods of high demand. The proceeds of this goes to the block builder.</li>
-<li>Fee Splitting and Deflation: The two fee components are treated differently. The entire base_fee is burned, permanently removing it from the supply. This creates a direct link between network activity and the economic value of the native token, applying deflationary pressure as usage grows. The priority_fee is not immediately distributed to the block builder (to preserve privacy), but instead it is directed into the block builders reward stream. 40% of the rewards will be allocated to block builders and the remaining 60% to Blend nodes. Rewards are privacy-preserving via <a href="bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>.</li>
+<li>Fee Splitting and Pooling: The two fee components are treated differently. The entire base_fee is routed to the rewards pool, removing it from circulation. As usage grows, more base fees are routed to the pool and removed from circulation, which creates a direct link between network activity and the circulating supply of the native token. The priority_fee is not immediately distributed to the block builder (to preserve privacy), but instead it is directed into the block builders reward stream. 40% of the rewards will be allocated to block builders and the remaining 60% to Blend nodes. Rewards are privacy-preserving via <a href="bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>.</li>
 </ul>
 <p>The entire lifecycle can be visualized in the following flow:</p>
 <p><img src="execution-market/assets/execution-market-lifecycle.svg" alt="Execution market lifecycle flow" /></p>
@@ -245,7 +247,7 @@ This material, including any linked pages or documents, is provided for informat
 <h2 id="economic-properties"><a class="header" href="#economic-properties">Economic Properties</a></h2>
 <ul>
 <li>Sustainable Resource Management: The TFM automatically steers network usage toward the target (<span class="math-inline" data-tex="G_\text{target}"></span>). By increasing the cost of Execution Gas during high demand, the protocol prevents network overload. This protects the ability of nodes with modest hardware to participate, safeguarding decentralization.</li>
-<li>Deflationary Pressure: Burning the base_fee (and minting later a proportion of it back as rewards, cf <a href="block-rewards.html">Block Rewards</a>) establishes a direct link between network activity and the intrinsic economic utility of the Logos Blockchain token. As usage grows, the rate of token burn increases, applying deflationary pressure on the total supply and creating a sustainable economic flywheel.</li>
+<li>Circulating-Supply Pressure: Routing the base_fee to the rewards pool (and later distributing a proportion of it back as rewards, cf <a href="block-rewards.html">Block Rewards</a>) establishes a direct link between network activity and the circulating supply of the Logos Blockchain token. As usage grows, the rate at which base fees enter the pool increases, applying downward pressure on circulating supply. Because the pool is a redistributable reserve, this pressure acts on tokens in circulation, not on total supply.</li>
 </ul>
 <h2 id="security-properties-mitigation-of-base-fee-manipulation"><a class="header" href="#security-properties-mitigation-of-base-fee-manipulation">Security Properties: Mitigation of Base Fee Manipulation</a></h2>
 <p>A critical feature of this design is its resilience to the base fee manipulation attack identified in classic EIP-1559. Our EMA-based update rule directly mitigates this vulnerability in two ways:</p>
@@ -269,7 +271,7 @@ This material, including any linked pages or documents, is provided for informat
 <tr><td><span class="math-inline" data-tex="\phi"></span></td><td>Fee Adjustment Rate</td><td>1/8</td><td>A protocol constant controlling how quickly the base fee adjusts to demand.</td></tr>
 <tr><td><span class="math-inline" data-tex="q"></span></td><td>EMA Smoothing Factor</td><td>9/10</td><td>A protocol constant defining the weight of historical average in the EMA update rule.</td></tr>
 <tr><td><span class="math-inline" data-tex="F_t"></span></td><td>Total fee</td><td>-</td><td><span class="math-inline" data-tex="F_t = g_t \,\cdot\bigl(b_{\mathrm{exec}}[s] + p_t\bigr)= g_t\cdot c_t"></span></td></tr>
-<tr><td><span class="math-inline" data-tex="\hat{R}_{\mathrm{burned}}[s]"></span></td><td>Amount of base fees burnt</td><td>-</td><td>This is used as an input to compute the block rewards</td></tr>
+<tr><td><span class="math-inline" data-tex="\hat{R}_{\mathrm{pooled}}[s]"></span></td><td>Amount of base fees pooled</td><td>-</td><td>This is used as an input to compute the block rewards</td></tr>
 </tbody></table>
 </div>
 <h3 id="parameter-justification"><a class="header" href="#parameter-justification">Parameter Justification</a></h3>
@@ -344,9 +346,9 @@ def update_base_fee(base_fee: int, g_avg: int) -&gt; int:
 <div class="math-block" data-tex="p_t = c_t - b_{\mathrm{exec}}[s]."></div>
 <p>The final fee <span class="math-inline" data-tex="F_t"></span> paid by the transaction <span class="math-inline" data-tex="t"></span> is:</p>
 <div class="math-block" data-tex="F_t = g_t \,\cdot\bigl(b_{\mathrm{exec}}[s] + p_t\bigr)= g_t\cdot c_t"></div>
-<p>Let the amount of Execution fee burnt in a block be:</p>
-<div class="math-block" data-tex="\hat{R}_{\mathrm{burned}}(s)&#10;= \sum_{t \in \mathcal{B}_s} \bigl(g_t \cdot b_{\mathrm{exec}}[s]\bigr)."></div>
-<p>This burned quantity is then used as a input for the computation of the block rewards, as described in  <a href="block-rewards.html">Block Rewards</a>.</p>
+<p>Let the amount of Execution fee routed to the rewards pool in a block be:</p>
+<div class="math-block" data-tex="\hat{R}_{\mathrm{pooled}}(s)&#10;= \sum_{t \in \mathcal{B}_s} \bigl(g_t \cdot b_{\mathrm{exec}}[s]\bigr)."></div>
+<p>This pooled quantity is then used as an input for the computation of the block rewards. It is the Execution-market component of the per-block pool inflow <span class="math-inline" data-tex="R_{block}"></span>, as described in <a href="block-rewards.html">Block Rewards</a>.</p>
 
                     </main>
 

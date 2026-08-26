@@ -37147,6 +37147,7 @@ This material, including any linked pages or documents, is provided for informat
 </div><!-- timeline:start -->
 <h2 id="timeline-119"><a class="header" href="#timeline-119">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b655e4b0285d2e0bc09a19b5292d46bacc44019b/docs/blockchain/raw/overview-cryptoeconomics.md"><code>b655e4b</code></a> — [RFC] Block Rewards: Replace Burning/Minting with Pooling/Distributing/Releasing (#375)</li>
 <li><strong>2026-08-05</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b4388aae3549e5ebf0307258b825e766efcb9c38/docs/blockchain/raw/overview-cryptoeconomics.md"><code>b4388aa</code></a> — docs(blockchain): round the leader reward share down and align the voucher DST (#395)</li>
 <li><strong>2026-07-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/38916aa474164ac4acd81e62d19715e17626be17/docs/blockchain/raw/overview-cryptoeconomics.md"><code>38916aa</code></a> — docs(blockchain): prevent execution and storage fees from rounding down to zero (#384)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/overview-cryptoeconomics.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -37159,6 +37160,7 @@ This material, including any linked pages or documents, is provided for informat
 <tr><td>1.0.1</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
 <tr><td>1.1.0</td><td>Reflect the upward rounding of the fee market price updates</td><td>2026-07-28</td></tr>
 <tr><td>1.2.0</td><td>Reflect the downward rounding of the leader share</td><td>2026-08-05</td></tr>
+<tr><td>1.2.1</td><td>Changing from burning/minting to pooling/distributing/releasing</td><td>2026-08-25</td></tr>
 </tbody></table>
 </div>
 <blockquote>
@@ -37190,12 +37192,12 @@ This material, including any linked pages or documents, is provided for informat
 <li>Permanent Storage fee: covers the permanent Ledger storage resources consumed by the transaction.</li>
 </ul>
 </li>
-<li>All fees are burned for each block.</li>
+<li>Execution base fees and storage fees are routed into the rewards pool for each block, removing them from circulation.</li>
 <li>Rewards are distributed on an epoch basis:
 <ul>
-<li>Leaders (block proposers) include Mantle Transactions in every block. Each transaction pays Permanent Storage and Execution fees, which are burnt. For each block, a reward is calculated following the <a href="blockchain/raw/block-rewards.html">Block Rewards</a>. Additionally, a portion of the Execution fees is minted back for leaders according to the <a href="blockchain/raw/execution-market.html">Execution Market</a>. These two sources determine the total rewards allocated to leaders, as explained in <a href="blockchain/raw/overview-cryptoeconomics.html#blend-service-and-consensus-leaders">Blend Service and Consensus Leaders</a>, which correspond to tips from the Execution market and 40% of block rewards. For anonymity reasons, block proposers don't receive rewards directly. Instead, leader rewards accumulate in a single pool that increases on an epoch basis rather than per block (see <a href="blockchain/raw/bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>). When a new epoch begins, the pool increases by the total leader rewards from all blocks in the previous epoch. Simultaneously, leaders from the previous epoch can start claiming their rewards, with each unclaimed reward (since genesis) representing one equal share of the pool.</li>
+<li>Leaders (block proposers) include Mantle Transactions in every block. Each transaction pays Permanent Storage and Execution fees, which are routed into the rewards pool. For each block, a reward is calculated following the <a href="blockchain/raw/block-rewards.html">Block Rewards</a>. Additionally, a portion of the Execution fees is distributed back to leaders from the pool according to the <a href="blockchain/raw/execution-market.html">Execution Market</a>. These two sources determine the total rewards allocated to leaders, as explained in <a href="blockchain/raw/overview-cryptoeconomics.html#blend-service-and-consensus-leaders">Blend Service and Consensus Leaders</a>, which correspond to tips from the Execution market and 40% of block rewards. For anonymity reasons, block proposers don't receive rewards directly. Instead, leader rewards accumulate in a single pool that increases on an epoch basis rather than per block (see <a href="blockchain/raw/bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>). When a new epoch begins, the pool increases by the total leader rewards from all blocks in the previous epoch. Simultaneously, leaders from the previous epoch can start claiming their rewards, with each unclaimed reward (since genesis) representing one equal share of the pool.</li>
 <li>Blend nodes provide Blend service to the network for at least one epoch. Using the same <a href="blockchain/raw/block-rewards.html">Block Rewards</a>, the protocol determines the total rewards allocated to the Blend network, as explained in <a href="blockchain/raw/overview-cryptoeconomics.html#blend-service-and-consensus-leaders">Blend Service and Consensus Leaders</a> which correspond to 60% of the block rewards.
-When an epoch e ends, Blend validators have one additional epoch <span class="math-inline" data-tex="e+1"></span> to send an active message used by the <a href="blockchain/raw/overview-cryptoeconomics.html#reward-distribution-protocols">Reward Distribution Protocols</a> to determine reward distribution among validators. During the first block of epoch <span class="math-inline" data-tex="e+2"></span>, Blend validators from epoch <span class="math-inline" data-tex="e"></span> receive their portion of <a href="blockchain/raw/overview-cryptoeconomics.html#blend-service-and-consensus-leaders">Blend Service and Consensus Leaders</a> rewards, with proportions determined by the <a href="blockchain/raw/overview-cryptoeconomics.html#reward-distribution-protocols">Reward Distribution Protocols</a>. These rewards are distributed at the start of the next epoch.</li>
+When an epoch <span class="math-inline" data-tex="e"></span>  ends, Blend validators have one additional epoch <span class="math-inline" data-tex="e+1"></span>  to send an active message used by the <a href="blockchain/raw/overview-cryptoeconomics.html#reward-distribution-protocols">Reward Distribution Protocols</a> to determine reward distribution among validators. During the first block of epoch &lt;span class="math-inline" data-tex="e+2<span class="math-inline" data-tex=", Blend validators from epoch "></span>`e"&gt;</span> receive their portion of <a href="blockchain/raw/overview-cryptoeconomics.html#blend-service-and-consensus-leaders">Blend Service and Consensus Leaders</a> rewards, with proportions determined by the <a href="blockchain/raw/overview-cryptoeconomics.html#reward-distribution-protocols">Reward Distribution Protocols</a>. These rewards are distributed at the start of the next epoch.</li>
 </ul>
 </li>
 <li>The <a href="blockchain/raw/overview-cryptoeconomics.html#service-rewards-distribution-protocol">Service Rewards Distribution Protocol</a> handles payments of rewards for Blend Services to individual nodes.</li>
@@ -37221,7 +37223,7 @@ When an epoch e ends, Blend validators have one additional epoch <span class="ma
 <p>Both markets recompute their price with integer arithmetic, so that the result is identical on every node, and both round the updated price upwards. Each update multiplies the current price by an adjustment factor, so a price rounded downwards would reach 0 at the bottom of its range and remain there, leaving the resource permanently free. Rounding upwards keeps one unit as the effective floor of each price. The usage signals driving these updates measure consumption rather than price and are rounded downwards.</p>
 <p>All fee markets aim to ensure fair compensation, sustainability, proper incentives, and to address specific market needs. Because every Operation (except the Channel Inscribe and the Channel Config Operations), whether it involves computation, or permanent storage, requires some execution to be validated and processed, reaching the execution limit effectively constrains the Permanent Storage market (except for Channel Inscribe and Channel Config). In practice, this means that the Permanent Storage market is limited in the number of transactions it can process per block except for Channel Inscribe and Channel Config Operations.</p>
 <h3 id="execution-fee-market"><a class="header" href="#execution-fee-market">Execution Fee Market</a></h3>
-<p>Execution fees cover the validation and execution of Mantle Transactions. The protocol does not directly cap the number of CPU cycles per block, but fees must enforce an Execution Gas limit to ensure compliance with the minimum hardware requirements of a node. The execution limit (<span class="math-inline" data-tex="\text{limit}_{\text{Ex}}"></span>) represents the maximum acceptable number of Execution Gas per block that a node with the minimum-specification CPU can process to validate and execute the block in a reasonable time.</p>
+<p>Execution fees cover the validation and execution of Mantle Transactions. The protocol does not directly cap the number of CPU cycles per block, but fees must enforce an Execution Gas limit to ensure compliance with the minimum hardware requirements of a node. The execution limit ( <span class="math-inline" data-tex="\text{limit}_{\text{Ex}}"></span> ) represents the maximum acceptable number of Execution Gas per block that a node with the minimum-specification CPU can process to validate and execute the block in a reasonable time.</p>
 <p>We define "reasonable" as limiting the Execution Gas such that a potential leader can verify and execute it in 1 second using 80% (arbitrary) of its CPU (based on minimum CPU specifications in <a href="blockchain/raw/../deprecated/p2p-hardware-requirements.html">Hardware Requirements - Basic Bedrock Node (Validator)</a>). This corresponds to a maximum of 3,200,000,000 CPU cycles for a leader, which converts to 3,200,000 Execution Gas. We require this 1-second verification for leaders to ensure they can quickly identify the correct chain and extend it with their own produced block in time when they are close to proposing a new block.</p>
 <p>Consensus nodes must validate and execute a block using a small percentage of their CPU but during a longer period than the 1 second period for leaders, as they don't have the strict timing constraints that affect consensus and would increase forking. Using only 20% of their CPU, consensus nodes can validate and execute such blocks in approximately 4 seconds.</p>
 <p>We will also assume that block verification requires an initial and fixed amount of Execution Gas for different ZK proofs. According to <a href="blockchain/raw/bedrock-v1.1-block-construction.html">Block Construction, Validation and Execution</a>, we will reduce the Execution Gas limit by 6,540 which is dedicated to initializing batch verification for <a href="blockchain/raw/bedrock-v1.1-block-construction.html">ZkSignature</a> and <a href="blockchain/raw/bedrock-v1.1-block-construction.html">Proof of Claim</a>.</p>
@@ -37245,8 +37247,8 @@ When an epoch e ends, Blend validators have one additional epoch <span class="ma
 <h3 id="blend-service-and-consensus-leaders"><a class="header" href="#blend-service-and-consensus-leaders">Blend Service and Consensus Leaders</a></h3>
 <p>The Blend service and the leaders proposing the blocks share a same block reward that is calculated for each block based on a KPI function. This KPI function takes as input the inferred total stake and the amount of Execution and Permanent Storage fees of the block. How the KPI function calculates each block reward is explained in <a href="blockchain/raw/block-rewards.html">Block Rewards</a>.</p>
 <ul>
-<li>Blend rewards are distributed among all active Blend Nodes. Blend rewards are composed of a fraction of the block rewards. These rewards of epoch <span class="math-inline" data-tex="e"></span> are defined when a new Blend epoch <span class="math-inline" data-tex="e+1"></span> starts (a defined number of blocks) and are allocated to nodes based on their reported Active Messages and the <a href="blockchain/raw/overview-cryptoeconomics.html#reward-distribution-protocols">Reward Distribution Protocols</a> during epoch <span class="math-inline" data-tex="e+2"></span>. The <a href="blockchain/raw/bedrock-service-reward-distribution.html">Service Reward Distribution Protocol</a> manages the direct payment to nodes.</li>
-<li>Leaders get a voucher for each included block in epoch e. Vouchers represent an equal share of the leader reward pool. At the start of epoch e+1, the leaders rewards of epoch e are added to the pool (represented by a variable) and the voucher of epoch e can start being used. The amount added to the pool is composed of a fraction of the block rewards and a portion of the Execution fees minted back according to the <a href="blockchain/raw/execution-market.html">Execution Market</a> from all blocks of epoch e. Vouchers can be exchanged with a reward through a <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Leader Claim Operation</a> (on-chain transaction) that preserves privacy by decoupling the leader reward from the proposed block. The reward amount, represented by a share of the pool, is computed when the claim Operation is executed (c.f. <a href="blockchain/raw/bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>).</li>
+<li>Blend rewards are distributed among all active Blend Nodes. Blend rewards are composed of a fraction of the block rewards. These rewards of epoch <span class="math-inline" data-tex="e"></span> are defined when a new Blend epoch <span class="math-inline" data-tex="e+1"></span> starts (a defined number of blocks) and are allocated to nodes based on their reported Active Messages and the <a href="blockchain/raw/overview-cryptoeconomics.html#reward-distribution-protocols">Reward Distribution Protocols</a> during epoch <span class="math-inline" data-tex="e+2"></span> . The <a href="blockchain/raw/bedrock-service-reward-distribution.html">Service Reward Distribution Protocol</a> manages the direct payment to nodes.</li>
+<li>Leaders get a voucher for each included block in epoch <span class="math-inline" data-tex="e"></span> . Vouchers represent an equal share of the leader reward pool. At the start of epoch <span class="math-inline" data-tex="e+1"></span> , the leaders rewards of epoch <span class="math-inline" data-tex="e"></span> are added to the pool (represented by a variable) and the voucher of epoch <span class="math-inline" data-tex="e"></span> can start being used. The amount added to the pool is composed of a fraction of the block rewards and a portion of the Execution fees distributed back according to the <a href="blockchain/raw/execution-market.html">Execution Market</a> from all blocks of epoch <span class="math-inline" data-tex="e"></span> . Vouchers can be exchanged with a reward through a <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Leader Claim Operation</a> (on-chain transaction) that preserves privacy by decoupling the leader reward from the proposed block. The reward amount, represented by a share of the pool, is computed when the claim Operation is executed (c.f. <a href="blockchain/raw/bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>).</li>
 </ul>
 <p>Each block reward of each block is split as follows between the Blend service and the leader:</p>
 <ul>
@@ -37280,8 +37282,8 @@ When an epoch e ends, Blend validators have one additional epoch <span class="ma
 <p>To protect leaders' privacy, we must not link leaders to their blocks and rewards. Therefore, we designed a mechanism for anonymous reward claiming. A key design decision in this mechanism is that the amount of rewards a leader receives cannot be associated with or calculated based on the block they proposed. Without this approach, leaders could be linked back to their proposed blocks based on the value of their claimed rewards. This mechanism creates an anonymity pool where all leaders contribute, turning the leader-to-block assignment into a guessing game.</p>
 <p>The <a href="blockchain/raw/bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a> defines how leader rewards are maintained in the ledger and how leaders can claim them. Leader rewards follow a two-step procedure:</p>
 <ol>
-<li>When a new epoch e starts, the unique reward pool variable for leaders is updated, increasing by the reward amount for the previous epoch e-1. This reward amount is calculated as the sum of leader block rewards from epoch e-1. Simultaneously, consensus nodes update the voucher set, adding vouchers of leaders from epoch e-1 to the global voucher set.</li>
-<li>From epoch e onward, leaders can exchange their vouchers for shares of the rewards pool, as their vouchers are now in the set. Each unclaimed voucher represents an equal share of the leader rewards pool.</li>
+<li>When a new epoch <span class="math-inline" data-tex="e"></span> starts, the unique reward pool variable for leaders is updated, increasing by the reward amount for the previous epoch <span class="math-inline" data-tex="e-1"></span>. This reward amount is calculated as the sum of leader block rewards from epoch <span class="math-inline" data-tex="e-1"></span>. Simultaneously, consensus nodes update the voucher set, adding vouchers of leaders from epoch <span class="math-inline" data-tex="e-1"></span> to the global voucher set.</li>
+<li>From epoch <span class="math-inline" data-tex="e"></span> onward, leaders can exchange their vouchers for shares of the rewards pool, as their vouchers are now in the set. Each unclaimed voucher represents an equal share of the leader rewards pool.</li>
 </ol>
 <p>Claimable rewards remain stable during an epoch because the reward pool decreases proportionally to the number of unclaimed vouchers, and the pool is neither increased nor are new vouchers added to the set during an epoch. The share being a whole number of tokens, it is rounded down, so two leaders claiming during the same epoch may still differ by one token, the last claimants of the epoch being the ones receiving the extra token. The remainder of the division is left in the pool and redistributed at the next epoch.</p>
 <h3 id="blend-service"><a class="header" href="#blend-service">Blend Service</a></h3>
@@ -37293,20 +37295,20 @@ When an epoch e ends, Blend validators have one additional epoch <span class="ma
 </ol>
 <p>The rewards for Blend are given to nodes on the basis of a lottery system where the winning chances are proportional to the work performed by the node. The Blend node receives a base reward for providing the basic service and a bonus reward for an extra work. Both are identical for all qualifying nodes in an epoch and are calculated by the Blend rewarding logic on the basis of the block rewards. For more details on block reward calculations, see <a href="blockchain/raw/overview-cryptoeconomics.html#blend-service-and-consensus-leaders">Blend Service and Consensus Leaders</a>.</p>
 <h3 id="service-rewards-distribution-protocol"><a class="header" href="#service-rewards-distribution-protocol">Service Rewards Distribution Protocol</a></h3>
-<p>The <a href="blockchain/raw/bedrock-service-reward-distribution.html">Service Reward Distribution Protocol</a> defines how service rewards are minted and inserted in the Ledger and how active service nodes receive their rewards. When a new service epoch <span class="math-inline" data-tex="e"></span> starts, rewards for the previous epoch <span class="math-inline" data-tex="e-1"></span> are calculated and directly inserted in the ledger. The reward amount is calculated as the sum of service block rewards from the previous epoch <span class="math-inline" data-tex="e-1"></span>.</p>
+<p>The <a href="blockchain/raw/bedrock-service-reward-distribution.html">Service Reward Distribution Protocol</a> defines how service rewards are distributed from the pending rewards pool and inserted in the Ledger and how active service nodes receive their rewards. When a new service epoch <span class="math-inline" data-tex="e"></span> starts, rewards for the previous epoch <span class="math-inline" data-tex="e-1"></span> are calculated and directly inserted in the ledger. The reward amount is calculated as the sum of service block rewards from the previous epoch <span class="math-inline" data-tex="e-1"></span>.</p>
 <h1 id="further-details"><a class="header" href="#further-details">Further Details</a></h1>
 <p>In this section we provide references to the core specifications that define the mechanisms introduced throughout this document. Together, these specifications form the foundation of the Logos Blockchain cryptoeconomic model by detailing how fees are collected, how rewards are determined, and how incentives align across different roles in the network. Below is a short overview of each:</p>
 <ul>
-<li><a href="blockchain/raw/block-rewards.html">Block Rewards</a>. Outlines the KPI-based reward emission model that governs leader and Blend rewards. It details how token issuance adapts to network conditions using inferred stake and burn rates, ensuring sustainability, security, and deflationary pressure when demand is high.</li>
-<li><a href="blockchain/raw/execution-market.html">Execution Market</a>. Describes the fee mechanism for execution resources, including the use of a dynamic base fee and priority tips. It explains how execution demand is smoothed over time, how fees are burned and later reminted as rewards, and how the system mitigates manipulation risks while maintaining predictable costs.</li>
+<li><a href="blockchain/raw/block-rewards.html">Block Rewards</a>. Outlines the KPI-based reward emission model that governs leader and Blend rewards. It details how emission from the reserve rewards pool adapts to network conditions using inferred stake and fee-inflow rates, ensuring sustainability, security, and downward pressure on circulating supply when demand is high.</li>
+<li><a href="blockchain/raw/execution-market.html">Execution Market</a>. Describes the fee mechanism for execution resources, including the use of a dynamic base fee and priority tips. It explains how execution demand is smoothed over time, how fees are routed into the rewards pool and later distributed as rewards, and how the system mitigates manipulation risks while maintaining predictable costs.</li>
 <li><a href="blockchain/raw/storage-markets.html">Storage Markets</a>. Defines the transaction fee mechanism for the Permanent Storage market. It introduces a timeframe-based model where prices are fixed during an epoch and adjusted smoothly between them, ensuring predictability for users while allowing the market to adapt to long-term trends.</li>
 </ul>
 <p>These documents serve as complementary technical references, offering the deeper mathematical and procedural foundations that support the economic model described here.</p>
 <h2 id="on-execution-vs-storage-markets"><a class="header" href="#on-execution-vs-storage-markets">On Execution vs Storage Markets</a></h2>
 <p>As a general overview, and to prepare the reader before embarking in the study of these documents, we will highlight here the conceptual differences between the Execution Market and the Storage Market, since they operate under distinct economic logics even though both rely on fee mechanisms:</p>
 <ul>
-<li>Execution Market  Pricing is more reactive and adaptive, with the base fee updated every block using a smoothed demand signal. The system uses a dual-component fee structure: a protocol-defined base_fee and a priority_fee (tip) defined by the user setting the transaction's gas price. It is explicitly anchored to a target utilization (50% of gas limit, similar to EIP-1559) and a hard maximum gas per block, ensuring the network remains operable on minimal hardware. Both base and priority fees are initially burned, but the priority fee is later reminted back as part of leader rewardsproviding a clear, strategy-aligned mechanism for transaction inclusion and incentivization.</li>
-<li>Storage Markets  Pricing is designed to be predictable and stable over a timeframe. Fees remain fixed within an epoch and are updated only at the transition to the next timeframe. This creates a single-component fee that is straightforward for users. While the mechanism has an anchoring point <span class="math-inline" data-tex="T_\text{base}"></span>, it is not built around strict capacity limitsunlike execution. Instead, it prioritizes robustness and predictability, with parameters (such as the clipping factor) chosen to filter out volatility and keep pricing agnostic to short-term demand spikes.</li>
+<li>Execution Market  Pricing is more reactive and adaptive, with the base fee updated every block using a smoothed demand signal. The system uses a dual-component fee structure: a protocol-defined base_fee and a priority_fee (tip) defined by the user setting the transaction's gas price. It is explicitly anchored to a target utilization (50% of gas limit, similar to EIP-1559) and a hard maximum gas per block, ensuring the network remains operable on minimal hardware. Both base and priority fees are initially routed into the rewards pool, but the priority fee is later distributed back as part of leader rewards, providing a clear, strategy-aligned mechanism for transaction inclusion and incentivization.</li>
+<li>Storage Markets  Pricing is designed to be predictable and stable over a timeframe. Fees remain fixed within an epoch and are updated only at the transition to the next timeframe. This creates a single-component fee that is straightforward for users. While the mechanism has an anchoring point <span class="math-inline" data-tex="T_\text{base}"></span> , it is not built around strict capacity limitsunlike execution. Instead, it prioritizes robustness and predictability, with parameters (such as the clipping factor) chosen to filter out volatility and keep pricing agnostic to short-term demand spikes.</li>
 </ul>
 <p>Taken together, these distinctions show how the storage market emphasizes stability and medium-term predictability, while the execution market emphasizes responsiveness and short-term allocation efficiency, each addressing the unique constraints of their underlying resources.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="block-rewards"><a class="header" href="#block-rewards">BLOCK-REWARDS</a></h1>
@@ -37321,6 +37323,7 @@ When an epoch e ends, Blend validators have one additional epoch <span class="ma
 </div><!-- timeline:start -->
 <h2 id="timeline-120"><a class="header" href="#timeline-120">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b655e4b0285d2e0bc09a19b5292d46bacc44019b/docs/blockchain/raw/block-rewards.md"><code>b655e4b</code></a> — [RFC] Block Rewards: Replace Burning/Minting with Pooling/Distributing/Releasing (#375)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/block-rewards.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-29</strong> — <a href="https://github.com/logos-co/logos-lips/blob/67e498e2d65e447d954e213ea89bbe3b9b285a8a/docs/blockchain/raw/block-rewards.md"><code>67e498e</code></a> — chore: fix math issues (#350)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/block-rewards.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
@@ -37329,6 +37332,7 @@ When an epoch e ends, Blend validators have one additional epoch <span class="ma
 <h1 id="revisions-history-16"><a class="header" href="#revisions-history-16">Revisions History</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Version</th><th>Changes</th><th>Date</th></tr></thead><tbody>
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-04-24</td></tr>
+<tr><td>1.1.0</td><td>Changing from burning/minting to pooling/distributing/releasing, removing <span class="math-inline" data-tex="S_{tge}"></span></td><td>2026-08-25</td></tr>
 </tbody></table>
 </div>
 <blockquote>
@@ -37340,13 +37344,13 @@ This material, including any linked pages or documents, is provided for informat
 <h1 id="introduction-59"><a class="header" href="#introduction-59">Introduction</a></h1>
 <p>This document outlines the specifications for Logos Blockchain's block rewards mechanism, a critical component of the network's economic model. The mechanism is designed to create a sustainable economic framework that incentivizes network participation while maintaining long-term stability.</p>
 <p>The objective is to develop a block rewards system that addresses key challenges specific to Logos Blockchain's architecture, including the unlinkability between block proposal and reward collection, and the inability to directly allocate transaction fees to specific block proposers. These constraints necessitate a carefully designed economic incentive structure.</p>
-<p>Building on previous work in blockchain economics, this specification proposes a dynamic token emission system that calibrates LGO issuance according to network Key Performance Indicators (KPIs). The system uses two primary metrics: inferred total stake (as a security indicator) and average burning rate (to maintain supply equilibrium).</p>
+<p>Building on previous work in blockchain economics, this specification proposes a dynamic token emission system that calibrates the release of the LGO genesis minted reserve according to network Key Performance Indicators (KPIs). The system uses two primary metrics: inferred total stake (as a security indicator) and average pooling rate (to maintain supply equilibrium).</p>
 <p>The document references internal mathematical models and simulations that demonstrate how the proposed mechanism would behave under various conditions. Key parameters include maximum annual emission rate (<span class="math-inline" data-tex="1\%"></span>), control responsiveness factors, and target metrics for network security.</p>
 <p>The conclusion of our analysis indicates that this KPI-based emission model should achieve several important outcomes:</p>
 <ul>
-<li>Initially higher emission rates (capped at <span class="math-inline" data-tex="1\%"></span> annually) to bootstrap network participation.</li>
+<li>Initially higher emission rates from the reserve (capped at <span class="math-inline" data-tex="1\%"></span> of the max supply annually) to bootstrap network participation.</li>
 <li>Gradual stabilization of token supply as the system matures, with our baseline simulation showing just <span class="math-inline" data-tex="1.33\%"></span> total inflation after <span class="math-inline" data-tex="10"></span> years.</li>
-<li>Self-regulating mechanism where token issuance naturally adjusts to compensate for burned transaction fees.</li>
+<li>Self-regulating mechanism where the reserve release naturally adjusts to complement pooled transaction fees.</li>
 <li>Built-in safeguards against manipulation through moving averages and bounded functions.</li>
 </ul>
 <p>This specification represents a comprehensive approach to creating a robust economic foundation for the Logos Blockchain network that balances security requirements with long-term economic sustainability.</p>
@@ -37356,61 +37360,61 @@ This material, including any linked pages or documents, is provided for informat
 <p>The design of the rewards system reflects three architectural constraints unique to Logos Blockchain:</p>
 <ul>
 <li>Unlinkability: Block proposal and reward collection are intentionally decoupled for privacy, meaning rewards cannot be assigned to a single proposer.</li>
-<li>Fee burning: All transaction fees (execution base fees and permanent storage fees) are burned, rather than directly given to block proposers.</li>
+<li>Fee pooling: All transaction fees (execution base fees and permanent storage fees) are collected into a pending rewards pool, rather than directly given to block proposers.</li>
 <li>Global metrics over local signals: Rewards are computed from network-wide KPIs at block production time, rather than from easily manipulated per-block data.</li>
 </ul>
 <p>These principles ensure that the system is censorship-resistant, manipulation-resistant, and aligned with long-term network incentives.</p>
 <h2 id="requirements-5"><a class="header" href="#requirements-5">Requirements</a></h2>
-<p>Building upon the requirements for Logos Blockchain's block rewards system, the implementation will establish that all transaction fees are burned while block rewards are tied to measurable global metrics that reflect network health and security. This mechanism ensures that if network activity surges substantially, the accelerated burning of tokens will be balanced by compensatory emissions over time.</p>
+<p>Building upon the requirements for Logos Blockchain's block rewards system, the implementation will establish that all transaction fees are pooled while block rewards are tied to measurable global metrics that reflect network health and security. This mechanism ensures that if network activity surges substantially, the accelerated pooling of tokens will be balanced by complementary distribution from the reserve over time.</p>
 <p>For optimal functionality, block rewards should be anchored to specific observable metrics rather than arbitrary values. Block numbers simply track time passage without indicating chain state. Transaction counts per block are vulnerable to manipulation. On the other hand, tracking the number of Blend nodes or inferring total stake provide more robust information about the chain state, specially when they can be compared with targets that are considered “healthy”.</p>
 <p>Crucially, any metric-pegged reward system should aim toward a target value or equilibrium point, creating predictability and stability in the token economics.</p>
 <h2 id="high-level-system-design"><a class="header" href="#high-level-system-design">High-level System Design</a></h2>
 <p>The system dynamically adjusts token emission based on two primary KPIs:</p>
 <ul>
-<li>Inferred Total Stake: Measures network security by tracking the total amount staked against a target threshold (e.g., <span class="math-inline" data-tex="30\%"></span> of TGE supply).</li>
-<li>Average Burning Rate: Tracks transaction fees (both Execution base fees and Permanent Storage) burned to maintain supply equilibrium.</li>
+<li>Inferred Total Stake: Measures network security by tracking the total amount staked against a target threshold (e.g., <span class="math-inline" data-tex="30\%"></span> of the maximum supply).</li>
+<li>Average Pooling Rate: Tracks transaction fees (both Execution base fees and Permanent Storage) routed to the pending reward pool to maintain supply equilibrium.</li>
 </ul>
-<p>A control function combines these KPIs to determine the emission rate factor, bounded between a minimum and maximum annual issuance. This ensures that:</p>
+<p>A control function combines these KPIs to determine the emission rate factor, bounded between a minimum and maximum annual reserve release. This ensures that:</p>
 <ul>
-<li>When security participation is below target, higher issuance attracts more validators.</li>
-<li>As usage increases and fees are burned, emissions adjust downward to stabilize supply.</li>
+<li>When security participation is below target, a higher reserve release attracts more validators.</li>
+<li>As usage increases and fees are pooled, the reserve release adjusts downward and distribution from the pool rises to stabilize circulating supply.</li>
 </ul>
-<p><img src="blockchain/raw/block-rewards/assets/high-level-system-design.svg" alt="Block rewards high-level system design" /></p>
+<p><img src="blockchain/raw/block-rewards/assets/high-level-system-design.png" alt="Block rewards high-level system design" /></p>
 <p>The equation that defines the amount of block rewards is given by:</p>
-<div class="math-block" data-tex="A_t \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block}"></div>
+<div class="math-block" data-tex="A_t \cdot \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f} + (1-A_t) \cdot \bar{R}_t"></div>
 <p>where:</p>
 <ul>
 <li><span class="math-inline" data-tex="A_t"></span> is the emission rate factor on a per year basis.</li>
 <li><span class="math-inline" data-tex="I_{max}"></span> is the maximum emission rate per year.</li>
-<li><span class="math-inline" data-tex="S_{tge}"></span> denotes the token supply at Token Generation Event (TGE).</li>
+<li><span class="math-inline" data-tex="S_{cap}"></span> denotes the maximum allowable token supply (hard cap).</li>
 <li><span class="math-inline" data-tex="\Delta_t"></span> denotes the fraction of year in one time step per e.g., epoch, block, or day.</li>
 <li><span class="math-inline" data-tex="f"></span> be the average number of block proposal within <span class="math-inline" data-tex="\Delta_{t}"></span> units.</li>
-<li><span class="math-inline" data-tex="R_\text{block}"></span> denotes the total amount of Execution base fees and Permanent Storage fees that are burned when the block is proposed.</li>
+<li><span class="math-inline" data-tex="R_\text{block}"></span> denotes the total amount of Execution base fees and Permanent Storage fees that are routed to the pending reward pool when the block is proposed.</li>
+<li><span class="math-inline" data-tex="\bar{R}_t"></span> denotes the average pooled reward: the moving average of <span class="math-inline" data-tex="R_\text{block}"></span> over the look-back window <span class="math-inline" data-tex="T"></span>.</li>
 </ul>
 <h2 id="lifecycle-phases"><a class="header" href="#lifecycle-phases">Lifecycle Phases</a></h2>
 <p>The system is designed to evolve through different phases:</p>
 <ul>
 <li>Bootstrap Phase: Initially higher emission rates (up to <span class="math-inline" data-tex="1\%"></span> annually) to incentivize network participation when stake is below target. As it is explained below, this is viable even when Logos Blockchain experiences low activity because the level of activity only plays a role when the network participation gets close to the predefined target.</li>
-<li>Stabilization Phase: As Proof-of-Stake (PoS) participation approaches target levels, emission becomes primarily driven by burning rate.</li>
-<li>Equilibrium Phase: Supply stabilizes with issuance matching burned fees.</li>
-<li>High-Adoption Phase: If burning exceeds maximum emission, supply becomes deflationary.</li>
+<li>Stabilization Phase: As Proof-of-Stake (PoS) participation approaches target levels, emission becomes primarily driven by the fee pooling rate.</li>
+<li>Equilibrium Phase: Circulating supply stabilizes as distribution from the pool matches pooled fees and the reserve release approaches zero.</li>
+<li>High-Adoption Phase: If the fee pooling rate exceeds the maximum reserve release rate, circulating supply contracts as the pool accumulates faster than tokens are released. Total supply is unchanged.</li>
 </ul>
 <h2 id="benefits"><a class="header" href="#benefits">Benefits</a></h2>
 <p>This KPI-based approach delivers several advantages:</p>
 <ul>
 <li>Self-regulating mechanism that automatically adjusts to network conditions.</li>
-<li>Long-term sustainability with projected total inflation of just <span class="math-inline" data-tex="1.33\%"></span> after <span class="math-inline" data-tex="10"></span> years (assuming constant burning rate of <span class="math-inline" data-tex="0.5\%"></span> per year).</li>
+<li>Long-term sustainability with projected net circulating-supply growth of just <span class="math-inline" data-tex="1.33\%"></span> after <span class="math-inline" data-tex="10"></span> years (assuming constant pooling rate of <span class="math-inline" data-tex="0.5\%"></span> per year).</li>
 <li>Built-in safeguards against manipulation through moving averages and bounded functions.</li>
 <li>Predictable economic model that balances security incentives with controlled supply.</li>
 </ul>
 <p>The overall design creates a robust economic foundation for the Logos Blockchain blockchain that effectively balances the need for strong security incentives with long-term token supply stability.</p>
 <h1 id="construction-4"><a class="header" href="#construction-4">Construction</a></h1>
-<p>The proposed mechanism implements a dynamic token emission system that precisely calibrates LGO issuance according to network performance metrics (KPIs). This adaptive model adjusts emission rates based on how KPIs perform relative to their predetermined targets, while maintaining strict adherence to supply parameters and economic boundaries.</p>
+<p>The proposed mechanism implements a dynamic token emission system that precisely calibrates the LGO reserve release according to network performance metrics (KPIs). This adaptive model adjusts release rates based on how KPIs perform relative to their predetermined targets, while maintaining strict adherence to supply parameters and economic boundaries.</p>
 <h2 id="core-variables"><a class="header" href="#core-variables">Core Variables</a></h2>
 <p>The following variables are input to the model:</p>
 <ul>
-<li><span class="math-inline" data-tex="S_{tge}"></span> denotes the token supply at Token Generation Event (TGE).</li>
-<li><span class="math-inline" data-tex="S_{cap}"></span> denotes the maximum allowable token supply (hard cap), if any.</li>
+<li><span class="math-inline" data-tex="S_{cap}"></span> denotes the maximum allowable token supply (hard cap).</li>
 <li><span class="math-inline" data-tex="\Delta_t"></span> denotes the fraction of year in one time step per e.g., epoch, block, or day:
 <ul>
 <li>if the time step is 1 day, then <span class="math-inline" data-tex="\Delta_t = 1/365"></span>.</li>
@@ -37424,8 +37428,9 @@ This material, including any linked pages or documents, is provided for informat
 <li>if the time step is 1 epoch, which lasts 7.5 days, and blocks are processed every 30 seconds, then <span class="math-inline" data-tex="f = 7.5 \times 2880 = 21600"></span> (the number of 30 seconds intervals in 7.5 day).</li>
 </ul>
 </li>
-<li><span class="math-inline" data-tex="I_{min}"></span> is the minimum emission rate per year (default: <span class="math-inline" data-tex="0\%"></span>).</li>
-<li><span class="math-inline" data-tex="I_{max}"></span> is the maximum emission rate per year (default: <span class="math-inline" data-tex="1\%"></span>).</li>
+<li><span class="math-inline" data-tex="I_{min}"></span> is the minimum emission rate per year (<span class="math-inline" data-tex="I_{min} = 0\%"></span> of <span class="math-inline" data-tex="S_{cap}"></span>).</li>
+<li><span class="math-inline" data-tex="I_{max}"></span> is the maximum emission rate per year (<span class="math-inline" data-tex="I_{min} = 1\%"></span> of <span class="math-inline" data-tex="S_{cap}"></span>).</li>
+<li><span class="math-inline" data-tex="Y"></span> denotes the lifetime, in years, of the rewards reserve at the maximum release rate <span class="math-inline" data-tex="I_{max}"></span> of <span class="math-inline" data-tex="S_{cap}"></span> per year (<span class="math-inline" data-tex="Y = 10"></span> years).</li>
 <li><span class="math-inline" data-tex="D_{i,target}"></span> denotes the target value for the <span class="math-inline" data-tex="i"></span>-th KPI.</li>
 <li><span class="math-inline" data-tex="w_i"></span> denotes the weight of the <span class="math-inline" data-tex="i"></span>-th KPI in the normalized deviation from target or in the normalized average; it satisfies <span class="math-inline" data-tex="\sum_i w_i = 1"></span>.</li>
 <li><span class="math-inline" data-tex="\alpha_d \gt 0"></span> denotes the control responsiveness to KPI deviation metrics.</li>
@@ -37435,24 +37440,28 @@ This material, including any linked pages or documents, is provided for informat
 <p>Let us define the following variables:</p>
 <ul>
 <li><span class="math-inline" data-tex="S_t"></span> denotes the token circulating supply at time <span class="math-inline" data-tex="t"></span>.</li>
+<li><span class="math-inline" data-tex="P_t"></span> denotes the pending rewards pool balance at time <span class="math-inline" data-tex="t"></span>. It collects the pooled fees and funds the distributed portion of the reward.</li>
+<li><span class="math-inline" data-tex="B_t"></span> denotes the rewards reserve balance at time <span class="math-inline" data-tex="t"></span>. It holds the pre-allocated tokens drawn down by the reserve release, with initial size <span class="math-inline" data-tex="B_0 = I_{max} \cdot S_{cap} \cdot Y"></span>.</li>
 <li><span class="math-inline" data-tex="A_t \in [0,1]"></span> denotes the emission rate factor on a per year basis.
 <ul>
 <li>This implies that <span class="math-inline" data-tex="A_t \cdot I_{max} \cdot \Delta_t"></span> denotes the emission within the time-step.</li>
 </ul>
 </li>
 <li><span class="math-inline" data-tex="D_{i,t}"></span> denotes the <span class="math-inline" data-tex="i"></span>-th key performance indicator at time <span class="math-inline" data-tex="t"></span> (e.g., TVL, staked amount, active users).</li>
-<li><span class="math-inline" data-tex="R_\text{block}"></span> denotes the total amount of Execution Gas and Permanent Storage fees burnt in a block. Refer to <a href="blockchain/raw/execution-market.html">Execution Market</a> and <a href="blockchain/raw/storage-markets.html">Storage Markets</a> for how to compute <span class="math-inline" data-tex="R_{block}"></span>.</li>
+<li><span class="math-inline" data-tex="R_\text{block}"></span> denotes the total amount of Execution Gas and Permanent Storage fees routed to the rewards pool in a block. Refer to <a href="blockchain/raw/execution-market.html">Execution Market</a> and <a href="blockchain/raw/storage-markets.html">Storage Markets</a> for how to compute <span class="math-inline" data-tex="R_{block}"></span>.</li>
+<li><span class="math-inline" data-tex="\bar{R}_t = \dfrac{1}{T} \sum_{\tau=t-T+1}^{t} D_{1,\tau}"></span> denotes the average pooled reward: the moving average of <span class="math-inline" data-tex="R_\text{block}"></span> over the look-back window <span class="math-inline" data-tex="T"></span>. It is the base distributed each block, topped up by the reserve release.</li>
 </ul>
 <h2 id="parametrization"><a class="header" href="#parametrization">Parametrization</a></h2>
 <div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Definition</th><th>Default Value</th><th>Explanation</th></tr></thead><tbody>
-<tr><td><span class="math-inline" data-tex="S_{tge}"></span>​</td><td>Token supply at TGE</td><td>10 billion LGO</td><td>N.A.</td></tr>
-<tr><td><span class="math-inline" data-tex="T"></span>​</td><td>The number of periods in the look-back window for the moving average.</td><td><span class="math-inline" data-tex="120"></span>​</td><td>As the system is expected to mint 1 block every 30 seconds, this look-back window defines that the minting averages the fees burned in the last hour.</td></tr>
-<tr><td><span class="math-inline" data-tex="\alpha_a"></span>​</td><td>Denotes the control responsiveness to KPI average metrics.</td><td><span class="math-inline" data-tex="1"></span>​</td><td>This parameter drives the token emission from the burn rate. It must be one-to-one.</td></tr>
+<tr><td><span class="math-inline" data-tex="S_{cap}"></span>​</td><td>Maximum token supply (hard cap)</td><td>10 billion LGO</td><td>N.A.</td></tr>
+<tr><td><span class="math-inline" data-tex="T"></span>​</td><td>The number of periods in the look-back window for the moving average.</td><td><span class="math-inline" data-tex="120"></span>​</td><td>As the system is expected to produce 1 block every 30 seconds, this look-back window defines that the reward averages the fees pooled in the last hour.</td></tr>
+<tr><td><span class="math-inline" data-tex="\alpha_a"></span>​</td><td>Denotes the control responsiveness to KPI average metrics.</td><td><span class="math-inline" data-tex="1"></span>​</td><td>This parameter scales the reserve-release response to the pooling rate. It must be one-to-one.</td></tr>
 <tr><td><span class="math-inline" data-tex="\alpha_d"></span>​</td><td>Denotes the control responsiveness to KPI deviation metrics.</td><td><span class="math-inline" data-tex="1/4"></span>​</td><td>See <a href="blockchain/raw/analysis-block-reward-parameter-calibration.html">[Analysis] Block Reward Parameter Calibration</a>, for details.</td></tr>
 <tr><td><span class="math-inline" data-tex="w_i"></span>​</td><td>Denotes the weight of the <span class="math-inline" data-tex="i"></span>-th KPI in the normalized deviation from target</td><td><span class="math-inline" data-tex="1"></span>​</td><td>There's only one KPI of this type in our system.</td></tr>
-<tr><td><span class="math-inline" data-tex="D_{0,target}"></span>​</td><td>Denotes the target value for the first KPI based on stake.</td><td>3 billion LOGOS</td><td><span class="math-inline" data-tex="30\%"></span> of the token supply.</td></tr>
+<tr><td><span class="math-inline" data-tex="D_{0,target}"></span>​</td><td>Denotes the target value for the first KPI based on stake.</td><td>3 billion LOGOS</td><td><span class="math-inline" data-tex="30\%"></span> of the maximum supply.</td></tr>
 <tr><td><span class="math-inline" data-tex="D_{1,target}"></span>​</td><td>Denotes the target value for the second KPI based on fees.</td><td><span class="math-inline" data-tex="10"></span> billon LOGOS</td><td>In the context of this KPI, this value behaves as a normalizer</td></tr>
 <tr><td><span class="math-inline" data-tex="I_{max}"></span>​</td><td>The maximum emission rate per year</td><td><span class="math-inline" data-tex="1\%"></span>​</td><td>This value guarantees that, when the total inferred stake reaches <span class="math-inline" data-tex="D_{0,target}"></span>, then the APY for validation is ~3.33%.</td></tr>
+<tr><td><span class="math-inline" data-tex="Y"></span></td><td>Lifetime of the rewards reserve at the maximum release rate (<span class="math-inline" data-tex="I_{max}"></span> of <span class="math-inline" data-tex="S_{cap}"></span> per year)</td><td><span class="math-inline" data-tex="10"></span> years</td><td>Sets the reserve size <span class="math-inline" data-tex="B_0 = I_{max} \cdot S_{cap} \cdot Y = 10^9"></span> LGO (<span class="math-inline" data-tex="10\%"></span> of <span class="math-inline" data-tex="S_{cap}"></span>).</td></tr>
 <tr><td><span class="math-inline" data-tex="I_{min}"></span>​</td><td>The minimum emission rate per year</td><td><span class="math-inline" data-tex="0\%"></span>​</td><td>This avoids inflationary token emissions.</td></tr>
 <tr><td><span class="math-inline" data-tex="f"></span>​</td><td>The average number of block proposal within <span class="math-inline" data-tex="\Delta_{t}"></span> units</td><td><span class="math-inline" data-tex="1"></span>​</td><td>The time step <span class="math-inline" data-tex="\Delta_t"></span> was chosen so that <span class="math-inline" data-tex="f"></span> equals to <span class="math-inline" data-tex="1"></span>.</td></tr>
 <tr><td><span class="math-inline" data-tex="\Delta_t"></span>​</td><td>Time step, the fraction of year in one time step (per e.g., epoch, block, or day)</td><td><span class="math-inline" data-tex="1/(365 \times 2880)"></span>​</td><td>The time step is 1 block every <span class="math-inline" data-tex="30"></span> seconds; there are 2880 blocks of 30 seconds in a day.</td></tr>
@@ -37460,42 +37469,63 @@ This material, including any linked pages or documents, is provided for informat
 </div>
 <p>The calibration of these parameters can be found in <a href="blockchain/raw/analysis-block-reward-parameter-calibration.html">[Analysis] Block Reward Parameter Calibration</a>.</p>
 <h2 id="block-rewards-1"><a class="header" href="#block-rewards-1">Block Rewards</a></h2>
-<p>The amount of tokens to be rewarded in a block depends on the emission rate factor <span class="math-inline" data-tex="A_t"></span>. This controls how much is minted from inflation and how much is diverted from transaction fees. The following behavior is expected:</p>
+<p>The amount of tokens rewarded in a block is anchored on the average pooled fees and topped up by the reserve release. The emission rate factor <span class="math-inline" data-tex="A_t"></span> sets the size of the top-up: it controls how much of the reward is newly released and how much is the recycled average of pooled fees. The following behavior is expected:</p>
 <ul>
-<li>When the aggregate KPI is far from the target, <span class="math-inline" data-tex="A_t \rightarrow 1"></span>, then the emission of new tokens  (inflation) is maximized, and most of the transaction fees aren't minted back. The amount of tokens burned does not impact the block rewards in this situation. This means that the system can burn more tokens than it mints.</li>
-<li>When the aggregate KPI is close to the target, <span class="math-inline" data-tex="A_t \rightarrow 0"></span>, then the emission from inflation is minimized, and most of <span class="math-inline" data-tex="R_{block}"></span> is minted back for leaders and Blend nodes.</li>
+<li>When the aggregate KPI is far from the target, <span class="math-inline" data-tex="A_t \rightarrow 1"></span>, the reserve release is maximized: it tops up the average pooled reward <span class="math-inline" data-tex="\bar{R}_t"></span>, raising the reward toward the per-block release cap <span class="math-inline" data-tex="\frac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f}"></span>.</li>
+<li>When the aggregate KPI is close to the target, <span class="math-inline" data-tex="A_t \rightarrow 0"></span>, the top-up vanishes and the reward settles at the average pooled fees <span class="math-inline" data-tex="\bar{R}_t"></span>, funded by recycling the pooled fees to leaders and Blend nodes.</li>
 </ul>
-<p>That is, what drives the source of minting is the KPI: if far from the target, the system mints new tokens; if close to the target, the system mints exactly what was burned (up to <span class="math-inline" data-tex="I_{max}"></span> of TGE).</p>
-<p>The emission from inflation within the time step <span class="math-inline" data-tex="\Delta_t"></span> is given by</p>
-<div class="math-block" data-tex="A_t \cdot I_{max} \cdot S_{tge} \cdot \Delta_t."></div>
-<p>The actual amount of tokens minted per block (because of inflation) also depends on how many blocks are expected to be proposed between <span class="math-inline" data-tex="\Delta_{t-1}"></span> and <span class="math-inline" data-tex="\Delta_{t}"></span>. This is expressed by the factor <span class="math-inline" data-tex="f"></span>, as defined <a href="blockchain/raw/block-rewards.html#core-variables">above</a>.</p>
+<p>The reserve release within the time step <span class="math-inline" data-tex="\Delta_t"></span> is given by</p>
+<div class="math-block" data-tex="A_t \cdot I_{max} \cdot S_{cap} \cdot \Delta_t."></div>
+<p>The actual amount of tokens released from the reserve per block also depends on how many blocks are expected to be proposed between <span class="math-inline" data-tex="\Delta_{t-1}"></span> and <span class="math-inline" data-tex="\Delta_{t}"></span>. This is expressed by the factor <span class="math-inline" data-tex="f"></span>, as defined <a href="blockchain/raw/block-rewards.html#core-variables">above</a>.</p>
 <p>The equation that implements the behavior above in terms of <span class="math-inline" data-tex="A_t"></span> is given by:</p>
-<div class="math-block" data-tex="\begin{equation}&#10;A_t \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block}&#10;\end{equation}"></div>
+<div class="math-block" data-tex="\begin{equation}&#10;R_t = A_t \cdot \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f} + (1-A_t) \cdot \bar{R}_t&#10;\end{equation}"></div>
 <p>where:</p>
 <ul>
 <li><span class="math-inline" data-tex="A_t"></span> is the emission rate factor on a per year basis.</li>
 <li><span class="math-inline" data-tex="I_{max}"></span> is the maximum emission rate per year.</li>
-<li><span class="math-inline" data-tex="S_{tge}"></span> denotes the token supply at Token Generation Event (TGE).</li>
+<li><span class="math-inline" data-tex="S_{cap}"></span> denotes the maximum allowable token supply (hard cap).</li>
 <li><span class="math-inline" data-tex="\Delta_t"></span> denotes the fraction of year in one time step per e.g., epoch, block, or day.</li>
 <li><span class="math-inline" data-tex="f"></span> be the average number of block proposal within <span class="math-inline" data-tex="\Delta_{t}"></span> units.</li>
-<li><span class="math-inline" data-tex="R_\text{block} = D_{1,t}"></span> denotes the total amount of Execution base fees and Storage fees that are burned when the block is proposed.</li>
+<li><span class="math-inline" data-tex="R_\text{block} = D_{1,t}"></span> denotes the per-block Execution base fees and Storage fees collected in the block and routed to the pending reward pool when the block is proposed.</li>
+<li><span class="math-inline" data-tex="\bar{R}_t = \dfrac{1}{T} \sum_{\tau=t-T+1}^{t} D_{1,\tau}"></span> denotes the average pooled reward: the moving average of <span class="math-inline" data-tex="R_\text{block}"></span> over the look-back window <span class="math-inline" data-tex="T"></span>.</li>
 </ul>
+<p>The recycled component distributes the average pooled reward <span class="math-inline" data-tex="\bar{R}_t"></span>, rather than the single-block fee <span class="math-inline" data-tex="R_\text{block}"></span>, which smooths it across the window <span class="math-inline" data-tex="T"></span>. Rearranging equation (1) isolates the role of the reserve release:</p>
+<div class="math-block" data-tex="\bar{R}_t + A_t \cdot \left( \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f} - \bar{R}_t \right)."></div>
+<p>The base distributed every block is the average pooled fees <span class="math-inline" data-tex="\bar{R}_t"></span>. The second term is the reserve release: when the aggregate KPI is far from the target, <span class="math-inline" data-tex="A_t \rightarrow 1"></span> and the reserve release tops up the reward from <span class="math-inline" data-tex="\bar{R}_t"></span> toward the per-block release cap <span class="math-inline" data-tex="\frac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f}"></span>. In the bootstrap regime, where activity is low and <span class="math-inline" data-tex="\bar{R}_t &lt; \frac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f}"></span>, the top-up is positive, so the reserve release raises the reward above the average pooled fees. If the average pooled fees already exceeds the release cap, the second term is non-positive, and therefore less tokens are released from the average pooled fees as rewards.</p>
 <pre><code class="language-python">def block_rewards(
-    S_tge:float,
-    emission_rate_factor:float,
-    I_max:float,
-    Delta_t:float,
-    f:float,
-    D_1_t: float
+    S_cap: float,
+    emission_rate_factor: float,
+    I_max: float,
+    Delta_t: float,
+    f: float,
+    R_bar_t: float,
 ) -&gt; float:
     """
-    Calculate the rewards per block.
-    It implements equation (1).
+    Calculate the rewards distributed per block. It implements equation (1).
     """
-    emission_from_inflation = emission_rate_factor * I_max * S_tge * Delta_t / f
-    emission_from_rewards = (1. - emission_rate_factor) * R_block_cur
-    return emission_from_inflation + emission_from_rewards
+    reserve_release = emission_rate_factor * I_max * S_cap * Delta_t / f
+    pool_distribution = (1.0 - emission_rate_factor) * R_bar_t
+    return reserve_release + pool_distribution
 </code></pre>
+<h2 id="pool-accounting-and-supply-dynamics"><a class="header" href="#pool-accounting-and-supply-dynamics">Pool Accounting and Supply Dynamics</a></h2>
+<p>The mechanism routes all transaction fees into a rewards pool. Let <span class="math-inline" data-tex="P_t"></span> denote the pool balance at time <span class="math-inline" data-tex="t"></span> and <span class="math-inline" data-tex="\bar{R}_t = \frac{1}{T}\sum_{\tau=t-T+1}^{t} D_{1,\tau}"></span> the average pooled reward over the look-back window. Each block routes its fees into the pool and distributes the average pooled reward, recycled in proportion <span class="math-inline" data-tex="(1 - A_t)"></span>. The distribution is topped up by a release from a rewards reserve, not by minting: the reserve holds tokens pre-allocated from the fixed cap <span class="math-inline" data-tex="S_{cap}"></span> at genesis. It is sized so that releasing at the maximum rate <span class="math-inline" data-tex="I_{max}"></span> of <span class="math-inline" data-tex="S_{cap}"></span> per year lasts <span class="math-inline" data-tex="Y"></span> years, giving an initial balance <span class="math-inline" data-tex="B_0 = I_{max} \cdot S_{cap} \cdot Y"></span>.</p>
+<p>The inflows and the outflow at step <span class="math-inline" data-tex="t"></span> are:</p>
+<ul>
+<li>Fee inflow: <span class="math-inline" data-tex="R_\text{block} = D_{1,t}"></span>.</li>
+<li>Reserve release (top-up): <span class="math-inline" data-tex="\iota_t = \min \lbrace A_t \cdot \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f}, \; B_{t-1} \rbrace"></span>, drawn from the reserve and added to the payout.</li>
+<li>Distribution outflow, equal to the block reward: <span class="math-inline" data-tex="R_t = (1 - A_t) \cdot \bar{R}_t + \iota_t"></span>.</li>
+</ul>
+<p>The reserve funds the release and is monotonically non-increasing, bounded below by zero:</p>
+<div class="math-block" data-tex="B_t = B_{t-1} - \iota_t, \qquad B_t \geq 0."></div>
+<p>Once the reserve is depleted, <span class="math-inline" data-tex="\iota_t = 0"></span> and the reward reduces to the recycled component <span class="math-inline" data-tex="(1 - A_t) \cdot \bar{R}_t"></span>, funded entirely by pooled fees. The cap on <span class="math-inline" data-tex="\iota_t"></span> makes the reserve last <span class="math-inline" data-tex="Y"></span> years at the maximum release rate, and longer whenever <span class="math-inline" data-tex="A_t &lt; 1"></span>.</p>
+<p>The pool collects every fee and pays out only the recycled component, so its balance evolves as</p>
+<div class="math-block" data-tex="P_t = P_{t-1} + R_\text{block} - (1 - A_t) \cdot \bar{R}_t."></div>
+<p>The increment <span class="math-inline" data-tex="R_\text{block} - (1 - A_t)\bar{R}_t"></span> can take either sign. Near target (<span class="math-inline" data-tex="A_t \rightarrow 0"></span>) the pool pays the average and banks the difference <span class="math-inline" data-tex="D_{1,t} - \bar{R}_t"></span>, acting as a buffer that smooths fee fluctuations; far from target (<span class="math-inline" data-tex="A_t \rightarrow 1"></span>) it retains the full fee while the reserve release carries the reward. The pool is redistributable, subject to <span class="math-inline" data-tex="P_t \geq 0"></span>.</p>
+<p>The mechanism conserves tokens across the three stocks it controls. Let the controlled total be <span class="math-inline" data-tex="S_t^{tot} = S_t + P_t + B_t"></span>, with <span class="math-inline" data-tex="S_t"></span> the circulating supply. Per step:</p>
+<div class="math-block" data-tex="\Delta S_t = R_t - R_\text{block} = (1 - A_t) \cdot \bar{R}_t + \iota_t - D_{1,t},"></div>
+<div class="math-block" data-tex="\Delta P_t = R_\text{block} - (1 - A_t) \cdot \bar{R}_t, \qquad \Delta B_t = -\iota_t,"></div>
+<div class="math-block" data-tex="\Delta S_t^{tot} = \Delta S_t + \Delta P_t + \Delta B_t = 0."></div>
+<p>The controlled total is constant: the mechanism never mints tokens. A reserve release moves tokens from <span class="math-inline" data-tex="B_t"></span> into circulation, routing a fee moves tokens from circulation into <span class="math-inline" data-tex="P_t"></span>, and recycling moves them back. Circulating supply <span class="math-inline" data-tex="S_t"></span> rises as the reserve drains, and contracts whenever the fee inflow exceeds the distributed reward, <span class="math-inline" data-tex="D_{1,t} &gt; R_t"></span>, when tokens accumulate in the pool faster than they are paid out. This removes tokens from circulation, not from existence, and reverses if the pool is later released. Net circulating growth over the reserve's life is bounded by <span class="math-inline" data-tex="B_0 = I_{max} \cdot S_{cap} \cdot Y"></span>.</p>
 <h2 id="emission-rate-factor-function"><a class="header" href="#emission-rate-factor-function">Emission Rate Factor Function</a></h2>
 <p>The emission rate factor <span class="math-inline" data-tex="A_t \in [0,1]"></span> determines the portion of <span class="math-inline" data-tex="I_{max}"></span> that should be emitted based on current values of <span class="math-inline" data-tex="\delta_t"></span> and <span class="math-inline" data-tex="\gamma_t"></span>:</p>
 <div class="math-block" data-tex="A_t = \min \lbrace 1, \max \lbrace 0, \dfrac{ \alpha_d \cdot \delta_t + \alpha_a \cdot \gamma_t + I_{min}}{I_{max}} \rbrace \rbrace."></div>
@@ -37587,15 +37617,15 @@ This material, including any linked pages or documents, is provided for informat
 <li><span class="math-inline" data-tex="\gamma_t \lt 0"></span> → should reduce the token emission by a factor of <span class="math-inline" data-tex="\alpha_a \gamma_t"></span>.</li>
 </ul>
 <blockquote>
-<p>To measure the average, only the average burning rate KPI is used in this part of the computation</p>
+<p>To measure the average, only the average pooling rate KPI is used in this part of the computation</p>
 </blockquote>
 <h2 id="key-performance-indicators"><a class="header" href="#key-performance-indicators">Key Performance Indicator(s)</a></h2>
 <h3 id="kpi-1---the-inferred-total-stake"><a class="header" href="#kpi-1---the-inferred-total-stake">KPI 1 - The Inferred Total Stake</a></h3>
-<p>Given the privacy features of Logos Blockchain and the fact that the token TGE supply is known, the inferred total stake is the most appropriate indicator of the system's security.</p>
+<p>Given the privacy features of Logos Blockchain and the fact that the token's maximum supply is known, the inferred total stake is the most appropriate indicator of the system's security.</p>
 <p>Let:</p>
 <ul>
 <li><span class="math-inline" data-tex="D_{0,t}"></span> denotes the evolution of the inferred total stake.</li>
-<li><span class="math-inline" data-tex="D_{0,target}"></span> denotes the total stake that is considered secure. For the blockchain to be secure, we aim for <span class="math-inline" data-tex="30\%"></span> of the TGE supply.</li>
+<li><span class="math-inline" data-tex="D_{0,target}"></span> denotes the total stake that is considered secure. For the blockchain to be secure, we aim for <span class="math-inline" data-tex="30\%"></span> of the maximum supply.</li>
 </ul>
 <p>The inferred total stake affects the emission rate through the "normalized deviation from target." The deviation implied by this KPI is characterized by the plot below.</p>
 <p><img src="blockchain/raw/block-rewards/assets/cc1261aa-09df-82f0-ace9-81b7dd81a13a.png" alt="Diagram" /></p>
@@ -37604,21 +37634,21 @@ This material, including any linked pages or documents, is provided for informat
 </blockquote>
 <p>This happens because, when the blockchain starts, <span class="math-inline" data-tex="D_{0,t} \vert_{t=0}"></span> is very likely a small number compared to the target. Therefore, the equation <a href="blockchain/raw/block-rewards.html#kpi-deviation-from-target">above</a> tilts towards <span class="math-inline" data-tex="1"></span> (or <span class="math-inline" data-tex="100\%"></span>) at that moment. As time passes and more stake participates in the PoS, the difference between the current total stake and the target diminishes. The equation <a href="blockchain/raw/block-rewards.html#kpi-deviation-from-target">above</a> oscillates around 0 (or <span class="math-inline" data-tex="0\%"></span>) when <span class="math-inline" data-tex="D_{0,t}"></span> oscillates around <span class="math-inline" data-tex="D_{0,target}"></span>.</p>
 <p>Let the Logos Blockchain’s security level be defined by:</p>
-<div class="math-block" data-tex="\text{Security Level} = \dfrac{D_{0,target}}{S_{tge}}."></div>
-<h3 id="kpi-2---the-average-burning-rate"><a class="header" href="#kpi-2---the-average-burning-rate">KPI 2 - The Average Burning Rate</a></h3>
-<p>In the long run, Logos Blockchain should mint only enough tokens to compensate for the burned transaction fees.</p>
+<div class="math-block" data-tex="\text{Security Level} = \dfrac{D_{0,target}}{S_{cap}}."></div>
+<h3 id="kpi-2---the-average-pooling-rate"><a class="header" href="#kpi-2---the-average-pooling-rate">KPI 2 - The Average Pooling Rate</a></h3>
+<p>In the long run, Logos Blockchain should release only enough tokens to complement the pooled transaction fees, so that block rewards are funded primarily by distribution from the pool.</p>
 <p>Let</p>
 <ul>
-<li><span class="math-inline" data-tex="D_{1,t}"></span> denote the amount of Storage fees and Execution base fees burned since <span class="math-inline" data-tex="t-1"></span>.</li>
-<li><span class="math-inline" data-tex="D_{1,target}=S_{tge}"></span> denote the "normalizing factor" (it is the TGE supply, in this case).</li>
+<li><span class="math-inline" data-tex="D_{1,t}"></span> denote the amount of Storage fees and Execution base fees pooled since <span class="math-inline" data-tex="t-1"></span>.</li>
+<li><span class="math-inline" data-tex="D_{1,target}=S_{cap}"></span> denote the "normalizing factor" (it is the maximum supply, in this case).</li>
 </ul>
-<p>This choice of "target" implies that <span class="math-inline" data-tex="\gamma_t"></span> evaluates the annualized average burning rate with respect to the TGE supply. This makes the equation <a href="blockchain/raw/block-rewards.html#emission-rate-factor-function">above</a> consistent.</p>
+<p>This choice of "target" implies that <span class="math-inline" data-tex="\gamma_t"></span> evaluates the annualized average pooling rate with respect to the maximum supply. This makes the equation <a href="blockchain/raw/block-rewards.html#emission-rate-factor-function">above</a> consistent.</p>
 <h1 id="float-precision-for-implementation"><a class="header" href="#float-precision-for-implementation">Float Precision for Implementation</a></h1>
 <p>Because block rewards affect consensus state, the implementation must be fully deterministic across all nodes. For that reason, the normative implementation of the reward function should not rely on floating-point arithmetic, machine-dependent rounding behavior, or comparisons against machine epsilon. Earlier sections use real-valued formulas to explain the mechanism and its economic meaning, but the consensus rule itself should be defined only in terms of integer arithmetic. This is especially important because the current document already notes floating-point concerns in the KPI helper functions and then introduces a final integer rewrite for the reward computation. The issue is therefore not whether integers should be used, but how to present that integer formulation in a way that remains auditable and clearly derived from the protocol parameters.</p>
-<p>The goal of this section is not to change the reward mechanism. It is only to restate the already-specified mechanism in a canonical deterministic form with explicit named constants. In particular, the reward logic remains driven by the same two KPI components described previously: the inferred total stake relative to its target, and the moving average of burned fees over the look-back window. Likewise, the reward still interpolates between inflationary issuance and burned-fee compensation through the emission factor <span class="math-inline" data-tex="A_t"></span>.</p>
+<p>The goal of this section is not to change the reward mechanism. It is only to restate the already-specified mechanism in a canonical deterministic form with explicit named constants. In particular, the reward logic remains driven by the same two KPI components described previously: the inferred total stake relative to its target, and the moving average of pooled fees over the look-back window. Likewise, the reward still interpolates between the reserve release and distribution from the pooled fees through the emission factor <span class="math-inline" data-tex="A_t"></span>.</p>
 <div class="math-block" data-tex="A_t = \min \lbrace 1, \max \lbrace 0, \dfrac{ \alpha_d \cdot \delta_t + \alpha_a \cdot \gamma_t + I_{min}}{I_{max}} \rbrace \rbrace."></div>
 <p>Because we have</p>
-<div class="math-block" data-tex="\alpha_d=\frac{1}{4},\quad&#10;\alpha_a=1,\quad&#10;I_{\max}=10^{-2},\qquad&#10;T=120,\quad&#10;f=1,\quad R_\text{block} = D_{1,t}\\&#10;D_{0,\mathrm{target}}=3\cdot 10^9,\qquad&#10;D_{1,\mathrm{target}}=S_{\mathrm{tge}}=10^{10},\qquad&#10;\Delta_t=\frac{1}{365\cdot 2880},"></div>
+<div class="math-block" data-tex="\alpha_d=\frac{1}{4},\quad&#10;\alpha_a=1,\quad&#10;I_{\max}=10^{-2},\qquad&#10;T=120,\quad&#10;f=1,\quad R_\text{block} = D_{1,t}\\&#10;D_{0,\mathrm{target}}=3\cdot 10^9,\qquad&#10;D_{1,\mathrm{target}}=S_{\mathrm{cap}}=10^{10},\qquad&#10;\Delta_t=\frac{1}{365\cdot 2880},"></div>
 <div class="math-block" data-tex="\delta_t = \sum_i w_i \times &#10;\dfrac{D_{i,target} - D_{i,t}}{D_{i,target}},"></div>
 <div class="math-block" data-tex="\gamma_t = \dfrac{1}{\Delta_t} \sum_i w_i \cdot \Bigl(\dfrac{1}{T}  \sum_{\tau=t-T+1}^t \dfrac{ D_{i,\tau}}{D_{i,target}} \Bigr),"></div>
 <p>and <span class="math-inline" data-tex="w_i"></span> denotes the weight of the <span class="math-inline" data-tex="i"></span>-th KPI in the normalized deviation from target or in the normalized average; it satisfies <span class="math-inline" data-tex="\sum_i w_i = 1"></span>.</p>
@@ -37631,33 +37661,39 @@ This material, including any linked pages or documents, is provided for informat
 <p>And by denoting</p>
 <div class="math-block" data-tex="\begin{aligned}&#10;A_t&#x27;&#10;&amp;=&#10;\min\!\lbrace12\cdot 10^7,\max\!\lbrace0,\quad3\cdot 10^9-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}\rbrace\rbrace,&#10;\\&#10;A_t&amp;=\frac{A_t&#x27;}{12\cdot 10^7}.&#10;\end{aligned}"></div>
 <p>We can compute the block reward using only integers:</p>
-<div class="math-block" data-tex="\text{Rewards}_t= A_t \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block} =\\&#10;\frac{A_t&#x27;}{12\cdot 10^7} \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-\frac{A_t&#x27;}{12\cdot 10^7}) \cdot D_{1,t}"></div>
+<div class="math-block" data-tex="\text{Rewards}_t= A_t \cdot \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block} =\\&#10;\frac{A_t&#x27;}{12\cdot 10^7} \cdot \dfrac{I_{max} \cdot S_{cap} \cdot \Delta_t}{f} + (1-\frac{A_t&#x27;}{12\cdot 10^7}) \cdot D_{1,t}"></div>
 <p>and</p>
-<div class="math-block" data-tex="\frac{I_{\max} \cdot S_{\mathrm{tge}}\cdot \Delta_t}{f}=\frac{10^{-2}\cdot 10^{10}}{365\cdot 2880}=\frac{10^8}{1051200}=\frac{62500}{657}."></div>
+<div class="math-block" data-tex="\frac{I_{\max} \cdot S_{\mathrm{cap}}\cdot \Delta_t}{f}=\frac{10^{-2}\cdot 10^{10}}{365\cdot 2880}=\frac{10^8}{1051200}=\frac{62500}{657}."></div>
 <p>So:</p>
 <div class="math-block" data-tex="\text{Rewards}_t=&#10;\frac{A_t&#x27;}{12\cdot 10^7} \cdot \frac{62500}{657} + (1-\frac{A_t&#x27;}{12\cdot 10^7})\cdot D_{1,t} =\\&#10;\frac{62500\cdot A_t&#x27; + 657\cdot(12\cdot 10^7-A_t&#x27;)\cdot D_{1,t}}{657\cdot 12\cdot 10^7}&#10;."></div>
 <p>So we propose a reference implementation that uses integers:</p>
-<pre><code class="language-python">A_SCALE = 120_000_000            # denominator of 1/(I_max * D1_target * Delta_t * T) 
-INFLATION_NUMERATOR = 62_500     # numerator of I_max * S_TGE * DELTA_t / f
-INFLATION_DENOMINATOR = 657      # denominator of I_max * S_TGE * DELTA_t / f
-FEE_AVG_NUMERATOR = 10_512       # numerator of 1/(I_max * D1_target * Delta_t * T) 
-STAKE_TARGET = int(3e9)
+<pre><code class="language-python">import numpy as np
+from numpy import int64
 
-def block_reward(total_stake: int, burned_fees_window: list[int]) -&gt; tuple[int, int]:
-    sum_fees = sum(burned_fees_window)
-    last_burned_fee = burned_fees_window[-1]
+A_SCALE = int64(120_000_000)            # denominator of 1/(I_max * D1_target * Delta_t * T)
+INFLATION_NUMERATOR = int64(62_500)     # numerator of I_max * S_CAP * DELTA_t / f
+INFLATION_DENOMINATOR = int64(657)      # denominator of I_max * S_CAP * DELTA_t / f
+FEE_AVG_NUMERATOR = int64(10_512)       # numerator of 1/(I_max * D1_target * Delta_t * T)
+STAKE_TARGET = int64(3_000_000_000)
 
-    a_numerator = min(
-        max(STAKE_TARGET + FEE_AVG_NUMERATOR * sum_fees - total_stake, 0),
-        A_SCALE
+
+def block_reward(total_stake: int64, pooled_fees_window: list[int64]) -&gt; tuple[int64, int64]:
+    sum_fees = np.sum(pooled_fees_window, dtype=int64)
+    last_pooled_fee = pooled_fees_window[-1]
+
+    a_numerator = np.minimum(
+        np.maximum(STAKE_TARGET + FEE_AVG_NUMERATOR * sum_fees - total_stake, int64(0)),
+        A_SCALE,
     )
 
-    reward_numerator = INFLATION_NUMERATOR * a_numerator
-									   + INFLATION_DENOMINATOR * (A_SCALE - a_num) * last_burned_fee
+    reward_numerator = (
+        INFLATION_NUMERATOR * a_numerator
+        + INFLATION_DENOMINATOR * (A_SCALE - a_numerator) * last_pooled_fee
+    )
     reward_denominator = INFLATION_DENOMINATOR * A_SCALE
 
-    blend_reward = reward_numerator * 6 // (reward_denominator * 10)
-    leader_reward = reward_numerator * 4 // (reward_denominator * 10)
+    blend_reward = reward_numerator * int64(6) // (reward_denominator * int64(10))
+    leader_reward = reward_numerator * int64(4) // (reward_denominator * int64(10))
 
     return blend_reward, leader_reward
 </code></pre>
@@ -37673,6 +37709,7 @@ def block_reward(total_stake: int, burned_fees_window: list[int]) -&gt; tuple[in
 </div><!-- timeline:start -->
 <h2 id="timeline-121"><a class="header" href="#timeline-121">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b655e4b0285d2e0bc09a19b5292d46bacc44019b/docs/blockchain/raw/execution-market.md"><code>b655e4b</code></a> — [RFC] Block Rewards: Replace Burning/Minting with Pooling/Distributing/Releasing (#375)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/execution-market.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-07-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/38916aa474164ac4acd81e62d19715e17626be17/docs/blockchain/raw/execution-market.md"><code>38916aa</code></a> — docs(blockchain): prevent execution and storage fees from rounding down to zero (#384)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/ff40ae99c8e76a2bb36dcd83184434625a8daeb5/docs/blockchain/raw/execution-market.md"><code>ff40ae9</code></a> — docs(blockchain): TKE: fix base fees in the pseudocode based on G_target (#380)</li>
@@ -37687,6 +37724,7 @@ def block_reward(total_stake: int, burned_fees_window: list[int]) -&gt; tuple[in
 <tr><td>1.0.1</td><td>Fix base fee constants in pseudocode based on the correct <span class="math-inline" data-tex="G_{\mathrm{target}}"></span></td><td>2026-07-27</td></tr>
 <tr><td>1.1.0</td><td>Round the base fee update upwards</td><td>2026-07-28</td></tr>
 <tr><td>1.1.1</td><td>Precise that greedy inclusion selects a candidate only if it is valid in the state the already selected transactions leave</td><td>2026-08-24</td></tr>
+<tr><td>1.1.2</td><td>Changing from burning/minting to pooling/distributing</td><td>2026-08-26</td></tr>
 </tbody></table>
 </div>
 <blockquote>
@@ -37707,14 +37745,14 @@ This material, including any linked pages or documents, is provided for informat
 <h2 id="design-rationale"><a class="header" href="#design-rationale">Design Rationale</a></h2>
 <p>The design is founded on a target-based mechanism, philosophically aligned with Ethereum's EIP-1559. This model is crucial for long-term network health and security, as it actively steers execution utilization around a predefined target. This ensures the network remains performant and accessible for nodes with minimal hardware specifications, thereby promoting decentralization.</p>
 <p>To further enhance security, this specification addresses a known vulnerability in the classic EIP-1559 design. As demonstrated by recent research (<a href="https://arxiv.org/pdf/2304.11478">Cachin et al., 2023</a>), EIP-1559 is susceptible to base fee manipulation by rational, non-myopic block builders. Our design incorporates a direct mitigation for this threat, as proposed in <a href="https://arxiv.org/pdf/2304.11478">Cachin et al., 2023</a>: an Exponential Moving Average (EMA) based update rule for the base fee. Given the EMA nature of this update, these enhancements smooth fluctuations in execution gas consumption, making the protocol significantly more resilient to strategic manipulation without compromising its core benefits of responsiveness and predictability</p>
-<p>Furthermore, as opposed to the standard EIP-1559 mechanism, where base fee is burned and tips are immediately given to miners, in our setting we burn fees, and later, we mint rewards to which we add tips which are given to the block builders at a later block through the <a href="blockchain/raw/bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>, for privacy preservation.</p>
+<p>Furthermore, as opposed to the standard EIP-1559 mechanism, where the base fee is burned and tips are immediately given to miners, in our setting we route fees into a rewards pool, and later we distribute rewards from that pool given to the block builders at a later block through the <a href="blockchain/raw/bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>, for privacy preservation.</p>
 <h1 id="overview-55"><a class="header" href="#overview-55">Overview</a></h1>
 <p>Our fee mechanism adapts Ethereum's EIP-1559 to the specific economic and security goals of the Logos Blockchain network. It provides predictable execution gas costs for users while creating a robust incentive structure for block builders and Blend nodes that minimizes harmful emergent strategies.</p>
 <p>The mechanism operates on four core principles:</p>
 <ul>
 <li>Dynamic Base Fee: A protocol-defined base_fee for Execution Gas must be paid for a transaction to be included in a block. This fee adjusts automatically based on a smoothed average of recent network demand relative to a predefined capacity target, ensuring sustainable network load. This base_fee is the minimal threshold to be paid for the transaction to be accepted by the block builder.</li>
 <li>Priority Fee (Tip): To incentivize faster inclusion by block builders, users add a priority_fee on top of the base fee. This creates a simple and transparent auction for block space during periods of high demand. The proceeds of this goes to the block builder.</li>
-<li>Fee Splitting and Deflation: The two fee components are treated differently. The entire base_fee is burned, permanently removing it from the supply. This creates a direct link between network activity and the economic value of the native token, applying deflationary pressure as usage grows. The priority_fee is not immediately distributed to the block builder (to preserve privacy), but instead it is directed into the block builders reward stream. 40% of the rewards will be allocated to block builders and the remaining 60% to Blend nodes. Rewards are privacy-preserving via <a href="blockchain/raw/bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>.</li>
+<li>Fee Splitting and Pooling: The two fee components are treated differently. The entire base_fee is routed to the rewards pool, removing it from circulation. As usage grows, more base fees are routed to the pool and removed from circulation, which creates a direct link between network activity and the circulating supply of the native token. The priority_fee is not immediately distributed to the block builder (to preserve privacy), but instead it is directed into the block builders reward stream. 40% of the rewards will be allocated to block builders and the remaining 60% to Blend nodes. Rewards are privacy-preserving via <a href="blockchain/raw/bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>.</li>
 </ul>
 <p>The entire lifecycle can be visualized in the following flow:</p>
 <p><img src="blockchain/raw/execution-market/assets/execution-market-lifecycle.svg" alt="Execution market lifecycle flow" /></p>
@@ -37726,7 +37764,7 @@ This material, including any linked pages or documents, is provided for informat
 <h2 id="economic-properties"><a class="header" href="#economic-properties">Economic Properties</a></h2>
 <ul>
 <li>Sustainable Resource Management: The TFM automatically steers network usage toward the target (<span class="math-inline" data-tex="G_\text{target}"></span>). By increasing the cost of Execution Gas during high demand, the protocol prevents network overload. This protects the ability of nodes with modest hardware to participate, safeguarding decentralization.</li>
-<li>Deflationary Pressure: Burning the base_fee (and minting later a proportion of it back as rewards, cf <a href="blockchain/raw/block-rewards.html">Block Rewards</a>) establishes a direct link between network activity and the intrinsic economic utility of the Logos Blockchain token. As usage grows, the rate of token burn increases, applying deflationary pressure on the total supply and creating a sustainable economic flywheel.</li>
+<li>Circulating-Supply Pressure: Routing the base_fee to the rewards pool (and later distributing a proportion of it back as rewards, cf <a href="blockchain/raw/block-rewards.html">Block Rewards</a>) establishes a direct link between network activity and the circulating supply of the Logos Blockchain token. As usage grows, the rate at which base fees enter the pool increases, applying downward pressure on circulating supply. Because the pool is a redistributable reserve, this pressure acts on tokens in circulation, not on total supply.</li>
 </ul>
 <h2 id="security-properties-mitigation-of-base-fee-manipulation"><a class="header" href="#security-properties-mitigation-of-base-fee-manipulation">Security Properties: Mitigation of Base Fee Manipulation</a></h2>
 <p>A critical feature of this design is its resilience to the base fee manipulation attack identified in classic EIP-1559. Our EMA-based update rule directly mitigates this vulnerability in two ways:</p>
@@ -37750,7 +37788,7 @@ This material, including any linked pages or documents, is provided for informat
 <tr><td><span class="math-inline" data-tex="\phi"></span></td><td>Fee Adjustment Rate</td><td>1/8</td><td>A protocol constant controlling how quickly the base fee adjusts to demand.</td></tr>
 <tr><td><span class="math-inline" data-tex="q"></span></td><td>EMA Smoothing Factor</td><td>9/10</td><td>A protocol constant defining the weight of historical average in the EMA update rule.</td></tr>
 <tr><td><span class="math-inline" data-tex="F_t"></span></td><td>Total fee</td><td>-</td><td><span class="math-inline" data-tex="F_t = g_t \,\cdot\bigl(b_{\mathrm{exec}}[s] + p_t\bigr)= g_t\cdot c_t"></span></td></tr>
-<tr><td><span class="math-inline" data-tex="\hat{R}_{\mathrm{burned}}[s]"></span></td><td>Amount of base fees burnt</td><td>-</td><td>This is used as an input to compute the block rewards</td></tr>
+<tr><td><span class="math-inline" data-tex="\hat{R}_{\mathrm{pooled}}[s]"></span></td><td>Amount of base fees pooled</td><td>-</td><td>This is used as an input to compute the block rewards</td></tr>
 </tbody></table>
 </div>
 <h3 id="parameter-justification"><a class="header" href="#parameter-justification">Parameter Justification</a></h3>
@@ -37825,9 +37863,9 @@ def update_base_fee(base_fee: int, g_avg: int) -&gt; int:
 <div class="math-block" data-tex="p_t = c_t - b_{\mathrm{exec}}[s]."></div>
 <p>The final fee <span class="math-inline" data-tex="F_t"></span> paid by the transaction <span class="math-inline" data-tex="t"></span> is:</p>
 <div class="math-block" data-tex="F_t = g_t \,\cdot\bigl(b_{\mathrm{exec}}[s] + p_t\bigr)= g_t\cdot c_t"></div>
-<p>Let the amount of Execution fee burnt in a block be:</p>
-<div class="math-block" data-tex="\hat{R}_{\mathrm{burned}}(s)&#10;= \sum_{t \in \mathcal{B}_s} \bigl(g_t \cdot b_{\mathrm{exec}}[s]\bigr)."></div>
-<p>This burned quantity is then used as a input for the computation of the block rewards, as described in  <a href="blockchain/raw/block-rewards.html">Block Rewards</a>.</p>
+<p>Let the amount of Execution fee routed to the rewards pool in a block be:</p>
+<div class="math-block" data-tex="\hat{R}_{\mathrm{pooled}}(s)&#10;= \sum_{t \in \mathcal{B}_s} \bigl(g_t \cdot b_{\mathrm{exec}}[s]\bigr)."></div>
+<p>This pooled quantity is then used as an input for the computation of the block rewards. It is the Execution-market component of the per-block pool inflow <span class="math-inline" data-tex="R_{block}"></span>, as described in <a href="blockchain/raw/block-rewards.html">Block Rewards</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="storage-markets"><a class="header" href="#storage-markets">STORAGE-MARKETS</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
 <tr><td>Name</td><td>Storage Markets</td></tr>
@@ -37840,6 +37878,7 @@ def update_base_fee(base_fee: int, g_avg: int) -&gt; int:
 </div><!-- timeline:start -->
 <h2 id="timeline-122"><a class="header" href="#timeline-122">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b655e4b0285d2e0bc09a19b5292d46bacc44019b/docs/blockchain/raw/storage-markets.md"><code>b655e4b</code></a> — [RFC] Block Rewards: Replace Burning/Minting with Pooling/Distributing/Releasing (#375)</li>
 <li><strong>2026-07-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/38916aa474164ac4acd81e62d19715e17626be17/docs/blockchain/raw/storage-markets.md"><code>38916aa</code></a> — docs(blockchain): prevent execution and storage fees from rounding down to zero (#384)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/storage-markets.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/storage-markets.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -37853,6 +37892,7 @@ def update_base_fee(base_fee: int, g_avg: int) -&gt; int:
 <tr><td>1.0.1</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
 <tr><td>1.0.2</td><td>Fix invalid python indentation due to github migration</td><td>2026-07-27</td></tr>
 <tr><td>1.1.0</td><td>Round the price update upwards and align the reference code with the zero target guard</td><td>2026-07-28</td></tr>
+<tr><td>1.1.1</td><td>Changing from burning/minting to pooling/distributing/releasing</td><td>2026-08-25</td></tr>
 </tbody></table>
 </div>
 <blockquote>
@@ -37862,7 +37902,7 @@ This material, including any linked pages or documents, is provided for informat
 <p>Nothing in this material should be relied upon for investment or business decisions. Recipients of this information assume all risks associated with its use and are responsible for seeking independent professional advice regarding any actions based on it.</p>
 </blockquote>
 <h1 id="introduction-61"><a class="header" href="#introduction-61">Introduction</a></h1>
-<p>This document provides the formal specification for the fee collection mechanism of the Permanent Storage market. The primary objective is to define a system that is robust, predictable, and economically sustainable. This mechanism is a critical component of the overall Permanent Storage Market Transaction Fee Mechanism (TFM), which is designed as a self-contained, usage-driven market, economically decoupled from the protocol's core consensus and privacy services.</p>
+<p>This document provides the formal specification for the fee collection mechanism of the Permanent Storage market. The primary objective is to define a system that is robust, predictable, and economically sustainable. This mechanism is a critical component of the overall Permanent Storage Market Transaction Fee Mechanism (TFM), a usage-driven market whose price formation is self-contained and independent of the protocol's core consensus and privacy services. The fees it collects are routed into the shared rewards pool that funds leader and Blend rewards, as detailed in <a href="blockchain/raw/storage-markets.html#fee-routing">Fee Routing</a> below.</p>
 <p>In what follows, Logos Blockchain Storage refers to the Permanent Storage markets and Logos Blockchain Storage Gas refers to the Permanent Storage Gas respectively.</p>
 <h2 id="requirements-and-rationale"><a class="header" href="#requirements-and-rationale">Requirements and Rationale</a></h2>
 <p>The mechanism is designed with the following core requirements, derived from the project's goals:</p>
@@ -37875,20 +37915,25 @@ This material, including any linked pages or documents, is provided for informat
 <p>Justification. As will be discussed later, the tradeoff between adaptability and predictability of the mechanism is determined by its parameters. In scenarios of high volatility, its core design principle is to act as a shock absorber, deliberately filtering out high-frequency, transient volatility by operating over longer timeframes and using a smoothed moving average (EMA). For the primary consumer, reacting to every momentary spike in demand would create untenable price chaos. This model, therefore, intentionally forgoes instantaneous adaptation in favor of providing crucial timeframe-level price certainty, ensuring that fees reflect meaningful, medium-term trends rather than reacting to volatile, short-term market noise.</p>
 <h1 id="overview-56"><a class="header" href="#overview-56">Overview</a></h1>
 <p>The proposed fee mechanism operates on a simple but powerful principle: the price for Logos Blockchain Storage is fixed and predictable within a given timeframe (epoch for Permanent Storage), but it adjusts smoothly between timeframes based on observed network usage.</p>
-<p>When a user submits data, a fee is calculated based on the Logos Blockchain Storage Gas consumption. This fee is determined by a price per Gas, <span class="math-inline" data-tex="P_{STR}"></span>, which is known in advance for the entire timeframe.</p>
-<p>At the end of each timeframe, the protocol tallies the total amount of Logos Blockchain Storage Gas that was stored. It compares this actual usage to an adaptive target a "healthy" usage level that is itself a dynamic blend of a long-term policy goal and recent historical usage. Based on whether the actual usage was above or below this target, the price <span class="math-inline" data-tex="P_{STR}"></span> for the next timeframe is adjusted slightly up or down.</p>
+<p>When a user submits data, a fee is calculated based on the Logos Blockchain Storage Gas consumption. This fee is determined by a price per Gas, <span class="math-inline" data-tex="P_{storage}"></span>, which is known in advance for the entire timeframe. The collected fee is routed in full into the network's shared rewards pool, the same pool that funds block rewards (see <a href="blockchain/raw/storage-markets.html#fee-routing">Fee Routing</a>).</p>
+<p>At the end of each timeframe, the protocol tallies the total amount of Logos Blockchain Storage Gas that was stored. It compares this actual usage to an adaptive target a "healthy" usage level that is itself a dynamic blend of a long-term policy goal and recent historical usage. Based on whether the actual usage was above or below this target, the price <span class="math-inline" data-tex="P_{storage}"></span> for the next timeframe is adjusted slightly up or down.</p>
 <p>This flow can be visualized as follows:</p>
 <p><img src="blockchain/raw/storage-markets/assets/storage-market-lifecycle.svg" alt="Storage market lifecycle flow" /></p>
 <p>This model provides the best of both worlds: users have perfect price clarity for the duration of a timeframe, while the system as a whole can gracefully adapt to evolving market conditions over time.</p>
 <h1 id="construction-6"><a class="header" href="#construction-6">Construction</a></h1>
 <p>This section defines the precise algorithm, constants, and state variables for the Logos Blockchain Storage TFM.</p>
 <h2 id="core-fee-equation"><a class="header" href="#core-fee-equation">Core Fee Equation</a></h2>
-<p>The fee for a Logos Blockchain Storage transaction, <span class="math-inline" data-tex="F_{\text{STR}}"></span>, is a linear function of Logos Blockchain Storage Gas' size, <span class="math-inline" data-tex="S_{\text{gas}}"></span>, and the price-per-gas for the current timeframe, <span class="math-inline" data-tex="P_{\text{STR}}(s)"></span>.</p>
-<div class="math-block" data-tex="F_{\text{STR}} = S_{\text{gas}} \cdot P_{\text{STR}}(s)"></div>
-<p>As a remark, the equation above assumes a linear increase of <span class="math-inline" data-tex="F_\text{STR}"></span> with respect to <span class="math-inline" data-tex="S_\text{gas}"></span>. For completeness, a more general version can be</p>
-<div class="math-block" data-tex="\begin{align*}&#10;F_\text{STR}=f(S_\text{gas})\cdot P_\text{STR}&#10;\end{align*}"></div>
+<p>The fee for a Logos Blockchain Storage transaction, <span class="math-inline" data-tex="F_{\text{storage}}"></span>, is a linear function of Logos Blockchain Storage Gas' size, <span class="math-inline" data-tex="S_{\text{gas}}"></span>, and the price-per-gas for the current timeframe, <span class="math-inline" data-tex="P_{\text{storage}}(s)"></span>.</p>
+<div class="math-block" data-tex="F_{\text{storage}} = S_{\text{gas}} \cdot P_{\text{storage}}(s)"></div>
+<p>As a remark, the equation above assumes a linear increase of <span class="math-inline" data-tex="F_\text{storage}"></span> with respect to <span class="math-inline" data-tex="S_\text{gas}"></span>. For completeness, a more general version can be</p>
+<div class="math-block" data-tex="\begin{align*}&#10;F_\text{storage}=f(S_\text{gas})\cdot P_\text{storage}&#10;\end{align*}"></div>
 <p>with <span class="math-inline" data-tex="f:\mathbb{N}\to\mathbb{R}_+"></span> a monotonically increasing function. Making f sublinear can be understood as accounting for economies of scale, while making <span class="math-inline" data-tex="f"></span> superlinear can be understood as a penalization for using larger data sizes. We decided to go with the linear form of <span class="math-inline" data-tex="f"></span> as it was the least opinionated. Examples of this could be</p>
-<div class="math-block" data-tex="\begin{align*}&#10;F_\text{STR}^\text{exp}&amp;=\exp(\alpha S_\text{gas})\cdot P_\text{STR}\quad \alpha &gt;0\\&#10;F_\text{poly}^\text{exp}&amp;=S^\beta_\text{gas}\cdot P_\text{STR},\quad \beta&gt;1\\&#10;\end{align*}"></div>
+<div class="math-block" data-tex="\begin{align*}&#10;F_\text{storage}^\text{exp}&amp;=\exp(\alpha S_\text{gas})\cdot P_\text{storage}\quad \alpha &gt;0\\&#10;F_\text{poly}^\text{exp}&amp;=S^\beta_\text{gas}\cdot P_\text{storage},\quad \beta&gt;1\\&#10;\end{align*}"></div>
+<h3 id="fee-routing"><a class="header" href="#fee-routing">Fee Routing</a></h3>
+<p>Each Logos Blockchain Storage fee <span class="math-inline" data-tex="F_{\text{storage}}"></span> is routed in full into the network's shared rewards pool at the moment its transaction is included, rather than paid to any participant or removed from supply. This is the same pool fed by the <a href="blockchain/raw/execution-market.html">Execution Market</a> and drawn down to pay leaders and Blend nodes.</p>
+<p>Aggregated over a block, the Storage fees of its transactions form the Storage-market component of the per-block pool inflow <span class="math-inline" data-tex="R_{block}"></span> used to compute block rewards:</p>
+<div class="math-block" data-tex="\hat{R}_{\text{storage}} = \sum_{t \in \mathcal{B}} S_{\text{gas}}(t) \cdot P_{\text{storage}}(s) = P_{\text{storage}}(s) \sum_{t \in \mathcal{B}} S_{\text{gas}}(t),"></div>
+<p>where <span class="math-inline" data-tex="\mathcal{B}"></span> is the set of transactions in the block, <span class="math-inline" data-tex="S_{\text{gas}}(t)"></span> is the Logos Blockchain Storage Gas consumed by transaction <span class="math-inline" data-tex="t"></span>, and <span class="math-inline" data-tex="P_{\text{storage}}(s)"></span> is the fixed price of the enclosing timeframe <span class="math-inline" data-tex="s"></span>. The Execution market contributes the remaining component of <span class="math-inline" data-tex="R_{block}"></span>, the pooled base fees <span class="math-inline" data-tex="\hat{R}_{\text{pooled}}"></span> (cf. <a href="blockchain/raw/execution-market.html">Execution Market</a>), giving <span class="math-inline" data-tex="R_{block} = \hat{R}_{\text{storage}} + \hat{R}_{\text{pooled}}"></span>. This pooled inflow is distributed to leaders and Blend nodes through the reward mechanism of <a href="blockchain/raw/block-rewards.html">Block Rewards</a>. The Storage market governs only the price <span class="math-inline" data-tex="P_{\text{storage}}(s)"></span>; the routing and subsequent distribution of the resulting fee are defined by the block-reward mechanism.</p>
 <h3 id="protocol-constants"><a class="header" href="#protocol-constants">Protocol Constants</a></h3>
 <p>To ensure on-chain efficiency, the protocol shall use an Exponential Moving Average (EMA) for its adaptive target calculation. The behavior of the TFM is governed by the following on-chain constants, which are set at genesis.</p>
 <div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Name</th><th>Description</th><th>Initial Value</th><th>Justification</th></tr></thead><tbody>
@@ -37897,7 +37942,7 @@ This material, including any linked pages or documents, is provided for informat
 <tr><td><span class="math-inline" data-tex="\alpha"></span></td><td>Max Adjustment Factor</td><td>The maximum fractional amount the price can change per timeframe. Acts as "safety brakes" to bound price volatility.</td><td>0.125 for Permanent Storage</td><td>A <span class="math-inline" data-tex="100\alpha"></span>% cap provides strong predictability for users planning across timeframes while allowing the price to respond effectively to sustained demand changes.</td></tr>
 <tr><td><span class="math-inline" data-tex="\beta"></span></td><td>EMA Smoothing Factor</td><td>A coefficient in <span class="math-inline" data-tex="[0, 1]"></span> controlling the responsiveness of the usage EMA. It governs the speed of adaptation.</td><td>0.5 for Permanent Storage</td><td>A value of <span class="math-inline" data-tex="\beta"></span> gives significant weight to the most recent timeframe's usage while incorporating the "memory" of the system with a half-life of 1 timeframe, balancing responsiveness and stability.</td></tr>
 <tr><td><span class="math-inline" data-tex="T_{\text{RA}}(-1)"></span></td><td>Initial Usage EMA</td><td>First value for EMA</td><td>0 (=<span class="math-inline" data-tex="T_{\text{base}}"></span>)</td><td>Given <span class="math-inline" data-tex="T_{\text{base}} = 0"></span>, this is the least opinionated choice: with no prior usage data at genesis, a neutral prior of zero makes no assumption about initial market activity and anchors the EMA to the long-term policy goal from the outset.</td></tr>
-<tr><td><span class="math-inline" data-tex="P_{\text{STR}}(0)"></span></td><td>Initial Price</td><td>The price on the first epoch</td><td>1 LGO/gas</td><td>The initial price is set conservatively low at the beginning and let to discover the true market price</td></tr>
+<tr><td><span class="math-inline" data-tex="P_{\text{storage}}(0)"></span></td><td>Initial Price</td><td>The price on the first epoch</td><td>1 LGO/gas</td><td>The initial price is set conservatively low at the beginning and let to discover the true market price</td></tr>
 <tr><td><span class="math-inline" data-tex="s"></span></td><td>timeframe</td><td>How often things adjust</td><td>1 epoch</td><td>Primary users of the Storage market plan operational costs over days or weeks, not block-by-block.</td></tr>
 </tbody></table>
 </div>
@@ -37915,17 +37960,17 @@ This material, including any linked pages or documents, is provided for informat
 <li>
 <p>The seed value for the EMA is set to <span class="math-inline" data-tex="T_{\text{RA}}(-1) = T_{\text{base}} = 0"></span>.  Given <span class="math-inline" data-tex="T_{\text{base}} = 0"></span>, this is the least opinionated choice: with no prior usage data at genesis, a neutral prior of zero makes no assumption about initial market activity and anchors the EMA to the long-term policy goal from the outset.</p>
 <blockquote>
-<p><strong>Why is the index <span class="math-inline" data-tex="-1"></span>, not <span class="math-inline" data-tex="0"></span>?</strong> The price update algorithm runs at the end of timeframe <span class="math-inline" data-tex="s"></span> and requires <span class="math-inline" data-tex="T_{\text{RA}}(s-1)"></span> as its prior EMA value. When <span class="math-inline" data-tex="s = 0"></span>, the algorithm therefore requires <span class="math-inline" data-tex="T_{\text{RA}}(-1)"></span> as its seed. The value <span class="math-inline" data-tex="T_{\text{RA}}(0)"></span> is already a well-defined computed quantity  the EMA produced after the first epoch's observed usage: <span class="math-inline" data-tex="T_{\text{RA}}(0) = \beta \cdot C_{\text{usage}}(0) + (1-\beta) \cdot T_{\text{RA}}(-1)"></span>. Using index <span class="math-inline" data-tex="-1"></span> for the seed avoids a naming collision with this computed value. Implementation note. With <span class="math-inline" data-tex="w = 0"></span> and <span class="math-inline" data-tex="T_{\text{RA}}(-1) = 0"></span>, the effective target <span class="math-inline" data-tex="T_{\text{effective}}"></span> will be zero during the first epoch unless <span class="math-inline" data-tex="C_{\text{usage}}(0) \gt 0"></span>. The reference implementation handles this correctly via the <code>if usage == 0: return prev_price</code> guard, which holds the price at <span class="math-inline" data-tex="P_{\text{STR}}(0)"></span> until the first non-zero usage epoch provides a meaningful signal. This is the intended behavior at genesis.</p>
+<p><strong>Why is the index <span class="math-inline" data-tex="-1"></span>, not <span class="math-inline" data-tex="0"></span>?</strong> The price update algorithm runs at the end of timeframe <span class="math-inline" data-tex="s"></span> and requires <span class="math-inline" data-tex="T_{\text{RA}}(s-1)"></span> as its prior EMA value. When <span class="math-inline" data-tex="s = 0"></span>, the algorithm therefore requires <span class="math-inline" data-tex="T_{\text{RA}}(-1)"></span> as its seed. The value <span class="math-inline" data-tex="T_{\text{RA}}(0)"></span> is already a well-defined computed quantity  the EMA produced after the first epoch's observed usage: <span class="math-inline" data-tex="T_{\text{RA}}(0) = \beta \cdot C_{\text{usage}}(0) + (1-\beta) \cdot T_{\text{RA}}(-1)"></span>. Using index <span class="math-inline" data-tex="-1"></span> for the seed avoids a naming collision with this computed value. Implementation note. With <span class="math-inline" data-tex="w = 0"></span> and <span class="math-inline" data-tex="T_{\text{RA}}(-1) = 0"></span>, the effective target <span class="math-inline" data-tex="T_{\text{effective}}"></span> will be zero during the first epoch unless <span class="math-inline" data-tex="C_{\text{usage}}(0) \gt 0"></span>. The reference implementation handles this correctly via the <code>if usage == 0: return prev_price</code> guard, which holds the price at <span class="math-inline" data-tex="P_{\text{storage}}(0)"></span> until the first non-zero usage epoch provides a meaningful signal. This is the intended behavior at genesis.</p>
 </blockquote>
 </li>
 <li>
-<p>The precise value of <span class="math-inline" data-tex="P_{\text{STR}}(0)"></span> is not critical to the long-term behavior of the mechanism. As established in the equilibrium analysis, the price update rule converges autonomously to the market-clearing price <span class="math-inline" data-tex="P^*"></span> regardless of the starting point, provided the stability condition <span class="math-inline" data-tex="(*)"></span> holds (see <a href="blockchain/raw/analysis-storage-market.html#price-stability-analysis">[Analysis] Storage Market - Price Stability Analysis</a>). The only hard requirement is for <span class="math-inline" data-tex="P_{\text{STR}}(0)"></span> to be sufficiently low so as not to suppress early adoption before the mechanism has observed enough demand to self-correct.</p>
+<p>The precise value of <span class="math-inline" data-tex="P_{\text{storage}}(0)"></span> is not critical to the long-term behavior of the mechanism. As established in the equilibrium analysis, the price update rule converges autonomously to the market-clearing price <span class="math-inline" data-tex="P^*"></span> regardless of the starting point, provided the stability condition <span class="math-inline" data-tex="(*)"></span> holds (see <a href="blockchain/raw/analysis-storage-market.html#price-stability-analysis">[Analysis] Storage Market - Price Stability Analysis</a>). The only hard requirement is for <span class="math-inline" data-tex="P_{\text{storage}}(0)"></span> to be sufficiently low so as not to suppress early adoption before the mechanism has observed enough demand to self-correct.</p>
 <p>More precisely, since the price can increase by at most <span class="math-inline" data-tex="\alpha = 12.5\%"></span> per epoch, the number
-of epochs required to reach a target price <span class="math-inline" data-tex="P^*"></span> from an initial price <span class="math-inline" data-tex="P_{\text{STR}}(0) \lt P^*"></span> is bounded above by <span class="math-inline" data-tex="N \leq \left\lceil \log_{1+\alpha}\!\left(\frac{P^*}{P_{\text{STR}}(0)}\right) \right\rceil = \left\lceil \frac{\ln(P^*/P_{\text{STR}}(0))}{\ln(1.125)} \right\rceil"></span>.</p>
-<p>For example, if <span class="math-inline" data-tex="P_{\text{STR}}(0)"></span> is set to one tenth of the true equilibrium price, the mechanism reaches <span class="math-inline" data-tex="P^*"></span> within at most <span class="math-inline" data-tex="\lceil \ln(10)/\ln(1.125) \rceil = 20"></span> epochs. Starting
+of epochs required to reach a target price <span class="math-inline" data-tex="P^*"></span> from an initial price <span class="math-inline" data-tex="P_{\text{storage}}(0) \lt P^*"></span> is bounded above by <span class="math-inline" data-tex="N \leq \left\lceil \log_{1+\alpha}\!\left(\frac{P^*}{P_{\text{storage}}(0)}\right) \right\rceil = \left\lceil \frac{\ln(P^*/P_{\text{storage}}(0))}{\ln(1.125)} \right\rceil"></span>.</p>
+<p>For example, if <span class="math-inline" data-tex="P_{\text{storage}}(0)"></span> is set to one tenth of the true equilibrium price, the mechanism reaches <span class="math-inline" data-tex="P^*"></span> within at most <span class="math-inline" data-tex="\lceil \ln(10)/\ln(1.125) \rceil = 20"></span> epochs. Starting
 one hundredth below requires at most <span class="math-inline" data-tex="40"></span> epochs. Both are negligible relative to the expected lifetime of the network.
-We therefore set <span class="math-inline" data-tex="P_{\text{STR}}(0) = 1\ \text{LGO per Permanent Storage Gas}"></span>.</p>
-<p>This corresponds to a cost of 1 LGO per permanently stored byte. Genesis governance may adjust this value based on the LGO price at TGE, but the adjustment has no long-term consequence: the mechanism will converge to the true market price <span class="math-inline" data-tex="P^*"></span> within <span class="math-inline" data-tex="O(\log P^*/P_{\text{STR}}(0))"></span> epochs regardless.</p>
+We therefore set <span class="math-inline" data-tex="P_{\text{storage}}(0) = 1\ \text{LGO per Permanent Storage Gas}"></span>.</p>
+<p>This corresponds to a cost of 1 LGO per permanently stored byte. Genesis governance may adjust this value based on the LGO price at TGE, but the adjustment has no long-term consequence: the mechanism will converge to the true market price <span class="math-inline" data-tex="P^*"></span> within <span class="math-inline" data-tex="O(\log P^*/P_{\text{storage}}(0))"></span> epochs regardless.</p>
 </li>
 <li>
 <p>The timeframe <span class="math-inline" data-tex="s"></span> corresponds to one epoch. The core reason is that the primary users of the Storage market plan operational costs over days or weeks, not block-by-block. An epoch-length timeframe provides price certainty over hundreds of blocks, directly fulfilling the predictability requirement. It also ensures the EMA aggregates a meaningful volume of usage data before influencing the price, rather than reacting to per-block noise.</p>
@@ -37934,12 +37979,12 @@ We therefore set <span class="math-inline" data-tex="P_{\text{STR}}(0) = 1\ \tex
 <h3 id="state-variables"><a class="header" href="#state-variables">State Variables</a></h3>
 <p>The protocol must maintain the following state variables, updated at the end of each timeframe:</p>
 <div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Name</th><th>Description</th></tr></thead><tbody>
-<tr><td><span class="math-inline" data-tex="P_{\text{STR}}(s)"></span></td><td>Price Per Logos Blockchain Storage Gas</td><td>The price per Gas of storage for the current timeframe <span class="math-inline" data-tex="s"></span>.</td></tr>
+<tr><td><span class="math-inline" data-tex="P_{\text{storage}}(s)"></span></td><td>Price Per Logos Blockchain Storage Gas</td><td>The price per Gas of storage for the current timeframe <span class="math-inline" data-tex="s"></span>.</td></tr>
 <tr><td><span class="math-inline" data-tex="T_{\text{RA}}(s)"></span></td><td>Usage EMA</td><td>The Exponential Moving Average of storage usage, updated with the usage from timeframe <span class="math-inline" data-tex="s"></span>.</td></tr>
 </tbody></table>
 </div>
 <h3 id="price-update-algorithm"><a class="header" href="#price-update-algorithm">Price Update Algorithm</a></h3>
-<p>At the conclusion of each timeframe <span class="math-inline" data-tex="s"></span>, the protocol shall execute the following algorithm to determine the price for the next timeframe, <span class="math-inline" data-tex="P_{\text{STR}}(s+1)"></span>. This is done as follows.</p>
+<p>At the conclusion of each timeframe <span class="math-inline" data-tex="s"></span>, the protocol shall execute the following algorithm to determine the price for the next timeframe, <span class="math-inline" data-tex="P_{\text{storage}}(s+1)"></span>. This is done as follows.</p>
 <ol>
 <li>
 <p>Tally Usage: Aggregate the total Logos Blockchain Storage Gas consumed during timeframe <span class="math-inline" data-tex="s"></span> into a final value, <span class="math-inline" data-tex="C_{\text{usage}}(s)=\sum_{t\in\mathcal{B}_s}\mathsf{StorageGasUsed}[t]"></span>, where <span class="math-inline" data-tex="\mathcal{B}_s"></span> corresponds to one block in timeframe <span class="math-inline" data-tex="s"></span> and <span class="math-inline" data-tex="\mathsf{StorageGasUsed}[t]"></span> corresponds to the Logos Blockchain Storage Gas used by transaction <span class="math-inline" data-tex="t"></span>.</p>
@@ -37963,17 +38008,17 @@ We therefore set <span class="math-inline" data-tex="P_{\text{STR}}(0) = 1\ \tex
 </li>
 </ul>
 <ol start="5">
-<li>Update Price: Calculate the price for the next timeframe, <span class="math-inline" data-tex="s+1"></span>: <span class="math-inline" data-tex="P_{\mathrm{STR}}(s+1) = P_{\mathrm{STR}}(s) \cdot [1 + \mathrm{clampedAdjustment}(s)]"></span></li>
+<li>Update Price: Calculate the price for the next timeframe, <span class="math-inline" data-tex="s+1"></span>: <span class="math-inline" data-tex="P_{\mathrm{storage}}(s+1) = P_{\mathrm{storage}}(s) \cdot [1 + \mathrm{clampedAdjustment}(s)]"></span></li>
 </ol>
 <h3 id="implementation"><a class="header" href="#implementation">Implementation</a></h3>
 <p>Because computation affect consensus state, the implementation must be fully deterministic across all nodes. For that reason, the normative implementation of the reward function should not rely on floating-point arithmetic, machine-dependent rounding behavior, or comparisons against machine epsilon. Earlier sections use real-valued formulas to explain the mechanism and its economic meaning, but the consensus rule itself should be defined only in terms of integer arithmetic.</p>
 <p>The goal of this section is not to change the execution mechanism. It is only to restate the already-specified mechanism in a canonical deterministic form with explicit named constants. To we provide here a reference implementation that uses unsigned integers to have a common reference.</p>
 <p>First because we have <span class="math-inline" data-tex="w = 0"></span>, <span class="math-inline" data-tex="T_\text{RA}(s) = T_\text{effective}(s)"></span>. Then because <span class="math-inline" data-tex="\beta=0.5"></span></p>
 <div class="math-block" data-tex="T_{\mathrm{RA}}(s)=\frac{C_{\mathrm{usage}}(s)+T_{\mathrm{RA}}(s-1)}{2}"></div>
-<p>Secondly, we can rewrite <span class="math-inline" data-tex="P_\text{STR}"></span> equation:</p>
-<div class="math-block" data-tex="\begin{align*}&#10;P_{\mathrm{STR}}(s+1)&#10;&amp;= P_{\mathrm{STR}}(s) \cdot&#10;\left[1 + \max\bigl(-\alpha,\,&#10;\min\bigl(\alpha,\, \mathrm{adjustment}(s)\bigr)&#10;\bigr)\right]\\&#10;&amp;= P_{\mathrm{STR}}(s) \cdot&#10;\max\bigl(1-\alpha,\,&#10;\min\bigl(1+\alpha,\, 1+\mathrm{adjustment}(s)\bigr)&#10;\bigr)\\&#10;&amp;= P_{\mathrm{STR}}(s)\cdot&#10;\max\biggl(\frac78,\,&#10;\min\biggl(\frac98,\,&#10;\frac{C_{\mathrm{usage}}(s)}{T_{\mathrm{RA}}(s)}&#10;\biggr)&#10;\biggr)&#10;\end{align*}"></div>
+<p>Secondly, we can rewrite <span class="math-inline" data-tex="P_\text{storage}"></span> equation:</p>
+<div class="math-block" data-tex="\begin{align*}&#10;P_{\mathrm{storage}}(s+1)&#10;&amp;= P_{\mathrm{storage}}(s) \cdot&#10;\left[1 + \max\bigl(-\alpha,\,&#10;\min\bigl(\alpha,\, \mathrm{adjustment}(s)\bigr)&#10;\bigr)\right]\\&#10;&amp;= P_{\mathrm{storage}}(s) \cdot&#10;\max\bigl(1-\alpha,\,&#10;\min\bigl(1+\alpha,\, 1+\mathrm{adjustment}(s)\bigr)&#10;\bigr)\\&#10;&amp;= P_{\mathrm{storage}}(s)\cdot&#10;\max\biggl(\frac78,\,&#10;\min\biggl(\frac98,\,&#10;\frac{C_{\mathrm{usage}}(s)}{T_{\mathrm{RA}}(s)}&#10;\biggr)&#10;\biggr)&#10;\end{align*}"></div>
 <p>and so:</p>
-<p><span class="math-inline" data-tex="P_{\mathrm{STR}}(s+1)=\begin{cases}P_{\mathrm{STR}}(s),&amp; \text{if } T_{\mathrm{RA}}(s)=0,\\[6pt]\left\lceil P_{\mathrm{STR}}(s)\cdot \frac78 \right\rceil,&amp; \text{if } 8\,C_{\mathrm{usage}}(s)\le 7\,T_{\mathrm{RA}}(s),\\[6pt]\left\lceil P_{\mathrm{STR}}(s)\cdot \frac98 \right\rceil,&amp; \text{if } 8\,C_{\mathrm{usage}}(s)\ge 9\,T_{\mathrm{RA}}(s),\\[6pt]\left\lceil P_{\mathrm{STR}}(s)\cdot\frac{C_{\mathrm{usage}}(s)}{T_{\mathrm{RA}}(s)} \right\rceil,&amp; \text{otherwise.}\end{cases}"></span></p>
+<p><span class="math-inline" data-tex="P_{\mathrm{storage}}(s+1)=\begin{cases}P_{\mathrm{storage}}(s),&amp; \text{if } T_{\mathrm{RA}}(s)=0,\\[6pt]\left\lceil P_{\mathrm{storage}}(s)\cdot \frac78 \right\rceil,&amp; \text{if } 8\,C_{\mathrm{usage}}(s)\le 7\,T_{\mathrm{RA}}(s),\\[6pt]\left\lceil P_{\mathrm{storage}}(s)\cdot \frac98 \right\rceil,&amp; \text{if } 8\,C_{\mathrm{usage}}(s)\ge 9\,T_{\mathrm{RA}}(s),\\[6pt]\left\lceil P_{\mathrm{storage}}(s)\cdot\frac{C_{\mathrm{usage}}(s)}{T_{\mathrm{RA}}(s)} \right\rceil,&amp; \text{otherwise.}\end{cases}"></span></p>
 <p>The first case is the genesis guard discussed in the parameter justification: an effective target of zero carries no demand signal, so the price is held until the first epoch with a non-zero usage EMA. In the three adjustment cases the price is rounded upwards, while the usage EMA <span class="math-inline" data-tex="T_{\mathrm{RA}}(s)"></span> is rounded downwards, and so we can derive the following reference code:</p>
 <pre><code class="language-python">EMA_DENOMINATOR = 2         # 1/beta
 CLAMP_DENOMINATOR = 8       # denominator of 1+ alpha and 1-alpha
@@ -38001,7 +38046,7 @@ def update_storage_fee(total_gas_consumed: int, prev_price: int, prev_usage: int
     price = update_storage_price(prev_price, total_gas_consumed, usage)
     return price, usage
 </code></pre>
-<p>The two rounding directions are not interchangeable. The price is multiplied by a factor smaller than one whenever usage falls below the target, so rounding it downwards would make 0 an absorbing state: the initial price <span class="math-inline" data-tex="P_{\mathrm{STR}}(0)=1"></span> would be mapped to 0 by the first downward adjustment, and every subsequent update would keep it at 0, making Permanent Storage permanently free. Rounding upwards makes 1 LGO per Permanent Storage Gas the effective floor of the price and leaves the mechanism unchanged at every other price level, as the rounding error is at most one unit against an adjustment of up to <span class="math-inline" data-tex="\pm 12.5\%"></span>. The usage EMA is a measurement rather than a price and is not subject to this failure mode, as it is additive and recovers from 0 as soon as usage resumes. Rounding it upwards would instead pin it at 1 once it has been positive, reporting residual demand on an idle market.</p>
+<p>The two rounding directions are not interchangeable. The price is multiplied by a factor smaller than one whenever usage falls below the target, so rounding it downwards would make 0 an absorbing state: the initial price <span class="math-inline" data-tex="P_{\mathrm{storage}}(0)=1"></span> would be mapped to 0 by the first downward adjustment, and every subsequent update would keep it at 0, making Permanent Storage permanently free. Rounding upwards makes 1 LGO per Permanent Storage Gas the effective floor of the price and leaves the mechanism unchanged at every other price level, as the rounding error is at most one unit against an adjustment of up to <span class="math-inline" data-tex="\pm 12.5\%"></span>. The usage EMA is a measurement rather than a price and is not subject to this failure mode, as it is additive and recovers from 0 as soon as usage resumes. Rounding it upwards would instead pin it at 1 once it has been positive, reporting residual demand on an idle market.</p>
 <h3 id="genesis-state"><a class="header" href="#genesis-state">Genesis State</a></h3>
 <p>The initial state of the TFM at network launch shall be configured as follows:</p>
 <ul>
