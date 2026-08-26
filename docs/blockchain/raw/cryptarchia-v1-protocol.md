@@ -31,6 +31,7 @@
 | 1.1.1 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
 | 1.2.0 | Added [uncle references](#uncle-references): a block carries the signed headers of the fork blocks it references, every carried entry must be valid for the block itself to be valid, and the [Total Stake Inference](#total-stake-inference) counts their slots. Replaced `block_root` with `body_root`, which commits to those headers as well as to the transactions. | 2026-08-06 |
 | 1.2.1 | Defined `EpochNumber`, the type of an epoch number, as a 32-bit unsigned integer encoded little-endian wherever it is serialized or hashed. | 2026-08-25 |
+| 1.2.2 | Precise, in [Chain Maintenance](#chain-maintenance), that the execution layer validates the block by applying its transactions in the order they appear starting from the parent block's execution state. | 2026-08-25 |
 
 # Introduction
 
@@ -454,7 +455,7 @@ We say $`\textbf{valid\_header}(B)`$ returns True if all of the following constr
 
 We define the chain maintenance procedure $`\textbf{on\_block}(state,B)`$ that governs how the block tree $`T`$ is updated.
 
-**Note:** It’s assumed that block contents have already been validated by the execution layer w.r.t. the parent block’s execution state.
+**Note:** It’s assumed that block contents have already been validated by the execution layer, by applying the transactions of the block in the order they appear starting from the parent block’s execution state, as defined in [Block Proposal Validation](bedrock-v1.1-block-construction.md#block-proposal-validation).
 
 $`\text{define } \textbf{on\_block}(state, B)\to state'`$:
 
