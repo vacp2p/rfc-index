@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -210,12 +211,13 @@
 <tr><td>1.1.2</td><td>Precise that the maximum block size applies to the block body only.</td><td>2026-07-27</td></tr>
 <tr><td>1.1.3</td><td>Corrected <code>MAX_BLOCK_SIZE</code> to 2 MiB, to match the implementation.</td><td>2026-08-05</td></tr>
 <tr><td>1.2.0</td><td>Added the <code>uncle_headers</code> field — the signed headers of the referenced uncles — to the <a href="#block-proposal">Proposal</a> and to the newly defined <a href="#block">Block</a>, and replaced <code>block_root</code> with <code>body_root</code> in the <a href="#header">Header</a>, which commits to them, signatures included, as well as to the transactions. Due to updated <a href="cryptarchia-v1-protocol.html">Cryptarchia Protocol</a> (uncle references).</td><td>2026-08-06</td></tr>
+<tr><td>1.2.1</td><td>Precise the state each transaction of a block is validated against: the transactions are validated and executed one after the other in the order they appear, each against the state the preceding ones left, which makes block validity order-dependent. Precise that a block whose validation fails at any point is not executed at all.</td><td>2026-08-24</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <p>In this document, we present the specification defining the construction of the block proposal, its validation, and execution. We define the block proposal construction that contains references to transactions (from the mempool) instead of a complete transaction to limit its length. The raw block body increases with the size of transactions it contains up to <code>MAX_BLOCK_SIZE</code>, which is 2 MiB and covers the transactions only, and the proposal compresses its size down to 33 kB, which saves the bandwidth necessary to broadcast new blocks.</p>
 <h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
-<p>For the consensus protocol to make progress, a new <strong>leader</strong> is elected through the leader lottery. The new leader is in possession of a proof of leadership (PoL) that confirms that it is indeed the leader. The main objective of the leader is to construct a new block, hence becoming a <strong>block builder,</strong> and share it with other members of the network as a <strong>block proposer</strong>. The block must be correctly constructed; otherwise, it will be rejected by the consensus nodes who are validating every block. Only validated blocks are executed, which means that the transactions included in the block are interpreted by all nodes, and the state of the chain is modified according to the instructions embedded in the transactions.</p>
+<p>For the consensus protocol to make progress, a new <strong>leader</strong> is elected through the leader lottery. The new leader is in possession of a proof of leadership (PoL) that confirms that it is indeed the leader. The main objective of the leader is to construct a new block, hence becoming a <strong>block builder,</strong> and share it with other members of the network as a <strong>block proposer</strong>. The block must be correctly constructed; otherwise, it will be rejected by the consensus nodes who are validating every block. Only a block that validates in full modifies the state of the chain: the transactions it includes are interpreted by all nodes, one after the other in the order they appear, and the state of the chain is modified according to the instructions embedded in them.</p>
 <h2 id="high-level-flow"><a class="header" href="#high-level-flow">High-level Flow</a></h2>
 <p>Below, we present a high-level description of the block lifecycle. The main focus of this section is to build an intuition on the block construction, validation, and execution.</p>
 <ol>
@@ -224,15 +226,11 @@
 </li>
 <li>
 <p>The block builder <strong>constructs</strong> a block proposal.</p>
-</li>
-<li>
-<p>The block builder selects the latest block (parent) as the reference point for the chain state update.</p>
-</li>
-<li>
-<p>The block builder selects valid Mantle Transactions (as defined in <a href="bedrock-v1.1-mantle-specification.html">Mantle</a>) from its mempool and includes references to them in the proposal.</p>
-</li>
-<li>
-<p>The block builder populates the block header of the block proposal.</p>
+<ol>
+<li>The block builder selects the latest block (parent) as the reference point for the chain state update.</li>
+<li>The block builder selects valid Mantle Transactions (as defined in <a href="bedrock-v1.1-mantle-specification.html">Mantle</a>) from its mempool and includes references to them in the proposal.</li>
+<li>The block builder populates the block header of the block proposal.</li>
+</ol>
 </li>
 <li>
 <p>The block proposer sends the block proposal to the Blend network.</p>
@@ -242,27 +240,19 @@
 </li>
 <li>
 <p>The validators <strong>validate</strong> the block proposal.</p>
-</li>
-<li>
-<p>They validate the block header.</p>
-</li>
-<li>
-<p>They retrieve complete transactions from their mempool that are referred in the block.</p>
-</li>
-<li>
-<p>They validate each transaction included in the block.</p>
+<ol>
+<li>They validate the block header.</li>
+<li>They retrieve complete transactions from their mempool that are referred in the block.</li>
+<li>They validate each transaction included in the block, in the order the transactions appear, each against the state the preceding ones left.</li>
+</ol>
 </li>
 <li>
 <p>The validators <strong>execute</strong> the block proposal.</p>
-</li>
-<li>
-<p>They derive the new blockchain state from the previous one by executing transactions as defined in <a href="bedrock-v1.1-mantle-specification.html">Mantle</a>.</p>
-</li>
-<li>
-<p>They update the different variables that need to be maintained over time.</p>
-</li>
-<li>
-<p>They execute the <a href="bedrock-service-reward-distribution.html"><strong>Service Reward Distribution Protocol</strong></a> to generate reward notes locally.</p>
+<ol>
+<li>They append the <code>leader_voucher</code> of the block to the set of reward vouchers, which the following epoch starts with.</li>
+<li>They execute the <a href="bedrock-service-reward-distribution.html"><strong>Service Reward Distribution Protocol</strong></a> to generate reward notes locally and include them in the ledger.</li>
+<li>They derive the new blockchain state from the previous one by executing transactions as defined in <a href="bedrock-v1.1-mantle-specification.html">Mantle</a>, in that same pass, adopting the result only once the whole block has validated.</li>
+</ol>
 </li>
 </ol>
 <h1 id="constructions"><a class="header" href="#constructions">Constructions</a></h1>
@@ -392,12 +382,7 @@ class SignedHeader:                                 # 361 bytes
 <p>Select Mantle transactions:</p>
 <ul>
 <li>Choose up to <code>1024</code> valid <code>SignedMantleTx</code> from the local mempool.</li>
-<li>Ensure each transaction:
-<ul>
-<li>Is valid according to <a href="bedrock-v1.1-mantle-specification.html">Mantle</a>.</li>
-<li>Has no conflicts with others (e.g., two transactions trying to spend the same note).</li>
-</ul>
-</li>
+<li>Ensure the selected transactions, in the order they are placed in, form a sequence that is valid under <a href="#block-proposal-validation">Block Proposal Validation</a>.</li>
 </ul>
 </li>
 <li>
@@ -460,18 +445,22 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 </li>
 <li>
 <p><strong>Mempool Transactions Validation</strong>
-<code>mempool_transactions</code> must refer to a valid sequence of Mantle Transactions from the mempool. Each transaction must be valid according to the rules defined in the <a href="bedrock-v1.1-mantle-specification.html">Mantle</a>. In order to verify ZK proofs, they are batched for verification as explained in <a href="#batch-verification-of-zk-proofs">Batch verification of ZK proofs</a> to get better performance.</p>
+<code>mempool_transactions</code> must refer to a valid sequence of Mantle Transactions from the mempool. The transactions are validated in the order the <code>references</code> resolve them, against a state that advances with them: each transaction is validated against the state the transactions preceding it left, the first one against the state the block inherits once the steps of <a href="#block-execution">Block Execution</a> that precede it have been applied. Each transaction must be valid in that state according to the rules defined in the <a href="bedrock-v1.1-mantle-specification.html#validation">Mantle</a>, which validates and executes its Operations along that same progression. Validation and execution are therefore one pass over one state, not two.</p>
 </li>
 </ol>
-<p>If any of the above checks fail, the block proposal must be rejected.</p>
+<p>Block validity is consequently order-dependent, and the order the transactions appear in is normative. Two transactions consuming the same note make the block invalid whatever their order, since the second consumption finds the note gone; a transaction consuming a note an earlier transaction created is valid in that order and invalid in the reverse one.</p>
+<p>In order to verify ZK proofs, they are batched for verification as explained in <a href="#batch-verification-of-zk-proofs">Batch verification of ZK proofs</a> to get better performance. Batching covers the proof checks alone and does not change the state a transaction is validated in: the public inputs of every proof are taken from the state its transaction is reached in, and the state-dependent assertions still run in sequence.</p>
+<p>If any of the above checks fail, the block proposal must be rejected and nothing of it is executed. The state progression the pass builds is a working one, adopted as the new chain state only once the last transaction of the block has validated: a single failed check anywhere in the block, in any transaction, in any Operation of any transaction, invalidates the whole block, so a node rejecting it holds exactly the state it held before it started processing it.</p>
 <h2 id="block-execution"><a class="header" href="#block-execution">Block Execution</a></h2>
 <p>This section specifies how a Logos Blockchain node executes a valid block proposal to update its local state.</p>
-<p>Given a <code>ValidBlock</code> that has successfully passed proposal validation, the node must:</p>
+<p>Given a <code>ValidBlock</code> that has successfully passed proposal validation, the node must, in this order:</p>
 <ol>
 <li>Append the <code>leader_voucher</code> contained in the block to the set of reward vouchers <strong>when the following epoch starts</strong>.</li>
 <li>Execute the reward distribution protocol defined in <a href="bedrock-service-reward-distribution.html"><strong>Service Reward Distribution Protocol</strong></a> to generate reward notes locally and include them in the ledger.</li>
-<li>Execute the Mantle Transactions included in the block sequentially, using the execution rules defined in the <a href="bedrock-v1.1-mantle-specification.html">Mantle</a>.</li>
+<li>Execute the Mantle Transactions included in the block in the order they appear, using the execution rules defined in the <a href="bedrock-v1.1-mantle-specification.html">Mantle</a>.</li>
 </ol>
+<p>Steps 1 and 2 read the epoch and the state of the <a href="bedrock-service-declaration-protocol.html">Service Declaration Protocol</a>, never the transactions of the block, which is what lets them run before those transactions are validated and makes the reward notes of step 2 available to them.</p>
+<p>The three steps stand or fall together, on a block that has validated in full: a block that fails validation at any point is not executed at all. The voucher of step 1 is appended to the set the following epoch starts with, so it lands at the epoch boundary rather than with the other two.</p>
 <p>The carried <code>uncle_headers</code> are not executed. A referenced uncle is not part of the chain; therefore, its transactions have no effect on the ledger state. The uncles are used only as evidence of consensus participation for the <a href="cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a>.</p>
 <h1 id="annex"><a class="header" href="#annex">Annex</a></h1>
 <h2 id="batch-verification-of-zk-proofs"><a class="header" href="#batch-verification-of-zk-proofs">Batch verification of ZK proofs</a></h2>

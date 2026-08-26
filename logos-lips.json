@@ -527,7 +527,7 @@
     "title": "Execution Market",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-07-28",
+    "updated": "2026-08-26",
     "path": "blockchain/raw/execution-market.html"
   },
   {
@@ -941,7 +941,7 @@
     "title": "Block Construction, Validation and Execution",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-19",
+    "updated": "2026-08-26",
     "path": "blockchain/raw/bedrock-v1.1-block-construction.html"
   },
   {
@@ -986,7 +986,7 @@
     "title": "Mantle",
     "status": "raw",
     "category": "Informational",
-    "updated": "2026-08-24",
+    "updated": "2026-08-26",
     "path": "blockchain/raw/bedrock-v1.1-mantle-specification.html"
   },
   {

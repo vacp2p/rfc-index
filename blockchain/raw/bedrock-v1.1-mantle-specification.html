@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-08-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/91e5486791d2ad854029d3fb8ec16b1c5426b059/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>91e5486</code></a> — docs(blockchain): assert all inputs to be non empty (#399)</li>
 <li><strong>2026-08-07</strong> — <a href="https://github.com/logos-co/logos-lips/blob/4c22190fd0df0e7b10018fe6774a772fd7578c39/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>4c22190</code></a> — docs(blockchain): require checked arithmetic in Mantle spec (#369)</li>
@@ -222,6 +223,7 @@
 <tr><td>1.9.2</td><td>Required checked arithmetic for all token value, balance, gas, and fee computations.</td><td>2026-08-06</td></tr>
 <tr><td>1.10.0</td><td>Enforce non empty inputs for every operation not only transfer moving the assertion in the validation of input spendability</td><td>2026-08-11</td></tr>
 <tr><td>1.10.1</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code>: <code>ServiceType</code> is its one-byte discriminant and <code>Locator</code> is the multiaddr binary form. Added a <code>declaration_id</code> test vector</td><td>2026-08-14</td></tr>
+<tr><td>1.10.2</td><td>Precise the state validation reads: the Operations of a Mantle Transaction are validated and executed one after the other in the order they appear, each against the state the preceding ones left, and a Mantle Transaction against the state the transactions preceding it in the block left. Accumulated the transaction balance along that pass, replacing <code>get_transaction_balance</code></td><td>2026-08-24</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -230,9 +232,9 @@
 <p>Mantle manages assets using a note-based ledger that follows an UTXO model. Each Mantle Transaction can include Transfer Operation, and any excess balance serves as the fee payment.</p>
 <h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
 <h2 id="mantle-transaction"><a class="header" href="#mantle-transaction">Mantle Transaction</a></h2>
-<p>The features of the Logos Blockchain are exposed through Mantle Transactions. Each transaction can contain zero or more <strong>Operations</strong>. Mantle Transactions enable users to execute multiple Operations atomically.</p>
+<p>The features of the Logos Blockchain are exposed through Mantle Transactions. Each transaction can contain zero or more <strong>Operations</strong>. Mantle Transactions enable users to execute multiple Operations atomically: the Operations are applied one after the other in the order they appear, and either all of them take effect or none does.</p>
 <h2 id="mantle-operations"><a class="header" href="#mantle-operations">Mantle Operations</a></h2>
-<p>Logos Blockchain features are exposed through Mantle Operations, which can be combined and executed together in a single Mantle Transaction atomically. These Operations enable transfers and functions such as on-chain data posting, Cross-Zone interactions, SDP interaction, and leader reward claims.</p>
+<p>Logos Blockchain features are exposed through Mantle Operations, which can be combined in a single Mantle Transaction and executed atomically. These Operations enable transfers and functions such as on-chain data posting, Cross-Zone interactions, SDP interaction, and leader reward claims.</p>
 <h2 id="mantle-ledger"><a class="header" href="#mantle-ledger">Mantle Ledger</a></h2>
 <p>The Mantle Ledger enables asset transfers using a transparent UTXO model. While a Transfer Operation can consume more tokens than it creates, the Mantle Transaction excess balance must exactly pay for the fees. The ledger tracks three kinds of notes: regular notes, locked notes (collateral for service declarations) and channel notes (channel bridge funds eligible for PoS participation only).</p>
 <h2 id="transaction-fees"><a class="header" href="#transaction-fees">Transaction Fees</a></h2>
@@ -243,7 +245,7 @@
 </tbody></table>
 </div>
 <h1 id="mantle-transaction-1"><a class="header" href="#mantle-transaction-1">Mantle Transaction</a></h1>
-<p>Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes all Operations atomically, while using the Mantle Transaction's excess balance—calculated as the difference between the consumed and created value— as the fee payment.</p>
+<p>Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes the Operations atomically, while using the Mantle Transaction's excess balance, calculated as the difference between the consumed and created value, as the fee payment.</p>
 <pre><code class="language-python">class MantleTx:
     ops: list[Op]
 
@@ -292,7 +294,7 @@ def checked_int128(value: int) -&gt; int:
                    permanent_storage_gas_price: TokenValue, # Given by Storage Market
                    execution_gas_base_price: TokenValue) -&gt; uint64:  # Given by Execution Market
     mantle_tx = signed_tx.tx
-    permanent_storage_fees = checked_uint64(len(encode(signed_mantle_tx)) * permanent_storage_gas_price)
+    permanent_storage_fees = checked_uint64(len(encode(signed_tx)) * permanent_storage_gas_price)
     tx_execution_gas = 0
 
     for op in mantle_tx.ops:
@@ -310,7 +312,12 @@ def checked_int128(value: int) -&gt; int:
     tx=MantleTx(ops),
     op_proofs
 )
+
+permanent_storage_gas_price: TokenValue # Given by Storage Market
+execution_gas_base_price: TokenValue    # Given by Execution Market
 </code></pre>
+<p>The state validation reads is not a fixed snapshot: it advances as the block is processed. A Mantle Transaction is validated against the state left by the Mantle Transactions preceding it in the block, as defined in <a href="bedrock-v1.1-block-construction.html#block-proposal-validation">Block Proposal Validation</a>, and validation and execution then follow one another Operation by Operation, in the order the Operations appear: the Operation at index <code>i</code> is validated against the state the Operations at indices <code>0</code> to <code>i-1</code> left, then executed to produce the state the Operation at index <code>i+1</code> is validated against. This is what the <code>ledger</code>, <code>channels</code>, <code>locked_notes</code>, <code>declarations</code> and <code>voucher_nullifier_set</code> given to each Operation below denote.</p>
+<p>Atomicity is what a failed check means, not simultaneity. If any of the checks below fails, the whole Mantle Transaction is invalid: none of its Operations takes effect, whether or not it was reached. An invalid Mantle Transaction is never skipped over either, the block including it being invalid and nothing of that block being executed.</p>
 <p>Mantle validators will ensure the following:</p>
 <ol>
 <li>
@@ -319,34 +326,38 @@ def checked_int128(value: int) -&gt; int:
 </code></pre>
 </li>
 <li>
-<p>Each Operation is valid.</p>
-<pre><code class="language-python">for op, op_proof in zip(ops, op_proofs):
+<p>Each Operation is valid, and takes effect before the next one is validated. The transaction balance is accumulated over the same pass, so a <code>TRANSFER</code> consuming a note an earlier Operation created contributes that note's value like any other.</p>
+<pre><code class="language-python">tx_balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
+for op, op_proof in zip(ops, op_proofs):
     assert op.opcode in MANTLE_OPCODES
     validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof)
+    if op.opcode == TRANSFER:
+        for inp in op.inputs:
+            tx_balance = checked_int128(tx_balance + get_value_from_note_id(inp))
+        for out in op.outputs:
+            tx_balance = checked_int128(tx_balance - out.value)
+    execute_mantle_op(op.opcode, op.payload)
 
 def validate_mantle_op(txhash, opcode, payload, op_proof):
     if opcode == CHANNEL_INSCRIBE:
         validate_channel_inscribe(txhash, payload, op_proof)
     # elif opcode == ...
     #    ...
+
+def execute_mantle_op(opcode, payload):
+    if opcode == CHANNEL_INSCRIBE:
+        execute_channel_inscribe(payload)
+    # elif opcode == ...
+    #    ...
 </code></pre>
 </li>
 <li>
-<p>The Mantle Transaction excess balance pays least the mandatory fees.</p>
-<pre><code class="language-python">tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # int128
-tx_balance = get_transaction_balance(signed_tx)   # int128
+<p>The Mantle Transaction excess balance pays at least the mandatory fees.</p>
+<pre><code class="language-python">tx_mandatory_fee = mandatory_fees(signed_tx,                        # uint64
+                                  permanent_storage_gas_price,
+                                  execution_gas_base_price)
 assert tx_mandatory_fee &lt;= tx_balance
 tx_priority_tip = checked_uint64(tx_balance - tx_mandatory_fee)
-
-def get_transaction_balance(signed_tx: SignedMantleTx) -&gt; int128:
-    balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
-    for op in signed_tx.tx.ops:
-        if op.opcode == TRANSFER:
-            for inp in op.inputs:
-                balance = checked_int128(balance + get_value_from_note_id(inp))
-            for out in op.outputs:
-                balance = checked_int128(balance - out.value)
-    return balance
 </code></pre>
 </li>
 </ol>
@@ -357,7 +368,7 @@ def get_transaction_balance(signed_tx: SignedMantleTx) -&gt; int128:
     op_proofs
 )
 </code></pre>
-<p>Mantle Validators execute sequentially each Operation in <code>ops</code> according to its opcode.</p>
+<p>Mantle Validators execute each Operation in <code>ops</code> according to its opcode, in the order the Operations appear and along the state progression <a href="#validation">Validation</a> defines. The subsections below define, for each opcode, what validating and executing an Operation amount to.</p>
 <h1 id="operations"><a class="header" href="#operations">Operations</a></h1>
 <h2 id="opcodes"><a class="header" href="#opcodes">Opcodes</a></h2>
 <div class="table-wrapper"><table><thead><tr><th><strong>Operation</strong></th><th><strong>Opcode</strong></th><th><strong>Description</strong></th></tr></thead><tbody>

@@ -18940,6 +18940,7 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 </div><!-- timeline:start -->
 <h2 id="timeline-73"><a class="header" href="#timeline-73">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
 <li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
@@ -18958,6 +18959,7 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 <tr><td>1.1.1</td><td>Corrected <code>MAX_BLOCK_SIZE</code> to 2 MiB, to match the implementation.</td><td>2026-08-05</td></tr>
 <tr><td>1.2.0</td><td>Added <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncle references</a>: a block carries the signed headers of the fork blocks it references, every carried entry must be valid for the block itself to be valid, and the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a> counts their slots. Replaced <code>block_root</code> with <code>body_root</code>, which commits to those headers as well as to the transactions.</td><td>2026-08-06</td></tr>
 <tr><td>1.2.1</td><td>Defined <code>EpochNumber</code>, the type of an epoch number, as a 32-bit unsigned integer encoded little-endian wherever it is serialized or hashed.</td><td>2026-08-25</td></tr>
+<tr><td>1.2.2</td><td>Precise, in <a href="blockchain/raw/cryptarchia-v1-protocol.html#chain-maintenance">Chain Maintenance</a>, that the execution layer validates the block by applying its transactions in the order they appear starting from the parent block's execution state.</td><td>2026-08-25</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-12"><a class="header" href="#introduction-12">Introduction</a></h1>
@@ -19286,7 +19288,7 @@ Ensure every carried uncle is valid, as defined by the rules of <a href="blockch
 <p>Every input to these checks comes from the chain of <span class="math-inline" data-tex="B"></span> or from the carried entry itself, both of which any node validating <span class="math-inline" data-tex="B"></span> necessarily has — the entries travel inside <span class="math-inline" data-tex="B"></span> and are committed by its <span class="math-inline" data-tex="body\_root"></span>. Validity is therefore a function of the block and the chain it extends alone, so all nodes agree on it and an adversary influencing what nodes know of forks cannot influence block inclusion.</p>
 <h3 id="chain-maintenance"><a class="header" href="#chain-maintenance">Chain Maintenance</a></h3>
 <p>We define the chain maintenance procedure <span class="math-inline" data-tex="\textbf{on\_block}(state,B)"></span> that governs how the block tree <span class="math-inline" data-tex="T"></span> is updated.</p>
-<p><strong>Note:</strong> It’s assumed that block contents have already been validated by the execution layer w.r.t. the parent block’s execution state.</p>
+<p><strong>Note:</strong> It’s assumed that block contents have already been validated by the execution layer, by applying the transactions of the block in the order they appear starting from the parent block’s execution state, as defined in <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-proposal-validation">Block Proposal Validation</a>.</p>
 <p><span class="math-inline" data-tex="\text{define } \textbf{on\_block}(state, B)\to state&#x27;"></span>:</p>
 <p><span class="math-inline" data-tex="(c_{loc}, B_\text{imm}, T) \coloneqq state"></span></p>
 <p><strong>if</strong> <span class="math-inline" data-tex="B \in T \lor \lnot \textbf{valid\_header}(B)"></span>:</p>
@@ -21790,6 +21792,7 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 </div><!-- timeline:start -->
 <h2 id="timeline-83"><a class="header" href="#timeline-83">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -21808,12 +21811,13 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 <tr><td>1.1.2</td><td>Precise that the maximum block size applies to the block body only.</td><td>2026-07-27</td></tr>
 <tr><td>1.1.3</td><td>Corrected <code>MAX_BLOCK_SIZE</code> to 2 MiB, to match the implementation.</td><td>2026-08-05</td></tr>
 <tr><td>1.2.0</td><td>Added the <code>uncle_headers</code> field — the signed headers of the referenced uncles — to the <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-proposal">Proposal</a> and to the newly defined <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block">Block</a>, and replaced <code>block_root</code> with <code>body_root</code> in the <a href="blockchain/raw/bedrock-v1.1-block-construction.html#header">Header</a>, which commits to them, signatures included, as well as to the transactions. Due to updated <a href="blockchain/raw/cryptarchia-v1-protocol.html">Cryptarchia Protocol</a> (uncle references).</td><td>2026-08-06</td></tr>
+<tr><td>1.2.1</td><td>Precise the state each transaction of a block is validated against: the transactions are validated and executed one after the other in the order they appear, each against the state the preceding ones left, which makes block validity order-dependent. Precise that a block whose validation fails at any point is not executed at all.</td><td>2026-08-24</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-22"><a class="header" href="#introduction-22">Introduction</a></h1>
 <p>In this document, we present the specification defining the construction of the block proposal, its validation, and execution. We define the block proposal construction that contains references to transactions (from the mempool) instead of a complete transaction to limit its length. The raw block body increases with the size of transactions it contains up to <code>MAX_BLOCK_SIZE</code>, which is 2 MiB and covers the transactions only, and the proposal compresses its size down to 33 kB, which saves the bandwidth necessary to broadcast new blocks.</p>
 <h1 id="overview-19"><a class="header" href="#overview-19">Overview</a></h1>
-<p>For the consensus protocol to make progress, a new <strong>leader</strong> is elected through the leader lottery. The new leader is in possession of a proof of leadership (PoL) that confirms that it is indeed the leader. The main objective of the leader is to construct a new block, hence becoming a <strong>block builder,</strong> and share it with other members of the network as a <strong>block proposer</strong>. The block must be correctly constructed; otherwise, it will be rejected by the consensus nodes who are validating every block. Only validated blocks are executed, which means that the transactions included in the block are interpreted by all nodes, and the state of the chain is modified according to the instructions embedded in the transactions.</p>
+<p>For the consensus protocol to make progress, a new <strong>leader</strong> is elected through the leader lottery. The new leader is in possession of a proof of leadership (PoL) that confirms that it is indeed the leader. The main objective of the leader is to construct a new block, hence becoming a <strong>block builder,</strong> and share it with other members of the network as a <strong>block proposer</strong>. The block must be correctly constructed; otherwise, it will be rejected by the consensus nodes who are validating every block. Only a block that validates in full modifies the state of the chain: the transactions it includes are interpreted by all nodes, one after the other in the order they appear, and the state of the chain is modified according to the instructions embedded in them.</p>
 <h2 id="high-level-flow"><a class="header" href="#high-level-flow">High-level Flow</a></h2>
 <p>Below, we present a high-level description of the block lifecycle. The main focus of this section is to build an intuition on the block construction, validation, and execution.</p>
 <ol>
@@ -21822,15 +21826,11 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 </li>
 <li>
 <p>The block builder <strong>constructs</strong> a block proposal.</p>
-</li>
-<li>
-<p>The block builder selects the latest block (parent) as the reference point for the chain state update.</p>
-</li>
-<li>
-<p>The block builder selects valid Mantle Transactions (as defined in <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Mantle</a>) from its mempool and includes references to them in the proposal.</p>
-</li>
-<li>
-<p>The block builder populates the block header of the block proposal.</p>
+<ol>
+<li>The block builder selects the latest block (parent) as the reference point for the chain state update.</li>
+<li>The block builder selects valid Mantle Transactions (as defined in <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Mantle</a>) from its mempool and includes references to them in the proposal.</li>
+<li>The block builder populates the block header of the block proposal.</li>
+</ol>
 </li>
 <li>
 <p>The block proposer sends the block proposal to the Blend network.</p>
@@ -21840,27 +21840,19 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 </li>
 <li>
 <p>The validators <strong>validate</strong> the block proposal.</p>
-</li>
-<li>
-<p>They validate the block header.</p>
-</li>
-<li>
-<p>They retrieve complete transactions from their mempool that are referred in the block.</p>
-</li>
-<li>
-<p>They validate each transaction included in the block.</p>
+<ol>
+<li>They validate the block header.</li>
+<li>They retrieve complete transactions from their mempool that are referred in the block.</li>
+<li>They validate each transaction included in the block, in the order the transactions appear, each against the state the preceding ones left.</li>
+</ol>
 </li>
 <li>
 <p>The validators <strong>execute</strong> the block proposal.</p>
-</li>
-<li>
-<p>They derive the new blockchain state from the previous one by executing transactions as defined in <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Mantle</a>.</p>
-</li>
-<li>
-<p>They update the different variables that need to be maintained over time.</p>
-</li>
-<li>
-<p>They execute the <a href="blockchain/raw/bedrock-service-reward-distribution.html"><strong>Service Reward Distribution Protocol</strong></a> to generate reward notes locally.</p>
+<ol>
+<li>They append the <code>leader_voucher</code> of the block to the set of reward vouchers, which the following epoch starts with.</li>
+<li>They execute the <a href="blockchain/raw/bedrock-service-reward-distribution.html"><strong>Service Reward Distribution Protocol</strong></a> to generate reward notes locally and include them in the ledger.</li>
+<li>They derive the new blockchain state from the previous one by executing transactions as defined in <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Mantle</a>, in that same pass, adopting the result only once the whole block has validated.</li>
+</ol>
 </li>
 </ol>
 <h1 id="constructions"><a class="header" href="#constructions">Constructions</a></h1>
@@ -21990,12 +21982,7 @@ class SignedHeader:                                 # 361 bytes
 <p>Select Mantle transactions:</p>
 <ul>
 <li>Choose up to <code>1024</code> valid <code>SignedMantleTx</code> from the local mempool.</li>
-<li>Ensure each transaction:
-<ul>
-<li>Is valid according to <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Mantle</a>.</li>
-<li>Has no conflicts with others (e.g., two transactions trying to spend the same note).</li>
-</ul>
-</li>
+<li>Ensure the selected transactions, in the order they are placed in, form a sequence that is valid under <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-proposal-validation">Block Proposal Validation</a>.</li>
 </ul>
 </li>
 <li>
@@ -22058,18 +22045,22 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 </li>
 <li>
 <p><strong>Mempool Transactions Validation</strong>
-<code>mempool_transactions</code> must refer to a valid sequence of Mantle Transactions from the mempool. Each transaction must be valid according to the rules defined in the <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Mantle</a>. In order to verify ZK proofs, they are batched for verification as explained in <a href="blockchain/raw/bedrock-v1.1-block-construction.html#batch-verification-of-zk-proofs">Batch verification of ZK proofs</a> to get better performance.</p>
+<code>mempool_transactions</code> must refer to a valid sequence of Mantle Transactions from the mempool. The transactions are validated in the order the <code>references</code> resolve them, against a state that advances with them: each transaction is validated against the state the transactions preceding it left, the first one against the state the block inherits once the steps of <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-execution">Block Execution</a> that precede it have been applied. Each transaction must be valid in that state according to the rules defined in the <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#validation">Mantle</a>, which validates and executes its Operations along that same progression. Validation and execution are therefore one pass over one state, not two.</p>
 </li>
 </ol>
-<p>If any of the above checks fail, the block proposal must be rejected.</p>
+<p>Block validity is consequently order-dependent, and the order the transactions appear in is normative. Two transactions consuming the same note make the block invalid whatever their order, since the second consumption finds the note gone; a transaction consuming a note an earlier transaction created is valid in that order and invalid in the reverse one.</p>
+<p>In order to verify ZK proofs, they are batched for verification as explained in <a href="blockchain/raw/bedrock-v1.1-block-construction.html#batch-verification-of-zk-proofs">Batch verification of ZK proofs</a> to get better performance. Batching covers the proof checks alone and does not change the state a transaction is validated in: the public inputs of every proof are taken from the state its transaction is reached in, and the state-dependent assertions still run in sequence.</p>
+<p>If any of the above checks fail, the block proposal must be rejected and nothing of it is executed. The state progression the pass builds is a working one, adopted as the new chain state only once the last transaction of the block has validated: a single failed check anywhere in the block, in any transaction, in any Operation of any transaction, invalidates the whole block, so a node rejecting it holds exactly the state it held before it started processing it.</p>
 <h2 id="block-execution"><a class="header" href="#block-execution">Block Execution</a></h2>
 <p>This section specifies how a Logos Blockchain node executes a valid block proposal to update its local state.</p>
-<p>Given a <code>ValidBlock</code> that has successfully passed proposal validation, the node must:</p>
+<p>Given a <code>ValidBlock</code> that has successfully passed proposal validation, the node must, in this order:</p>
 <ol>
 <li>Append the <code>leader_voucher</code> contained in the block to the set of reward vouchers <strong>when the following epoch starts</strong>.</li>
 <li>Execute the reward distribution protocol defined in <a href="blockchain/raw/bedrock-service-reward-distribution.html"><strong>Service Reward Distribution Protocol</strong></a> to generate reward notes locally and include them in the ledger.</li>
-<li>Execute the Mantle Transactions included in the block sequentially, using the execution rules defined in the <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Mantle</a>.</li>
+<li>Execute the Mantle Transactions included in the block in the order they appear, using the execution rules defined in the <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Mantle</a>.</li>
 </ol>
+<p>Steps 1 and 2 read the epoch and the state of the <a href="blockchain/raw/bedrock-service-declaration-protocol.html">Service Declaration Protocol</a>, never the transactions of the block, which is what lets them run before those transactions are validated and makes the reward notes of step 2 available to them.</p>
+<p>The three steps stand or fall together, on a block that has validated in full: a block that fails validation at any point is not executed at all. The voucher of step 1 is appended to the set the following epoch starts with, so it lands at the epoch boundary rather than with the other two.</p>
 <p>The carried <code>uncle_headers</code> are not executed. A referenced uncle is not part of the chain; therefore, its transactions have no effect on the ledger state. The uncles are used only as evidence of consensus participation for the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a>.</p>
 <h1 id="annex-6"><a class="header" href="#annex-6">Annex</a></h1>
 <h2 id="batch-verification-of-zk-proofs"><a class="header" href="#batch-verification-of-zk-proofs">Batch verification of ZK proofs</a></h2>
@@ -22112,6 +22103,7 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 </div><!-- timeline:start -->
 <h2 id="timeline-84"><a class="header" href="#timeline-84">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-08-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/91e5486791d2ad854029d3fb8ec16b1c5426b059/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>91e5486</code></a> — docs(blockchain): assert all inputs to be non empty (#399)</li>
 <li><strong>2026-08-07</strong> — <a href="https://github.com/logos-co/logos-lips/blob/4c22190fd0df0e7b10018fe6774a772fd7578c39/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>4c22190</code></a> — docs(blockchain): require checked arithmetic in Mantle spec (#369)</li>
@@ -22142,6 +22134,7 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 <tr><td>1.9.2</td><td>Required checked arithmetic for all token value, balance, gas, and fee computations.</td><td>2026-08-06</td></tr>
 <tr><td>1.10.0</td><td>Enforce non empty inputs for every operation not only transfer moving the assertion in the validation of input spendability</td><td>2026-08-11</td></tr>
 <tr><td>1.10.1</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code>: <code>ServiceType</code> is its one-byte discriminant and <code>Locator</code> is the multiaddr binary form. Added a <code>declaration_id</code> test vector</td><td>2026-08-14</td></tr>
+<tr><td>1.10.2</td><td>Precise the state validation reads: the Operations of a Mantle Transaction are validated and executed one after the other in the order they appear, each against the state the preceding ones left, and a Mantle Transaction against the state the transactions preceding it in the block left. Accumulated the transaction balance along that pass, replacing <code>get_transaction_balance</code></td><td>2026-08-24</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-23"><a class="header" href="#introduction-23">Introduction</a></h1>
@@ -22150,9 +22143,9 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 <p>Mantle manages assets using a note-based ledger that follows an UTXO model. Each Mantle Transaction can include Transfer Operation, and any excess balance serves as the fee payment.</p>
 <h1 id="overview-20"><a class="header" href="#overview-20">Overview</a></h1>
 <h2 id="mantle-transaction"><a class="header" href="#mantle-transaction">Mantle Transaction</a></h2>
-<p>The features of the Logos Blockchain are exposed through Mantle Transactions. Each transaction can contain zero or more <strong>Operations</strong>. Mantle Transactions enable users to execute multiple Operations atomically.</p>
+<p>The features of the Logos Blockchain are exposed through Mantle Transactions. Each transaction can contain zero or more <strong>Operations</strong>. Mantle Transactions enable users to execute multiple Operations atomically: the Operations are applied one after the other in the order they appear, and either all of them take effect or none does.</p>
 <h2 id="mantle-operations"><a class="header" href="#mantle-operations">Mantle Operations</a></h2>
-<p>Logos Blockchain features are exposed through Mantle Operations, which can be combined and executed together in a single Mantle Transaction atomically. These Operations enable transfers and functions such as on-chain data posting, Cross-Zone interactions, SDP interaction, and leader reward claims.</p>
+<p>Logos Blockchain features are exposed through Mantle Operations, which can be combined in a single Mantle Transaction and executed atomically. These Operations enable transfers and functions such as on-chain data posting, Cross-Zone interactions, SDP interaction, and leader reward claims.</p>
 <h2 id="mantle-ledger"><a class="header" href="#mantle-ledger">Mantle Ledger</a></h2>
 <p>The Mantle Ledger enables asset transfers using a transparent UTXO model. While a Transfer Operation can consume more tokens than it creates, the Mantle Transaction excess balance must exactly pay for the fees. The ledger tracks three kinds of notes: regular notes, locked notes (collateral for service declarations) and channel notes (channel bridge funds eligible for PoS participation only).</p>
 <h2 id="transaction-fees"><a class="header" href="#transaction-fees">Transaction Fees</a></h2>
@@ -22163,7 +22156,7 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 </tbody></table>
 </div>
 <h1 id="mantle-transaction-1"><a class="header" href="#mantle-transaction-1">Mantle Transaction</a></h1>
-<p>Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes all Operations atomically, while using the Mantle Transaction's excess balance—calculated as the difference between the consumed and created value— as the fee payment.</p>
+<p>Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes the Operations atomically, while using the Mantle Transaction's excess balance, calculated as the difference between the consumed and created value, as the fee payment.</p>
 <pre><code class="language-python">class MantleTx:
     ops: list[Op]
 
@@ -22212,7 +22205,7 @@ def checked_int128(value: int) -&gt; int:
                    permanent_storage_gas_price: TokenValue, # Given by Storage Market
                    execution_gas_base_price: TokenValue) -&gt; uint64:  # Given by Execution Market
     mantle_tx = signed_tx.tx
-    permanent_storage_fees = checked_uint64(len(encode(signed_mantle_tx)) * permanent_storage_gas_price)
+    permanent_storage_fees = checked_uint64(len(encode(signed_tx)) * permanent_storage_gas_price)
     tx_execution_gas = 0
 
     for op in mantle_tx.ops:
@@ -22230,7 +22223,12 @@ def checked_int128(value: int) -&gt; int:
     tx=MantleTx(ops),
     op_proofs
 )
+
+permanent_storage_gas_price: TokenValue # Given by Storage Market
+execution_gas_base_price: TokenValue    # Given by Execution Market
 </code></pre>
+<p>The state validation reads is not a fixed snapshot: it advances as the block is processed. A Mantle Transaction is validated against the state left by the Mantle Transactions preceding it in the block, as defined in <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-proposal-validation">Block Proposal Validation</a>, and validation and execution then follow one another Operation by Operation, in the order the Operations appear: the Operation at index <code>i</code> is validated against the state the Operations at indices <code>0</code> to <code>i-1</code> left, then executed to produce the state the Operation at index <code>i+1</code> is validated against. This is what the <code>ledger</code>, <code>channels</code>, <code>locked_notes</code>, <code>declarations</code> and <code>voucher_nullifier_set</code> given to each Operation below denote.</p>
+<p>Atomicity is what a failed check means, not simultaneity. If any of the checks below fails, the whole Mantle Transaction is invalid: none of its Operations takes effect, whether or not it was reached. An invalid Mantle Transaction is never skipped over either, the block including it being invalid and nothing of that block being executed.</p>
 <p>Mantle validators will ensure the following:</p>
 <ol>
 <li>
@@ -22239,34 +22237,38 @@ def checked_int128(value: int) -&gt; int:
 </code></pre>
 </li>
 <li>
-<p>Each Operation is valid.</p>
-<pre><code class="language-python">for op, op_proof in zip(ops, op_proofs):
+<p>Each Operation is valid, and takes effect before the next one is validated. The transaction balance is accumulated over the same pass, so a <code>TRANSFER</code> consuming a note an earlier Operation created contributes that note's value like any other.</p>
+<pre><code class="language-python">tx_balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
+for op, op_proof in zip(ops, op_proofs):
     assert op.opcode in MANTLE_OPCODES
     validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof)
+    if op.opcode == TRANSFER:
+        for inp in op.inputs:
+            tx_balance = checked_int128(tx_balance + get_value_from_note_id(inp))
+        for out in op.outputs:
+            tx_balance = checked_int128(tx_balance - out.value)
+    execute_mantle_op(op.opcode, op.payload)
 
 def validate_mantle_op(txhash, opcode, payload, op_proof):
     if opcode == CHANNEL_INSCRIBE:
         validate_channel_inscribe(txhash, payload, op_proof)
     # elif opcode == ...
     #    ...
+
+def execute_mantle_op(opcode, payload):
+    if opcode == CHANNEL_INSCRIBE:
+        execute_channel_inscribe(payload)
+    # elif opcode == ...
+    #    ...
 </code></pre>
 </li>
 <li>
-<p>The Mantle Transaction excess balance pays least the mandatory fees.</p>
-<pre><code class="language-python">tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # int128
-tx_balance = get_transaction_balance(signed_tx)   # int128
+<p>The Mantle Transaction excess balance pays at least the mandatory fees.</p>
+<pre><code class="language-python">tx_mandatory_fee = mandatory_fees(signed_tx,                        # uint64
+                                  permanent_storage_gas_price,
+                                  execution_gas_base_price)
 assert tx_mandatory_fee &lt;= tx_balance
 tx_priority_tip = checked_uint64(tx_balance - tx_mandatory_fee)
-
-def get_transaction_balance(signed_tx: SignedMantleTx) -&gt; int128:
-    balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
-    for op in signed_tx.tx.ops:
-        if op.opcode == TRANSFER:
-            for inp in op.inputs:
-                balance = checked_int128(balance + get_value_from_note_id(inp))
-            for out in op.outputs:
-                balance = checked_int128(balance - out.value)
-    return balance
 </code></pre>
 </li>
 </ol>
@@ -22277,7 +22279,7 @@ def get_transaction_balance(signed_tx: SignedMantleTx) -&gt; int128:
     op_proofs
 )
 </code></pre>
-<p>Mantle Validators execute sequentially each Operation in <code>ops</code> according to its opcode.</p>
+<p>Mantle Validators execute each Operation in <code>ops</code> according to its opcode, in the order the Operations appear and along the state progression <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#validation">Validation</a> defines. The subsections below define, for each opcode, what validating and executing an Operation amount to.</p>
 <h1 id="operations"><a class="header" href="#operations">Operations</a></h1>
 <h2 id="opcodes"><a class="header" href="#opcodes">Opcodes</a></h2>
 <div class="table-wrapper"><table><thead><tr><th><strong>Operation</strong></th><th><strong>Opcode</strong></th><th><strong>Description</strong></th></tr></thead><tbody>
@@ -37671,6 +37673,7 @@ def block_reward(total_stake: int, burned_fees_window: list[int]) -&gt; tuple[in
 </div><!-- timeline:start -->
 <h2 id="timeline-121"><a class="header" href="#timeline-121">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/execution-market.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-07-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/38916aa474164ac4acd81e62d19715e17626be17/docs/blockchain/raw/execution-market.md"><code>38916aa</code></a> — docs(blockchain): prevent execution and storage fees from rounding down to zero (#384)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/ff40ae99c8e76a2bb36dcd83184434625a8daeb5/docs/blockchain/raw/execution-market.md"><code>ff40ae9</code></a> — docs(blockchain): TKE: fix base fees in the pseudocode based on G_target (#380)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/execution-market.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -37683,6 +37686,7 @@ def block_reward(total_stake: int, burned_fees_window: list[int]) -&gt; tuple[in
 <tr><td>1.0.0</td><td>Initial revision</td><td>2026-04-24</td></tr>
 <tr><td>1.0.1</td><td>Fix base fee constants in pseudocode based on the correct <span class="math-inline" data-tex="G_{\mathrm{target}}"></span></td><td>2026-07-27</td></tr>
 <tr><td>1.1.0</td><td>Round the base fee update upwards</td><td>2026-07-28</td></tr>
+<tr><td>1.1.1</td><td>Precise that greedy inclusion selects a candidate only if it is valid in the state the already selected transactions leave</td><td>2026-08-24</td></tr>
 </tbody></table>
 </div>
 <blockquote>
@@ -37761,9 +37765,9 @@ This material, including any linked pages or documents, is provided for informat
 <li>Filter Mempool: From the set of all available transactions <span class="math-inline" data-tex="\mathcal{M}"></span>, create a candidate set <span class="math-inline" data-tex="\mathcal{M}&#x27;"></span> containing only valid transactions where the user's Execution Gas price cap is sufficient to pay the base fee.</li>
 </ol>
 <div class="math-block" data-tex="\mathcal{M}&#x27; = \{\,t \in \mathcal{M} \mid c_t \ge b_{\mathrm{exec}}[s] \,\}"></div>
-<ol>
+<ol start="3">
 <li>Sort Candidates: Sort the valid transactions in <span class="math-inline" data-tex="\mathcal{M}&#x27;"></span> in descending order of revenue</li>
-<li>Greedy Inclusion: Initialize an empty block and a running total for Execution Gas used, current_block_gas = 0. Iterate through the sorted transactions and add them to the block one by one, as long as the block's total Execution Gas does not exceed the <span class="math-inline" data-tex="G_{\max}"></span> limit.</li>
+<li>Greedy Inclusion: Initialize an empty block and a running total for Execution Gas used, current_block_gas = 0. Iterate through the sorted transactions and add them to the block one by one, as long as the block's total Execution Gas does not exceed the <span class="math-inline" data-tex="G_{\max}"></span> limit and the transaction is valid in the state left by the previously selected transactions.</li>
 </ol>
 <p>Pseudocode for Block Construction:</p>
 <pre><code class="language-python">def construct_block(mempool, base_fee, gt, G_max):
@@ -37775,11 +37779,12 @@ This material, including any linked pages or documents, is provided for informat
     block_txs = []
     current_block_gas = 0
     for tx in valid_txs:
-        if current_block_gas + tx.gas_limit &lt;= G_max:
+        if current_block_gas + tx.gas_limit &lt;= G_max and applies(tx, block_txs):
             block_txs.append(tx)
             current_block_gas += tx.gas_limit # Using gas_limit for packing
     return block_txs
 </code></pre>
+<p><code>applies(tx, block_txs)</code> holds when <code>tx</code> is valid in the state left by the previously selected transactions, per <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-proposal-validation">Block Proposal Validation</a>.</p>
 <h2 id="on-chain-rules-fee-update-and-revenue"><a class="header" href="#on-chain-rules-fee-update-and-revenue">On-Chain Rules: Fee Update and Revenue</a></h2>
 <p>After a block <span class="math-inline" data-tex="s"></span> is executed and its total Execution Gas usage <span class="math-inline" data-tex="G[s]"></span> is known, the protocol deterministically applies the following rules.</p>
 <h3 id="base-fee-update-rule"><a class="header" href="#base-fee-update-rule">Base Fee Update Rule</a></h3>

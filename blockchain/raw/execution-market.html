@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/execution-market.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-07-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/38916aa474164ac4acd81e62d19715e17626be17/docs/blockchain/raw/execution-market.md"><code>38916aa</code></a> — docs(blockchain): prevent execution and storage fees from rounding down to zero (#384)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/ff40ae99c8e76a2bb36dcd83184434625a8daeb5/docs/blockchain/raw/execution-market.md"><code>ff40ae9</code></a> — docs(blockchain): TKE: fix base fees in the pseudocode based on G_target (#380)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/execution-market.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -204,6 +205,7 @@
 <tr><td>1.0.0</td><td>Initial revision</td><td>2026-04-24</td></tr>
 <tr><td>1.0.1</td><td>Fix base fee constants in pseudocode based on the correct <span class="math-inline" data-tex="G_{\mathrm{target}}"></span></td><td>2026-07-27</td></tr>
 <tr><td>1.1.0</td><td>Round the base fee update upwards</td><td>2026-07-28</td></tr>
+<tr><td>1.1.1</td><td>Precise that greedy inclusion selects a candidate only if it is valid in the state the already selected transactions leave</td><td>2026-08-24</td></tr>
 </tbody></table>
 </div>
 <blockquote>
@@ -282,9 +284,9 @@ This material, including any linked pages or documents, is provided for informat
 <li>Filter Mempool: From the set of all available transactions <span class="math-inline" data-tex="\mathcal{M}"></span>, create a candidate set <span class="math-inline" data-tex="\mathcal{M}&#x27;"></span> containing only valid transactions where the user's Execution Gas price cap is sufficient to pay the base fee.</li>
 </ol>
 <div class="math-block" data-tex="\mathcal{M}&#x27; = \{\,t \in \mathcal{M} \mid c_t \ge b_{\mathrm{exec}}[s] \,\}"></div>
-<ol>
+<ol start="3">
 <li>Sort Candidates: Sort the valid transactions in <span class="math-inline" data-tex="\mathcal{M}&#x27;"></span> in descending order of revenue</li>
-<li>Greedy Inclusion: Initialize an empty block and a running total for Execution Gas used, current_block_gas = 0. Iterate through the sorted transactions and add them to the block one by one, as long as the block's total Execution Gas does not exceed the <span class="math-inline" data-tex="G_{\max}"></span> limit.</li>
+<li>Greedy Inclusion: Initialize an empty block and a running total for Execution Gas used, current_block_gas = 0. Iterate through the sorted transactions and add them to the block one by one, as long as the block's total Execution Gas does not exceed the <span class="math-inline" data-tex="G_{\max}"></span> limit and the transaction is valid in the state left by the previously selected transactions.</li>
 </ol>
 <p>Pseudocode for Block Construction:</p>
 <pre><code class="language-python">def construct_block(mempool, base_fee, gt, G_max):
@@ -296,11 +298,12 @@ This material, including any linked pages or documents, is provided for informat
     block_txs = []
     current_block_gas = 0
     for tx in valid_txs:
-        if current_block_gas + tx.gas_limit &lt;= G_max:
+        if current_block_gas + tx.gas_limit &lt;= G_max and applies(tx, block_txs):
             block_txs.append(tx)
             current_block_gas += tx.gas_limit # Using gas_limit for packing
     return block_txs
 </code></pre>
+<p><code>applies(tx, block_txs)</code> holds when <code>tx</code> is valid in the state left by the previously selected transactions, per <a href="bedrock-v1.1-block-construction.html#block-proposal-validation">Block Proposal Validation</a>.</p>
 <h2 id="on-chain-rules-fee-update-and-revenue"><a class="header" href="#on-chain-rules-fee-update-and-revenue">On-Chain Rules: Fee Update and Revenue</a></h2>
 <p>After a block <span class="math-inline" data-tex="s"></span> is executed and its total Execution Gas usage <span class="math-inline" data-tex="G[s]"></span> is known, the protocol deterministically applies the following rules.</p>
 <h3 id="base-fee-update-rule"><a class="header" href="#base-fee-update-rule">Base Fee Update Rule</a></h3>
