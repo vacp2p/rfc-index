@@ -53,9 +53,9 @@ but describes their instantiation for compatibility within the Logos Mixnet.
 
 Each Logos Mixnet node MUST implement [LIBP2P-MIX](https://lip.logos.co/anoncomms/raw/mix.html),
 mounting the libp2p protocol with identifier `/mix/1.0.0` ([LIBP2P-MIX §7.1](https://lip.logos.co/anoncomms/raw/mix.html#71-protocol-identifier)).
-Each node MUST at least support sender and intermediary processing as defined in [LIBP2P-MIX §7](https://lip.logos.co/anoncomms/raw/mix.html#7-core-mix-protocol-responsibilities),
-as well as forward-to-destination exit processing (_still to be defined_).
+Each node SHOULD at least support sender and intermediary processing as defined in [LIBP2P-MIX §7](https://lip.logos.co/anoncomms/raw/mix.html#7-core-mix-protocol-responsibilities).
 In addition, nodes MAY support destination-as-final-hop processing for specific applications (_still to be defined_).
+It is possible that forward-to-destination exit processing (_still to be defined_) is supported in future.
 
 ### Path Selection and Length
 
@@ -71,12 +71,14 @@ Logos Mixnet nodes MUST use the Sphinx packet format defined in [LIBP2P-MIX §8]
 
 ### Packet and Message Size
 
-The total Sphinx packet size MUST be 4908 bytes ([LIBP2P-MIX §8.3.2](https://lip.logos.co/anoncomms/raw/mix.html#832-payload-size)).
+The total packet size MUST be 4909 bytes ([LIBP2P-MIX §8.3.2](https://lip.logos.co/anoncomms/raw/mix.html#832-payload-size)).
 
-The Sphinx header has a total of 924 bytes,
-which includes the 300 byte [RLN DoS protection](#dos-protection) proof.
-The applicable maximum payload size is 3984 bytes.
-The payload contains the application message, the origin protocol codec, the payload integrity prefix, and optional SURBs.
+The Sphinx header has a total of 624 bytes.
+The applicable maximum Sphinx payload size is 3984 bytes,
+for a total Sphinx packet size of 4608 bytes.
+In addition, a 301 byte [RLN DoS protection](#dos-protection) proof is appended after the Sphinx packet,
+bringing the total packet size to 4909 bytes.
+The Sphinx payload contains the application message, the origin protocol codec, the payload integrity prefix, and optional SURBs.
 Nodes MUST pad each payload to the maximum payload size ([LIBP2P-MIX §8.3.3](https://lip.logos.co/anoncomms/raw/mix.html#833-padding-and-fragmentation)).
 Origin protocols SHOULD fragment messages that are too large for one payload before they submit them to mix.
 
@@ -97,10 +99,9 @@ Nodes MUST encrypt the Sphinx payload with LIONESS as defined in [LIONESS-PAYLOA
 
 ## Exit Node Behaviour and Replies
 
-Each Logos Mixnet node MUST support operation as the exit node, at least for forwarded destination delivery.
-In addition, a node MAY support operation as an exit node for destination-as-final-hop delivery.
+A Logos Mixnet node MAY support operation as an exit node for destination-as-final-hop ("exit==destination") delivery.
 
-> *_Note:_* supported delivery modes are [currently being revised](https://github.com/logos-co/logos-lips/pull/351).
+> *_Note:_* supported delivery modes are [currently (2026-08) being revised](https://github.com/logos-co/logos-lips/pull/351).
 This specification will pin the permitted delivery modes when that revision is complete.
 
 A node identifies its exit role through node role determination ([LIBP2P-MIX §8.6.2](https://lip.logos.co/anoncomms/raw/mix.html#862-node-role-determination)).
@@ -117,7 +118,9 @@ Logos Mixnet nodes SHOULD use [Logos Service Discovery](https://lip.logos.co/ano
 [Extensible Peer Records](https://lip.logos.co/anoncomms/raw/extensible-peer-records.html) to advertise mix capability and to find other nodes in the Logos Mixnet.
 Nodes MAY augment discovery with other discovery methods.
 
-Each node MUST advertise its mix capability, its X25519 public key, and one or more routable multiaddresses ([LIBP2P-MIX §6.1](https://lip.logos.co/anoncomms/raw/mix.html#61-discovery)).
+Each node MUST advertise its mix capability, its X25519 public key, and one or more reachable multiaddresses ([LIBP2P-MIX §6.1](https://lip.logos.co/anoncomms/raw/mix.html#61-discovery)).
+
+> *_Note:_* Logos Mixnet currently (2026-08) supports only IPv4 addresses over TCP/QUIC-v1 transports.
 
 The anonymity of the mixnet depends on the integrity of the discovered node pool.
 Discovery methods that give a biased node sample, or that are open to sybil attacks, decrease the anonymity of all paths.
@@ -135,15 +138,18 @@ Nodes MUST use Rate Limiting Nullifiers (RLN) as the proof mechanism, as defined
 Each node MUST have an RLN membership to send or to forward messages.
 Each node in the path MUST verify the incoming RLN proof before Sphinx packet processing.
 After verification, an intermediary node MUST generate a new RLN proof and attach it to the outgoing packet.
-The exit node verifies the incoming proof and does not generate a new one.
+A node MUST derive the epoch for each proof it generates from its own local clock.
+In particular, an intermediary node MUST NOT simply propagate the epoch of the incoming proof.
+The exit node verifies the incoming proof
+and does not generate a new one for the message it forwards.
 
 ### RLN Parameters
 
 | Parameter | Value | Description |
 | --- | --- | --- |
-| `period` | `TBD` | The length of an epoch in seconds |
-| messaging rate | `TBD` | The number of messages permitted for each membership in each epoch |
-| `max_epoch_gap` | `TBD` | The maximum permitted gap between the epoch of a node and an incoming message |
+| `period` | `10` | The length of an epoch in seconds |
+| messaging rate | `100` | The number of messages permitted for each membership in each epoch |
+| `max_epoch_gap` | `3` | The maximum permitted gap between the epoch of a node and an incoming message |
 | `acceptable_root_window_size` | 5 | The maximum number of past Merkle roots that a node keeps |
 | `staked_fund` | `TBD` | The amount that a node stakes at registration |
 
@@ -175,10 +181,10 @@ and the related [cover traffic extension](https://github.com/logos-co/logos-lips
 
 ## Cover Traffic
 
-Nodes MUST implement [Mix Cover Traffic](https://lip.logos.co/anoncomms/raw/mix-cover-traffic.html).
+Nodes SHOULD implement [Mix Cover Traffic](https://lip.logos.co/anoncomms/raw/mix-cover-traffic.html).
 
-The `strategy_type` MUST be `CONSTANT_RATE` ([Mix Cover Traffic §7](https://lip.logos.co/anoncomms/raw/mix-cover-traffic.html#7-recommended-strategy)).
-The `cover_rate_fraction` MUST be 0.7.
+The `strategy_type` SHOULD be `CONSTANT_RATE` ([Mix Cover Traffic §7](https://lip.logos.co/anoncomms/raw/mix-cover-traffic.html#7-recommended-strategy)).
+When implementing this strategy, the `cover_rate_fraction` MUST be 0.7.
 
 > *_Note:_* different cover traffic generation strategies are currently being investigated.
 
