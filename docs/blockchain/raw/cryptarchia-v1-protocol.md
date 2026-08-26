@@ -30,6 +30,7 @@
 | 1.1.0 | Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be <= 1024 | 2026-07-27 |
 | 1.1.1 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
 | 1.2.0 | Added [uncle references](#uncle-references): a block carries the signed headers of the fork blocks it references, every carried entry must be valid for the block itself to be valid, and the [Total Stake Inference](#total-stake-inference) counts their slots. Replaced `block_root` with `body_root`, which commits to those headers as well as to the transactions. | 2026-08-06 |
+| 1.2.1 | Defined `EpochNumber`, the type of an epoch number, as a 32-bit unsigned integer encoded little-endian wherever it is serialized or hashed. | 2026-08-25 |
 
 # Introduction
 
@@ -133,6 +134,8 @@ Cryptarchia has a few global variables that are adjusted periodically in order f
 - Approximately constant block production rate achieved by dynamically adjusting the lottery difficulty based on observed participation levels.
 
 The order in which these variables are calculated is important and is done w.r.t. the epoch schedule.
+
+Epochs are numbered consecutively from `0`, the epoch the Genesis block belongs to. That number is an `EpochNumber`, a 32-bit unsigned integer, encoded little-endian over 4 bytes wherever it is serialized or hashed.
 
 ### Epoch Schedule
 
