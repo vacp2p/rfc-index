@@ -31,6 +31,7 @@
 | 1.1.2 | Precise that the maximum block size applies to the block body only. | 2026-07-27 |
 | 1.1.3 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
 | 1.2.0 | Added the `uncle_headers` field — the signed headers of the referenced uncles — to the [Proposal](#block-proposal) and to the newly defined [Block](#block), and replaced `block_root` with `body_root` in the [Header](#header), which commits to them, signatures included, as well as to the transactions. Due to updated [Cryptarchia Protocol](cryptarchia-v1-protocol.md) (uncle references). | 2026-08-06 |
+| 1.2.1 | Precise the state each transaction of a block is validated against: the transactions are validated and executed one after the other in the order they appear, each against the state the preceding ones left, which makes block validity order-dependent. Precise that a block whose validation fails at any point is not executed at all. | 2026-08-24 |
 | 1.3.0 | Compressed Block Proposal: 16-byte transaction reference prefixes and a variable-length `references` list, reducing the proposal from 34,574 bytes to at most 18,192. Added the [Canonical Encoding](#canonical-encoding) section. | 2026-08-18 |
 | 1.4.0 | Revised compression: replaced the 16-byte unkeyed hash prefixes with 8-byte keyed short transaction IDs — a truncated Blake2b under a per-proposal key derived from signed header fields — with a builder-side collision pre-check and a bounded-ambiguity reconstruction (`MAX_RECONSTRUCTION_COMBINATIONS = 8192`, set from a one-second reconstruction budget on validator-class hardware). The reference key is derived from `leader_key` and `entropy_contribution` rather than the whole `proof_of_leadership`, which would be grindable by Groth16 re-randomisation. The maximum proposal falls from 18,192 to 10,000 bytes. | 2026-08-20 |
 
@@ -40,7 +41,7 @@ In this document, we present the specification defining the construction of the 
 
 # Overview
 
-For the consensus protocol to make progress, a new **leader** is elected through the leader lottery. The new leader is in possession of a proof of leadership (PoL) that confirms that it is indeed the leader. The main objective of the leader is to construct a new block, hence becoming a **block builder,** and share it with other members of the network as a **block proposer**. The block must be correctly constructed; otherwise, it will be rejected by the consensus nodes who are validating every block. Only validated blocks are executed, which means that the transactions included in the block are interpreted by all nodes, and the state of the chain is modified according to the instructions embedded in the transactions.
+For the consensus protocol to make progress, a new **leader** is elected through the leader lottery. The new leader is in possession of a proof of leadership (PoL) that confirms that it is indeed the leader. The main objective of the leader is to construct a new block, hence becoming a **block builder,** and share it with other members of the network as a **block proposer**. The block must be correctly constructed; otherwise, it will be rejected by the consensus nodes who are validating every block. Only a block that validates in full modifies the state of the chain: the transactions it includes are interpreted by all nodes, one after the other in the order they appear, and the state of the chain is modified according to the instructions embedded in them.
 
 ## High-level Flow
 
@@ -48,21 +49,21 @@ Below, we present a high-level description of the block lifecycle. The main focu
 
 1. A leader is selected. The leader becomes a block builder.
 2. The block builder **constructs** a block proposal.
-1. The block builder selects the latest block (parent) as the reference point for the chain state update.
-2. The block builder selects valid Mantle Transactions (as defined in [Mantle](bedrock-v1.1-mantle-specification.md)) from its mempool and includes references to them in the proposal.
-3. The block builder populates the block header of the block proposal.
+   1. The block builder selects the latest block (parent) as the reference point for the chain state update.
+   2. The block builder selects valid Mantle Transactions (as defined in [Mantle](bedrock-v1.1-mantle-specification.md)) from its mempool and includes references to them in the proposal.
+   3. The block builder populates the block header of the block proposal.
 
 3. The block proposer sends the block proposal to the Blend network.
 4. The validators receive the block proposal.
 5. The validators **validate** the block proposal.
-1. They validate the block header.
-2. They retrieve complete transactions from their mempool that are referred in the block.
-3. They validate each transaction included in the block.
+   1. They validate the block header.
+   2. They retrieve complete transactions from their mempool that are referred in the block.
+   3. They validate each transaction included in the block, in the order the transactions appear, each against the state the preceding ones left.
 
 6. The validators **execute** the block proposal.
-1. They derive the new blockchain state from the previous one by executing transactions as defined in [Mantle](bedrock-v1.1-mantle-specification.md).
-2. They update the different variables that need to be maintained over time.
-3. They execute the [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally.
+   1. They append the `leader_voucher` of the block to the set of reward vouchers, which the following epoch starts with.
+   2. They execute the [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally and include them in the ledger.
+   3. They derive the new blockchain state from the previous one by executing transactions as defined in [Mantle](bedrock-v1.1-mantle-specification.md), in that same pass, adopting the result only once the whole block has validated.
 
 # Constructions
 
@@ -290,9 +291,7 @@ Only after the PoL is generated can the block proposal be constructed (see [Proo
 2. Construct the `mempool_transactions` object:
 1. Select Mantle transactions:
     - Choose up to `MAX_BLOCK_TXS` valid `SignedMantleTx` from the local mempool.
-    - Ensure each transaction:
-      - Is valid according to [Mantle](bedrock-v1.1-mantle-specification.md).
-      - Has no conflicts with others (e.g., two transactions trying to spend the same note).
+    - Ensure the selected transactions, in the order they are placed in, form a sequence that is valid under [Block Proposal Validation](#block-proposal-validation).
 
 3. Derive the reference key and the short IDs, and clear the selection of collisions:
 ```python
@@ -426,9 +425,13 @@ The order is constrained as well as economical. [Block Header Validation](crypta
   With `transactions` now available, the remaining rule of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation) applies: rule 2, `bytes(transactions) <= MAX_BLOCK_SIZE`.
 
 6. **Mempool Transactions Validation**
-  `mempool_transactions` must refer to a valid sequence of Mantle Transactions from the mempool. Each transaction must be valid according to the rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md). In order to verify ZK proofs, they are batched for verification as explained in [Batch verification of ZK proofs](#batch-verification-of-zk-proofs) to get better performance.
+  `mempool_transactions` must refer to a valid sequence of Mantle Transactions from the mempool. The transactions are validated in the order the `references` resolve them, against a state that advances with them: each transaction is validated against the state the transactions preceding it left, the first one against the state the block inherits once the steps of [Block Execution](#block-execution) that precede it have been applied. Each transaction must be valid in that state according to the rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md#validation), which validates and executes its Operations along that same progression. Validation and execution are therefore one pass over one state, not two.
 
-If any of the above checks fail, the block proposal must be rejected. What the rejection establishes depends on which bytes the failed check read. `block_id` is computed from the 297-byte header alone, so every byte outside the header — `uncle_headers`, `references`, `signature`, trailing bytes — can be altered in a copy without changing the `block_id` it names, and none of those bytes are authenticated until `header.body_root` is confirmed in step 4. A failure detected in them is a property of the received copy, not of the block: a frame that does not decode (step 1), a bad `signature` (step 2), an invalid uncle entry (step 3) and a failure to reconstruct (step 4) each discard the copy **without** recording a verdict against `block_id`. Only a failure implied by the header bytes themselves — a wrong version, an invalid proof of leadership — condemns the block the header names, identically at every node. Treating any of the former as final would let an attacker censor a genuine block by circulating tampered copies of it: one flipped bit in the trailing `signature`, or one substituted uncle entry, leaves `block_id` unchanged. The mempool-dependence of step 4 adds one further distinction — a reference that fails to resolve locally may resolve at another node — described in [Reference Resolution](#reference-resolution).
+  Block validity is consequently order-dependent, and the order the transactions appear in is normative. Two transactions consuming the same note make the block invalid whatever their order, since the second consumption finds the note gone; a transaction consuming a note an earlier transaction created is valid in that order and invalid in the reverse one.
+
+  In order to verify ZK proofs, they are batched for verification as explained in [Batch verification of ZK proofs](#batch-verification-of-zk-proofs) to get better performance. Batching covers the proof checks alone and does not change the state a transaction is validated in: the public inputs of every proof are taken from the state its transaction is reached in, and the state-dependent assertions still run in sequence.
+
+If any of the above checks fail, the block proposal must be rejected. What the rejection establishes depends on which bytes the failed check read. `block_id` is computed from the 297-byte header alone, so every byte outside the header — `uncle_headers`, `references`, `signature`, trailing bytes — can be altered in a copy without changing the `block_id` it names, and none of those bytes are authenticated until `header.body_root` is confirmed in step 4. A failure detected in them is a property of the received copy, not of the block: a frame that does not decode (step 1), a bad `signature` (step 2), an invalid uncle entry (step 3) and a failure to reconstruct (step 4) each discard the copy **without** recording a verdict against `block_id`. Only a failure implied by the header bytes themselves — a wrong version, an invalid proof of leadership — condemns the block the header names, identically at every node. Treating any of the former as final would let an attacker censor a genuine block by circulating tampered copies of it: one flipped bit in the trailing `signature`, or one substituted uncle entry, leaves `block_id` unchanged. The mempool-dependence of step 4 adds one further distinction — a reference that fails to resolve locally may resolve at another node — described in [Reference Resolution](#reference-resolution). Independently of what a rejection establishes about the block, **nothing of the proposal is executed**. The state progression the pass builds is a working one, adopted as the new chain state only once the last transaction of the block has validated: a single failed check anywhere in the block, in any transaction, in any Operation of any transaction, invalidates the whole block, so a node rejecting it holds exactly the state it held before it started processing it.
 
 This ordering is specific to the proposal path. A block received in full through chain synchronisation carries its transactions from the start, so [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation) applies to it as written, with no ordering constraint.
 
@@ -436,11 +439,15 @@ This ordering is specific to the proposal path. A block received in full through
 
 This section specifies how a Logos Blockchain node executes a valid block proposal to update its local state.
 
-Given a `ValidBlock` that has successfully passed proposal validation, the node must:
+Given a `ValidBlock` that has successfully passed proposal validation, the node must, in this order:
 
 1. Append the `leader_voucher` contained in the block to the set of reward vouchers **when the following epoch starts**.
 2. Execute the reward distribution protocol defined in [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally and include them in the ledger.
-3. Execute the Mantle Transactions included in the block sequentially, using the execution rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md).
+3. Execute the Mantle Transactions included in the block in the order they appear, using the execution rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md).
+
+Steps 1 and 2 read the epoch and the state of the [Service Declaration Protocol](bedrock-service-declaration-protocol.md), never the transactions of the block, which is what lets them run before those transactions are validated and makes the reward notes of step 2 available to them.
+
+The three steps stand or fall together, on a block that has validated in full: a block that fails validation at any point is not executed at all. The voucher of step 1 is appended to the set the following epoch starts with, so it lands at the epoch boundary rather than with the other two.
 
 The carried `uncle_headers` are not executed. A referenced uncle is not part of the chain; therefore, its transactions have no effect on the ledger state. The uncles are used only as evidence of consensus participation for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference).
 
