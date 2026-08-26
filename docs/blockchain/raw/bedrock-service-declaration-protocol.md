@@ -29,6 +29,7 @@
 | 1.2.0 | [RFC] Per-service uniqueness of `provider_id` and `zk_id` | 2026-07-08 |
 | 1.3.0 | Length-prefix the `locators` list in the `declaration_id` preimage | 2026-07-30 |
 | 1.4.0 | [RFC] One canonical encoding for `ServiceType` and `Locator` | 2026-08-14 |
+| 1.4.1 | Replaced the `uint64` width given to the `epoch` fields with a reference to [`EpochNumber`](cryptarchia-v1-protocol.md#epoch), which is 32 bits | 2026-08-25 |
 
 # Introduction
 
@@ -90,7 +91,7 @@ Each service type is assigned a one-byte discriminant, given by the enum value a
 
 The minimum stake is a global value that defines the minimum stake a node must have to perform any service.
 
-The `MinStake` is a structure that holds the value of the stake `stake_threshold` and the `epoch`, which is an epoch number at which the threshold was set; it is `uint64`.
+The `MinStake` is a structure that holds the value of the stake `stake_threshold` and the `epoch`, which is an epoch number at which the threshold was set; it is an [`EpochNumber`](cryptarchia-v1-protocol.md#epoch).
 
 ```python
 class MinStake:
@@ -111,7 +112,7 @@ For more information on how the minimum stake is calculated, please refer to the
 The service parameters structure defines the parameters set necessary for correctly handling interaction between the protocol and services. Each of the service types defined above must be mapped to a set of the following parameters:
 
 - `inactivity_period` defines the maximum time (as a number of epochs) during which an activation message must be sent; otherwise, the declaration is considered inactive. It must be at least 2 epochs long due to finalization reasons.
-- `epoch` defines the epoch number at which the parameter was set; it is `uint64`.
+- `epoch` defines the epoch number at which the parameter was set; it is an [`EpochNumber`](cryptarchia-v1-protocol.md#epoch).
 
 ```python
 class ServiceParameters:
