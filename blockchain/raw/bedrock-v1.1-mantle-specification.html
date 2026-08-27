@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/48fbc82c3545f8512176ce7c707019aefce24650/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>48fbc82</code></a> — docs(blockchain): order channel configurations and prevent their replay (#396)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-08-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/91e5486791d2ad854029d3fb8ec16b1c5426b059/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>91e5486</code></a> — docs(blockchain): assert all inputs to be non empty (#399)</li>
@@ -224,6 +225,7 @@
 <tr><td>1.10.0</td><td>Enforce non empty inputs for every operation not only transfer moving the assertion in the validation of input spendability</td><td>2026-08-11</td></tr>
 <tr><td>1.10.1</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code>: <code>ServiceType</code> is its one-byte discriminant and <code>Locator</code> is the multiaddr binary form. Added a <code>declaration_id</code> test vector</td><td>2026-08-14</td></tr>
 <tr><td>1.10.2</td><td>Precise the state validation reads: the Operations of a Mantle Transaction are validated and executed one after the other in the order they appear, each against the state the preceding ones left, and a Mantle Transaction against the state the transactions preceding it in the block left. Accumulated the transaction balance along that pass, replacing <code>get_transaction_balance</code></td><td>2026-08-24</td></tr>
+<tr><td>1.11.0</td><td>Track the configuration lineage of a channel: <code>ChannelState</code> gains <code>config_tip_hash</code> and the <code>CHANNEL_CONFIG</code> payload carries the <code>parent</code> configuration it extends, ordering configurations and preventing their replay</td><td>2026-08-27</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -392,6 +394,7 @@ tx_priority_tip = checked_uint64(tx_balance - tx_mandatory_fee)
 <p>Channels allow Zones to post their updates on chain. Channels form virtual chains that overlay on top of the Cryptarchia blockchain. Clients and Followers of a Zone can watch its channel to learn the state of that Zone. Each channel has an associated balance, enabling bridging between Zones and Bedrock.</p>
 <h3 id="message-ordering"><a class="header" href="#message-ordering">Message Ordering</a></h3>
 <p>Channels form virtual chains by having each message reference its parent message. The order of messages in these channels is enforced by the sequencer by building a hash chain of messages, i.e. new messages reference the previous messages through a parent hash. Given that Cryptarchia has long finality times, these message parent references allow Zone sequencers to continue to post new updates to channels without having to wait for finality. No matter how Cryptarchia forks and reorgs, the channel messages from honest sequencers will eventually be re-included in a way that satisfies the virtual chain order.</p>
+<p>Configurations form a second hash chain within the channel: each configuration names the configuration it supersedes, so a pending reconfiguration stays valid while the sequencer keeps posting inscriptions.</p>
 <p>The first time a message is sent to an unclaimed channel, the key that signs the initial message becomes the only accredited key in the list (Note that this key may correspond to a threshold signature key). Accredited keys of a channel forms a committee that can configure the channel, withdraw funds and take turns to write messages to that channel following a round-robin algorithm. Configuring a channel includes modifying the list of accredited keys, the round-robin parameters and the required number of signatures to withdraw funds or establish a new configuration.</p>
 <p>Validators must maintain the following state to process channel Operations:</p>
 <pre><code class="language-python">channels: dict[ChannelId, ChannelState] # ChannelId is 32 bytes
@@ -403,7 +406,8 @@ class ChannelState:
                                   # required to update the configuration
 
     # Message Ordering
-    tip_hash: hash
+    tip_hash: hash         # Last message of the channel
+    config_tip_hash: hash  # Last configuration of the channel
 
     # Decentralized Sequencing
     tip_slot: Slot
@@ -420,6 +424,7 @@ class ChannelState:
 def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey]) -&gt; ChannelState:
     return ChannelState(
         tip_hash = ZERO,
+        config_tip_hash = ZERO,
         tip_slot = block_slot,
         accredited_keys = keys,
         tip_sequencer = 0,
@@ -588,6 +593,7 @@ mempool.push(signed_tx)
 <h4 id="payload-1"><a class="header" href="#payload-1">Payload</a></h4>
 <pre><code class="language-python">class ChannelConfig:
     channel: ChannelId
+    parent: hash             # Previous configuration of the channel
     keys: list[Ed25519PublicKey]
     posting_timeframe: u32
     posting_timeout: u32
@@ -622,12 +628,21 @@ assert config.configuration_threshold &lt;= len(config.keys)
 
 if config.channel in channels:
     chan = channels[config.channel]
+
+    # Ensure the configuration is extending the last configuration
+    # of the channel
+    assert config.parent == chan.config_tip_hash
+
     # Verify the configuration_threshold signatures (see Appendix)
     MultiEd25519_verify(txhash,
                         proof.signatures,
                         proof.indexes,
                         chan.accredited_keys,
                         chan.configuration_threshold)
+else:
+    # Channel will be created automatically upon execution
+    # Ensure that this configuration is the genesis configuration
+    assert config.parent == ZERO
 </code></pre>
 <h4 id="execution-2"><a class="header" href="#execution-2">Execution</a></h4>
 <p><em>Given</em></p>
@@ -653,6 +668,7 @@ chan.accredited_keys = config.keys
 chan.configuration_threshold = config.configuration_threshold
 
 # Update Decentralized Sequencing Parameters
+chan.tip_slot = block_slot
 chan.tip_sequencer = 0
 chan.tip_sequencer_starting_slot = block_slot
 chan.posting_timeframe = config.posting_timeframe
@@ -663,21 +679,22 @@ chan.transfer_threshold = config.transfer_threshold
 </code></pre>
 </li>
 <li>
-<p>Update the channel tip.</p>
+<p>Update the configuration tip.</p>
 <pre><code class="language-python">chan = channels[config.channel]
-chan.tip_slot = block_slot
-chan.tip_hash = hash(encode(config))
+chan.config_tip_hash = hash(encode(config))
 </code></pre>
 </li>
 </ol>
 <h4 id="example-1"><a class="header" href="#example-1">Example</a></h4>
 <p>Suppose the unique sequencer of Zone A wants to add a key to the list of accredited keys:</p>
-<pre><code class="language-python"># Given a key to add
+<pre><code class="language-python"># Given a key to add and the current configuration tip of the channel
 new_sequencer_pk: Ed25519PublicKey
+zone_a_config_tip: hash
 
 # The unique sequencer encodes the update and builds the payload
 config = ChannelConfig(
     channel=ZONE_A,
+    parent=zone_a_config_tip,
     keys=[old_sequencer_pk, new_sequencer_pk],
     posting_timeframe = 5000,
     posting_timeout = 500,
@@ -1748,7 +1765,7 @@ threshold: u16                     # the number of required signatures
 <h3 id="operation-id"><a class="header" href="#operation-id">Operation Id</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Operation</th><th>Payload</th><th><code>op_id</code></th></tr></thead><tbody>
 <tr><td><code>TRANSFER</code></td><td>0x0201000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020300000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000600000000000000000000000000000000000000000000000000000000000000</td><td>0x5e5e1b318aa0c2aec93fbb327e6af5f705e5684269a34e0c1319539d00d06cdb</td></tr>
-<tr><td><code>CHANNEL_CONFIG</code></td><td>0x070707070707070707070707070707070707070707070707070707070707070702001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00</td><td>0x0cf0dd115eadfc303eeb4c103a7d2faba3cf3a25b549da79c30857fb9eebc0cb</td></tr>
+<tr><td><code>CHANNEL_CONFIG</code></td><td>0x0707070707070707070707070707070707070707070707070707070707070707000000000000000000000000000000000000000000000000000000000000000002001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00</td><td>0x8bac7efe4c3ef10745c0d509ac88e2abaf1d3cda94987ed2eeb9ad71dd31d056</td></tr>
 <tr><td><code>CHANNEL_INSCRIBE</code></td><td>0x0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c</td><td>0xfb9af7fb1384fff51780ec8c5afbcba76449ab7603484f797df3a472e48826c1</td></tr>
 <tr><td><code>CHANNEL_DEPOSIT</code></td><td>0x1010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d65746164617461</td><td>0xf14ff0aad9bc5e8e30c5d1aa3710aaa1c1cc1f47c2c256e7d9e73104cb17ccaf</td></tr>
 <tr><td><code>CHANNEL_WITHDRAW</code></td><td>0x1212121212121212121212121212121212121212121212121212121212121212011300000000000000000000000000000000000000000000000000000000000000</td><td>0x503d0d08f9faef971864943103965d13be7159fe6e0361c8ea614c6d0431e59c</td></tr>
@@ -1762,7 +1779,7 @@ threshold: u16                     # the number of required signatures
 <h3 id="mantle-transaction-hash-1"><a class="header" href="#mantle-transaction-hash-1">Mantle Transaction Hash</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Transaction</th><th>Payload</th><th>Transaction Hash</th></tr></thead><tbody>
 <tr><td>Empty transaction</td><td>0x00</td><td>0x2eba3f667b80a508f3d44d149a1c27a90ea365a51e4fc8209289088142b364e5</td></tr>
-<tr><td>Transaction with one of each operation</td><td>0x0a00020100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002030000000000000004000000000000000000000000000000000000000000000000000000000000000500000000000000060000000000000000000000000000000000000000000000000000000000000010070707070707070707070707070707070707070707070707070707070707070702001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00110e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c121010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d6574616461746113121212121212121212121212121212121212121212121212121212121212121201130000000000000000000000000000000000000000000000000000000000000014141414141414141414141414141414141414141414141414141414141414141401150000000000000000000000000000000000000000000000000000000000000001160000000000000017000000000000000000000000000000000000000000000000000000000000002000010b00047f00000191020bb8cd0353470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000211b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d000000000000001c00000000000000000000000000000000000000000000000000000000000000221e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030330200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000</td><td>0x5d3ff950e0752dc4ebf8c8d73a8cc7b22445b9245ea317f7ebdaa8d6fd881589</td></tr>
+<tr><td>Transaction with one of each operation</td><td>0x0a000201000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020300000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000600000000000000000000000000000000000000000000000000000000000000100707070707070707070707070707070707070707070707070707070707070707000000000000000000000000000000000000000000000000000000000000000002001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00110e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c121010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d6574616461746113121212121212121212121212121212121212121212121212121212121212121201130000000000000000000000000000000000000000000000000000000000000014141414141414141414141414141414141414141414141414141414141414141401150000000000000000000000000000000000000000000000000000000000000001160000000000000017000000000000000000000000000000000000000000000000000000000000002000010b00047f00000191020bb8cd0353470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000211b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d000000000000001c00000000000000000000000000000000000000000000000000000000000000221e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030330200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000</td><td>0x11e6013847824badf33aa383cfbdb4b5b74a621acefc8296c21f48c4072e0e92</td></tr>
 </tbody></table>
 </div>
 <h3 id="declaration-id"><a class="header" href="#declaration-id">Declaration Id</a></h3>
