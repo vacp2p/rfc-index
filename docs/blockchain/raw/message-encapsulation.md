@@ -133,6 +133,8 @@ This document outlines the cryptographic notation, data structures, and algorith
       return rand
   ```
 
+  Every $`\text {CSPRBG}`$ invocation in this specification generates at most a message-sized output, so the interoperability note of the [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction) applies: an RFC 8439 (IETF) ChaCha20 with a zero nonce is byte-for-byte compatible.
+
 - $`|t|`$ returns the length of the $`t`$ expressed in bytes.
 - $`\oplus`$ is a XOR operation.
   ```python

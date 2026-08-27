@@ -118,6 +118,11 @@ Notes:
 - Seed choice and domain separation must be handled at the protocol level.
 - A seed MUST NOT be reused across two different generation contexts: with the nonce fixed to zero, keystream security relies on each key producing a single stream.
 
+Interoperability:
+
+- Implementations MAY use the IETF variant of ChaCha20 ([RFC 8439](https://datatracker.ietf.org/doc/html/rfc8439): 32-bit block counter, 96-bit nonce) with the nonce set to zero. With a zero nonce the two variants produce identical keystreams for the first $`2^{32}`$ blocks (256 GiB) of output: the original variant's upper counter word is zero in that range and coincides with the IETF variant's zero nonce words.
+- Every use of this construction in the Logos Blockchain generates far less than $`2^{32}`$ blocks per seed, so any RFC 8439 implementation with a zero nonce and an initial counter of zero is byte-for-byte compatible with the definition above.
+
 ## [Poseidon2 (](https://eprint.iacr.org/2023/323)[ZK Friendly Hash Function)](https://eprint.iacr.org/2023/323)
 
 Description:
