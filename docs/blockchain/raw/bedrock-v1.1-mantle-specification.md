@@ -38,6 +38,7 @@
 | 1.9.2 | Required checked arithmetic for all token value, balance, gas, and fee computations. | 2026-08-06 |
 | 1.10.0| Enforce non empty inputs for every operation not only transfer moving the assertion in the validation of input spendability | 2026-08-11 |
 | 1.10.1| [RFC] One canonical encoding for `ServiceType` and `Locator`: `ServiceType` is its one-byte discriminant and `Locator` is the multiaddr binary form. Added a `declaration_id` test vector | 2026-08-14 |
+| 1.10.2| Precise the state validation reads: the Operations of a Mantle Transaction are validated and executed one after the other in the order they appear, each against the state the preceding ones left, and a Mantle Transaction against the state the transactions preceding it in the block left. Accumulated the transaction balance along that pass, replacing `get_transaction_balance` | 2026-08-24 |
 | 1.11.0 | Track the configuration lineage of a channel: `ChannelState` gains `config_tip_hash` and the `CHANNEL_CONFIG` payload carries the `parent` configuration it extends, ordering configurations and preventing their replay | 2026-08-27 |
 
 # Introduction
@@ -52,11 +53,11 @@ Mantle manages assets using a note-based ledger that follows an UTXO model. Each
 
 ## Mantle Transaction
 
-The features of the Logos Blockchain are exposed through Mantle Transactions. Each transaction can contain zero or more **Operations**. Mantle Transactions enable users to execute multiple Operations atomically.
+The features of the Logos Blockchain are exposed through Mantle Transactions. Each transaction can contain zero or more **Operations**. Mantle Transactions enable users to execute multiple Operations atomically: the Operations are applied one after the other in the order they appear, and either all of them take effect or none does.
 
 ## Mantle Operations
 
-Logos Blockchain features are exposed through Mantle Operations, which can be combined and executed together in a single Mantle Transaction atomically. These Operations enable transfers and functions such as on-chain data posting, Cross-Zone interactions, SDP interaction, and leader reward claims.
+Logos Blockchain features are exposed through Mantle Operations, which can be combined in a single Mantle Transaction and executed atomically. These Operations enable transfers and functions such as on-chain data posting, Cross-Zone interactions, SDP interaction, and leader reward claims.
 
 ## Mantle Ledger
 
@@ -73,7 +74,7 @@ Mantle Transaction fees are derived from a gas model. The Logos Blockchain has t
 
 # Mantle Transaction
 
-Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes all Operations atomically, while using the Mantle Transaction's excess balance—calculated as the difference between the consumed and created value— as the fee payment.
+Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes the Operations atomically, while using the Mantle Transaction's excess balance, calculated as the difference between the consumed and created value, as the fee payment.
 
 ```python
 class MantleTx:
@@ -142,7 +143,7 @@ def mandatory_fees(signed_tx: SignedMantleTx,
                    permanent_storage_gas_price: TokenValue, # Given by Storage Market
                    execution_gas_base_price: TokenValue) -> uint64:  # Given by Execution Market
     mantle_tx = signed_tx.tx
-    permanent_storage_fees = checked_uint64(len(encode(signed_mantle_tx)) * permanent_storage_gas_price)
+    permanent_storage_fees = checked_uint64(len(encode(signed_tx)) * permanent_storage_gas_price)
     tx_execution_gas = 0
 
     for op in mantle_tx.ops:
@@ -165,7 +166,14 @@ signed_tx = SignedMantleTx(
     tx=MantleTx(ops),
     op_proofs
 )
+
+permanent_storage_gas_price: TokenValue # Given by Storage Market
+execution_gas_base_price: TokenValue    # Given by Execution Market
 ```
+
+The state validation reads is not a fixed snapshot: it advances as the block is processed. A Mantle Transaction is validated against the state left by the Mantle Transactions preceding it in the block, as defined in [Block Proposal Validation](bedrock-v1.1-block-construction.md#block-proposal-validation), and validation and execution then follow one another Operation by Operation, in the order the Operations appear: the Operation at index `i` is validated against the state the Operations at indices `0` to `i-1` left, then executed to produce the state the Operation at index `i+1` is validated against. This is what the `ledger`, `channels`, `locked_notes`, `declarations` and `voucher_nullifier_set` given to each Operation below denote.
+
+Atomicity is what a failed check means, not simultaneity. If any of the checks below fails, the whole Mantle Transaction is invalid: none of its Operations takes effect, whether or not it was reached. An invalid Mantle Transaction is never skipped over either, the block including it being invalid and nothing of that block being executed.
 
 Mantle validators will ensure the following:
 
@@ -174,35 +182,39 @@ Mantle validators will ensure the following:
     assert len(op_proofs) == len(ops)
     ```
 
-2. Each Operation is valid.
+2. Each Operation is valid, and takes effect before the next one is validated. The transaction balance is accumulated over the same pass, so a `TRANSFER` consuming a note an earlier Operation created contributes that note's value like any other.
     ```python
+    tx_balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
     for op, op_proof in zip(ops, op_proofs):
         assert op.opcode in MANTLE_OPCODES
         validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof)
+        if op.opcode == TRANSFER:
+            for inp in op.inputs:
+                tx_balance = checked_int128(tx_balance + get_value_from_note_id(inp))
+            for out in op.outputs:
+                tx_balance = checked_int128(tx_balance - out.value)
+        execute_mantle_op(op.opcode, op.payload)
 
     def validate_mantle_op(txhash, opcode, payload, op_proof):
         if opcode == CHANNEL_INSCRIBE:
             validate_channel_inscribe(txhash, payload, op_proof)
         # elif opcode == ...
         #    ...
+
+    def execute_mantle_op(opcode, payload):
+        if opcode == CHANNEL_INSCRIBE:
+            execute_channel_inscribe(payload)
+        # elif opcode == ...
+        #    ...
     ```
 
-3. The Mantle Transaction excess balance pays least the mandatory fees.
+3. The Mantle Transaction excess balance pays at least the mandatory fees.
     ```python
-    tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # int128
-    tx_balance = get_transaction_balance(signed_tx)   # int128
+    tx_mandatory_fee = mandatory_fees(signed_tx,                        # uint64
+                                      permanent_storage_gas_price,
+                                      execution_gas_base_price)
     assert tx_mandatory_fee <= tx_balance
     tx_priority_tip = checked_uint64(tx_balance - tx_mandatory_fee)
-
-    def get_transaction_balance(signed_tx: SignedMantleTx) -> int128:
-        balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
-        for op in signed_tx.tx.ops:
-            if op.opcode == TRANSFER:
-                for inp in op.inputs:
-                    balance = checked_int128(balance + get_value_from_note_id(inp))
-                for out in op.outputs:
-                    balance = checked_int128(balance - out.value)
-        return balance
     ```
 
 ## Execution
@@ -216,7 +228,7 @@ SignedMantleTx(
 )
 ```
 
-Mantle Validators execute sequentially each Operation in `ops` according to its opcode.
+Mantle Validators execute each Operation in `ops` according to its opcode, in the order the Operations appear and along the state progression [Validation](#validation) defines. The subsections below define, for each opcode, what validating and executing an Operation amount to.
 
 # Operations
 
