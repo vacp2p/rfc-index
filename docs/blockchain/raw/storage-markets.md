@@ -26,7 +26,7 @@
 | 1.0.2 | Fix invalid python indentation due to github migration | 2026-07-27 | 
 | 1.1.0 | Round the price update upwards and align the reference code with the zero target guard | 2026-07-28 |
 | 1.1.1 | Changing from burning/minting to pooling/distributing/releasing | 2026-08-25 |
-| 1.1.2 | Align every block-reward reference with [Block Rewards](block-rewards.md) 1.2.0: fees pass through in full and settle at the epoch boundary, the rewards pool accrues rather than funds, notation harmonised to $`R^{\text{block}}`$. No change to the price mechanism. | 2026-08-27 |
+| 1.1.2 | Align every block-reward reference with [Block Rewards](block-rewards.md) 1.2.0. No change to the price mechanism. | 2026-08-27 |
 
 > **Disclaimer:**
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
