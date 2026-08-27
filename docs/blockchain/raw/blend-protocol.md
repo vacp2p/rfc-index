@@ -29,6 +29,7 @@
 | 1.1.1 | Updated the block proposal message size to 34574 bytes in the encapsulation-overhead calculation, following the addition of carried uncle headers in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md). | 2026-08-06 |
 | 1.2.0 | Define the token evaluation under a low core quota, and specify the Active Message metadata layout. | 2026-08-19 |
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
+| 1.3.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 
 # Introduction
 
@@ -464,7 +465,7 @@ Every active core node receives a reward. The activity of a node is verified in 
 - $`R_D`$ denote a redundancy parameter for data messages, defining the number of “replications” of the same message;
 - $`\mathcal{N} = \text{SDP}(s)`$ denote a set of core nodes providing the Blend service for the epoch $`e`$ returned by the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md));
 - $`N = |\mathcal N|`$ denote a number of core nodes providing the Blend service;
-- $`\text {CSPRNG}()`$ is a cryptographically secure pseudo-random number generator, implemented as a [BLAKE2b-Based PRNG Construction](common-cryptographic-components.md#blake2b-based-prng-construction);
+- $`\text {CSPRNG}()`$ is a cryptographically secure pseudo-random number generator, implemented as a [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction);
 
 ## Global Parameters
 
@@ -1149,7 +1150,7 @@ TTL — peering degree 6:
 
 ## Statistical Analysis of Selection Bias of Modulo Operation
 
-Applying a modulo $`N`$ operation to the output of a pseudorandom number generator (here the Blake2b hash function) with a large range (here from $`0`$ to $`2^{256}-1`$), introduces a statistical bias when mapping to the smaller domain $`\{0,1,\ldots,N-1\}`$. This bias arises because $`2^{256}`$ is typically not divisible by $`N`$, meaning that some residues modulo $`N`$ will occur slightly more often than others. Specifically, let $`R:=2^{256}`$, then $`R=q\cdot N+r`$ with $`0 \leq r \lt N`$. The first $`r`$ values modulo $`N`$ will appear $`q+1`$ times, while the remaining $`N-r`$ values will appear $`q`$ times. Thus, the maximum bias between two values $`a\leq r`$ and $`b \gt r`$ in $`\{0,1,\ldots,N-1\}`$ is:
+Applying a modulo $`N`$ operation to the output of a pseudorandom number generator (here the ChaCha20 keystream) with a large range (here from $`0`$ to $`2^{256}-1`$), introduces a statistical bias when mapping to the smaller domain $`\{0,1,\ldots,N-1\}`$. This bias arises because $`2^{256}`$ is typically not divisible by $`N`$, meaning that some residues modulo $`N`$ will occur slightly more often than others. Specifically, let $`R:=2^{256}`$, then $`R=q\cdot N+r`$ with $`0 \leq r \lt N`$. The first $`r`$ values modulo $`N`$ will appear $`q+1`$ times, while the remaining $`N-r`$ values will appear $`q`$ times. Thus, the maximum bias between two values $`a\leq r`$ and $`b \gt r`$ in $`\{0,1,\ldots,N-1\}`$ is:
 
 $$
 |Pr[a]-Pr[b]| \leq \left| \frac{q+1}{R} - \frac{q}{R} \right| = \frac{1}{R}

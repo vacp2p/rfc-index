@@ -26,6 +26,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
+| 1.1.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 
 # Introduction
 
@@ -123,11 +124,11 @@ This document outlines the cryptographic notation, data structures, and algorith
   ENCAPSULATION_COUNT: int
   ```
 
-- $`\text {CSPRBG}()`$ is a generalized cryptographically secure pseudo-random bytes generator, it is implemented as [BLAKE2b-Based PRNG Construction](common-cryptographic-components.md#blake2b-based-prng-construction).
-- $`\text {CSPRBG}()_{x}`$ is a cryptographically secure pseudo-random bytes generator whose output is restricted to $`x`$ bytes, it is implemented as [BLAKE2b-Based PRNG Construction](common-cryptographic-components.md#blake2b-based-prng-construction).
+- $`\text {CSPRBG}()`$ is a generalized cryptographically secure pseudo-random bytes generator, it is implemented as [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction).
+- $`\text {CSPRBG}()_{x}`$ is a cryptographically secure pseudo-random bytes generator whose output is restricted to $`x`$ bytes, it is implemented as [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction).
   ```python
   def pseudo_random(domain: bytes, key: bytes, size: int) -> bytes:
-      rand = BlakeRng.from_seed(hashds(domain, key)).generate(size)
+      rand = ChaCha20Rng.from_seed(hashds(domain, key)[:32]).generate(size)
       assert len(rand) == size
       return rand
   ```
