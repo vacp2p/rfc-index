@@ -36,7 +36,9 @@
 | 1.9.0 | Update the execution of `CHANNEL_DEPOSIT` to consume the inputs and recreate them in the channel, updating their NoteId avoid replay attacks in case of withdraw after a deposit | 2026-07-27 |
 | 1.9.1 | Rename the excess balance left after the mandatory fees into `tx_priority_tip` and convert it back into a `TokenValue` explicitly | 2026-08-05 |
 | 1.9.2 | Required checked arithmetic for all token value, balance, gas, and fee computations. | 2026-08-06 |
-| 1.10.0 | Track the configuration lineage of a channel: `ChannelState` gains `config_tip_hash` and the `CHANNEL_CONFIG` payload carries the `parent` configuration it extends, ordering configurations and preventing their replay | 2026-08-10 |
+| 1.10.0| Enforce non empty inputs for every operation not only transfer moving the assertion in the validation of input spendability | 2026-08-11 |
+| 1.10.1| [RFC] One canonical encoding for `ServiceType` and `Locator`: `ServiceType` is its one-byte discriminant and `Locator` is the multiaddr binary form. Added a `declaration_id` test vector | 2026-08-14 |
+| 1.11.0 | Track the configuration lineage of a channel: `ChannelState` gains `config_tip_hash` and the `CHANNEL_CONFIG` payload carries the `parent` configuration it extends, ordering configurations and preventing their replay | 2026-08-27 |
 
 # Introduction
 
@@ -1007,9 +1009,11 @@ class LockedNote:
 
 ```python
 class ServiceType(Enum):
-    BN="BN" # Blend Network
+    BN=0 # Blend Network; the one-byte discriminant is the canonical encoding
 
-class Locator(str):
+class Locator(bytes):
+    # multiaddr binary form; the canonical encoding
+    # (see SDP: Locators)
     def validate(self):
         assert len(self) <= 329
         assert validate_multiaddr(self)
@@ -1595,24 +1599,19 @@ ledger: Ledger
 
   *Validate*
 
-  1. Ensure the Transfer in non-empty
-      ```python
-      assert len(transfer.inputs) > 0
-      ```
-
-  2. Ensure all inputs are spendable and not in a channel.
+  1. Ensure all inputs are spendable and not in a channel.
       ```python
       ledger.assert_spendable(transfer.inputs)
       ```
 
-  3. Validate transfer proof to show ownership over input notes.
+  2. Validate transfer proof to show ownership over input notes.
       ```python
       input_notes = [ledger[input_note_id] for input_note_id in transfer.inputs]
       input_pks = [note.public_key for note in input_notes]
       assert ZkSignature_verify(mantle_txhash, transfer_proof, input_pks)
       ```
 
-  4. Ensure outputs are valid.
+  3. Ensure outputs are valid.
       ```python
       ledger.assert_valid_output(transfer.output)
       ```
@@ -1720,6 +1719,9 @@ A note is spendable if and only if it exists, it is not spent or locked. The fol
 ```python
 class Ledger:
     def assert_spendable(inputs: list[NoteId], channel_id: ChannelId | None):
+		# Assert inputs are empty
+		assert len(inputs) > 0
+
         ## Check there is no duplicate
         assert len(inputs) == len(set(inputs))
 
@@ -1965,3 +1967,16 @@ To see what the payloads represent, refer to [Mantle Transaction Encoding](mantl
 | - | - | - |
 | Empty transaction | 0x00 | 0x2eba3f667b80a508f3d44d149a1c27a90ea365a51e4fc8209289088142b364e5 |
 | Transaction with one of each operation | 0x0a000201000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020300000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000600000000000000000000000000000000000000000000000000000000000000100707070707070707070707070707070707070707070707070707070707070707000000000000000000000000000000000000000000000000000000000000000002001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00110e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c121010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d6574616461746113121212121212121212121212121212121212121212121212121212121212121201130000000000000000000000000000000000000000000000000000000000000014141414141414141414141414141414141414141414141414141414141414141401150000000000000000000000000000000000000000000000000000000000000001160000000000000017000000000000000000000000000000000000000000000000000000000000002000010b00047f00000191020bb8cd0353470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000211b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d000000000000001c00000000000000000000000000000000000000000000000000000000000000221e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030330200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000 | 0x11e6013847824badf33aa383cfbdb4b5b74a621acefc8296c21f48c4072e0e92 |
+
+### Declaration Id
+
+The `declaration_id` ([Declaration Storage](bedrock-service-declaration-protocol.md#declaration-storage)) is `Hash(service||provider_id||zk_id||locators)` (BLAKE2b, 256-bit output, no DST), where `service` is the one-byte `ServiceType` discriminant and `locators` is the `Locators` production ([Mantle Transaction Encoding](mantle-transaction-encoding.md#sdp-operations)): the element count followed by each `Locator`'s binary form prefixed with its 2-byte little-endian byte length. Note that the preimage field order differs from the `SDP_DECLARE` wire order and excludes `locked_note_id`. This vector reuses the fields of the `SDP_DECLARE` payload from [Operation Id](#operation-id).
+
+| Field | Value |
+| - | - |
+| `service` | 0x00 |
+| `provider_id` | 0x53470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f3 |
+| `zk_id` | 0x1900000000000000000000000000000000000000000000000000000000000000 |
+| `locators` | 0x010b00047f00000191020bb8cd03 |
+| Preimage | 0x0053470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f31900000000000000000000000000000000000000000000000000000000000000010b00047f00000191020bb8cd03 |
+| `declaration_id` | 0x7fb647c069bade94e06685b0825299d220e7cc14752cfc474773b6c4040e37b5 |
