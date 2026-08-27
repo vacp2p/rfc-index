@@ -14,6 +14,7 @@
 
 ## Timeline
 
+- **2026-04-20** — [`c3d15a9`](https://github.com/logos-co/logos-lips/blob/c3d15a9c7c24b4d6b0eb4fb578f9670ede6f69b0/docs/storage/deprecated/codex-prover.md) — COSS overhaul: new statuses, CFR type, raw-spec leniency (#308)
 - **2026-01-22** — [`e356a07`](https://github.com/logos-co/logos-lips/blob/e356a076aea06653764515babc71c8d69b26358d/docs/storage/deprecated/codex-prover.md) — Chore/add makefile (#271)
 - **2026-01-22** — [`af45aae`](https://github.com/logos-co/logos-lips/blob/af45aae01271637142fa931e673dc7c8627f480e/docs/storage/deprecated/codex-prover.md) — chore: deprecate Marketplace-related specs (#268)
 - **2026-01-19** — [`f24e567`](https://github.com/logos-co/logos-lips/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/storage/raw/codex-prover.md) — Chore/updates mdbook (#262)
@@ -24,7 +25,7 @@
 ## Abstract
 
 This specification defines the Proving module for
-[Codex](https://github.com/codex-storage/nim-codex),
+[Codex](https://github.com/logos-storage/logos-storage-nim),
 which provides a succinct, publicly verifiable way to check that storage
 providers still hold the data they committed to.
 The proving module samples cells from stored slots,
@@ -36,7 +37,7 @@ to manage incentives such as payments and slashing.
 ## Background / Rationale / Motivation
 
 In decentralized storage networks such as
-[Codex](https://github.com/codex-storage/nim-codex),
+[Codex](https://github.com/logos-storage/logos-storage-nim),
 one of the main challenges is ensuring durability and availability of data
 stored by storage providers.
 To achieve durability, random sampling combined with erasure coding is used
@@ -528,7 +529,7 @@ Storage providers must submit valid proofs within the proof window deadline. Thi
 
 ## Rationale
 
-This specification is based on the Proving module component specification from the [Codex project](https://github.com/codex-storage/nim-codex).
+This specification is based on the Proving module component specification from the [Codex project](https://github.com/logos-storage/logos-storage-nim).
 
 ### Probabilistic Verification
 
@@ -571,7 +572,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### Normative
 
-- **Codex**: [GitHub - codex-storage/nim-codex](https://github.com/codex-storage/nim-codex)
+- **Codex**: [GitHub - codex-storage/nim-codex](https://github.com/logos-storage/logos-storage-nim)
 - **Codex Prover Specification**: [Codex Docs - Component Specification - Prover](https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Prover.md)
 - **CODEX-SLOT-BUILDER**: Codex Slot Builder specification (defines `SlotsBuilder`
   and slot commitment construction)

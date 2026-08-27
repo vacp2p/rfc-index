@@ -150,7 +150,7 @@ from the received manifest data.
 - [Codex Manifest Spec][origin-ref] - Original specification
 
 [rfc-2119]: https://www.ietf.org/rfc/rfc2119.txt
-[merkle-tree]: ./merkle-tree.md
+[merkle-tree]: ../draft/merkle-tree.md
 [codex-dht]: ./dht.md
 [bep3]: http://bittorrent.org/beps/bep_0003.html
 [cidv1]: https://github.com/multiformats/cid#cidv1

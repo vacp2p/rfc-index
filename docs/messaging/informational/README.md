@@ -1,3 +1,3 @@
-# Waku Informational LIPs
+# Informational
 
-Informational Waku documents covering guidance, examples, and supporting material.
+Supporting informational messaging specifications.

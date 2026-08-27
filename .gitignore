@@ -2,3 +2,6 @@ book
 node_modules
 docs/logos-lips.json
 docs/SUMMARY.md
+docs/blockchain-structure.json
+.DS_Store
+__pycache__

@@ -12,6 +12,7 @@
 
 ## Timeline
 
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/storage/raw/dataset-store.md) — chore: split ift ts specs (#334)
 - **2026-02-09** — [`afd94c8`](https://github.com/logos-co/logos-lips/blob/afd94c8bc1420376ae9af7e14a4feb246f2ed621/docs/storage/raw/dataset-store.md) — chore: add math support (#287)
 - **2026-02-05** — [`4d0ee49`](https://github.com/logos-co/logos-lips/blob/4d0ee4929bd2c5037f72e3ca544f116f4c6fe39d/docs/storage/raw/dataset-store.md) — feat: Logos Storage dataset store (#278)
 
@@ -53,7 +54,7 @@ The `DatasetStore`/`Dataset` interfaces rely on a few external pseudotypes:
 1. `BytesIO` represents a generic read or write byte stream;
 2. `Bitset` is a fixed-size set - typically represented as a bit array - which encodes an integer set. Bit $i$ in this array is set to $1$ if $i$ is in the set, or $0$ otherwise;
 3. `CID` represents a libp2p [Content Identifier](https://github.com/multiformats/cid);
-4. `Manifest` represents a [Logos Storage Manifest](./datasets.md);
+4. `Manifest` represents a [Logos Storage Manifest](datasets.md);
 5. `Block` represents an arbitrary chunk of data;
 6. `MerkleProof` represents a Merkle inclusion proof for a `Block`.
 

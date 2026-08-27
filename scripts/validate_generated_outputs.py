@@ -6,17 +6,46 @@ Run this after `gen_rfc_index.py` and `gen_summary.py`.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import re
 from pathlib import Path
 from typing import List, Tuple
 
-from validate_metadata import DOCS, ROOT, discover_docs, read_doc
+from target_args import add_target_args, load_target_paths
+from validate_metadata import DOCS, ROOT, EXCLUDE_FILES, EXCLUDE_PARTS, discover_docs, read_doc
 
 SUMMARY = DOCS / "SUMMARY.md"
 INDEX = DOCS / "logos-lips.json"
-EXCLUDE_INDEX_PARTS = {"previous-versions"}
-SUMMARY_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+\.md(?:#[^)]+)?)\)")
+EXCLUDE_INDEX_PARTS = {"previous-versions", "appendix", "appendices"}
+SUMMARY_AUXILIARY_PARTS = {"appendix", "appendices"}
+SUMMARY_ALLOWED_NON_SPEC_FILES = {"README.md", "about.md", "template.md"}
+SUMMARY_LINK_RE = re.compile(r"\[(?:\\.|[^\]\\])+\]\(([^)]+\.md(?:#[^)]+)?)\)")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    add_target_args(parser)
+    return parser.parse_args()
+
+
+def target_spec_rels(targets: list[Path] | None) -> set[Path]:
+    if targets is None:
+        return set()
+
+    rels: set[Path] = set()
+    for target in targets:
+        if len(target.parts) < 2 or target.parts[0] != "docs":
+            continue
+        docs_rel = Path(*target.parts[1:])
+        if docs_rel.suffix.lower() != ".md":
+            continue
+        if docs_rel.name in EXCLUDE_FILES:
+            continue
+        if EXCLUDE_PARTS.intersection(docs_rel.parts):
+            continue
+        rels.add(docs_rel)
+    return rels
 
 
 def parse_summary_links() -> Tuple[set[Path], List[str]]:
@@ -43,19 +72,32 @@ def parse_summary_links() -> Tuple[set[Path], List[str]]:
     return links, errors
 
 
-def validate_summary_coverage() -> List[str]:
+def validate_summary_coverage(targets: list[Path] | None = None) -> List[str]:
     linked_paths, errors = parse_summary_links()
-    expected_paths = {path.resolve() for path in discover_docs()}
+    expected_paths = {path.resolve() for path in discover_docs(targets)}
 
     missing = sorted(expected_paths - linked_paths)
     if missing:
         joined = ", ".join(str(path.relative_to(ROOT)) for path in missing)
         errors.append(f"{SUMMARY.relative_to(ROOT)} is missing spec link(s): {joined}")
 
+    if targets is not None:
+        deleted = sorted(
+            (DOCS / rel).resolve()
+            for rel in target_spec_rels(targets)
+            if not (DOCS / rel).exists()
+        )
+        stale = [path for path in deleted if path in linked_paths]
+        if stale:
+            joined = ", ".join(str(path.relative_to(ROOT)) for path in stale)
+            errors.append(f"{SUMMARY.relative_to(ROOT)} still links deleted spec(s): {joined}")
+        return errors
+
     extra = sorted(
         path
         for path in linked_paths - expected_paths
-        if path.name not in {"README.md", "about.md"}
+        if path.name not in SUMMARY_ALLOWED_NON_SPEC_FILES
+        and not SUMMARY_AUXILIARY_PARTS.intersection(path.relative_to(DOCS).parts)
     )
     if extra:
         joined = ", ".join(str(path.relative_to(ROOT)) for path in extra)
@@ -64,7 +106,7 @@ def validate_summary_coverage() -> List[str]:
     return errors
 
 
-def validate_index_coverage() -> List[str]:
+def validate_index_coverage(targets: list[Path] | None = None) -> List[str]:
     if not INDEX.exists():
         return [f"{INDEX.relative_to(ROOT)} is missing"]
 
@@ -83,7 +125,7 @@ def validate_index_coverage() -> List[str]:
     }
     expected_paths = {
         read_doc(path).rel.relative_to("docs").with_suffix(".html").as_posix()
-        for path in discover_docs()
+        for path in discover_docs(targets)
         if not EXCLUDE_INDEX_PARTS.intersection(path.relative_to(ROOT).parts)
     }
 
@@ -93,6 +135,20 @@ def validate_index_coverage() -> List[str]:
         errors.append(
             f"{INDEX.relative_to(ROOT)} is missing spec path(s): {', '.join(missing)}"
         )
+
+    if targets is not None:
+        deleted = sorted(
+            rel.with_suffix(".html").as_posix()
+            for rel in target_spec_rels(targets)
+            if not (DOCS / rel).exists()
+            and not EXCLUDE_INDEX_PARTS.intersection(("docs", *rel.parts))
+        )
+        stale = sorted(path for path in deleted if path in actual_paths)
+        if stale:
+            errors.append(
+                f"{INDEX.relative_to(ROOT)} still contains deleted spec path(s): {', '.join(stale)}"
+            )
+        return errors
 
     extra = sorted(actual_paths - expected_paths)
     if extra:
@@ -104,8 +160,10 @@ def validate_index_coverage() -> List[str]:
 
 
 def main() -> int:
-    errors = validate_summary_coverage()
-    errors.extend(validate_index_coverage())
+    args = parse_args()
+    targets = load_target_paths(ROOT, args)
+    errors = validate_summary_coverage(targets)
+    errors.extend(validate_index_coverage(targets))
 
     for error in errors:
         print(f"[ERROR] {error}")

@@ -14,6 +14,7 @@
 
 ## Timeline
 
+- **2026-04-20** — [`c3d15a9`](https://github.com/logos-co/logos-lips/blob/c3d15a9c7c24b4d6b0eb4fb578f9670ede6f69b0/docs/storage/deprecated/codex-marketplace.md) — COSS overhaul: new statuses, CFR type, raw-spec leniency (#308)
 - **2026-01-22** — [`e356a07`](https://github.com/logos-co/logos-lips/blob/e356a076aea06653764515babc71c8d69b26358d/docs/storage/deprecated/codex-marketplace.md) — Chore/add makefile (#271)
 - **2026-01-22** — [`af45aae`](https://github.com/logos-co/logos-lips/blob/af45aae01271637142fa931e673dc7c8627f480e/docs/storage/deprecated/codex-marketplace.md) — chore: deprecate Marketplace-related specs (#268)
 - **2026-01-19** — [`f24e567`](https://github.com/logos-co/logos-lips/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/storage/raw/codex-marketplace.md) — Chore/updates mdbook (#262)
@@ -133,7 +134,7 @@ A client has two primary responsibilities:
 
 When a user prompts the client node to create a storage request, the client node SHOULD receive the input parameters for the storage request from the user.
 
-To create a request to persist a dataset on the Codex network, client nodes MUST split the dataset into data chunks, $(c_1, c_2, c_3, \ldots, c_{n})$. Using the erasure coding method and the provided input parameters, the data chunks are encoded and distributed over a number of slots. The applied erasure coding method MUST use the [Reed-Solomon algorithm](https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA). The final slot roots and other metadata MUST be placed into a `Manifest` (TODO: Manifest RFC). The CID for the `Manifest` MUST then be used as the `cid` for the stored dataset.
+To create a request to persist a dataset on the Codex network, client nodes MUST split the dataset into data chunks, $`(c_1, c_2, c_3, \ldots, c_{n})`$. Using the erasure coding method and the provided input parameters, the data chunks are encoded and distributed over a number of slots. The applied erasure coding method MUST use the [Reed-Solomon algorithm](https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA). The final slot roots and other metadata MUST be placed into a `Manifest` (TODO: Manifest RFC). The CID for the `Manifest` MUST then be used as the `cid` for the stored dataset.
 
 After the dataset is prepared, a client node MUST call the smart contract function `requestStorage(request)`, providing the desired request parameters in the `request` parameter. The `request` parameter is of type `Request`:
 
@@ -171,9 +172,9 @@ The table below provides the description of the `Request` and the associated typ
 | `content` | `Content` | The dataset that will be hosted with the storage request. |
 | `expiry` | `uint64` | Timeout in seconds during which all the slots have to be filled, otherwise Request will get cancelled. The final deadline timestamp is calculated at the moment the transaction is mined. |
 | `nonce` | `bytes32` | Random value to differentiate from other requests of same parameters. It SHOULD be a random byte array. |
-| `pricePerBytePerSecond` | `uint256` | Amount of tokens that will be awarded to SPs for finishing the storage request. It MUST be an amount of tokens offered per slot per second per byte. The Ethereum address that submits the `requestStorage()` transaction MUST have [approval](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-) for the transfer of at least an equivalent amount of full reward (`pricePerBytePerSecond * duration * slots * slotSize`) in tokens. |
+| `pricePerBytePerSecond` | `uint256` | Amount of tokens that will be awarded to SPs for finishing the storage request. It MUST be an amount of tokens offered per slot per second per byte. The Ethereum address that submits the `requestStorage()` transaction MUST have [approval](https://docs.openzeppelin.com/contracts/5.x/api/token/erc20#IERC20-approve-address-uint256-) for the transfer of at least an equivalent amount of full reward (`pricePerBytePerSecond * duration * slots * slotSize`) in tokens. |
 | `collateralPerByte` | `uint256` | The amount of tokens per byte of slot's size that SPs submit when they fill slots. Collateral is then slashed or forfeited if SPs fail to provide the service requested by the storage request (more information in the [Slashing](#### Slashing) section). |
-| `proofProbability` | `uint256` | Determines the average frequency that a proof is required within a period: $\frac{1}{proofProbability}$. SPs are required to provide proofs of storage to the marketplace contract when challenged. To prevent hosts from only coming online when proofs are required, the frequency at which proofs are requested from SPs is stochastic and is influenced by the `proofProbability` parameter. |
+| `proofProbability` | `uint256` | Determines the average frequency that a proof is required within a period: $`\frac{1}{proofProbability}`$. SPs are required to provide proofs of storage to the marketplace contract when challenged. To prevent hosts from only coming online when proofs are required, the frequency at which proofs are requested from SPs is stochastic and is influenced by the `proofProbability` parameter. |
 | `duration` | `uint64` | Total duration of the storage request in seconds. It MUST NOT exceed the limit specified in the configuration `config.requestDurationLimit`. |
 | `slots` | `uint64` | The number of requested slots. The slots will all have the same size. |
 | `slotSize` | `uint64` | Amount of storage per slot in bytes. |
@@ -244,7 +245,7 @@ When the proof is ready, the SP MUST call `fillSlot()` on the smart contract wit
 - `slotIndex` - the slot index that the node wants to fill.
 - `proof` - the `Groth16Proof` proof structure, generated over the slot data.
 
-The Ethereum address of the SP node from which the transaction originates MUST have [approval](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-) for the transfer of at least the amount of tokens required as collateral for the slot (`collateralPerByte * slotSize`).
+The Ethereum address of the SP node from which the transaction originates MUST have [approval](https://docs.openzeppelin.com/contracts/5.x/api/token/erc20#IERC20-approve-address-uint256-) for the transfer of at least the amount of tokens required as collateral for the slot (`collateralPerByte * slotSize`).
 
 If the proof delivered by the SP is invalid or the slot was already filled by another SP, then the transaction will revert. Otherwise, a `SlotFilled(requestId, slotIndex)` event is emitted. If the transaction is successful, the SP SHOULD transition into the **proving** state, where it will need to submit proof of data possession when challenged by the smart contract.
 
@@ -805,8 +806,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### Informative
 
-- [Codex Implementation](https://github.com/codex-storage/nim-codex) - Reference implementation in Nim
-- [Codex market implementation](https://github.com/codex-storage/nim-codex/blob/master/codex/market.nim) - Marketplace module implementation
+- [Codex Implementation](https://github.com/logos-storage/logos-storage-nim) - Reference implementation in Nim
+- [Codex market implementation](https://github.com/logos-storage/logos-storage-nim) - Marketplace module implementation
 - [Codex Sales Component Spec](https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Sales.md) - Storage Provider implementation details
 - [Codex Purchase Component Spec](https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Purchase.md) - Client implementation details
 - [Nim Chronos](https://github.com/status-im/nim-chronos) - Async/await framework for Nim

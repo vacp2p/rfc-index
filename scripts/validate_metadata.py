@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Validate RFC metadata tables and auto-assign missing slugs.
+Validate RFC metadata tables and auto-assign invalid or missing slugs.
 
-By default, this script writes fixes for missing/blank `Slug` values and
+By default, this script writes fixes for missing/blank/invalid `Slug` values and
 returns non-zero on any validation issue.
 Use `--check` to run in read-only mode.
 """
@@ -14,17 +14,23 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+from target_args import add_target_args, load_target_paths
+
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 
 EXCLUDE_FILES = {"README.md", "SUMMARY.md", "about.md", "template.md"}
+EXCLUDE_PARTS = {"appendix", "appendices"}
 # Fields required for draft and above; raw specs only need name + status.
 REQUIRED_FIELDS_ALL = ("name", "slug", "status", "type", "category", "editor")
 REQUIRED_FIELDS_RAW = ("name", "status")
 ALLOWED_STATUS = {"raw", "draft", "approved", "stable", "verified", "deprecated", "retired", "deleted"}
+STATUS_SCOPED_COMPONENTS = {"messaging", "blockchain", "storage", "anoncomms", "research"}
 ALLOWED_TYPES = {"rfc", "cfr"}
 ALLOWED_CATEGORIES = {
     "standards track",
+    "application",
+    "core",
     "informational",
     "best current practice",
     "process",
@@ -40,9 +46,6 @@ FRONT_MATTER_KEY_RE = re.compile(
     r"^(title|name|slug|status|type|category|tags|editor|contributors)\s*:",
     re.IGNORECASE,
 )
-CANONICAL_HEADER = "| Field | Value |"
-
-
 @dataclass
 class TableInfo:
     start: int
@@ -73,15 +76,39 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Read-only mode; do not write missing slugs.",
     )
+    add_target_args(parser)
     return parser.parse_args()
 
 
-def discover_docs() -> List[Path]:
+def is_discoverable_doc(path: Path) -> bool:
+    try:
+        rel = path.relative_to(DOCS)
+    except ValueError:
+        return False
+    if path.suffix.lower() != ".md":
+        return False
+    if path.name in EXCLUDE_FILES:
+        return False
+    if EXCLUDE_PARTS.intersection(rel.parts):
+        return False
+    return True
+
+
+def discover_docs(targets: Optional[List[Path]] = None) -> List[Path]:
+    if targets is not None:
+        files = []
+        for rel_target in targets:
+            path = ROOT / rel_target
+            if not path.exists() or not path.is_file():
+                continue
+            if is_discoverable_doc(path):
+                files.append(path)
+        return sorted(set(files))
+
     files = []
     for path in DOCS.rglob("*.md"):
-        if path.name in EXCLUDE_FILES:
-            continue
-        files.append(path)
+        if is_discoverable_doc(path):
+            files.append(path)
     return sorted(files)
 
 
@@ -151,6 +178,19 @@ def read_doc(path: Path) -> DocInfo:
     )
 
 
+def lifecycle_status_dir(rel: Path) -> Optional[str]:
+    parts = rel.parts
+    if len(parts) < 4 or parts[0] != "docs":
+        return None
+    component = parts[1]
+    if component not in STATUS_SCOPED_COMPONENTS:
+        return None
+    for part in parts[2:-1]:
+        if part in ALLOWED_STATUS:
+            return part
+    return None
+
+
 def next_free_slug(used: set[int]) -> int:
     candidate = max(used, default=0) + 1
     while candidate in used:
@@ -158,7 +198,7 @@ def next_free_slug(used: set[int]) -> int:
     return candidate
 
 
-def assign_missing_slug(doc: DocInfo, slug: int) -> None:
+def assign_slug(doc: DocInfo, slug: int) -> None:
     assert doc.table is not None
     slug_row = doc.table.rows.get("slug")
     if slug_row:
@@ -189,25 +229,39 @@ def collect_used_numeric_slugs(docs: List[DocInfo]) -> set[int]:
     return used
 
 
-def maybe_assign_slugs(docs: List[DocInfo], check_mode: bool) -> List[DocInfo]:
+def slug_needs_assignment(doc: DocInfo, seen: set[int]) -> bool:
+    slug = doc.meta().get("slug", "").strip()
+    if not NUMERIC_RE.fullmatch(slug):
+        return True
+
+    value = int(slug)
+    if "previous-versions" in doc.rel.parts:
+        return False
+    if value in seen:
+        return True
+
+    seen.add(value)
+    return False
+
+
+def maybe_assign_slugs(
+    docs: List[DocInfo],
+    check_mode: bool,
+    all_docs: Optional[List[DocInfo]] = None,
+) -> List[DocInfo]:
     if check_mode:
         return []
 
     changed: List[DocInfo] = []
-    used = collect_used_numeric_slugs(docs)
+    used = collect_used_numeric_slugs(all_docs or docs)
+    seen_unique: set[int] = set()
     for doc in docs:
         if not doc.table:
             continue
-        meta = doc.meta()
-        slug = meta.get("slug", "").strip()
-        if slug:
-            continue
-        # Do not auto-assign slugs to raw specs; slugs are assigned on draft promotion.
-        status = meta.get("status", "").strip().lower()
-        if status == "raw":
+        if not slug_needs_assignment(doc, seen_unique):
             continue
         free_slug = next_free_slug(used)
-        assign_missing_slug(doc, free_slug)
+        assign_slug(doc, free_slug)
         used.add(free_slug)
         changed.append(doc)
     return changed
@@ -220,7 +274,7 @@ def validate_doc(doc: DocInfo) -> None:
         )
 
     if not doc.table:
-        doc.errors.append(f"missing metadata table '{CANONICAL_HEADER}'")
+        doc.errors.append("missing metadata table '| Field | Value |'")
         return
 
     expected_start = expected_metadata_table_start(doc.lines)
@@ -229,9 +283,9 @@ def validate_doc(doc: DocInfo) -> None:
             "metadata table must appear at the top of the spec, immediately after the optional H1"
         )
 
-    # Ensure standard header rows remain canonical.
-    if doc.lines[doc.table.start].strip() != CANONICAL_HEADER:
-        doc.errors.append(f"metadata header row must be exactly '{CANONICAL_HEADER}'")
+    # Keep header validation aligned with metadata-table discovery.
+    if not HEADER_RE.match(doc.lines[doc.table.start].strip()):
+        doc.errors.append("metadata header row must contain only 'Field' and 'Value' columns")
     if not SEPARATOR_RE.match(doc.lines[doc.table.separator].strip()):
         doc.errors.append("metadata separator row is malformed")
 
@@ -261,6 +315,18 @@ def validate_doc(doc: DocInfo) -> None:
             "file is under '/deprecated/' but status is not deprecated/deleted"
         )
 
+    status_dir = lifecycle_status_dir(doc.rel)
+    component = doc.rel.parts[1] if len(doc.rel.parts) > 1 else ""
+    if component in STATUS_SCOPED_COMPONENTS:
+        if not status_dir:
+            doc.errors.append(
+                f"file is under status-scoped component '{component}' but not under a lifecycle status directory"
+            )
+        elif status and status != status_dir:
+            doc.errors.append(
+                f"file is under '/{status_dir}/' but metadata status is '{status}'"
+            )
+
     slug = meta.get("slug", "").strip()
     if slug and not NUMERIC_RE.fullmatch(slug):
         doc.errors.append("slug must be a positive integer")
@@ -283,7 +349,10 @@ def validate_doc(doc: DocInfo) -> None:
             )
 
 
-def validate_slug_uniqueness(docs: List[DocInfo]) -> List[str]:
+def validate_slug_uniqueness(
+    docs: List[DocInfo],
+    scoped_to: Optional[set[Path]] = None,
+) -> List[str]:
     # Allow duplicated slugs in archived previous-version snapshots.
     slug_map: Dict[int, List[Path]] = {}
     for doc in docs:
@@ -300,6 +369,8 @@ def validate_slug_uniqueness(docs: List[DocInfo]) -> List[str]:
     for slug, paths in sorted(slug_map.items()):
         if len(paths) <= 1:
             continue
+        if scoped_to is not None and not scoped_to.intersection(paths):
+            continue
         joined = ", ".join(str(p) for p in paths)
         errors.append(f"duplicate slug {slug}: {joined}")
     return errors
@@ -312,13 +383,17 @@ def write_if_changed(doc: DocInfo) -> None:
 
 def main() -> int:
     args = parse_args()
-    docs = [read_doc(path) for path in discover_docs()]
+    targets = load_target_paths(ROOT, args)
+    target_paths = discover_docs(targets)
+    docs = [read_doc(path) for path in target_paths]
+    all_docs = docs if targets is None else [read_doc(path) for path in discover_docs()]
 
-    changed = maybe_assign_slugs(docs, check_mode=args.check)
+    changed = maybe_assign_slugs(docs, check_mode=args.check, all_docs=all_docs)
     for doc in docs:
         validate_doc(doc)
 
-    global_errors = validate_slug_uniqueness(docs)
+    scoped_to = None if targets is None else {doc.rel for doc in docs}
+    global_errors = validate_slug_uniqueness(all_docs, scoped_to=scoped_to)
 
     if changed:
         for doc in changed:

@@ -58,7 +58,8 @@
           <a href="${root}messaging/index.html">Messaging</a>
           <a href="${root}blockchain/index.html">Blockchain</a>
           <a href="${root}storage/index.html">Storage</a>
-          <a href="${root}ift-ts/index.html">IFT-TS</a>
+          <a href="${root}anoncomms/index.html">AnonComms</a>
+          <a href="${root}research/index.html">Research</a>
         </div>
       </details>
       <a class="nav-link" href="${root}about.html">About</a>
@@ -99,7 +100,7 @@
     const footer = document.createElement("footer");
     footer.className = "site-footer";
     footer.innerHTML = `
-      <a href="https://vac.dev">IFT-TS</a>
+      <a href="https://vac.dev">Logos Research</a>
       <span class="footer-sep">·</span>
       <a href="https://www.ietf.org">IETF</a>
       <span class="footer-sep">·</span>
@@ -213,30 +214,69 @@
     const items = root.querySelectorAll("li.chapter-item");
     items.forEach((item) => {
       const sectionInfo = getSectionInfo(item);
-      const link = item.querySelector(":scope > a, :scope > .chapter-link-wrapper > a");
-      if (!sectionInfo || !link) return;
+      const label = item.querySelector(
+        ":scope > a, :scope > .chapter-link-wrapper > a, :scope > div"
+      );
+      if (!sectionInfo || !label) return;
+      const isStructuralLabel = label.matches("div");
 
-      if (!link.querySelector(".section-toggle")) {
+      const setActive = () => {
+        root.querySelectorAll(
+          "li.chapter-item > a.active, " +
+          "li.chapter-item > .chapter-link-wrapper > a.active, " +
+          "li.chapter-item > div.active"
+        ).forEach((active) => active.classList.remove("active"));
+        label.classList.add("active");
+      };
+      const setExpanded = (expanded) => {
+        item.classList.toggle("expanded", expanded);
+        const toggle = label.querySelector(".section-toggle");
+        const control = isStructuralLabel ? label : toggle;
+        if (control) {
+          control.setAttribute("aria-expanded", expanded ? "true" : "false");
+        }
+      };
+      const toggleExpanded = () => {
+        if (isStructuralLabel) {
+          setActive();
+        }
+        setExpanded(!item.classList.contains("expanded"));
+      };
+
+      if (!label.querySelector(".section-toggle")) {
         const toggle = document.createElement("span");
         toggle.className = "section-toggle";
-        toggle.setAttribute("role", "button");
-        toggle.setAttribute("aria-label", "Toggle section");
+        if (isStructuralLabel) {
+          toggle.setAttribute("aria-hidden", "true");
+        } else {
+          toggle.setAttribute("role", "button");
+          toggle.setAttribute("aria-label", "Toggle section");
+        }
         toggle.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
-          item.classList.toggle("expanded");
+          toggleExpanded();
         });
-        link.prepend(toggle);
+        label.prepend(toggle);
+      }
+
+      if (isStructuralLabel && label.dataset.collapsibleLabelInit !== "true") {
+        label.setAttribute("role", "button");
+        label.setAttribute("tabindex", "0");
+        label.addEventListener("click", toggleExpanded);
+        label.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          toggleExpanded();
+        });
+        label.dataset.collapsibleLabelInit = "true";
       }
 
       if (item.dataset.collapsibleInit !== "true") {
-        const hasActive = link.classList.contains("active");
+        const directLink = label.matches("a") ? label : label.querySelector("a");
+        const hasActive = !!directLink && directLink.classList.contains("active");
         const hasActiveInSection = !!sectionInfo.section.querySelector(".active");
-        if (hasActive || hasActiveInSection) {
-          item.classList.add("expanded");
-        } else {
-          item.classList.remove("expanded");
-        }
+        setExpanded(hasActive || hasActiveInSection);
         item.dataset.collapsibleInit = "true";
       }
     });
@@ -359,10 +399,11 @@
     unknown: "Unknown"
   };
   const componentLabels = {
-    waku: "Messaging",
-    nomos: "Blockchain",
-    codex: "Storage",
-    vac: "IFT-TS",
+    messaging: "Messaging",
+    blockchain: "Blockchain",
+    storage: "Storage",
+    "anoncomms": "AnonComms",
+    research: "Research",
   };
   const hiddenByDefaultStatuses = new Set(["deprecated", "deleted"]);
   const headers = [
@@ -702,4 +743,149 @@
       console.error(err);
       resultsCount.textContent = "Failed to load RFC index.";
     });
+
+  /* ---------- Blockchain topic tree (mirrors the SUMMARY sidebar) ---------- */
+
+  const treeContainer = document.getElementById("blockchain-tree-container");
+  if (treeContainer) {
+    const TREE_STATUS_LABELS = {
+      raw: "Raw",
+      draft: "Draft",
+      approved: "Approved",
+      stable: "Stable",
+      verified: "Verified",
+      deprecated: "Deprecated",
+      retired: "Retired",
+      deleted: "Deleted",
+    };
+
+    const treeSource = `${rootPrefix}blockchain-structure.json`;
+
+    function buildTreeSpec(spec) {
+      const li = document.createElement("li");
+      li.className = spec.path ? "tree-spec" : "tree-spec tree-spec-placeholder";
+
+      if (spec.path) {
+        const a = document.createElement("a");
+        a.href = `${rootPrefix}${spec.path.replace(/\.md(#.*)?$/, ".html$1")}`;
+        a.textContent = spec.label;
+        li.appendChild(a);
+      } else {
+        const span = document.createElement("span");
+        span.className = "tree-spec-label";
+        span.textContent = spec.label;
+        li.appendChild(span);
+        const tbd = document.createElement("span");
+        tbd.className = "tree-badge tree-badge-tbd";
+        tbd.textContent = "TBD";
+        li.appendChild(tbd);
+      }
+
+      if (spec.status && TREE_STATUS_LABELS[spec.status]) {
+        const badge = document.createElement("span");
+        badge.className = `tree-badge tree-badge-${spec.status}`;
+        badge.textContent = TREE_STATUS_LABELS[spec.status];
+        li.appendChild(badge);
+      }
+
+      return li;
+    }
+
+    function buildTreeBucket(bucket) {
+      const realCount = bucket.specs.filter((s) => s.path).length;
+      const totalCount = bucket.specs.length;
+
+      const details = document.createElement("details");
+      details.className = totalCount === 0 ? "tree-bucket tree-bucket-empty" : "tree-bucket";
+
+      const summary = document.createElement("summary");
+      summary.className = "tree-bucket-summary";
+      summary.appendChild(document.createTextNode(bucket.name));
+
+      const count = document.createElement("span");
+      count.className = "tree-bucket-count";
+      if (totalCount === 0) {
+        count.textContent = "empty";
+      } else if (realCount === totalCount) {
+        count.textContent = String(totalCount);
+      } else {
+        count.textContent = `${realCount} of ${totalCount}`;
+      }
+      summary.appendChild(count);
+      details.appendChild(summary);
+
+      if (totalCount > 0) {
+        const ul = document.createElement("ul");
+        ul.className = "tree-specs";
+        bucket.specs.forEach((spec) => ul.appendChild(buildTreeSpec(spec)));
+        details.appendChild(ul);
+      }
+
+      return details;
+    }
+
+    function buildTreeTopic(topic) {
+      const details = document.createElement("details");
+      details.className = "tree-topic";
+
+      const summary = document.createElement("summary");
+      summary.className = "tree-topic-summary";
+      summary.textContent = topic.name;
+      details.appendChild(summary);
+
+      const inner = document.createElement("div");
+      inner.className = "tree-buckets";
+      topic.buckets.forEach((bucket) => inner.appendChild(buildTreeBucket(bucket)));
+      details.appendChild(inner);
+
+      return details;
+    }
+
+    function buildTreeGroup(data) {
+      const root = document.createElement("details");
+      root.className = "tree-root";
+      root.open = true;
+
+      const summary = document.createElement("summary");
+      summary.className = "tree-root-summary";
+      summary.textContent = data.label;
+      root.appendChild(summary);
+
+      const inner = document.createElement("div");
+      inner.className = "tree-topics";
+      if (Array.isArray(data.buckets)) {
+        data.buckets.forEach((bucket) => inner.appendChild(buildTreeBucket(bucket)));
+      } else {
+        data.topics.forEach((topic) => inner.appendChild(buildTreeTopic(topic)));
+      }
+      root.appendChild(inner);
+
+      return root;
+    }
+
+    function buildTreeRoot(data) {
+      if (!Array.isArray(data.groups)) {
+        return buildTreeGroup(data);
+      }
+
+      const groups = document.createElement("div");
+      groups.className = "tree-groups";
+      data.groups.forEach((group) => groups.appendChild(buildTreeGroup(group)));
+      return groups;
+    }
+
+    fetch(treeSource)
+      .then((resp) => {
+        if (!resp.ok) throw new Error(resp.statusText);
+        return resp.json();
+      })
+      .then((data) => {
+        treeContainer.innerHTML = "";
+        treeContainer.appendChild(buildTreeRoot(data));
+      })
+      .catch((err) => {
+        console.error("Blockchain tree:", err);
+        treeContainer.innerHTML = '<p class="blockchain-tree-error">Failed to load topic tree.</p>';
+      });
+  }
 })();

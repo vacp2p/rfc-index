@@ -13,6 +13,7 @@
 
 ## Timeline
 
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/storage/raw/community-history.md) — chore: split ift ts specs (#334)
 - **2026-02-09** — [`afd94c8`](https://github.com/logos-co/logos-lips/blob/afd94c8bc1420376ae9af7e14a4feb246f2ed621/docs/storage/raw/community-history.md) — chore: add math support (#287)
 - **2026-01-30** — [`d5a9240`](https://github.com/logos-co/logos-lips/blob/d5a9240c6c6c859eddd30742b2251f8a13480cf9/docs/storage/raw/community-history.md) — chore: removed archived (#283)
 - **2026-01-19** — [`f24e567`](https://github.com/logos-co/logos-lips/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/storage/raw/community-history.md) — Chore/updates mdbook (#262)
@@ -24,7 +25,7 @@
 ## Abstract
 
 This document describes how nodes in Status Communities archive historical message data of their communities.
-Not requiring to follow the time range limit provided by [13/WAKU2-STORE](../../messaging/standards/core/13/store.md)
+Not requiring to follow the time range limit provided by [13/WAKU2-STORE](../../messaging/core/draft/13/store.md)
 nodes using the [BitTorrent protocol](https://www.bittorrent.org/beps/bep_0003.html).
 It also describes how the archives are distributed to community members via the [Status network](https://status.network/),
 so they can fetch them and
@@ -32,9 +33,9 @@ gain access to a complete message history.
 
 ## Background
 
-Messages are stored permanently by [13/WAKU2-STORE](../../messaging/standards/core/13/store.md) nodes for a configurable time range,
-which is limited by the overall storage provided by a [13/WAKU2-STORE](../../messaging/standards/core/13/store.md) nodes.
-Messages older than that period are no longer provided by [13/WAKU2-STORE](../../messaging/standards/core/13/store.md) nodes,
+Messages are stored permanently by [13/WAKU2-STORE](../../messaging/core/draft/13/store.md) nodes for a configurable time range,
+which is limited by the overall storage provided by a [13/WAKU2-STORE](../../messaging/core/draft/13/store.md) nodes.
+Messages older than that period are no longer provided by [13/WAKU2-STORE](../../messaging/core/draft/13/store.md) nodes,
 making it impossible for other nodes to request historical messages that go beyond that time range.
 This raises issues in the case of Status communities,
 where recently joined members of a community are not able to request complete message histories of the community channels.
@@ -43,15 +44,15 @@ where recently joined members of a community are not able to request complete me
 
 | Name | Description |
 | ---- | -------------- |
-| Waku node | A [10/WAKU2](../../messaging/standards/core/10/waku2.md) node that implements [11/WAKU2-RELAY](../../messaging/standards/core/11/relay.md) |
-| Store node | A [10/WAKU2](../../messaging/standards/core/10/waku2.md) node that implements [13/WAKU2-STORE](../../messaging/standards/core/13/store.md) |
-| Waku network | A group of [10/WAKU2](../../messaging/standards/core/10/waku2.md) nodes forming a graph, connected via [11/WAKU2-RELAY](../../messaging/standards/core/11/relay.md) |
+| Waku node | A [10/WAKU2](../../messaging/core/draft/10/waku2.md) node that implements [11/WAKU2-RELAY](../../messaging/core/stable/11/relay.md) |
+| Store node | A [10/WAKU2](../../messaging/core/draft/10/waku2.md) node that implements [13/WAKU2-STORE](../../messaging/core/draft/13/store.md) |
+| Waku network | A group of [10/WAKU2](../../messaging/core/draft/10/waku2.md) nodes forming a graph, connected via [11/WAKU2-RELAY](../../messaging/core/stable/11/relay.md) |
 | Status user | A Status account that is used in a Status consumer product, such as Status Mobile or Status Desktop |
 | Status node | A Status client run by a Status application |
 | Control node| A Status node that owns the private key for a Status community |
 | Community member | A Status user that is part of a Status community, not owning the private key of the community|
 | Community member node | A Status node with message archive capabilities enabled, run by a community member |
-| Live messages | [14/WAKU2-MESSAGE](../../messaging/standards/core/14/message.md) received through the Waku network |
+| Live messages | [14/WAKU2-MESSAGE](../../messaging/core/stable/14/message.md) received through the Waku network |
 | BitTorrent client | A program implementing the BitTorrent protocol |
 | Torrent/Torrent file | A file containing metadata about data to be downloaded by BitTorrent clients |
 | Magnet link | A link encoding the metadata provided by a torrent file (Magnet URI scheme) |
@@ -65,7 +66,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 ### Message History Archive
 
 Message history archives are represented as `WakuMessageArchive` and
-created from a [14/WAKU2-MESSAGE](../../messaging/standards/core/14/message.md) exported from the local database.
+created from a [14/WAKU2-MESSAGE](../../messaging/core/stable/14/message.md) exported from the local database.
 The following describes the protocol buffer for `WakuMessageArchive` :
 
 ``` protobuf
@@ -269,13 +270,13 @@ The `content_Topic` of that special channel follows the following format:
 ```
 
 All messages sent with this special channel's `content_Topic` MUST be instances of `ApplicationMetadataMessage`,
-with a [62/STATUS-PAYLOADS](https://github.com/status-im/status-specs/tree/master/specs/status/62/payloads.md) of `CommunityMessageArchiveIndex`.
+with a [62/STATUS-PAYLOADS](../../messaging/application/draft/26/payload.md) of `CommunityMessageArchiveIndex`.
 
 Only the control node MAY post to the special channel.
 Other messages on this specified channel MUST be ignored by clients.
 Community members MUST NOT have permission to send messages to the special channel.
 However, community member nodes MUST subscribe to a special channel,
-to receive a [14/WAKU2-MESSAGE](../../messaging/standards/core/14/message.md) containing magnet links for message archives.
+to receive a [14/WAKU2-MESSAGE](../../messaging/core/stable/14/message.md) containing magnet links for message archives.
 
 #### Canonical Message Histories
 
@@ -309,7 +310,7 @@ Two RECOMMENDED scenarios in which community member nodes can receive such a mag
 (this is the case when a new community member joins a community.)
 3. Downloading message archives
 
-When community member nodes receive a message with a `CommunityMessageHistoryArchive` [62/STATUS-PAYLOADS](https://github.com/status-im/status-specs/tree/master/specs/status/62/payloads.md),
+When community member nodes receive a message with a `CommunityMessageHistoryArchive` [62/STATUS-PAYLOADS](../../messaging/application/draft/26/payload.md),
 they MUST extract the `magnet_uri`.
 Then SHOULD pass it to their underlying BitTorrent client to fetch the latest message history archive index,
 which is the index file of the torrent, see [Creating message archive torrents].
@@ -381,10 +382,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [13/WAKU2-STORE](../../messaging/standards/core/13/store.md)
+- [13/WAKU2-STORE](../../messaging/core/draft/13/store.md)
 - [BitTorrent protocol](https://www.bittorrent.org/beps/bep_0003.html)
 - [Status network](https://status.network/)
-- [10/WAKU2](../../messaging/standards/core/10/waku2.md)
-- [11/WAKU2-RELAY](../../messaging/standards/core/11/relay.md)
-- [14/WAKU2-MESSAGE](../../messaging/standards/core/14/message.md)
-- [62/STATUS-PAYLOADS](https://github.com/status-im/status-specs/tree/master/specs/status/62/payloads.md)
+- [10/WAKU2](../../messaging/core/draft/10/waku2.md)
+- [11/WAKU2-RELAY](../../messaging/core/stable/11/relay.md)
+- [14/WAKU2-MESSAGE](../../messaging/core/stable/14/message.md)
+- [62/STATUS-PAYLOADS](../../messaging/application/draft/26/payload.md)
