@@ -45,6 +45,7 @@ message SegmentMessage {
   uint32 segment_count        = 3;
   bool   is_parity            = 4;
   bytes  payload              = 5;
+  uint32 payload_length       = 6;
 }
 ```
 
@@ -55,9 +56,13 @@ message SegmentMessage {
 | `segment_count` | REQUIRED | Number of segments in this segment's own class: the count of data segments when `is_parity` is `false`; the count of parity segments when `is_parity` is `true`. |
 | `is_parity` | OPTIONAL, defaults to `false` | `true` for a parity segment, `false` for a data segment. |
 | `payload` | REQUIRED | The data chunk or the parity shard. |
+| `payload_length` | REQUIRED | Length in bytes of the original payload, before segmentation. |
 
 `is_parity` gives `index` and `segment_count` their meaning: both are read within the class the flag selects.
-Every segment of a set carries the same `segment_count` as the other segments of its class.
+Every segment of a set carries the same `segment_count` as the other segments of its class,
+and the same `payload_length` as every other segment of the set.
+`payload_length` is repeated on every segment because any segment may be one of those lost,
+and reconstruction needs the length whichever subset survives.
 
 ### Segment Message Validity
 
@@ -75,8 +80,8 @@ its `payload` is the entire original payload.
 
 ### Segment Set Validity
 
-Two valid segment messages belong to the same **segment set** only if they carry equal `entire_message_hash`,
-and equal `segment_count` whenever they carry equal `is_parity`.
+Two valid segment messages belong to the same **segment set** only if they carry equal `entire_message_hash`
+and equal `payload_length`, and equal `segment_count` whenever they carry equal `is_parity`.
 
 Within a segment set, `(is_parity, index)` MUST be unique.
 A segment message whose `(is_parity, index)` is already held MUST be ignored.
@@ -91,6 +96,11 @@ The reconstructed payload is obtained as follows:
 - Otherwise, it is the result of Reed–Solomon decoding over the held data and parity segments,
   as defined in [Reed–Solomon Coding](#reedsolomon-coding).
 
+The assembled bytes are then truncated to `payload_length`.
+This step is unconditional, and is what discards the zero padding that Reed–Solomon encoding may leave
+on a data segment recovered by decoding.
+Assembled bytes shorter than `payload_length` mean the set is incomplete and MUST NOT be truncated or delivered.
+
 The reconstructed payload is valid only if `Keccak256(reconstructed payload)` equals the `entire_message_hash` of the segment set.
 An invalid reconstructed payload MUST be discarded and the failure SHOULD be logged.
 Only a valid reconstructed payload is delivered to the application.
@@ -104,7 +114,8 @@ To transmit an original payload, the sender:
   choosing the chunk size so that every resulting serialized `SegmentMessage` is at most `segmentSize` bytes.
 - MAY generate parity segments at `parityRate` as defined in [Reed–Solomon Coding](#reedsolomon-coding).
 - MUST encode every segment as a `SegmentMessage` that satisfies [Segment Message Validity](#segment-message-validity),
-  with `segment_count` set to the number of segments in that segment's own class.
+  with `segment_count` set to the number of segments in that segment's own class,
+  and `payload_length` set to the length of the original payload.
 - MUST send each segment message as an individual transport message.
 
 Segments MAY be sent in any order.
@@ -130,10 +141,9 @@ A set that carries parity is reconstructible from any subset of its segments as 
 the receiver reads the shard length off a parity segment, re-pads the data segments it holds, and decodes the rest.
 Receivers MUST support Reed–Solomon decoding, since any sender MAY use parity.
 
-> **Open point.** A recovered final data segment comes back zero-padded to shard length,
-> but the length of the original payload is not carried on the wire,
-> so the padding cannot be stripped and the hash check fails.
-> Resolving this needs either a payload-length field, or parity restricted to payloads that split evenly.
+A final data segment recovered by decoding comes back zero-padded to shard length rather than at its true length.
+Truncating the assembled bytes to `payload_length` discards that padding,
+which is why [Reconstructed Payload Validity](#reconstructed-payload-validity) applies it to every reconstruction.
 
 ## Implementation Suggestions
 
