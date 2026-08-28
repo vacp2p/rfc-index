@@ -159,6 +159,10 @@ Where an end-to-end reliability layer already retransmits missing segments,
 as in [RELIABLE-CHANNEL-API](reliable-channel-api.md) with SDS,
 parity repairs the same loss a second time; set `parityRate = 0` there.
 
+Note also that `ceil` rounds small sets up sharply:
+at `parityRate = 0.125`, two data segments still get one parity segment,
+a 50% overhead to tolerate a single loss.
+
 ### Segment Caching
 
 Received segments accumulate until their set is reconstructible, so an unbounded cache is a memory leak driven by remote senders.
