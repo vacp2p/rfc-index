@@ -465,7 +465,7 @@ Every active core node receives a reward. The activity of a node is verified in 
 - $`R_D`$ denote a redundancy parameter for data messages, defining the number of “replications” of the same message;
 - $`\mathcal{N} = \text{SDP}(s)`$ denote a set of core nodes providing the Blend service for the epoch $`e`$ returned by the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md));
 - $`N = |\mathcal N|`$ denote a number of core nodes providing the Blend service;
-- $`\text {CSPRNG}()`$ is a cryptographically secure pseudo-random number generator, implemented as a [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction). Its seed is exactly 32 bytes: wherever a formula writes $`\text {CSPRNG}(H(x))`$, the seed is the first 32 bytes of the 64-byte digest $`H(x)`$, truncated explicitly;
+- $`\text {CSPRNG}()`$ is a cryptographically secure pseudo-random number generator, implemented as a [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction). Its seed is exactly 32 bytes: wherever a formula writes $`\text {CSPRNG}(H(x))`$, the 32-byte digest $`H(x)`$ is used directly as the seed;
 
 ## Global Parameters
 

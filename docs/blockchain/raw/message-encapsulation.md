@@ -98,25 +98,25 @@ This document outlines the cryptographic notation, data structures, and algorith
 - $`H_{\mathbf N}()`$ is a domain-separated hash function dedicated to the node index selection (the implementation of the hash function is `blake2b`).
   ```python
   def hashds(domain=b"BlendNode", data: bytes) -> bytes:
-      return Blake2B.hash512(domain + data)
+      return Blake2B.hash256(domain + data)
   ```
 
 - $`H_\mathbf{I}()`$ is a domain-separated hash function dedicated to the initialization of the blend header (the implementation of the hash function is `blake2b`).
   ```python
   def hashds(domain=b"BlendInitialization", data: bytes) -> bytes:
-      return Blake2b.hash512(domain + data)
+      return Blake2b.hash256(domain + data)
   ```
 
 - $`H_\mathbf{b}()`$ is a domain-separated hash function dedicated to the blend header encryption operations (the implementation of the hash function is `blake2b`).
   ```python
   def hashds(domain=b"BlendHeader", data: bytes) -> bytes:
-      return Blake2b.hash512(domain + data)
+      return Blake2b.hash256(domain + data)
   ```
 
 - $`H_\mathbf{P}()`$ is a domain-separated hash function dedicated to the payload encryption operations (the implementation of the hash function is `blake2b`).
   ```python
   def hashds(domain=b"BlendPayload", data: bytes) -> bytes:
-      return Blake2b.hash512(domain + data)
+      return Blake2b.hash256(domain + data)
   ```
 
 - $`\beta_{max}`$ is the maximal number of blending headers in the private header.
@@ -128,12 +128,12 @@ This document outlines the cryptographic notation, data structures, and algorith
 - $`\text {CSPRBG}()_{x}`$ is a cryptographically secure pseudo-random bytes generator whose output is restricted to $`x`$ bytes, it is implemented as [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction).
   ```python
   def pseudo_random(domain: bytes, key: bytes, size: int) -> bytes:
-      rand = ChaCha20Rng.from_seed(hashds(domain, key)[:32]).generate(size)
+      rand = ChaCha20Rng.from_seed(hashds(domain, key)).generate(size)
       assert len(rand) == size
       return rand
   ```
 
-  The $`\text {CSPRBG}`$ seed is exactly 32 bytes: wherever a formula writes $`\text {CSPRBG}(H(x))`$, the seed is the first 32 bytes of the 64-byte digest $`H(x)`$, truncated explicitly as shown in the pseudocode above.
+  The $`\text {CSPRBG}`$ seed is exactly 32 bytes: the domain-separated hash functions above return 32-byte digests, which are used directly as the seed.
 
   Every $`\text {CSPRBG}`$ invocation in this specification generates at most a message-sized output, so the interoperability note of the [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction) applies: an RFC 8439 (IETF) ChaCha20 with a zero nonce is byte-for-byte compatible.
 
