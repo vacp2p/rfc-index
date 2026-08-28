@@ -4,7 +4,7 @@
 | --- | --- |
 | Name | Message Segmentation and Reconstruction |
 | Slug | 243 |
-| Version | 0.1 |
+| Version | 0.2 |
 | Status | raw |
 | Type | RFC |
 | Category | application |
@@ -14,213 +14,240 @@
 
 ## Abstract
 
-This specification defines an application-layer protocol for **segmentation** and **reconstruction** of messages carried over a transport/delivery service with a message-size limitation, when the original payload exceeds said limitation.
-Applications partition the payload into multiple transport messages and reconstruct the original on receipt,
-even when segments arrive out of order or up to a **predefined percentage** of segments are lost.
-The protocol optionally uses **Reed–Solomon** erasure coding for fault tolerance.
-All messages are wrapped in a `SegmentMessageProto`, including those that fit in a single segment.
+This specification defines an application-layer wire format that carries a payload larger than the maximum message size of the underlying transport.
+The payload is split into data segments, optionally extended with Reed–Solomon parity segments,
+and reconstructed by the receiver even when segments arrive out of order or a bounded fraction of them is lost (Reed-Solomon.)
 
 ## Motivation
 
-Many message transport and delivery protocols impose a maximum message size that restricts the size of application payloads.
-For example, Waku Relay typically propagates messages up to **150 KB** as per [64/WAKU2-NETWORK - Message](../../core/draft/64/network.md#message-size).
-To support larger application payloads, a segmentation layer is required.
-This specification enables larger messages by partitioning them into multiple envelopes and reconstructing them at the receiver.
-Erasure-coded parity segments provide resilience against partial loss or reordering.
+Message transports impose a maximum message size that bounds the application payload.
+Segmentation lifts that bound by spreading one payload over several transport messages.
+Optional parity segments may let the receiver reconstruct the payload when some are lost.
 
 ## Terminology
 
 - **original payload**: the full application payload before segmentation.
-- **data segment**: one of the partitioned chunks of the original message payload.
+- **data segment**: one chunk of the original payload.
 - **parity segment**: an erasure-coded segment derived from the set of data segments.
-- **segment message**: a wire-message whose `payload` field carries a serialized `SegmentMessageProto`.
-- **`segmentSize`**: configured maximum size in bytes of each data segment's `payload` chunk (before protobuf serialization).
+- **segment message**: a [`SegmentMessage`](#wire-format) carrying either data or parity segment.
+- **segmentSize**: maximum size in bytes of a serialized segment message, see [Configuration](#configuration).
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-## Wire Format
+## Interoperability
 
-Each segmented message is encoded as a `SegmentMessageProto` protobuf message:
+The wire format and the Keccak256 hash below are fixed by this specification,
+so participants that agree on `maxTotalSegments` can exchange segmented payloads.
+That is the only configured value one participant enforces against another,
+and it is chosen per application rather than fixed here, see [Configuration](#configuration).
+
+Interoperability is therefore scoped to a single application,
+whose participants MUST share a `maxTotalSegments` value.
+Interoperability across applications is not a goal of this specification:
+it additionally requires an integration specification fixing the layers above and below segmentation.
+
+## Wire Format
 
 ```protobuf
 syntax = "proto3";
 
-message SegmentMessageProto {
-  // Keccak256(original payload), 32 bytes
-  bytes  entire_message_hash    = 1;
-
-  // Data segment indexing
-  uint32 data_segment_index     = 2; // zero-indexed sequence number for data segments
-  uint32 data_segment_count         = 3; // number of data segments (>= 1)
-
-  // Segment payload (data or parity shard)
-  bytes  payload                = 4;
-
-  // Parity segment indexing
-  uint32 parity_segment_index   = 5; // zero-based sequence number for parity segments
-  uint32 parity_segment_count  = 6; // number of parity segments
-
-  // Segment type
-  bool   is_parity              = 7; // true for parity segments, false (default) for data segments
+message SegmentMessage {
+  bytes  entire_message_hash  = 1;
+  uint32 index                = 2;
+  uint32 data_segment_count   = 3;
+  uint32 parity_segment_count = 4;
+  bool   is_parity            = 5;
+  bytes  payload              = 6;
 }
 ```
 
-**Field descriptions:**
+| Field | Presence | Description |
+| --- | --- | --- |
+| `entire_message_hash` | REQUIRED | `Keccak256(original payload)`, exactly 32 bytes. Identifies the set of segments that reconstruct one payload. |
+| `index` | REQUIRED | Zero-based position of this segment within its own class: among the data segments when `is_parity` is `false`, among the parity segments when `is_parity` is `true`. |
+| `data_segment_count` | REQUIRED | Number of data segments the original payload was split into. |
+| `parity_segment_count` | OPTIONAL, defaults to `0` | Number of parity segments generated. `0` means no parity was used. |
+| `is_parity` | OPTIONAL, defaults to `false` | `true` for a parity segment, `false` for a data segment. |
+| `payload` | REQUIRED | The data chunk or the parity shard. |
 
-- `entire_message_hash`: A 32-byte Keccak256 hash of the original complete payload, used to identify which segments belong together and verify reconstruction integrity.
-- `data_segment_index`: Zero-indexed sequence number identifying this data segment's position (0, 1, 2, ..., data_segment_count - 1). Set only on data segments.
-- `data_segment_count`: Total number of data segments the original message was split into. Set on every segment (data and parity).
-- `payload`: The actual chunk of data or parity information for this segment.
-- `parity_segment_index`: Zero-based sequence number for parity segments. Set only on parity segments.
-- `parity_segment_count`: Total number of parity segments generated. Set on every segment (data and parity) when Reed–Solomon parity is used; `0` (default) otherwise.
-- `is_parity`: Explicit segment type marker. `false` (default) for data segments; `true` for parity segments.
+`data_segment_count` and `parity_segment_count` describe the whole segment set and therefore carry the same values on every segment of that set,
+so a receiver knows how many segments to expect from any single one of them.
 
-A message is either a **data segment** (when `is_parity == false`) or a **parity segment** (when `is_parity == true`).
+### Segment Message Validity
 
-### Validation
+A segment message is valid only if all of the following hold:
 
-Receivers MUST enforce:
+- `entire_message_hash` is exactly 32 bytes.
+- `data_segment_count >= 1`.
+- `data_segment_count + parity_segment_count <= maxTotalSegments`, the receiver's configured limit.
+- If `is_parity` is `false`, then `index < data_segment_count`.
+- If `is_parity` is `true`, then `parity_segment_count > 0` and `index < parity_segment_count`.
 
-- `entire_message_hash.length == 32`
-- `data_segment_count >= 1`
-- `data_segment_count + parity_segment_count < maxTotalSegments` 
-- **Data segments** (`is_parity == false`):
-  `data_segment_index < data_segment_count`
-- **Parity segments** (`is_parity == true`):
-  `parity_segment_count > 0` AND `parity_segment_index < parity_segment_count`
+An invalid segment message MUST be discarded.
 
-No other combinations are permitted.
-A `SegmentMessageProto` with `data_segment_count == 1` and `data_segment_index == 0` is a valid single-segment data message: the `payload` field carries the entire original payload (see [Sending](#sending)).
+A segment message with `data_segment_count == 1`, `index == 0` and `is_parity == false` is valid:
+its `payload` is the entire original payload.
+
+### Segment Set Validity
+
+Two valid segment messages belong to the same **segment set** only if they carry equal `entire_message_hash`, `data_segment_count` and `parity_segment_count`.
+
+Within a segment set, `(is_parity, index)` MUST be unique.
+A segment message whose `(is_parity, index)` is already held MUST be ignored.
+
+### Reconstructed Payload Validity
+
+A segment set can be reconstructed once it holds at least `data_segment_count` segment messages.
+The reconstructed payload is obtained as follows:
+
+- If all `data_segment_count` data segments are held,
+  it is the concatenation of their `payload` fields in ascending `index` order.
+- Otherwise, it is the result of Reed–Solomon decoding over the held data and parity segments,
+  as defined in [Reed–Solomon Coding](#reedsolomon-coding).
+
+The reconstructed payload is valid only if `Keccak256(reconstructed payload)` equals the `entire_message_hash` of the segment set.
+An invalid reconstructed payload MUST be discarded and the failure SHOULD be logged.
+Only a valid reconstructed payload is delivered to the application.
 
 ## Segmentation
 
-### Sending
+To transmit an original payload, the sender:
 
-To transmit a payload, the sender:
-
-- MUST compute a 32-byte `entire_message_hash = Keccak256(original_payload)`.
+- MUST compute `entire_message_hash = Keccak256(original payload)`.
 - MUST split the payload into one or more data segments,
-  each of size up to `segmentSize` bytes.
-  A payload of size ≤ `segmentSize` produces a single data segment (`data_segment_count == 1`).
-- MUST pad the last segment to `segmentSize` for Reed-Solomon erasure coding (only if Reed-Solomon coding is enabled).
-- MAY use Reed–Solomon erasure coding at the predefined parity rate.
-- MUST encode every segment as a `SegmentMessageProto` with:
-  - The `entire_message_hash`
-  - `data_segment_count` (total number of data segments, always set)
-  - When Reed–Solomon parity is used, `parity_segment_count` (total number of parity segments, set on every segment)
-  - For data segments: `is_parity = false`, `data_segment_index`
-  - For parity segments: `is_parity = true`, `parity_segment_index`
-  - The raw payload data
-- Send each segment as an individual transport message according to the underlying transport service.
+  choosing the chunk size so that every resulting serialized `SegmentMessage` is at most `segmentSize` bytes.
+- MAY generate parity segments at `parityRate` as defined in [Reed–Solomon Coding](#reedsolomon-coding).
+- MUST encode every segment as a `SegmentMessage` that satisfies [Segment Message Validity](#segment-message-validity),
+  with `data_segment_count` and `parity_segment_count` set to the sizes of the whole segment set.
+- MUST send each segment message as an individual transport message.
 
-This yields a deterministic wire format: every transmitted payload is a `SegmentMessageProto`.
+Segments MAY be sent in any order.
 
-### Receiving
+## Reed–Solomon Coding
 
-Upon receiving a segmented message, the receiver:
+A sender that uses parity generates `parity_segment_count = ceil(data_segment_count * parityRate)` parity segments
+by applying [Reed–Solomon erasure coding](https://github.com/catid/leopard) over its data segments.
 
-- MUST validate each segment according to [Wire Format -> Validation](#validation).
-- MUST cache received segments.
-- MUST attempt reconstruction once at least `data_segment_count` distinct segments (data and parity combined) have been received:
-  - If all data segments are present, concatenate their `payload` fields in `data_segment_index` order.
-  - Otherwise, recover the payload via Reed–Solomon decoding over the available data and parity segments.
-- MUST verify `Keccak256(reconstructed_payload)` matches `entire_message_hash`.
-  On mismatch,
-  the message MUST be discarded and logged as invalid.
-- Once verified,
-  the reconstructed payload SHALL be delivered to the application.
+Reed–Solomon operates on equal-length inputs, called **shards**.
+The **shard length** is the chunk size the sender split the payload into,
+that is, the length of the data segment at `index == 0`.
+Every data segment has that length except the last,
+which is shorter whenever the payload does not divide evenly into `data_segment_count` chunks.
+The encoder zero-pads that last data segment up to the shard length before encoding,
+so that all of its inputs are shards.
 
----
+This padding never reaches the wire.
+Each data segment is transmitted at its true length, leaving the last one short,
+while every parity segment is a shard and so is always exactly shard-length.
+
+A receiver therefore takes the shard length from the `payload` length of any parity segment it holds,
+rather than from a data segment, which may be the short one or missing altogether.
+It always holds a parity segment when it decodes:
+a set with every data segment present needs no decoding,
+so reaching `data_segment_count` segments without them all requires at least one parity segment.
+
+A segment set with `parity_segment_count > 0` is reconstructible from any `data_segment_count` of its
+`data_segment_count + parity_segment_count` segments:
+the receiver re-pads the data segments it holds to the shard length and decodes the missing ones.
+Receivers MUST support Reed–Solomon decoding, since any sender MAY use parity.
+
+> **Open point.** A data segment recovered by decoding comes back at shard length, zero-padded.
+> For the final data segment that padding has to be stripped, but the length of the original payload is not carried on the wire,
+> so the padding cannot be told apart from payload bytes and the hash check fails.
+> Resolving this requires either carrying the payload length or restricting parity to payloads that split into equal-length data segments.
 
 ## Implementation Suggestions
 
-### Reed–Solomon
+### When to Use Parity
 
-Implementations that apply parity SHALL use fixed-size shards of length `segmentSize`.
-The reference implementation uses **nim-leopard** (Leopard-RS) with a maximum of **256 total shards**.
+Parity costs `parityRate` extra bandwidth on *every* message, whether or not anything is lost.
+It pays off when a retransmission is expensive and when losses are independent across segments:
 
-### Storage / Persistence
+- **Worth it** on a one-shot broadcast to many receivers with no feedback channel,
+  or over a high-latency link where a retransmission round trip is costlier than the constant overhead.
+- **Wasted** when a reliability layer above or below already retransmits missing segments,
+  for example [Reliable Channel API](reliable-channel-api.md) with SDS.
+  The two mechanisms repair the same loss twice; set `parityRate = 0` in that stack.
+- **Wasted** on small segment sets.
+  With two data segments, a single parity segment is a 50% overhead that still tolerates only one loss.
+- **Wasted** when loss is bursty rather than independent.
+  If the transport drops a whole flow, the parity segments are dropped with the data they protect.
 
-Segments may be persisted (e.g., SQLite) and indexed by `entire_message_hash` and by sender. Sender may be authenticated, this is out of scope of this spec.
-Implementations SHOULD support:
+### Segment Caching
 
-- Duplicate detection and idempotent saves
-- Completion flags to prevent duplicate processing
-- Timeout-based cleanup of incomplete reconstructions
-- Per-sender quotas for stored bytes and concurrent reconstructions
+Received segments accumulate until their set is reconstructible, so an unbounded cache is a memory leak driven by remote senders.
+Implementations SHOULD:
+
+- Index the cache by `entire_message_hash`, and additionally by sender where the transport authenticates one.
+  Authenticating the sender is out of scope of this specification.
+- Bound both the number of concurrent reconstructions and the total buffered bytes,
+  per sender as well as globally where a sender identity is available.
+  A fixed-size ring of reconstruction slots gives a hard worst-case bound of `slots * maxTotalSegments * segmentSize` bytes.
+- Evict the least recently updated set first, and drop any set whose last segment arrived longer ago than a reconstruction timeout.
+- Record the `entire_message_hash` of a completed set for some time after delivery,
+  so that late or duplicate segments are dropped instead of starting a fresh reconstruction and re-delivering the payload.
+- Make segment insertion idempotent, so a redelivered segment does not corrupt or grow a pending set.
+
+Segments MAY be persisted, for example in SQLite, so that partial reconstructions survive a restart.
+In-memory buffering is sufficient otherwise.
 
 ### Configuration
 
-- `segmentSize` — maximum size in bytes of each data segment's payload chunk (before protobuf serialization).
-  REQUIRED parameter, configurable by the client.
-- `parityRate` — fraction of parity shards relative to data shards.
-    Configurable by the client. Defaults to **0.125** (12.5%).
-- `maxTotalSegments` — maximum number of total shards (data + parity) per message.
-    Implementation-specific parameter, fixed. The reference implementation uses **256**.
+- `segmentSize`: maximum size in bytes of a serialized segment message.
+  Set by the application, bounded by the maximum message size of the transport,
+  minus the overhead of any layer applied between segmentation and the transport.
+- `parityRate`: number of parity segments relative to the number of data segments.
+  Defaults to `0`, which disables parity.
+  `0.125` is RECOMMENDED where the [guidance above](#when-to-use-parity) favours parity.
+- `maxTotalSegments`: maximum number of segments, data plus parity, per original payload.
+  **256** is RECOMMENDED, as used by the reference implementation on [nim-leopard](https://github.com/status-im/nim-leopard).
+  This caps an original payload at roughly `256 * segmentSize` bytes,
+  about 38 MB over a transport with a 150 KB message limit.
+  An application needing larger payloads MAY use a higher value,
+  bounded when parity is used by the maximum shard count of its Reed–Solomon implementation.
+  All participants in an application MUST use the same value, see [Interoperability](#interoperability).
 
-**Reconstruction capability:**
-With the predefined parity rate, reconstruction is possible if **all data segments** are received or if **any combination of data + parity** totals at least `data_segment_count` (i.e., up to the predefined percentage of loss tolerated).
+`segmentSize` is the only value an application needs to supply for normal operation.
 
-**API simplicity:**
-Libraries SHOULD require only `segmentSize` from the application for normal operation.
-
----
+[RELIABLE-CHANNEL-API](reliable-channel-api.md) surfaces these as `SegmentationConfig`,
+where `segmentSizeBytes` is this `segmentSize`
+and `enableReedSolomon` selects between `parityRate = 0` and a non-zero rate.
+It applies segmentation before SDS and encryption,
+so `segmentSizeBytes` MUST leave room for the SDS and encryption overhead added to each segment before it reaches the transport.
+Its `persistence` backend is the storage referred to in [Segment Caching](#segment-caching).
 
 ## Security Considerations
 
 ### Privacy
 
-`entire_message_hash` enables correlation of segments that belong to the same original message but does not reveal content.
-To prevent this correlation, applications SHOULD encrypt each segment after segmentation (see [Encryption](#encryption)).
-Traffic analysis may still identify segmented flows.
-
-### Encryption
-
-This specification does not provide confidentiality.
-Applications SHOULD encrypt each segment after segmentation
-(i.e., encrypt the serialized `SegmentMessageProto` prior to transmission),
-so that `entire_message_hash` and other identifying fields are not visible to observers.
+`entire_message_hash` links the segments of one payload to each other, but does not reveal the payload.
+Applications SHOULD encrypt each serialized `SegmentMessage` before transmission,
+which hides both the hash and the segment counts from observers.
+Traffic analysis may still identify a segmented flow by its timing and volume.
 
 ### Integrity
 
-Implementations MUST verify the Keccak256 hash post-reconstruction and discard on mismatch.
+This specification provides no confidentiality and no sender authentication.
+The `entire_message_hash` check on the reconstructed payload detects accidental corruption and mismatched segments,
+but an attacker able to inject transport messages can compute a consistent hash over a payload of their own.
+Applications requiring authenticity MUST obtain it from another layer.
 
 ### Denial of Service
 
-To mitigate resource exhaustion:
-
-- Limit total concurrent reconstructions and aggregate buffered bytes
-  - When sender identity is available, apply the same two limits per sender
-- Enforce timeouts and size caps
-- Validate segment counts (≤ 256)
-- Consider rate-limiting at the transport layer (for example, via [17/WAKU2-RLN-RELAY](../../core/draft/17/rln-relay.md) on Waku)
-
----
-
-## Deployment Considerations
-
-**Overhead:**
-
-- Bandwidth overhead ≈ the predefined parity rate from parity (if enabled)
-- Additional per-segment overhead ≤ **100 bytes** (protobuf + metadata)
-
-**Network impact:**
-
-- Larger messages increase transport traffic and storage;
-  operators SHOULD consider policy limits
-
-**Compatibility:**
-
-- Nodes that do not implement this specification cannot reconstruct any messages.
-
----
+A remote sender controls how much memory a receiver buffers, so implementations MUST bound it.
+The limits and timeouts in [Segment Caching](#segment-caching) are the mitigation.
+Rate limiting at the transport, for example [17/WAKU2-RLN-RELAY](../../core/draft/17/rln-relay.md) on Waku,
+additionally bounds how fast an attacker can create pending reconstructions.
 
 ## References
 
-1. [10/WAKU2 – Waku](../../core/draft/10/waku2.md)
-2. [11/WAKU2-RELAY – Relay](../../core/stable/11/relay.md)
-3. [14/WAKU2-MESSAGE – Message](../../core/stable/14/message.md)
-4. [64/WAKU2-NETWORK](../../core/draft/64/network.md#message-size)
-5. [nim-leopard](https://github.com/status-im/nim-leopard) – Nim bindings for Leopard-RS (Reed–Solomon)
-6. [Leopard-RS](https://github.com/catid/leopard) – Fast Reed–Solomon erasure coding library
-7. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) – Key words for use in RFCs to Indicate Requirement Levels
+1. [64/WAKU2-NETWORK](../../core/draft/64/network.md#message-size)
+2. [17/WAKU2-RLN-RELAY](../../core/draft/17/rln-relay.md)
+3. [RELIABLE-CHANNEL-API](reliable-channel-api.md)
+4. [nim-leopard](https://github.com/status-im/nim-leopard) – Nim bindings for Leopard-RS
+5. [Leopard-RS](https://github.com/catid/leopard) – Fast Reed–Solomon erasure coding library
+6. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) – Key words for use in RFCs to Indicate Requirement Levels
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
