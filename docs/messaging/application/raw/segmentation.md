@@ -124,27 +124,22 @@ Segments MAY be sent in any order.
 ## Reed–Solomon Coding
 
 A sender that uses parity applies [Reed–Solomon erasure coding](https://github.com/catid/leopard)
-over its data segments to produce a further `ceil(parityRate * number of data segments)` parity segments.
-Parity MUST remain the minority class, which follows from `parityRate < 1`:
-reconstruction takes as many segments as the set has data segments,
-so a set reaches that number only by holding at least one data segment, and with it the count.
+over its data segments to produce `ceil(parityRate * number of data segments)` more.
+Parity MUST remain the minority class, which `parityRate < 1` ensures,
+so a receiver always learns the data-segment count before it can reconstruct.
 
 Reed–Solomon operates on equal-length inputs, called **shards**.
 The **shard length** is the chunk size the payload was split into,
-that is the length of the data segment at `index == 0`.
-Only the last data segment may be shorter, and the encoder zero-pads it to shard length.
-That padding never reaches the wire:
-data segments are sent at their true length,
-so a parity segment is the only one guaranteed to be exactly shard-length,
-and a decoding receiver always holds one, since a complete set needs no decoding.
+so only the last data segment may be shorter, and the encoder zero-pads it.
+That padding never reaches the wire, data segments being sent at their true length,
+which leaves parity segments as the only ones always exactly shard-length.
 
-A set that carries parity is reconstructible from any subset of its segments as large as its number of data segments:
-the receiver reads the shard length off a parity segment, re-pads the data segments it holds, and decodes the rest.
+Such a set is reconstructible from any subset as large as its number of data segments.
+A decoding receiver always holds a parity segment, since a complete set needs no decoding:
+it reads the shard length from one, re-pads its data segments, and decodes the rest.
 Receivers MUST support Reed–Solomon decoding, since any sender MAY use parity.
-
-A final data segment recovered by decoding comes back zero-padded to shard length rather than at its true length.
-Truncating the assembled bytes to `payload_length` discards that padding,
-which is why [Reconstructed Payload Validity](#reconstructed-payload-validity) applies it to every reconstruction.
+A segment recovered this way is shard-length, and the truncation in
+[Reconstructed Payload Validity](#reconstructed-payload-validity) removes its padding.
 
 ## Implementation Suggestions
 
