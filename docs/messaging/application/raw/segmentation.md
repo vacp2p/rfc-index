@@ -54,10 +54,9 @@ syntax = "proto3";
 message SegmentMessage {
   bytes  entire_message_hash  = 1;
   uint32 index                = 2;
-  uint32 data_segment_count   = 3;
-  uint32 parity_segment_count = 4;
-  bool   is_parity            = 5;
-  bytes  payload              = 6;
+  uint32 segment_count        = 3;
+  bool   is_parity            = 4;
+  bytes  payload              = 5;
 }
 ```
 
@@ -65,42 +64,45 @@ message SegmentMessage {
 | --- | --- | --- |
 | `entire_message_hash` | REQUIRED | `Keccak256(original payload)`, exactly 32 bytes. Identifies the set of segments that reconstruct one payload. |
 | `index` | REQUIRED | Zero-based position of this segment within its own class: among the data segments when `is_parity` is `false`, among the parity segments when `is_parity` is `true`. |
-| `data_segment_count` | REQUIRED | Number of data segments the original payload was split into. |
-| `parity_segment_count` | OPTIONAL, defaults to `0` | Number of parity segments generated. `0` means no parity was used. |
+| `segment_count` | REQUIRED | Number of segments in this segment's own class: the count of data segments when `is_parity` is `false`, the count of parity segments when `is_parity` is `true`. |
 | `is_parity` | OPTIONAL, defaults to `false` | `true` for a parity segment, `false` for a data segment. |
 | `payload` | REQUIRED | The data chunk or the parity shard. |
 
-`data_segment_count` and `parity_segment_count` describe the whole segment set and therefore carry the same values on every segment of that set,
-so a receiver knows how many segments to expect from any single one of them.
+`is_parity` gives `index` and `segment_count` their meaning: both are read within the class the flag selects.
+Every segment of one class therefore carries the same `segment_count`.
+
+The **data segment count** of a set is the `segment_count` carried by any of its data segments.
+It is the number of segments needed to reconstruct the original payload, so a receiver must learn it before reconstructing;
+[Reed–Solomon Coding](#reedsolomon-coding) guarantees it always does in time.
 
 ### Segment Message Validity
 
 A segment message is valid only if all of the following hold:
 
 - `entire_message_hash` is exactly 32 bytes.
-- `data_segment_count >= 1`.
-- `data_segment_count + parity_segment_count <= maxTotalSegments`, the receiver's configured limit.
-- If `is_parity` is `false`, then `index < data_segment_count`.
-- If `is_parity` is `true`, then `parity_segment_count > 0` and `index < parity_segment_count`.
+- `segment_count >= 1`.
+- `segment_count <= maxTotalSegments`, the receiver's configured limit.
+- `index < segment_count`.
 
 An invalid segment message MUST be discarded.
 
-A segment message with `data_segment_count == 1`, `index == 0` and `is_parity == false` is valid:
+A segment message with `segment_count == 1`, `index == 0` and `is_parity == false` is valid:
 its `payload` is the entire original payload.
 
 ### Segment Set Validity
 
-Two valid segment messages belong to the same **segment set** only if they carry equal `entire_message_hash`, `data_segment_count` and `parity_segment_count`.
+Two valid segment messages belong to the same **segment set** only if they carry equal `entire_message_hash`,
+and equal `segment_count` whenever they carry equal `is_parity`.
 
 Within a segment set, `(is_parity, index)` MUST be unique.
 A segment message whose `(is_parity, index)` is already held MUST be ignored.
 
 ### Reconstructed Payload Validity
 
-A segment set can be reconstructed once it holds at least `data_segment_count` segment messages.
+A segment set can be reconstructed once it holds at least its data segment count of segment messages.
 The reconstructed payload is obtained as follows:
 
-- If all `data_segment_count` data segments are held,
+- If every data segment is held,
   it is the concatenation of their `payload` fields in ascending `index` order.
 - Otherwise, it is the result of Reed–Solomon decoding over the held data and parity segments,
   as defined in [Reed–Solomon Coding](#reedsolomon-coding).
@@ -118,21 +120,28 @@ To transmit an original payload, the sender:
   choosing the chunk size so that every resulting serialized `SegmentMessage` is at most `segmentSize` bytes.
 - MAY generate parity segments at `parityRate` as defined in [Reed–Solomon Coding](#reedsolomon-coding).
 - MUST encode every segment as a `SegmentMessage` that satisfies [Segment Message Validity](#segment-message-validity),
-  with `data_segment_count` and `parity_segment_count` set to the sizes of the whole segment set.
+  with `segment_count` set to the number of segments in that segment's own class.
 - MUST send each segment message as an individual transport message.
 
 Segments MAY be sent in any order.
 
 ## Reed–Solomon Coding
 
-A sender that uses parity generates `parity_segment_count = ceil(data_segment_count * parityRate)` parity segments
-by applying [Reed–Solomon erasure coding](https://github.com/catid/leopard) over its data segments.
+A sender that uses parity applies [Reed–Solomon erasure coding](https://github.com/catid/leopard) over its data segments
+to produce `ceil(data segment count * parityRate)` parity segments.
+
+A set MUST hold fewer parity segments than data segments, which follows from `parityRate < 1`.
+This is what lets a receiver read the data segment count off a single field.
+Reconstruction needs that many segments in total,
+so with parity in the minority a set can never reach the threshold without holding at least one data segment,
+and any data segment carries the count.
+A receiver that holds only parity segments could not reconstruct in any case, so it never needs the count sooner.
 
 Reed–Solomon operates on equal-length inputs, called **shards**.
 The **shard length** is the chunk size the sender split the payload into,
 that is, the length of the data segment at `index == 0`.
 Every data segment has that length except the last,
-which is shorter whenever the payload does not divide evenly into `data_segment_count` chunks.
+which is shorter whenever the payload does not divide evenly into that many chunks.
 The encoder zero-pads that last data segment up to the shard length before encoding,
 so that all of its inputs are shards.
 
@@ -144,10 +153,9 @@ A receiver therefore takes the shard length from the `payload` length of any par
 rather than from a data segment, which may be the short one or missing altogether.
 It always holds a parity segment when it decodes:
 a set with every data segment present needs no decoding,
-so reaching `data_segment_count` segments without them all requires at least one parity segment.
+so reaching the data segment count without them all requires at least one parity segment.
 
-A segment set with `parity_segment_count > 0` is reconstructible from any `data_segment_count` of its
-`data_segment_count + parity_segment_count` segments:
+A segment set that carries parity is reconstructible from any data-segment-count-many of its segments:
 the receiver re-pads the data segments it holds to the shard length and decodes the missing ones.
 Receivers MUST support Reed–Solomon decoding, since any sender MAY use parity.
 
@@ -182,7 +190,7 @@ Implementations SHOULD:
   Authenticating the sender is out of scope of this specification.
 - Bound both the number of concurrent reconstructions and the total buffered bytes,
   per sender as well as globally where a sender identity is available.
-  A fixed-size ring of reconstruction slots gives a hard worst-case bound of `slots * maxTotalSegments * segmentSize` bytes.
+  A fixed-size ring of reconstruction slots gives a hard worst-case bound of `slots * 2 * maxTotalSegments * segmentSize` bytes.
 - Evict the least recently updated set first, and drop any set whose last segment arrived longer ago than a reconstruction timeout.
 - Record the `entire_message_hash` of a completed set for some time after delivery,
   so that late or duplicate segments are dropped instead of starting a fresh reconstruction and re-delivering the payload.
@@ -197,9 +205,11 @@ In-memory buffering is sufficient otherwise.
   Set by the application, bounded by the maximum message size of the transport,
   minus the overhead of any layer applied between segmentation and the transport.
 - `parityRate`: number of parity segments relative to the number of data segments.
+  MUST be less than `1`, see [Reed–Solomon Coding](#reedsolomon-coding).
   Defaults to `0`, which disables parity.
   `0.125` is RECOMMENDED where the [guidance above](#when-to-use-parity) favours parity.
-- `maxTotalSegments`: maximum number of segments, data plus parity, per original payload.
+- `maxTotalSegments`: maximum `segment_count` a receiver accepts, applied to each class separately.
+  Since parity segments are the minority, a set holds fewer than `2 * maxTotalSegments` segments in total.
   **256** is RECOMMENDED, as used by the reference implementation on [nim-leopard](https://github.com/status-im/nim-leopard).
   This caps an original payload at roughly `256 * segmentSize` bytes,
   about 38 MB over a transport with a 150 KB message limit.
