@@ -169,6 +169,8 @@ Implementations typically:
 - Bound both the number of concurrent reconstructions and the total buffered bytes,
   per sender as well as globally where a sender identity is available.
   A fixed-size ring of reconstruction slots gives a hard worst-case bound of `slots * 2 * maxDataSegments * segmentSize` bytes.
+- Evict the least recently updated set first,
+  and drop any set whose last segment arrived longer ago than a reconstruction timeout.
 
 Segments can be persisted, for example in SQLite, so that partial reconstructions survive a restart.
 In-memory buffering is sufficient otherwise.
