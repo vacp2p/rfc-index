@@ -111,42 +111,29 @@ Segments MAY be sent in any order.
 
 ## Reed–Solomon Coding
 
-A sender that uses parity applies [Reed–Solomon erasure coding](https://github.com/catid/leopard) over its data segments
-to produce `ceil(data segment count * parityRate)` parity segments.
-
-A set MUST hold fewer parity segments than data segments, which follows from `parityRate < 1`.
-This is what lets a receiver read the data segment count off a single field.
-Reconstruction needs that many segments in total,
-so with parity in the minority a set can never reach the threshold without holding at least one data segment,
-and any data segment carries the count.
-A receiver that holds only parity segments could not reconstruct in any case, so it never needs the count sooner.
+A sender that uses parity applies [Reed–Solomon erasure coding](https://github.com/catid/leopard)
+over its data segments to produce a further `ceil(parityRate * number of data segments)` parity segments.
+Parity MUST remain the minority class, which follows from `parityRate < 1`:
+reconstruction takes as many segments as the set has data segments,
+so a set reaches that number only by holding at least one data segment, and with it the count.
 
 Reed–Solomon operates on equal-length inputs, called **shards**.
-The **shard length** is the chunk size the sender split the payload into,
-that is, the length of the data segment at `index == 0`.
-Every data segment has that length except the last,
-which is shorter whenever the payload does not divide evenly into that many chunks.
-The encoder zero-pads that last data segment up to the shard length before encoding,
-so that all of its inputs are shards.
+The **shard length** is the chunk size the payload was split into,
+that is the length of the data segment at `index == 0`.
+Only the last data segment may be shorter, and the encoder zero-pads it to shard length.
+That padding never reaches the wire:
+data segments are sent at their true length,
+so a parity segment is the only one guaranteed to be exactly shard-length,
+and a decoding receiver always holds one, since a complete set needs no decoding.
 
-This padding never reaches the wire.
-Each data segment is transmitted at its true length, leaving the last one short,
-while every parity segment is a shard and so is always exactly shard-length.
-
-A receiver therefore takes the shard length from the `payload` length of any parity segment it holds,
-rather than from a data segment, which may be the short one or missing altogether.
-It always holds a parity segment when it decodes:
-a set with every data segment present needs no decoding,
-so reaching the data segment count without them all requires at least one parity segment.
-
-A segment set that carries parity is reconstructible from any data-segment-count-many of its segments:
-the receiver re-pads the data segments it holds to the shard length and decodes the missing ones.
+A set that carries parity is reconstructible from any subset of its segments as large as its number of data segments:
+the receiver reads the shard length off a parity segment, re-pads the data segments it holds, and decodes the rest.
 Receivers MUST support Reed–Solomon decoding, since any sender MAY use parity.
 
-> **Open point.** A data segment recovered by decoding comes back at shard length, zero-padded.
-> For the final data segment that padding has to be stripped, but the length of the original payload is not carried on the wire,
-> so the padding cannot be told apart from payload bytes and the hash check fails.
-> Resolving this requires either carrying the payload length or restricting parity to payloads that split into equal-length data segments.
+> **Open point.** A recovered final data segment comes back zero-padded to shard length,
+> but the length of the original payload is not carried on the wire,
+> so the padding cannot be stripped and the hash check fails.
+> Resolving this needs either a payload-length field, or parity restricted to payloads that split evenly.
 
 ## Implementation Suggestions
 
