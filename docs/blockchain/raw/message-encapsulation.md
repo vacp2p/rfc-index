@@ -133,6 +133,8 @@ This document outlines the cryptographic notation, data structures, and algorith
       return rand
   ```
 
+  The $`\text {CSPRBG}`$ seed is exactly 32 bytes: wherever a formula writes $`\text {CSPRBG}(H(x))`$, the seed is the first 32 bytes of the 64-byte digest $`H(x)`$, truncated explicitly as shown in the pseudocode above.
+
   Every $`\text {CSPRBG}`$ invocation in this specification generates at most a message-sized output, so the interoperability note of the [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction) applies: an RFC 8439 (IETF) ChaCha20 with a zero nonce is byte-for-byte compatible.
 
 - $`|t|`$ returns the length of the $`t`$ expressed in bytes.

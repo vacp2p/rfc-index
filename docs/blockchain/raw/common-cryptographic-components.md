@@ -98,14 +98,14 @@ The Logos Blockchain uses the [ChaCha20](https://cr.yp.to/chacha/chacha-20080128
 
 Construction:
 
-Given a seed of at least 32 bytes, the PRNG output is the ChaCha20 keystream:
+Given a 32-byte seed, the PRNG output is the ChaCha20 keystream:
 
 ```text
-PRNG(seed) = ChaCha20Keystream(key = seed[0..32], nonce = 0, initial_counter = 0)
+PRNG(seed) = ChaCha20Keystream(key = seed, nonce = 0, initial_counter = 0)
 ```
 
 - ChaCha20 is used in its original variant: 20 rounds, 256-bit key, 64-bit nonce (fixed to zero), 64-bit block counter (starting at zero).
-- seed: when the available seed material is longer than 32 bytes (e.g., a 64-byte BLAKE2b digest), the key is its first 32 bytes.
+- seed: exactly 32 bytes, used directly as the ChaCha20 key. A protocol deriving the seed from longer material (e.g., a 64-byte BLAKE2b digest) MUST truncate it to 32 bytes explicitly before seeding; this construction performs no truncation itself.
 - This construction is byte-for-byte the output of `ChaCha20Rng` (Rust crate [`rand_chacha`](https://docs.rs/rand_chacha)) seeded with the key, using the default stream identifier.
 
 Output:
