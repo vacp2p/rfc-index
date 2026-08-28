@@ -27,12 +27,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Interoperability
 
-The wire format and the Keccak256 hash below are fixed by this specification,
-so participants that agree on `maxDataSegments` can exchange segmented payloads.
-That is the only configured value one participant enforces against another,
-and it is chosen per application rather than fixed here, see [Configuration](#configuration).
-
-Interoperability across applications is not a goal of this specification.
+The wire format and the Keccak256 hash are fixed here, but `maxDataSegments` is chosen per application
+and is the only configured value one participant enforces against another, see [Configuration](#configuration).
+Participants therefore interoperate within an application, not across applications.
 
 ## Wire Format
 
@@ -141,17 +138,13 @@ Receivers MUST support Reed–Solomon decoding, since any sender MAY use parity.
 
 ### When to Use Parity
 
-Parity costs `parityRate` extra bandwidth on *every* message, whether or not anything is lost.
-It pays off only where losses are independent and a retransmission would cost more than that constant overhead.
+Parity costs `parityRate` extra bandwidth on *every* message, whether or not anything is lost,
+and pays off only where losses are independent and a retransmission would cost more;
 [RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) covers the general trade-off.
 
-One case is specific to this stack.
 Where an end-to-end reliability layer already retransmits missing segments,
-as in [RELIABLE-CHANNEL-API](reliable-channel-api.md) with SDS,
-parity repairs the same loss a second time; set `parityRate = 0` there.
-
-Note also that `ceil` rounds small sets up sharply:
-at `parityRate = 0.125`, two data segments still get one parity segment,
+as in [RELIABLE-CHANNEL-API](reliable-channel-api.md) with SDS, parity repairs the same loss twice: set `parityRate = 0`.
+`ceil` also rounds small sets up sharply: at `parityRate = 0.125` two data segments still get one parity segment,
 a 50% overhead to tolerate a single loss.
 
 ### Segment Caching
@@ -183,12 +176,9 @@ In-memory buffering is sufficient otherwise.
   An application needing more MAY raise it, up to the shard limit of its Reed–Solomon implementation.
   All participants in an application MUST use the same value, see [Interoperability](#interoperability).
 
-[RELIABLE-CHANNEL-API](reliable-channel-api.md) surfaces these as `SegmentationConfig`,
-where `segmentSizeBytes` is this `segmentSize`
-and `enableReedSolomon` selects between `parityRate = 0` and a non-zero rate.
-It applies segmentation before SDS and encryption,
-so `segmentSizeBytes` MUST leave room for the SDS and encryption overhead added to each segment before it reaches the transport.
-Its `persistence` backend is the storage referred to in [Segment Caching](#segment-caching).
+[RELIABLE-CHANNEL-API](reliable-channel-api.md) surfaces these as `SegmentationConfig`: `segmentSizeBytes` is
+`segmentSize`, `enableReedSolomon` selects `parityRate`, and `persistence` backs [Segment Caching](#segment-caching).
+Since it segments before SDS and encryption, `segmentSizeBytes` MUST leave room for their per-segment overhead.
 
 ## Security Considerations
 
@@ -201,7 +191,7 @@ Traffic analysis may still identify a segmented flow by its timing and volume.
 
 ### Integrity
 
-This specification provides no confidentiality and no sender authentication.
+This specification provides no sender authentication.
 The `entire_message_hash` check on the reconstructed payload detects accidental corruption and mismatched segments,
 but an attacker able to inject transport messages can compute a consistent hash over a payload of their own.
 Applications requiring authenticity MUST obtain it from another layer.
