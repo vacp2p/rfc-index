@@ -102,7 +102,7 @@ on a data segment recovered by decoding.
 Assembled bytes shorter than `payload_length` mean the set is incomplete and MUST NOT be truncated or delivered.
 
 The reconstructed payload is valid only if `Keccak256(reconstructed payload)` equals the `entire_message_hash` of the segment set.
-An invalid reconstructed payload MUST be discarded and the failure SHOULD be logged.
+An invalid reconstructed payload MUST be discarded.
 Only a valid reconstructed payload is delivered to the application.
 
 ## Segmentation
@@ -162,7 +162,7 @@ parity repairs the same loss a second time; set `parityRate = 0` there.
 ### Segment Caching
 
 Received segments accumulate until their set is reconstructible, so an unbounded cache is a memory leak driven by remote senders.
-Implementations SHOULD:
+Implementations typically:
 
 - Index the cache by `entire_message_hash`, and additionally by sender where the transport authenticates one.
   Authenticating the sender is out of scope of this specification.
@@ -170,7 +170,7 @@ Implementations SHOULD:
   per sender as well as globally where a sender identity is available.
   A fixed-size ring of reconstruction slots gives a hard worst-case bound of `slots * 2 * maxDataSegments * segmentSize` bytes.
 
-Segments MAY be persisted, for example in SQLite, so that partial reconstructions survive a restart.
+Segments can be persisted, for example in SQLite, so that partial reconstructions survive a restart.
 In-memory buffering is sufficient otherwise.
 
 ### Configuration
