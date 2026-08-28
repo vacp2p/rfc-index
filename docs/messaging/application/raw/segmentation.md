@@ -25,12 +25,6 @@ The payload is split into data segments that can be reconstructed by the receive
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-## Interoperability
-
-The wire format and the Keccak256 hash are fixed here, but `maxDataSegments` is chosen per application
-and is the only configured value one participant enforces against another, see [Configuration](#configuration).
-Participants therefore interoperate within an application, not across applications.
-
 ## Wire Format
 
 ```protobuf
@@ -162,7 +156,10 @@ In-memory buffering is sufficient otherwise.
   Parity needs no separate limit, being the smaller class.
   **256** is RECOMMENDED.
   An application needing more MAY raise it, up to the shard limit of its Reed–Solomon implementation.
-  All participants in an application MUST use the same value, see [Interoperability](#interoperability).
+  All participants in an application MUST use the same value:
+  the wire format and the Keccak256 hash are fixed by this specification,
+  but this is the only configured value one participant enforces against another,
+  so participants interoperate within an application and not across applications.
 
 [RELIABLE-CHANNEL-API](reliable-channel-api.md) surfaces these as `SegmentationConfig`: `segmentSizeBytes` is
 `segmentSize`, `enableReedSolomon` selects `parityRate`, and `persistence` backs [Segment Caching](#segment-caching).
