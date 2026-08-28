@@ -52,38 +52,25 @@ message SegmentMessage {
 `entire_message_hash` identifies the segments that together reconstruct one payload.
 `payload_length` is on every segment because reconstruction needs it whichever subset survives.
 
-### Segment Message Validity
+### Validity
 
-A segment message is valid only if all of the following hold:
-
-- `entire_message_hash` is exactly 32 bytes.
-- `segment_count >= 1`.
-- `segment_count <= maxDataSegments`, the receiver's configured limit.
-- `index < segment_count`.
-
+A **segment message** is valid only if `entire_message_hash` is exactly 32 bytes,
+`1 <= segment_count <= maxDataSegments`, the receiver's configured limit, and `index < segment_count`.
 An invalid segment message MUST be discarded.
-
 A payload that fits one segment is still wrapped, as `segment_count == 1`, `index == 0`, `is_parity == false`.
-
-### Segment Set Validity
 
 Two valid segment messages belong to the same **segment set** only if they carry equal `entire_message_hash`
 and equal `payload_length`, and equal `segment_count` whenever they carry equal `is_parity`.
+Within a set, `(is_parity, index)` MUST be unique; a segment message repeating one already held MUST be ignored.
 
-Within a segment set, `(is_parity, index)` MUST be unique.
-A segment message whose `(is_parity, index)` is already held MUST be ignored.
+A set holding as many segment messages as it has data segments reconstructs a **payload**:
 
-### Reconstructed Payload Validity
+1. Concatenate the data segments' `payload` fields in ascending `index` order,
+   or, where any is missing, Reed–Solomon decode over the held segments, see [Reed–Solomon Coding](#reedsolomon-coding).
+2. Truncate to `payload_length`, which discards any zero padding left by Reed–Solomon encoding.
+   Fewer assembled bytes than that mean the set is incomplete and MUST NOT be delivered.
+3. Verify that `Keccak256` of the result equals the set's `entire_message_hash`.
 
-A segment set can be reconstructed once it holds as many segment messages as the set has data segments.
-Where every data segment is held, the assembled bytes are their `payload` fields concatenated in ascending `index` order;
-otherwise they are the output of Reed–Solomon decoding over the held segments, see [Reed–Solomon Coding](#reedsolomon-coding).
-
-The assembled bytes are then truncated to `payload_length`, unconditionally,
-which discards any zero padding left by Reed–Solomon encoding.
-Assembled bytes shorter than `payload_length` mean the set is incomplete and MUST NOT be delivered.
-
-The reconstructed payload is valid only if `Keccak256(reconstructed payload)` equals the set's `entire_message_hash`.
 An invalid payload MUST be discarded; only a valid one is delivered to the application.
 
 ## Segmentation
@@ -95,7 +82,7 @@ To transmit an original payload, the sender:
 - MAY generate parity segments at `parityRate` as defined in [Reed–Solomon Coding](#reedsolomon-coding).
 - MUST choose the chunk size so that every segment it sends, data and parity alike,
   serializes to at most `segmentSize` bytes.
-- MUST encode every segment as a `SegmentMessage` that satisfies [Segment Message Validity](#segment-message-validity).
+- MUST encode every segment as a `SegmentMessage` that satisfies [Validity](#validity).
 - MUST send each segment message as an individual transport message; the order is unconstrained.
 
 ## Reed–Solomon Coding
