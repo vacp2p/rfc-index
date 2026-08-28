@@ -28,7 +28,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ## Interoperability
 
 The wire format and the Keccak256 hash below are fixed by this specification,
-so participants that agree on `maxTotalSegments` can exchange segmented payloads.
+so participants that agree on `maxDataSegments` can exchange segmented payloads.
 That is the only configured value one participant enforces against another,
 and it is chosen per application rather than fixed here, see [Configuration](#configuration).
 
@@ -70,7 +70,7 @@ A segment message is valid only if all of the following hold:
 
 - `entire_message_hash` is exactly 32 bytes.
 - `segment_count >= 1`.
-- `segment_count <= maxTotalSegments`, the receiver's configured limit.
+- `segment_count <= maxDataSegments`, the receiver's configured limit.
 - `index < segment_count`.
 
 An invalid segment message MUST be discarded.
@@ -150,17 +150,13 @@ which is why [Reconstructed Payload Validity](#reconstructed-payload-validity) a
 ### When to Use Parity
 
 Parity costs `parityRate` extra bandwidth on *every* message, whether or not anything is lost.
-It pays off when a retransmission is expensive and when losses are independent across segments:
+It pays off only where losses are independent and a retransmission would cost more than that constant overhead.
+[RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) covers the general trade-off.
 
-- **Worth it** on a one-shot broadcast to many receivers with no feedback channel,
-  or over a high-latency link where a retransmission round trip is costlier than the constant overhead.
-- **Wasted** when a reliability layer above or below already retransmits missing segments,
-  for example [Reliable Channel API](reliable-channel-api.md) with SDS.
-  The two mechanisms repair the same loss twice; set `parityRate = 0` in that stack.
-- **Wasted** on small segment sets.
-  With two data segments, a single parity segment is a 50% overhead that still tolerates only one loss.
-- **Wasted** when loss is bursty rather than independent.
-  If the transport drops a whole flow, the parity segments are dropped with the data they protect.
+One case is specific to this stack.
+Where an end-to-end reliability layer already retransmits missing segments,
+as in [RELIABLE-CHANNEL-API](reliable-channel-api.md) with SDS,
+parity repairs the same loss a second time; set `parityRate = 0` there.
 
 ### Segment Caching
 
@@ -171,11 +167,7 @@ Implementations SHOULD:
   Authenticating the sender is out of scope of this specification.
 - Bound both the number of concurrent reconstructions and the total buffered bytes,
   per sender as well as globally where a sender identity is available.
-  A fixed-size ring of reconstruction slots gives a hard worst-case bound of `slots * 2 * maxTotalSegments * segmentSize` bytes.
-- Evict the least recently updated set first, and drop any set whose last segment arrived longer ago than a reconstruction timeout.
-- Record the `entire_message_hash` of a completed set for some time after delivery,
-  so that late or duplicate segments are dropped instead of starting a fresh reconstruction and re-delivering the payload.
-- Make segment insertion idempotent, so a redelivered segment does not corrupt or grow a pending set.
+  A fixed-size ring of reconstruction slots gives a hard worst-case bound of `slots * 2 * maxDataSegments * segmentSize` bytes.
 
 Segments MAY be persisted, for example in SQLite, so that partial reconstructions survive a restart.
 In-memory buffering is sufficient otherwise.
@@ -183,22 +175,16 @@ In-memory buffering is sufficient otherwise.
 ### Configuration
 
 - `segmentSize`: maximum size in bytes of a serialized segment message.
-  Set by the application, bounded by the maximum message size of the transport,
-  minus the overhead of any layer applied between segmentation and the transport.
+  Chosen by the application so that a segment fits the transport's maximum message size.
 - `parityRate`: number of parity segments relative to the number of data segments.
   MUST be less than `1`, see [Reed–Solomon Coding](#reedsolomon-coding).
   Defaults to `0`, which disables parity.
   `0.125` is RECOMMENDED where the [guidance above](#when-to-use-parity) favours parity.
-- `maxTotalSegments`: maximum `segment_count` a receiver accepts, applied to each class separately.
-  Since parity segments are the minority, a set holds fewer than `2 * maxTotalSegments` segments in total.
-  **256** is RECOMMENDED, as used by the reference implementation on [nim-leopard](https://github.com/status-im/nim-leopard).
-  This caps an original payload at roughly `256 * segmentSize` bytes,
-  about 38 MB over a transport with a 150 KB message limit.
-  An application needing larger payloads MAY use a higher value,
-  bounded when parity is used by the maximum shard count of its Reed–Solomon implementation.
+- `maxDataSegments`: maximum number of data segments a receiver accepts.
+  Parity needs no separate limit, being the smaller class.
+  **256** is RECOMMENDED, capping an original payload near `256 * segmentSize`, about 38 MB over a 150 KB transport.
+  An application needing more MAY raise it, up to the shard limit of its Reed–Solomon implementation.
   All participants in an application MUST use the same value, see [Interoperability](#interoperability).
-
-`segmentSize` is the only value an application needs to supply for normal operation.
 
 [RELIABLE-CHANNEL-API](reliable-channel-api.md) surfaces these as `SegmentationConfig`,
 where `segmentSizeBytes` is this `segmentSize`
@@ -237,7 +223,8 @@ additionally bounds how fast an attacker can create pending reconstructions.
 3. [RELIABLE-CHANNEL-API](reliable-channel-api.md)
 4. [nim-leopard](https://github.com/status-im/nim-leopard) – Nim bindings for Leopard-RS
 5. [Leopard-RS](https://github.com/catid/leopard) – Fast Reed–Solomon erasure coding library
-6. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) – Key words for use in RFCs to Indicate Requirement Levels
+6. [RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) – The Use of Forward Error Correction (FEC) in Reliable Multicast
+7. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) – Key words for use in RFCs to Indicate Requirement Levels
 
 ## Copyright
 
