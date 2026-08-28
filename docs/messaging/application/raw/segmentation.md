@@ -110,9 +110,10 @@ Only a valid reconstructed payload is delivered to the application.
 To transmit an original payload, the sender:
 
 - MUST compute `entire_message_hash = Keccak256(original payload)`.
-- MUST split the payload into one or more data segments,
-  choosing the chunk size so that every resulting serialized `SegmentMessage` is at most `segmentSize` bytes.
+- MUST split the payload into one or more data segments.
 - MAY generate parity segments at `parityRate` as defined in [Reed–Solomon Coding](#reedsolomon-coding).
+- MUST choose the chunk size so that every segment it sends, data and parity alike,
+  serializes to at most `segmentSize` bytes.
 - MUST encode every segment as a `SegmentMessage` that satisfies [Segment Message Validity](#segment-message-validity),
   with `segment_count` set to the number of segments in that segment's own class,
   and `payload_length` set to the length of the original payload.
