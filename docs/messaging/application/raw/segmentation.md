@@ -10,18 +10,10 @@
 | Category | application |
 | Tags | segmentation |
 
-
-
 ## Abstract
 
 This specification defines an application-layer wire format that carries a payload larger than the maximum message size of the underlying transport.
 The payload is split into data segments that can be reconstructed by the receiver even when segments arrive out of order. The data segments can optionally be extended with Reed–Solomon parity ones, in which case, recovery can also happen if the lost segments are under a certain threshold.
-
-## Motivation
-
-Message transports impose a maximum message size that bounds the application payload.
-Segmentation lifts that bound by spreading one payload over several transport messages.
-Optional parity segments may let the receiver reconstruct the payload when some are lost.
 
 ## Terminology
 
@@ -40,10 +32,7 @@ so participants that agree on `maxTotalSegments` can exchange segmented payloads
 That is the only configured value one participant enforces against another,
 and it is chosen per application rather than fixed here, see [Configuration](#configuration).
 
-Interoperability is therefore scoped to a single application,
-whose participants MUST share a `maxTotalSegments` value.
-Interoperability across applications is not a goal of this specification:
-it additionally requires an integration specification fixing the layers above and below segmentation.
+Interoperability across applications is not a goal of this specification.
 
 ## Wire Format
 
@@ -62,17 +51,13 @@ message SegmentMessage {
 | Field | Presence | Description |
 | --- | --- | --- |
 | `entire_message_hash` | REQUIRED | `Keccak256(original payload)`, exactly 32 bytes. Identifies the set of segments that reconstruct one payload. |
-| `index` | REQUIRED | Zero-based position of this segment within its own class: among the data segments when `is_parity` is `false`, among the parity segments when `is_parity` is `true`. |
-| `segment_count` | REQUIRED | Number of segments in this segment's own class: the count of data segments when `is_parity` is `false`, the count of parity segments when `is_parity` is `true`. |
+| `index` | REQUIRED | Zero-based position of this segment within its own class: among the data segments when `is_parity` is `false`; among the parity segments when `is_parity` is `true`. |
+| `segment_count` | REQUIRED | Number of segments in this segment's own class: the count of data segments when `is_parity` is `false`; the count of parity segments when `is_parity` is `true`. |
 | `is_parity` | OPTIONAL, defaults to `false` | `true` for a parity segment, `false` for a data segment. |
 | `payload` | REQUIRED | The data chunk or the parity shard. |
 
 `is_parity` gives `index` and `segment_count` their meaning: both are read within the class the flag selects.
-Every segment of one class therefore carries the same `segment_count`.
-
-The **data segment count** of a set is the `segment_count` carried by any of its data segments.
-It is the number of segments needed to reconstruct the original payload, so a receiver must learn it before reconstructing;
-[Reed–Solomon Coding](#reedsolomon-coding) guarantees it always does in time.
+Every segment of a set carries the same `segment_count` as the other segments of its class.
 
 ### Segment Message Validity
 
@@ -98,7 +83,7 @@ A segment message whose `(is_parity, index)` is already held MUST be ignored.
 
 ### Reconstructed Payload Validity
 
-A segment set can be reconstructed once it holds at least its data segment count of segment messages.
+A segment set can be reconstructed once it holds as many segment messages as the set has data segments.
 The reconstructed payload is obtained as follows:
 
 - If every data segment is held,
