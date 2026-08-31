@@ -40,10 +40,6 @@ message SegmentMessage {
 }
 ```
 
-
-`entire_message_hash` identifies the segments that together reconstruct one payload.
-`payload_length` is on every segment because reconstruction needs it whichever subset survives.
-
 ### Validity
 
 A **segment message** is valid only if `entire_message_hash` is exactly 32 bytes,
@@ -52,14 +48,14 @@ An invalid segment message MUST be discarded.
 A payload that fits one segment is still wrapped, as `segment_count == 1`, `index == 0`, `is_parity == false`.
 
 Two valid segment messages belong to the same **segment set** only if they carry equal `entire_message_hash`
-and equal `payload_length`, and equal `segment_count` whenever they carry equal `is_parity`.
+and equal `original_length`, and equal `segment_count` whenever they carry equal `is_parity`.
 Within a set, `(is_parity, index)` MUST be unique; a segment message repeating one already held MUST be ignored.
 
 A set holding as many segment messages as it has data segments reconstructs a **payload**:
 
 1. Concatenate the data segments' `payload` fields in ascending `index` order,
    or, where any is missing, Reed–Solomon decode over the held segments, see [Reed–Solomon Coding](#reedsolomon-coding).
-2. Truncate to `payload_length`, which discards any zero padding left by Reed–Solomon encoding.
+2. Truncate to `original_length`, which discards any zero padding left by Reed–Solomon encoding.
    Fewer assembled bytes than that mean the set is incomplete and MUST NOT be delivered.
 3. Verify that `Keccak256` of the result equals the set's `entire_message_hash`.
 
