@@ -43,7 +43,7 @@ message SegmentMessage {
 ### Validity
 
 A **segment message** is valid only if `entire_message_hash` is exactly 32 bytes,
-`1 <= segment_count <= maxDataSegments`, the receiver's configured limit, and `index < segment_count`.
+`1 <= segment_count <= maxSegmentsPerClass`, the receiver's configured limit, and `index < segment_count`.
 A payload that fits one segment is still wrapped, as `segment_count == 1`, `index == 0`, `is_parity == false`.
 
 Two valid segment messages belong to the same **segment set** only if they carry equal `entire_message_hash`
@@ -137,9 +137,10 @@ Implementations typically:
 
 - Index the cache by `entire_message_hash`, and additionally by sender where the transport authenticates one.
   Authenticating the sender is out of scope of this specification.
-- Bound both the number of concurrent reconstructions and the total buffered bytes,
+- Bound both the number of segment sets held and the total buffered bytes,
   per sender as well as globally where a sender identity is available.
-  A fixed-size ring of reconstruction slots gives a hard worst-case bound of `slots * 2 * maxDataSegments * segmentSize` bytes.
+  Capping the sets bounds the bytes at
+  `2 * maxSegmentsPerClass * segmentSize`, being the factor of two covering both classes (data and parity.)
 - Evict the least recently updated set first,
   in addition to the `reconstructionTimeout` expiry every receiver applies.
 
@@ -155,8 +156,8 @@ In-memory buffering is sufficient otherwise.
   `0.125` is RECOMMENDED where the [guidance above](#when-to-use-parity) favours parity.
 - `reconstructionTimeout`: how long a segment set may go without a new segment message before the receiver
   drops it, see [Expiry](#expiry).
-- `maxDataSegments`: maximum number of data segments a receiver accepts.
-  Parity needs no separate limit, being the smaller class.
+- `maxSegmentsPerClass`: greatest `segment_count` a receiver accepts, applied to each segment class, data or parity, separately, so a segment
+set holds at most twice this many segment messages.
   **256** is RECOMMENDED.
   An application needing more MAY raise it, up to the shard limit of its Reed–Solomon implementation.
   All participants in an application MUST use the same value:
