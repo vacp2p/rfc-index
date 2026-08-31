@@ -42,12 +42,18 @@ message SegmentMessage {
 
 ### Validity
 
-A **segment message** is valid only if `entire_message_hash` is exactly 32 bytes,
-`1 <= segment_count <= maxSegmentsPerClass`, the receiver's configured limit, and `index < segment_count`.
-A payload that fits one segment is still wrapped, as `segment_count == 1`, `index == 0`, `is_parity == false`.
+A **segment message** is valid only if all of the following hold:
+- `entire_message_hash` is exactly 32 bytes.
+- `1 <= segment_count <= maxSegmentsPerClass` (receiver's configured limit.)
+- `index < segment_count`.
 
-Two valid segment messages belong to the same **segment set** only if they carry equal `entire_message_hash`
-and equal `original_length`, and equal `segment_count` whenever they carry equal `is_parity`.
+A payload that fits one segment is valid if `segment_count == 1`, `index == 0`, `is_parity == false`.
+
+Two valid segment messages belong to the same **segment set** only if all of the following hold:
+- they carry equal `entire_message_hash`.
+- they carry equal `original_length`.
+- they carry equal `segment_count`, whenever their `is_parity` is equal.
+
 Within a set, `(is_parity, index)` MUST be unique; a segment message repeating one already held MUST be ignored.
 
 ## Segmentation
@@ -55,24 +61,23 @@ Within a set, `(is_parity, index)` MUST be unique; a segment message repeating o
 To transmit an original payload, the sender:
 
 - MUST compute `entire_message_hash = Keccak256(original payload)`.
-- MUST split the payload into one or more data segments.
+- MUST split the payload into one or more data segments, at a chunk size such that every segment
+  it sends, data and parity alike, serializes to at most `segmentSize` bytes.
 - MAY generate parity segments at `parityRate` as defined in [Reed–Solomon Coding](#reedsolomon-coding).
-- MUST choose the chunk size so that every segment it sends, data and parity alike,
-  serializes to at most `segmentSize` bytes.
 - MUST encode every segment as a `SegmentMessage` that satisfies [Validity](#validity).
 - MUST send each segment message as an individual transport message; the order is unconstrained.
 
 ## Reconstruction
 
 A receiver retains every valid segment message in its [segment set](#validity).
-A set's **data-segment count** is the `segment_count` of any segment message with `is_parity == false`.
-- A set reaching that count in data segments alone reconstructs by [concatenation](#all-data-segments-received)
-- One set reaching that count in data plus parity segments together reconstructs [through parity](#recovery-through-parity)
-- One that reaches it in neither, [expires](#expiry).
+A set's `data_segment_count` is the `segment_count` of any segment message with `is_parity == false`.
+- A set reaching that count in data segments alone reconstructs by [concatenation](#all-data-segments-received).
+- A set reaching that count in data plus parity segments together reconstructs [through parity](#recovery-through-parity).
+- Else, [expires](#expiry) after a configured timeout.
 
-### All Data Segments Received
+### All data segments are received successfuly
 
-Once a set holds every data segment, the receiver produces the original payload:
+The receiver produces the original payload following these steps:
 
 1. Concatenate the data segments' `payload` fields in ascending `index` order.
 2. Truncate to `original_length`, which discards any zero padding left by Reed–Solomon encoding.
@@ -82,21 +87,23 @@ Once a set holds every data segment, the receiver produces the original payload:
 An invalid payload MUST be discarded; only a valid one is delivered to the application.
 Any parity segments the set holds are unused, and the set MAY be released once the payload is delivered.
 
-### Recovery Through Parity
+### Recovery hrough parity
 
 Where a data segment is missing, parity segments stand in for it:
 the set reconstructs once the number of segment messages it holds, data and parity alike,
-reaches the data-segment count.
+reaches the original data-segment count.
 The receiver [Reed–Solomon decodes](#reedsolomon-coding) the missing data segments from the ones it holds,
 then proceeds as [above](#all-data-segments-received) from step 1.
 
 ### Expiry
 
-A set may never become reconstructible, its remaining segment messages having been lost outright.
-The receiver MUST NOT wait indefinitely: it MUST drop a set that has received no further segment message
-within a reconstruction timeout, discarding what it holds without delivering anything to the application.
+The receiver MUST NOT wait indefinitely for all the required segments to arrive.
+It MUST drop a set that has received no further segments
+within a reconstruction timeout without delivering anything to the application.
+
 A later segment message of a dropped set starts a new set, which reconstructs only if enough of the
 original set's segments are retransmitted.
+
 The timeout and the other bounds a receiver places on pending sets are covered in [Segment Caching](#segment-caching).
 
 ## Reed–Solomon Coding
@@ -106,34 +113,33 @@ over its data segments to produce `ceil(parityRate * number of data segments)` m
 Parity MUST remain the minority class, which `parityRate < 1` ensures,
 so a receiver always learns the data-segment count before it can reconstruct.
 
-Reed–Solomon operates on equal-length inputs, called **shards**.
-The **shard length** is the chunk size the payload was split into,
+Reed–Solomon operates on equal-length inputs, called shards.
+The shard length is the chunk size the payload was split into,
 so only the last data segment may be shorter, and the encoder zero-pads it.
 That padding never reaches the wire, data segments being sent at their true length,
 which leaves parity segments as the only ones always exactly shard-length.
 
-Such a set is reconstructible from any subset as large as its number of data segments.
-A decoding receiver always holds a parity segment, since a complete set needs no decoding:
-it reads the shard length from one, re-pads its data segments, and decodes the rest.
+Reed–Solomon recovers the data segments from any combination of segments as large as the data-segment count.
+
 Receivers MUST support Reed–Solomon decoding, since any sender MAY use parity.
 
 ## Implementation Suggestions
 
 ### When to Use Parity
 
-Parity costs `parityRate` extra bandwidth on *every* message, whether or not anything is lost,
+Parity costs `parityRate` extra bandwidth on every message, whether or not anything is lost,
 and pays off only where losses are independent and a retransmission would cost more;
 [RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) covers the general trade-off.
 
 Where an end-to-end reliability layer already retransmits missing segments,
-parity duplicates a repair you are getting from other reliability layers, and charges for it on every message: set `parityRate = 0`.
+parity duplicates a repair you are getting from other reliability layers, and charges for it on every message. Then, in this case, set `parityRate = 0` to disable parity.
+
 `ceil` also rounds small sets up sharply: at `parityRate = 0.125` two data segments still get one parity segment,
 a 50% overhead to tolerate a single loss.
 
 ### Segment Caching
 
-Received segments accumulate until their set is reconstructible, so an unbounded cache is a memory leak driven by remote senders.
-Implementations typically:
+Received segments accumulate until their set is reconstructible. Implementations typically:
 
 - Index the cache by `entire_message_hash`, and additionally by sender where the transport authenticates one.
   Authenticating the sender is out of scope of this specification.
@@ -170,9 +176,7 @@ set holds at most twice this many segment messages.
 ### Privacy
 
 `entire_message_hash` links the segments of one payload to each other, but does not reveal the payload.
-Applications SHOULD encrypt each serialized `SegmentMessage` before transmission,
-which hides both the hash and the segment counts from observers.
-Traffic analysis may still identify a segmented flow by its timing and volume.
+Encryption is not enforced in the current specification.
 
 ### Integrity
 
