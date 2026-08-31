@@ -23,7 +23,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2025-09-04 |
 | 1.0.1 | Renamed Nomos to Logos Blockchain. Removed mentions of DA. | 2026-04-23 |
-| 1.1.0 | State that amending a circuit requires a fresh Phase 2, and that the Proof of Quota proof of work branch is such an amendment | 2026-08-10 |
+| 1.1.0 | State that amending a circuit requires a fresh Phase 2, and that the Proof of Quota proof of work branch is such an amendment | 2026-08-31 |
 
 # Introduction
 

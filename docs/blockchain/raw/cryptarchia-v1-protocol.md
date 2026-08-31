@@ -34,7 +34,7 @@
 | 1.2.2 | Precise, in [Chain Maintenance](#chain-maintenance), that the execution layer validates the block by applying its transactions in the order they appear starting from the parent block's execution state. | 2026-08-25 |
 | 1.2.3 | Update the test vectors to reflect the parent added in the `CHANNEL_CONFIG` payload | 2026-08-27 |
 | 1.2.4 | Reordered the `ProofOfLeadership` fields to the wire order defined by the [Canonical Encoding](bedrock-v1.1-block-construction.md#canonical-encoding), and noted that the [Block ID](#block-id) preimage absorbs the same fields in a different order by design. The `Header` layout and the `block_id` preimage are otherwise unchanged. | 2026-08-28 |
-| 1.3.0 | Scope the Proof of Stake vs. Proof of Work annex to leader election, state that proof of work does not enter fork choice, and define the expected number of blocks in an epoch | 2026-08-10 |
+| 1.3.0 | Scope the Proof of Stake vs. Proof of Work annex to leader election, state that proof of work does not enter fork choice, and define the expected number of blocks in an epoch | 2026-08-31 |
 
 # Introduction
 

@@ -30,7 +30,7 @@
 | 1.1.2 | Denominated the encapsulation-overhead calculation against `Max_Payload_Length` (18195 bytes), the payload that is actually encapsulated, rather than the body it contains, following the compression of transaction references (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)). | 2026-08-18 |
 | 1.2.0 | Define the token evaluation under a low core quota, and specify the Active Message metadata layout. | 2026-08-19 |
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
-| 1.3.0 | Add the proof of work quota and the Blend difficulty, verify the proof of quota before relaying any message, and add transactions as a data message payload; re-derive the nullifier cache bound and align the nullifier retention period | 2026-08-10 |
+| 1.3.0 | Add the proof of work quota and the Blend difficulty, verify the proof of quota before relaying any message, and add transactions as a data message payload; re-derive the nullifier cache bound and align the nullifier retention period | 2026-08-31 |
 
 # Introduction
 

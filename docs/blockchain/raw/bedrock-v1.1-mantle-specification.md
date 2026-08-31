@@ -41,7 +41,7 @@
 | 1.10.2| Precise the state validation reads: the Operations of a Mantle Transaction are validated and executed one after the other in the order they appear, each against the state the preceding ones left, and a Mantle Transaction against the state the transactions preceding it in the block left. Accumulated the transaction balance along that pass, replacing `get_transaction_balance` | 2026-08-24 |
 | 1.11.0 | Track the configuration lineage of a channel: `ChannelState` gains `config_tip_hash` and the `CHANNEL_CONFIG` payload carries the `parent` configuration it extends, ordering configurations and preventing their replay | 2026-08-27 |
 | 1.11.1 | Renamed locked notes into service notes: `service_notes`, `ServiceNote` and `service_note_id` replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in | 2026-08-27 |
-| 1.12.0 | Add the `CLAIM_POW_REWARD` Operation, the proof of work reward pool and its difficulty retargeting | 2026-08-11 |
+| 1.12.0 | Add the `CLAIM_POW_REWARD` Operation, the proof of work reward pool and its difficulty retargeting | 2026-08-31 |
 
 # Introduction
 
