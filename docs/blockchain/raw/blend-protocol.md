@@ -29,6 +29,7 @@
 | 1.1.1 | Updated the block proposal message size to 34574 bytes in the encapsulation-overhead calculation, following the addition of carried uncle headers in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md). | 2026-08-06 |
 | 1.2.0 | Define the token evaluation under a low core quota, and specify the Active Message metadata layout. | 2026-08-19 |
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
+| 1.2.2 | Updated Connection Details to follow [Transport Security](../draft/p2p-network.md#transport-security) and require the hybrid post-quantum key exchange. | 2026-08-28 |
 
 # Introduction
 
@@ -501,7 +502,7 @@ Implementations should choose a default based on the deployment they operate in,
 
 ### Connection Details
 
-The connections are established using libp2p with TLS version 1.3 (not older). The cryptographic scheme is Ed25519 with ephemeral keys**.** The libp2p protocol name is `/logos-blockchain/blend/1.0.0` for mainnet and `/logos-blockchain-testnet/blend/1.0.0` for testnet.
+The connections are established using libp2p with TLS version 1.3 (not older), following the transport security configuration of the network — the peer authentication model (Ed25519 node identity) and the key exchange — as specified in [Transport Security](../draft/p2p-network.md#transport-security). As of the first post-quantum phase, the key exchange is the hybrid group `X25519MLKEM768`, with `X25519` retained for interoperability. Blend is the sharpest reason for the hybrid requirement: traffic recorded today and decrypted by a future quantum adversary would retroactively degrade the privacy this protocol provides. The libp2p protocol name is `/logos-blockchain/blend/1.0.0` for mainnet and `/logos-blockchain-testnet/blend/1.0.0` for testnet.
 
 ### Neighbor Distinction Process
 
