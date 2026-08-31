@@ -32,7 +32,7 @@ Erasure-coded parity segments provide resilience against partial loss or reorder
   `is_parity` tells which class a segment message belongs to, and its `index` and `segment_count`
   are relative to that class alone, never to the two combined.
 - **segment message**: a [`SegmentMessage`](#wire-format) carrying either data or parity segment.
-- **segmentSize**: maximum size in bytes of a serialized segment message, see [Configuration](#configuration).
+- **segmentSizeBytes**: maximum size of a serialized segment message, see [Configuration](#configuration).
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
@@ -85,7 +85,8 @@ A receiver takes the shard length from a parity segment, those being always exac
 re-pads its data segments to it, and decodes.
 It always holds a parity segment when decoding, a missing data segment being what parity made up for.
 
-Receivers MUST support Reed–Solomon decoding, since any sender MAY use parity.
+Receivers SHOULD support Reed–Solomon decoding, and MUST where the application sets `parityRate > 0`;
+without it a set reconstructs only once every data segment has arrived.
 
 ## Segmentation
 
@@ -93,7 +94,7 @@ To transmit an original payload, the sender:
 
 - MUST compute `entire_message_hash = Keccak256(original payload)`.
 - MUST split the payload into one or more data segments, at a chunk size such that every segment
-  it sends, data and parity alike, serializes to at most `segmentSize` bytes.
+  it sends, data and parity alike, serializes to at most `segmentSizeBytes`.
 - MAY generate parity segments at `parityRate` as defined in [Reed–Solomon Coding](#reedsolomon-coding).
 - MUST encode every segment as a `SegmentMessage` that satisfies [Validity](#validity).
 - MUST send each segment message as an individual transport message; the order is unconstrained.
@@ -130,7 +131,7 @@ Any parity segments the set holds are unused, and the set MAY be released once t
 
 Where a data segment is missing, parity segments stand in for it:
 the set reconstructs once the number of segment messages it holds, data and parity alike,
-reaches the original data-segment count.
+reaches the `data_segment_count`.
 The receiver [Reed–Solomon decodes](#reedsolomon-coding) the missing data segments from the ones it holds,
 then proceeds as [above](#all-data-segments-are-received-successfully) from step 1.
 
@@ -147,13 +148,13 @@ The timeout and the other bounds a receiver places on pending sets are covered i
 
 ## Configuration
 
-- `segmentSize`: chosen by the application so that a segment fits the transport's maximum message size.
+- `segmentSizeBytes`: chosen by the application so that a segment fits the transport's maximum message size.
 - `parityRate`: number of parity segments relative to the number of data segments.
   MUST be less than `1`, and the count it yields is capped so that parity stays the minority class,
   see [Reed–Solomon Coding](#reedsolomon-coding).
   Defaults to `0`, which disables parity.
   `0.125` is RECOMMENDED where the [guidance below](#when-to-use-parity) favours parity.
-- `reconstructionTimeout`: how long a segment set may go without a new segment message before the receiver
+- `reconstructionTimeoutSeconds`: how long a segment set may go without a new segment message before the receiver
   drops it, see [Expiry](#expiry).
 - `maxSegmentsPerClass`: greatest `segment_count` a receiver accepts, applied to each segment class, data or parity, separately, so a segment set holds at most twice this many segment messages.
   256 is RECOMMENDED.
@@ -188,9 +189,9 @@ Received segments accumulate until their set is reconstructible. Implementations
 - Bound both the number of segment sets held and the total buffered bytes,
   per sender as well as globally where a sender identity is available.
   Capping the sets bounds the bytes at that cap times
-  `2 * maxSegmentsPerClass * segmentSize`, being the factor of two covering both classes (data and parity.)
+  `2 * maxSegmentsPerClass * segmentSizeBytes`, being the factor of two covering both classes (data and parity.)
 - Evict the least recently updated set first,
-  in addition to the `reconstructionTimeout` expiry every receiver applies.
+  in addition to the `reconstructionTimeoutSeconds` expiry every receiver applies.
 
 Segments can be persisted, for example in SQLite, so that partial reconstructions survive a restart.
 In-memory buffering is sufficient otherwise.
