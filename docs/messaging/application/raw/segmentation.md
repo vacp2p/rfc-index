@@ -51,16 +51,6 @@ Two valid segment messages belong to the same **segment set** only if they carry
 and equal `original_length`, and equal `segment_count` whenever they carry equal `is_parity`.
 Within a set, `(is_parity, index)` MUST be unique; a segment message repeating one already held MUST be ignored.
 
-A set holding as many segment messages as it has data segments reconstructs a **payload**:
-
-1. Concatenate the data segments' `payload` fields in ascending `index` order,
-   or, where any is missing, Reed–Solomon decode over the held segments, see [Reed–Solomon Coding](#reedsolomon-coding).
-2. Truncate to `original_length`, which discards any zero padding left by Reed–Solomon encoding.
-   Fewer assembled bytes than that mean the set is incomplete and MUST NOT be delivered.
-3. Verify that `Keccak256` of the result equals the set's `entire_message_hash`.
-
-An invalid payload MUST be discarded; only a valid one is delivered to the application.
-
 ## Segmentation
 
 To transmit an original payload, the sender:
@@ -72,6 +62,43 @@ To transmit an original payload, the sender:
   serializes to at most `segmentSize` bytes.
 - MUST encode every segment as a `SegmentMessage` that satisfies [Validity](#validity).
 - MUST send each segment message as an individual transport message; the order is unconstrained.
+
+## Reconstruction
+
+A receiver retains every valid segment message in its [segment set](#validity).
+A set's **data-segment count** is the `segment_count` of any segment message with `is_parity == false`.
+- A set reaching that count in data segments alone reconstructs by [concatenation](#all-data-segments-received)
+- One set reaching that count in data plus parity segments together reconstructs [through parity](#recovery-through-parity)
+- One that reaches it in neither, [expires](#expiry).
+
+### All Data Segments Received
+
+Once a set holds every data segment, the receiver produces the original payload:
+
+1. Concatenate the data segments' `payload` fields in ascending `index` order.
+2. Truncate to `original_length`, which discards any zero padding left by Reed–Solomon encoding.
+   Fewer assembled bytes than that mean the set is incomplete and MUST NOT be delivered to the application.
+3. Verify that `Keccak256` of the result equals the set's `entire_message_hash`.
+
+An invalid payload MUST be discarded; only a valid one is delivered to the application.
+Any parity segments the set holds are unused, and the set MAY be released once the payload is delivered.
+
+### Recovery Through Parity
+
+Where a data segment is missing, parity segments stand in for it:
+the set reconstructs once the number of segment messages it holds, data and parity alike,
+reaches the data-segment count.
+The receiver [Reed–Solomon decodes](#reedsolomon-coding) the missing data segments from the ones it holds,
+then proceeds as [above](#all-data-segments-received) from step 1.
+
+### Expiry
+
+A set may never become reconstructible, its remaining segment messages having been lost outright.
+The receiver MUST NOT wait indefinitely: it MUST drop a set that has received no further segment message
+within a reconstruction timeout, discarding what it holds without delivering anything to the application.
+A later segment message of a dropped set starts a new set, which reconstructs only if enough of the
+original set's segments are retransmitted.
+The timeout and the other bounds a receiver places on pending sets are covered in [Segment Caching](#segment-caching).
 
 ## Reed–Solomon Coding
 
@@ -115,7 +142,7 @@ Implementations typically:
   per sender as well as globally where a sender identity is available.
   A fixed-size ring of reconstruction slots gives a hard worst-case bound of `slots * 2 * maxDataSegments * segmentSize` bytes.
 - Evict the least recently updated set first,
-  and drop any set whose last segment arrived longer ago than a reconstruction timeout.
+  in addition to the `reconstructionTimeout` expiry every receiver applies.
 
 Segments can be persisted, for example in SQLite, so that partial reconstructions survive a restart.
 In-memory buffering is sufficient otherwise.
@@ -127,6 +154,8 @@ In-memory buffering is sufficient otherwise.
   MUST be less than `1`, see [Reed–Solomon Coding](#reedsolomon-coding).
   Defaults to `0`, which disables parity.
   `0.125` is RECOMMENDED where the [guidance above](#when-to-use-parity) favours parity.
+- `reconstructionTimeout`: how long a segment set may go without a new segment message before the receiver
+  drops it, see [Expiry](#expiry).
 - `maxDataSegments`: maximum number of data segments a receiver accepts.
   Parity needs no separate limit, being the smaller class.
   **256** is RECOMMENDED.
