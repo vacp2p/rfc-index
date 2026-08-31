@@ -40,14 +40,6 @@ message SegmentMessage {
 }
 ```
 
-| Field | Presence |
-| --- | --- |
-| `entire_message_hash` | REQUIRED |
-| `index` | REQUIRED |
-| `segment_count` | REQUIRED |
-| `is_parity` | OPTIONAL, defaults to `false` |
-| `payload` | REQUIRED |
-| `payload_length` | REQUIRED |
 
 `entire_message_hash` identifies the segments that together reconstruct one payload.
 `payload_length` is on every segment because reconstruction needs it whichever subset survives.
