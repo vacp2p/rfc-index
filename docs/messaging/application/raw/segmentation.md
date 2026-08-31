@@ -44,7 +44,6 @@ message SegmentMessage {
 
 A **segment message** is valid only if `entire_message_hash` is exactly 32 bytes,
 `1 <= segment_count <= maxDataSegments`, the receiver's configured limit, and `index < segment_count`.
-An invalid segment message MUST be discarded.
 A payload that fits one segment is still wrapped, as `segment_count == 1`, `index == 0`, `is_parity == false`.
 
 Two valid segment messages belong to the same **segment set** only if they carry equal `entire_message_hash`
