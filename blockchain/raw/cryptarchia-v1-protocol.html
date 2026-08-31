@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5fa8ee40c1de478b0934d95ddade7ce6a406fd1c/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>5fa8ee4</code></a> — docs(blockchain): compress the block proposal with 16-byte transaction reference prefixes (#389)</li>
 <li><strong>2026-08-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/48fbc82c3545f8512176ce7c707019aefce24650/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>48fbc82</code></a> — docs(blockchain): order channel configurations and prevent their replay (#396)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
@@ -214,6 +215,7 @@
 <tr><td>1.2.1</td><td>Defined <code>EpochNumber</code>, the type of an epoch number, as a 32-bit unsigned integer encoded little-endian wherever it is serialized or hashed.</td><td>2026-08-25</td></tr>
 <tr><td>1.2.2</td><td>Precise, in <a href="#chain-maintenance">Chain Maintenance</a>, that the execution layer validates the block by applying its transactions in the order they appear starting from the parent block's execution state.</td><td>2026-08-25</td></tr>
 <tr><td>1.2.3</td><td>Update the test vectors to reflect the parent added in the <code>CHANNEL_CONFIG</code> payload</td><td>2026-08-27</td></tr>
+<tr><td>1.2.4</td><td>Reordered the <code>ProofOfLeadership</code> fields to the wire order defined by the <a href="bedrock-v1.1-block-construction.html#canonical-encoding">Canonical Encoding</a>, and noted that the <a href="#block-id">Block ID</a> preimage absorbs the same fields in a different order by design. The <code>Header</code> layout and the <code>block_id</code> preimage are otherwise unchanged.</td><td>2026-08-28</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -397,11 +399,12 @@
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 
 class ProofOfLeadership:                     # 224 bytes
-    leader_voucher: zkhash                   # 32 bytes
-    entropy_contribution: zkhash             # 32 bytes
     proof: Groth16Proof                      # 128 bytes
+    entropy_contribution: zkhash             # 32 bytes
     leader_key: Ed25519PublicKey             # 32 bytes
+    leader_voucher: zkhash                   # 32 bytes
 </code></pre>
+<p>The field order above is the wire order defined in <a href="bedrock-v1.1-block-construction.html#canonical-encoding">Canonical Encoding</a>. The <a href="#block-id">Block ID</a> preimage above absorbs the same <code>ProofOfLeadership</code> fields in a different order; that is deliberate, since the preimage is a domain-separated enumeration of header fields rather than a re-serialization of the header.</p>
 <h3 id="block"><a class="header" href="#block">Block</a></h3>
 <p><a href="bedrock-v1.1-block-construction.html">Block Construction, Validation and Execution</a></p>
 <h3 id="uncle-references"><a class="header" href="#uncle-references">Uncle References</a></h3>

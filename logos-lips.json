@@ -545,7 +545,7 @@
     "title": "Network Wire Format",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-06-12",
+    "updated": "2026-08-31",
     "path": "blockchain/raw/network-wire-format.html"
   },
   {
@@ -905,7 +905,7 @@
     "title": "Message Formatting",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-19",
+    "updated": "2026-08-31",
     "path": "blockchain/raw/message-formatting.html"
   },
   {
@@ -932,7 +932,7 @@
     "title": "Cryptarchia Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-27",
+    "updated": "2026-08-31",
     "path": "blockchain/raw/cryptarchia-v1-protocol.html"
   },
   {
@@ -941,7 +941,7 @@
     "title": "Block Construction, Validation and Execution",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-26",
+    "updated": "2026-08-31",
     "path": "blockchain/raw/bedrock-v1.1-block-construction.html"
   },
   {
@@ -959,7 +959,7 @@
     "title": "Blend Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-26",
+    "updated": "2026-08-31",
     "path": "blockchain/raw/blend-protocol.html"
   },
   {
@@ -977,7 +977,7 @@
     "title": "Payload Formatting",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-19",
+    "updated": "2026-08-31",
     "path": "blockchain/raw/payload-formatting.html"
   },
   {
