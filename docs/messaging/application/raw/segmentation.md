@@ -117,8 +117,9 @@ The timeout and the other bounds a receiver places on pending sets are covered i
 ## Reed–Solomon Coding
 
 A sender that uses parity applies [Reed–Solomon erasure coding](https://github.com/catid/leopard)
-over its data segments to produce `ceil(parityRate * number of data segments)` more.
-Parity MUST remain the minority class, which `parityRate < 1` ensures,
+over its data segments to produce `ceil(parityRate * number of data segments)` more,
+or one fewer than the data segments where that is smaller, so a single data segment gets none.
+Parity MUST remain the minority class, fewer parity segments than data ones,
 so a receiver always learns the data-segment count before it can reconstruct.
 
 Reed–Solomon operates on equal-length inputs, called shards.
@@ -128,6 +129,10 @@ That padding never reaches the wire, data segments being sent at their true leng
 which leaves parity segments as the only ones always exactly shard-length.
 
 Reed–Solomon recovers the data segments from any combination of segments as large as the data-segment count.
+Decoding needs every shard at shard length, but the last data segment may travel shorter than that.
+A receiver takes the shard length from a parity segment, those being always exactly that long,
+re-pads its data segments to it, and decodes.
+It always holds a parity segment when decoding, a missing data segment being what parity made up for.
 
 Receivers MUST support Reed–Solomon decoding, since any sender MAY use parity.
 
@@ -153,7 +158,7 @@ Received segments accumulate until their set is reconstructible. Implementations
   Authenticating the sender is out of scope of this specification.
 - Bound both the number of segment sets held and the total buffered bytes,
   per sender as well as globally where a sender identity is available.
-  Capping the sets bounds the bytes at
+  Capping the sets bounds the bytes at that cap times
   `2 * maxSegmentsPerClass * segmentSize`, being the factor of two covering both classes (data and parity.)
 - Evict the least recently updated set first,
   in addition to the `reconstructionTimeout` expiry every receiver applies.
@@ -165,14 +170,17 @@ In-memory buffering is sufficient otherwise.
 
 - `segmentSize`: chosen by the application so that a segment fits the transport's maximum message size.
 - `parityRate`: number of parity segments relative to the number of data segments.
-  MUST be less than `1`, see [Reed–Solomon Coding](#reedsolomon-coding).
+  MUST be less than `1`, and the count it yields is capped so that parity stays the minority class,
+  see [Reed–Solomon Coding](#reedsolomon-coding).
   Defaults to `0`, which disables parity.
   `0.125` is RECOMMENDED where the [guidance above](#when-to-use-parity) favours parity.
 - `reconstructionTimeout`: how long a segment set may go without a new segment message before the receiver
   drops it, see [Expiry](#expiry).
 - `maxSegmentsPerClass`: greatest `segment_count` a receiver accepts, applied to each segment class, data or parity, separately, so a segment set holds at most twice this many segment messages.
   256 is RECOMMENDED.
-  An application needing more MAY raise it, up to the shard limit of its Reed–Solomon implementation.
+  An application needing more MAY raise it, so long as `maxSegmentsPerClass` and the parity segments
+  `parityRate` adds to it together stay within the shard limit of the Reed–Solomon implementation,
+  65536 for [Leopard-RS](https://github.com/catid/leopard).
   All participants in an application MUST use the same value:
   the wire format and the Keccak256 hash are fixed by this specification,
   but this is the only configured value one participant enforces against another,
@@ -183,13 +191,21 @@ In-memory buffering is sufficient otherwise.
 ### Privacy
 
 `entire_message_hash` links the segments of one payload to each other, but does not reveal the payload.
-Encryption is not enforced in the current specification.
+This specification does not enforce encryption, but applications SHOULD encrypt each serialized
+`SegmentMessage` before transmission, which hides the hash and the segment counts from observers
+and denies an attacker the hash it would need to [poison a set](#integrity).
+Traffic analysis may still identify a segmented flow by its timing and volume.
 
 ### Integrity
 
 This specification provides no sender authentication.
 The `entire_message_hash` check on the reconstructed payload detects accidental corruption and mismatched segments,
 but an attacker able to inject transport messages can compute a consistent hash over a payload of their own.
+Such an attacker can also deny reconstruction outright: injecting a segment message that occupies an
+`(is_parity, index)` of a set already in flight makes the receiver ignore the genuine one, so the set fails
+its hash check and never reconstructs until it [expires](#expiry).
+Encrypting each segment message, as [Privacy](#privacy) recommends, keeps `entire_message_hash` out of an
+observer's reach and so out of reach of this attack.
 Applications requiring authenticity MUST obtain it from another layer.
 
 ### Denial of Service
