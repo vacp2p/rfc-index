@@ -126,7 +126,7 @@ and pays off only where losses are independent and a retransmission would cost m
 [RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) covers the general trade-off.
 
 Where an end-to-end reliability layer already retransmits missing segments,
-as in [RELIABLE-CHANNEL-API](reliable-channel-api.md) with SDS, parity repairs the same loss twice: set `parityRate = 0`.
+parity duplicates a repair you are getting from other reliability layers, and charges for it on every message: set `parityRate = 0`.
 `ceil` also rounds small sets up sharply: at `parityRate = 0.125` two data segments still get one parity segment,
 a 50% overhead to tolerate a single loss.
 
@@ -164,10 +164,6 @@ In-memory buffering is sufficient otherwise.
   but this is the only configured value one participant enforces against another,
   so participants interoperate within an application and not across applications.
 
-[RELIABLE-CHANNEL-API](reliable-channel-api.md) surfaces these as `SegmentationConfig`: `segmentSizeBytes` is
-`segmentSize`, `enableReedSolomon` selects `parityRate`, and `persistence` backs [Segment Caching](#segment-caching).
-Since it segments before SDS and encryption, `segmentSizeBytes` MUST leave room for their per-segment overhead.
-
 ## Security Considerations
 
 ### Privacy
@@ -195,11 +191,10 @@ additionally bounds how fast an attacker can create pending reconstructions.
 
 1. [64/WAKU2-NETWORK](../../core/draft/64/network.md#message-size)
 2. [17/WAKU2-RLN-RELAY](../../core/draft/17/rln-relay.md)
-3. [RELIABLE-CHANNEL-API](reliable-channel-api.md)
-4. [nim-leopard](https://github.com/status-im/nim-leopard) – Nim bindings for Leopard-RS
-5. [Leopard-RS](https://github.com/catid/leopard) – Fast Reed–Solomon erasure coding library
-6. [RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) – The Use of Forward Error Correction (FEC) in Reliable Multicast
-7. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) – Key words for use in RFCs to Indicate Requirement Levels
+3. [nim-leopard](https://github.com/status-im/nim-leopard) – Nim bindings for Leopard-RS
+4. [Leopard-RS](https://github.com/catid/leopard) – Fast Reed–Solomon erasure coding library
+5. [RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) – The Use of Forward Error Correction (FEC) in Reliable Multicast
+6. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) – Key words for use in RFCs to Indicate Requirement Levels
 
 ## Copyright
 
