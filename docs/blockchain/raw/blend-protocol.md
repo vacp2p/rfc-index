@@ -30,6 +30,7 @@
 | 1.1.2 | Denominated the encapsulation-overhead calculation against `Max_Payload_Length` (18195 bytes), the payload that is actually encapsulated, rather than the body it contains, following the compression of transaction references (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)). | 2026-08-18 |
 | 1.2.0 | Define the token evaluation under a low core quota, and specify the Active Message metadata layout. | 2026-08-19 |
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
+| 1.3.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 
 # Introduction
 
@@ -465,7 +466,7 @@ Every active core node receives a reward. The activity of a node is verified in 
 - $`R_D`$ denote a redundancy parameter for data messages, defining the number of “replications” of the same message;
 - $`\mathcal{N} = \text{SDP}(s)`$ denote a set of core nodes providing the Blend service for the epoch $`e`$ returned by the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md));
 - $`N = |\mathcal N|`$ denote a number of core nodes providing the Blend service;
-- $`\text {CSPRNG}()`$ is a cryptographically secure pseudo-random number generator, implemented as a [BLAKE2b-Based PRNG Construction](common-cryptographic-components.md#blake2b-based-prng-construction);
+- $`\text {CSPRNG}()`$ is a cryptographically secure pseudo-random number generator, implemented as a [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction);
 
 ## Global Parameters
 
@@ -1150,7 +1151,7 @@ TTL — peering degree 6:
 
 ## Statistical Analysis of Selection Bias of Modulo Operation
 
-Applying a modulo $`N`$ operation to the output of a pseudorandom number generator (here the Blake2b hash function) with a large range (here from $`0`$ to $`2^{256}-1`$), introduces a statistical bias when mapping to the smaller domain $`\{0,1,\ldots,N-1\}`$. This bias arises because $`2^{256}`$ is typically not divisible by $`N`$, meaning that some residues modulo $`N`$ will occur slightly more often than others. Specifically, let $`R:=2^{256}`$, then $`R=q\cdot N+r`$ with $`0 \leq r \lt N`$. The first $`r`$ values modulo $`N`$ will appear $`q+1`$ times, while the remaining $`N-r`$ values will appear $`q`$ times. Thus, the maximum bias between two values $`a\leq r`$ and $`b \gt r`$ in $`\{0,1,\ldots,N-1\}`$ is:
+Applying a modulo $`N`$ operation to the output of a pseudorandom number generator (here the ChaCha20 keystream) with a large range (here from $`0`$ to $`2^{64}-1`$, since the selection draws $`8`$ bytes), introduces a statistical bias when mapping to the smaller domain $`\{0,1,\ldots,N-1\}`$. This bias arises because $`2^{64}`$ is typically not divisible by $`N`$, meaning that some residues modulo $`N`$ will occur slightly more often than others. Specifically, let $`R:=2^{64}`$, then $`R=q\cdot N+r`$ with $`0 \leq r \lt N`$. The first $`r`$ values modulo $`N`$ will appear $`q+1`$ times, while the remaining $`N-r`$ values will appear $`q`$ times. Thus, the maximum bias between two values $`a\leq r`$ and $`b \gt r`$ in $`\{0,1,\ldots,N-1\}`$ is:
 
 $$
 |Pr[a]-Pr[b]| \leq \left| \frac{q+1}{R} - \frac{q}{R} \right| = \frac{1}{R}
@@ -1158,7 +1159,7 @@ $$
 
 Where $`Pr[a]`$ is the probability that $`a`$ is the result of the modulo $`N`$ operation and $`Pr[b]`$ the probability that $`b`$ is the result of the modulo $`N`$ operation.
 
-The maximum per-value bias is exactly $`\frac{1}{R}`$, regardless of $`N`$, as long as $`N \lt R`$. That means no single output differs from uniform by more than $`2^{-256}`$.
+The maximum per-value bias is exactly $`\frac{1}{R}`$, regardless of $`N`$, as long as $`N \lt R`$. That means no single output differs from uniform by more than $`2^{-64}`$.
 
 But now we consider total variation distance, a better global metric of distinguishability between the true distribution and uniform. This is:
 
@@ -1186,4 +1187,4 @@ TV&=\frac{1}{2} \left( r \cdot \left( \frac{1}{R} - \frac{r}{NR} \right) + (N-r)
 \end{aligned}
 $$
 
-So the distribution deviation is less than $`\frac{N}{R}`$ which is cryptographically negligible when $`\frac{N}{R} \leq 2^{-128}`$. Since $`R=2^{256} \implies N \leq 2^{128}`$. Since the number of nodes participating in Blend is expected to be less than 10 million (less than $`N=2^{24}`$) we can safely skip the rejection process necessary to draw random numbers uniformly in $`\{0,1,\ldots,N-1\}`$.
+So the distribution deviation is less than $`\frac{N}{R}`$. Since the number of nodes participating in Blend is expected to be less than 10 million (less than $`N=2^{24}`$), the total variation distance is at most $`\frac{2^{24}}{2^{64}} = 2^{-40}`$. Distinguishing the selection distribution from uniform then requires on the order of $`2^{40}`$ observed selections, far beyond what any observer collects in practice, so we can safely skip the rejection process necessary to draw random numbers uniformly in $`\{0,1,\ldots,N-1\}`$.
