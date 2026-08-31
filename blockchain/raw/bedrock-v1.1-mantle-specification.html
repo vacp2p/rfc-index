@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/3cac48f3f3c7db46eddf3bbb70c1567d96e2b213/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>3cac48f</code></a> — docs(blockchain): rename locked notes to service notes (#423)</li>
 <li><strong>2026-08-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/48fbc82c3545f8512176ce7c707019aefce24650/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>48fbc82</code></a> — docs(blockchain): order channel configurations and prevent their replay (#396)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
@@ -226,6 +227,7 @@
 <tr><td>1.10.1</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code>: <code>ServiceType</code> is its one-byte discriminant and <code>Locator</code> is the multiaddr binary form. Added a <code>declaration_id</code> test vector</td><td>2026-08-14</td></tr>
 <tr><td>1.10.2</td><td>Precise the state validation reads: the Operations of a Mantle Transaction are validated and executed one after the other in the order they appear, each against the state the preceding ones left, and a Mantle Transaction against the state the transactions preceding it in the block left. Accumulated the transaction balance along that pass, replacing <code>get_transaction_balance</code></td><td>2026-08-24</td></tr>
 <tr><td>1.11.0</td><td>Track the configuration lineage of a channel: <code>ChannelState</code> gains <code>config_tip_hash</code> and the <code>CHANNEL_CONFIG</code> payload carries the <code>parent</code> configuration it extends, ordering configurations and preventing their replay</td><td>2026-08-27</td></tr>
+<tr><td>1.11.1</td><td>Renamed locked notes into service notes: <code>service_notes</code>, <code>ServiceNote</code> and <code>service_note_id</code> replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in</td><td>2026-08-27</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -238,7 +240,7 @@
 <h2 id="mantle-operations"><a class="header" href="#mantle-operations">Mantle Operations</a></h2>
 <p>Logos Blockchain features are exposed through Mantle Operations, which can be combined in a single Mantle Transaction and executed atomically. These Operations enable transfers and functions such as on-chain data posting, Cross-Zone interactions, SDP interaction, and leader reward claims.</p>
 <h2 id="mantle-ledger"><a class="header" href="#mantle-ledger">Mantle Ledger</a></h2>
-<p>The Mantle Ledger enables asset transfers using a transparent UTXO model. While a Transfer Operation can consume more tokens than it creates, the Mantle Transaction excess balance must exactly pay for the fees. The ledger tracks three kinds of notes: regular notes, locked notes (collateral for service declarations) and channel notes (channel bridge funds eligible for PoS participation only).</p>
+<p>The Mantle Ledger enables asset transfers using a transparent UTXO model. While a Transfer Operation can consume more tokens than it creates, the Mantle Transaction excess balance must exactly pay for the fees. The ledger tracks three kinds of notes: regular notes, service notes (collateral for service declarations) and channel notes (channel bridge funds eligible for PoS participation only).</p>
 <h2 id="transaction-fees"><a class="header" href="#transaction-fees">Transaction Fees</a></h2>
 <p>Mantle Transaction fees are derived from a gas model. The Logos Blockchain has two different gas markets, accounting for permanent data storage, and execution costs. Each Operation has an associated Execution Gas cost. Users can build unbalanced Mantle Transactions to tip the leaders and incentivize the network to include their transaction.</p>
 <div class="table-wrapper"><table><thead><tr><th>Gas Market</th><th>Charged On</th><th>Pricing Basis</th></tr></thead><tbody>
@@ -318,7 +320,7 @@ def checked_int128(value: int) -&gt; int:
 permanent_storage_gas_price: TokenValue # Given by Storage Market
 execution_gas_base_price: TokenValue    # Given by Execution Market
 </code></pre>
-<p>The state validation reads is not a fixed snapshot: it advances as the block is processed. A Mantle Transaction is validated against the state left by the Mantle Transactions preceding it in the block, as defined in <a href="bedrock-v1.1-block-construction.html#block-proposal-validation">Block Proposal Validation</a>, and validation and execution then follow one another Operation by Operation, in the order the Operations appear: the Operation at index <code>i</code> is validated against the state the Operations at indices <code>0</code> to <code>i-1</code> left, then executed to produce the state the Operation at index <code>i+1</code> is validated against. This is what the <code>ledger</code>, <code>channels</code>, <code>locked_notes</code>, <code>declarations</code> and <code>voucher_nullifier_set</code> given to each Operation below denote.</p>
+<p>The state validation reads is not a fixed snapshot: it advances as the block is processed. A Mantle Transaction is validated against the state left by the Mantle Transactions preceding it in the block, as defined in <a href="bedrock-v1.1-block-construction.html#block-proposal-validation">Block Proposal Validation</a>, and validation and execution then follow one another Operation by Operation, in the order the Operations appear: the Operation at index <code>i</code> is validated against the state the Operations at indices <code>0</code> to <code>i-1</code> left, then executed to produce the state the Operation at index <code>i+1</code> is validated against. This is what the <code>ledger</code>, <code>channels</code>, <code>service_notes</code>, <code>declarations</code> and <code>voucher_nullifier_set</code> given to each Operation below denote.</p>
 <p>Atomicity is what a failed check means, not simultaneity. If any of the checks below fails, the whole Mantle Transaction is invalid: none of its Operations takes effect, whether or not it was reached. An invalid Mantle Transaction is never skipped over either, the block including it being invalid and nothing of that block being executed.</p>
 <p>Mantle validators will ensure the following:</p>
 <ol>
@@ -993,10 +995,10 @@ signed_tx = SignedMantleTx(
 <h2 id="service-declaration-protocol-sdp-operations"><a class="header" href="#service-declaration-protocol-sdp-operations">Service Declaration Protocol (SDP) Operations</a></h2>
 <p>These Operations implement the <a href="bedrock-service-declaration-protocol.html">Service Declaration Protocol</a>.</p>
 <p>Validators must keep the following state when implementing SDP Operations:</p>
-<pre><code class="language-python">locked_notes: dict[NoteID, LockedNote]
+<pre><code class="language-python">service_notes: dict[NoteID, ServiceNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 
-class LockedNote:
+class ServiceNote:
     declarations: set[DeclarationID]
 </code></pre>
 <h3 id="common-sdp-structures"><a class="header" href="#common-sdp-structures">Common SDP Structures</a></h3>
@@ -1023,7 +1025,7 @@ class DeclarationInfo:
     locators: list[Locator]
     provider_id: Ed25519PublicKey
     zk_id: ZkPublicKey
-    locked_note_id: NoteId
+    service_note_id: NoteId
     created: EpochNumber
     active: EpochNumber | None
     withdraw_at: EpochNumber | None
@@ -1038,13 +1040,13 @@ class DeclarationInfo:
     locators: list[Locator]
     provider_id: Ed25519PublicKey
     zk_id: ZkPublicKey
-    locked_note_id: NoteId
+    service_note_id: NoteId
 </code></pre>
-<p>Locked notes are introduced in <a href="#locked-notes">Locked notes</a> and serve as Service collaterals. They cannot be spent before the owner withdraw its participation from the declared service(s).</p>
+<p>Service notes are introduced in <a href="#service-notes">Service notes</a> and serve as Service collaterals. They cannot be spent before the owner withdraw its participation from the declared service(s).</p>
 <h4 id="proof-5"><a class="header" href="#proof-5">Proof</a></h4>
 <pre><code class="language-python">class DeclarationProof:
     zk_sig: ZkSignature             # signature proving ownership over
-                                    # locked note and zk_id
+                                    # service note and zk_id
     provider_sig: Ed25519Signature  # signature proving ownership of provider key
 </code></pre>
 <p>see: <a href="#zero-knowledge-signature-scheme-zksignature">Zero Knowledge Signature Scheme (ZkSignature)</a>.</p>
@@ -1058,14 +1060,14 @@ proof: DeclarationProof
 
 min_stake: MinStake      # the (global) minimum stake setting
 ledger: Ledger           # the set of unspent notes
-locked_notes: dict[NoteId, LockedNote]
+service_notes: dict[NoteId, ServiceNote]
 declarations: dict[NoteId, DeclarationInfo]
 </code></pre>
 <p><em>Validate</em></p>
 <p>The declaration is verified according to <a href="bedrock-service-declaration-protocol.html#declare">Declare</a>.</p>
 <ol>
 <li>
-<p>Ensure ownership over the locked note, <code>zk_id</code> and <code>provider_id</code>.</p>
+<p>Ensure ownership over the service note, <code>zk_id</code> and <code>provider_id</code>.</p>
 <pre><code class="language-python">assert ZkSignature_verify(
     txhash, proof.zk_sig, [note.public_key, declaration.zk_id]
 )
@@ -1084,17 +1086,17 @@ assert len(declaration.locators) &lt;= 8
 </code></pre>
 </li>
 <li>
-<p>Ensure the locked note exists and its value is sufficient for joining the service.</p>
-<pre><code class="language-python">assert ledger.is_unspent(declaration.locked_note_id)
-note = ledger.get_note(declaration.locked_note_id)
+<p>Ensure the service note exists and its value is sufficient for joining the service.</p>
+<pre><code class="language-python">assert ledger.is_unspent(declaration.service_note_id)
+note = ledger.get_note(declaration.service_note_id)
 assert note.value &gt;= min_stake.stake_threshold
 </code></pre>
 </li>
 <li>
-<p>Ensure the note has not already been locked for this service.</p>
-<pre><code class="language-python">if declaration.locked_note in locked_notes:
-    locked_note = locked_notes[declaration.locked_note]
-    services = [declarations[declare_id] for declare_id in locked_note.declarations]
+<p>Ensure the note has not already been used for this service.</p>
+<pre><code class="language-python">if declaration.service_note in service_notes:
+    service_note = service_notes[declaration.service_note]
+    services = [declarations[declare_id] for declare_id in service_note.declarations]
     assert declaration.service_type not in services
 </code></pre>
 </li>
@@ -1103,22 +1105,22 @@ assert note.value &gt;= min_stake.stake_threshold
 <p><em>Given</em></p>
 <pre><code class="language-python">declaration: DeclarationMessage # the declaration we are executing
 current_epoch: EpochNumber
-locked_notes : dict[NoteId, LockedNote]
+service_notes : dict[NoteId, ServiceNote]
 </code></pre>
 <p><em>Execute</em></p>
 <ol>
 <li>
-<p>Create the locked note state if it doesn't already exist.</p>
-<pre><code class="language-python">if declaration.locked_note not in locked_notes:
-    locked_notes[declaration.locked_note_id] = LockedNote(declarations=set())
+<p>Create the service note state if it doesn't already exist.</p>
+<pre><code class="language-python">if declaration.service_note not in service_notes:
+    service_notes[declaration.service_note_id] = ServiceNote(declarations=set())
 
-locked_note = locked_notes[declaration.locked_note_id]
+service_note = service_notes[declaration.service_note_id]
 </code></pre>
 </li>
 <li>
-<p>Add this declaration to the locked note.</p>
+<p>Add this declaration to the service note.</p>
 <pre><code class="language-python">declare_id = declaration_id(declaration)
-locked_note.declarations.add(declare_id)
+service_note.declarations.add(declare_id)
 </code></pre>
 </li>
 <li>
@@ -1128,7 +1130,7 @@ locked_note.declarations.add(declare_id)
     locators: declaration.locators
     provider_id: declaration.provider_id
     zk_id: declaration.zk_id
-    locked_note_id: declaration.locked_note_id
+    service_note_id: declaration.service_note_id
     declaration,
     created=current_epoch,
     active=None,
@@ -1152,7 +1154,7 @@ declaration=DeclarationMessage(
     locators=["/ip4/203.0.113.10/tcp/4001/p2p"],
     provider_id=alice_provider_pk,
     zk_id=alice_pk_2,
-    locked_note_id=alice_note.id()
+    service_note_id=alice_note.id()
 )
 
 # Build the transfer operation to pay the fees
@@ -1182,11 +1184,11 @@ SignedMantleTx(
 <h4 id="payload-6"><a class="header" href="#payload-6">Payload</a></h4>
 <pre><code class="language-python">class WithdrawMessage:
     declaration: DeclarationID
-    locked_note_id: NoteId
+    service_note_id: NoteId
     nonce: int
 </code></pre>
 <h4 id="proof-6"><a class="header" href="#proof-6">Proof</a></h4>
-<p>A signature from the <code>zk_id</code> and the locked note <code>pk</code> attached to the declaration is required for withdrawing from a service, (see <a href="#zero-knowledge-signature-scheme-zksignature">Zero Knowledge Signature Scheme (ZkSignature)</a>).</p>
+<p>A signature from the <code>zk_id</code> and the service note <code>pk</code> attached to the declaration is required for withdrawing from a service, (see <a href="#zero-knowledge-signature-scheme-zksignature">Zero Knowledge Signature Scheme (ZkSignature)</a>).</p>
 <pre><code class="language-python">ZkSignature
 </code></pre>
 <h4 id="execution-gas-6"><a class="header" href="#execution-gas-6">Execution Gas</a></h4>
@@ -1198,19 +1200,19 @@ withdraw: WithdrawMessage
 signature: ZkSignature
 
 ledger: Ledger
-locked_notes: dict[NoteId, LockedNote]
+service_notes: dict[NoteId, ServiceNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 </code></pre>
 <p><em>Validate</em></p>
 <ol>
 <li>
-<p>Ensure that the locked note exists, is locked and bound to this declaration.</p>
-<pre><code class="language-python">assert ledger.is_unspent(withdraw.locked_note_id)
-assert withdraw.locked_note_id in locked_notes
+<p>Ensure that the service note exists and is bound to this declaration.</p>
+<pre><code class="language-python">assert ledger.is_unspent(withdraw.service_note_id)
+assert withdraw.service_note_id in service_notes
 
-locked_note = locked_notes[withdraw.locked_note_id]
+service_note = service_notes[withdraw.service_note_id]
 
-assert withdraw.declaration in locked_note.declarations
+assert withdraw.declaration in service_note.declarations
 </code></pre>
 </li>
 <li>
@@ -1225,9 +1227,9 @@ declare_info = declarations[withdraw.declaration]
 <pre><code class="language-python">assert declare_info.withdraw_at is None
 </code></pre>
 </li>
-<li>Ensure locked note <code>pk</code> and <code>zk_id</code> attached to this declaration authorized this Operation.
-<pre><code class="language-python">locked_note = ledger[withdraw.locked_note_id]
-assert ZkSignature_verify(txhash, signature, [locked_note.pk, declare_info.zk_id])
+<li>Ensure service note <code>pk</code> and <code>zk_id</code> attached to this declaration authorized this Operation.
+<pre><code class="language-python">service_note = ledger[withdraw.service_note_id]
+assert ZkSignature_verify(txhash, signature, [service_note.pk, declare_info.zk_id])
 </code></pre>
 </li>
 <li>Ensure that the nonce is greater than the previous one.
@@ -1244,7 +1246,7 @@ signature: ZkSignature
 
 current_epoch: EpochNumber # current epoch
 ledger: Ledger
-locked_notes: dict[NoteId, LockedNote]
+service_notes: dict[NoteId, ServiceNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 </code></pre>
 <p><em>Execute</em></p>
@@ -1265,12 +1267,12 @@ declare_info.withdraw_at = current_epoch
 <h4 id="example-6"><a class="header" href="#example-6">Example</a></h4>
 <pre><code class="language-python">withdraw=Withdraw(
     declaration=alice_declaration_id,
-    locked_note_id=alices_locked_note_id
+    service_note_id=alices_service_note_id
     nonce=1579532
 )
 
 # Build the transfer operation to pay the fees
-transfer = Transfer(inputs=[alices_locked_note_id],
+transfer = Transfer(inputs=[alices_service_note_id],
                     outputs=[Note(100, alice_note_pk)])
 
 tx = MantleTx(
@@ -1299,7 +1301,7 @@ is paid. Declarations that withdrew without earning a final reward are removed
 by the same step, so their stake is always released.</p>
 <p><em>Given</em></p>
 <pre><code class="language-python">current_epoch: EpochNumber
-locked_notes: dict[NoteId, LockedNote]
+service_notes: dict[NoteId, ServiceNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 </code></pre>
 <p><em>Execute</em></p>
@@ -1307,9 +1309,9 @@ declarations: dict[DeclarationID, DeclarationInfo]
 <code>declare_info.withdraw_at is not None and declare_info.withdraw_at &lt;= current_epoch - 2</code>:</p>
 <ol>
 <li>
-<p>Remove the declaration from its locked note.</p>
-<pre><code class="language-python">locked_note = locked_notes[declare_info.locked_note_id]
-locked_note.declarations.remove(declare_id)
+<p>Remove the declaration from its service note.</p>
+<pre><code class="language-python">service_note = service_notes[declare_info.service_note_id]
+service_note.declarations.remove(declare_id)
 </code></pre>
 </li>
 <li>
@@ -1319,8 +1321,8 @@ locked_note.declarations.remove(declare_id)
 </li>
 <li>
 <p>Unlock the note once it is no longer bound to any declaration.</p>
-<pre><code class="language-python">if len(locked_note.declarations) == 0:
-    del locked_notes[declare_info.locked_note_id]
+<pre><code class="language-python">if len(service_note.declarations) == 0:
+    del service_notes[declare_info.service_note_id]
 </code></pre>
 </li>
 </ol>
@@ -1563,19 +1565,19 @@ def derive_note_id(op_id: Hash, output_number: int, note: Note) -&gt; NoteId:
 </code></pre>
 <p><code>op_id</code> is a classical 256-bit hash digest and must be reduced to a field element before being passed to the ZkHasher. We apply a direct modular reduction mod <code>p</code> (via <code>FiniteField(..., modulus=p)</code>). Since <span class="math-inline" data-tex="p \approx2^{-254}"></span>, the reduction is slightly non-uniform, values in <span class="math-inline" data-tex="[0, 2^{256} \mod p)"></span> appear one extra time, but this is inconsequential in practice: the collision probability remains around <span class="math-inline" data-tex="2^{-254}"></span>, and <code>NoteId</code> uniqueness is not derived from uniformity of <code>op_id</code> over <span class="math-inline" data-tex="𝔽_p"></span> but from the collision-resistance of the underlying hash and per-operation payload uniqueness.</p>
 <p>These note identifiers uniquely define notes in the system and cannot be chosen by the user. Nodes maintain the set of notes through a dictionary mapping the NoteId to the note.</p>
-<h3 id="locked-notes"><a class="header" href="#locked-notes">Locked notes</a></h3>
-<p>Locked notes are special notes in Mantle that serve as collateral for Service Declarations. A note can become locked after executing a Declare Operation, preventing it from being spent until explicitly released through a Withdraw Operation. The system maintains a mapping of locked note IDs to their supporting declarations. Though locked, these notes remain in the Ledger and can still participate in Proof of Stake. When service providers withdraw all their declarations, the associated note(s) become unlocked and available for spending again.</p>
+<h3 id="service-notes"><a class="header" href="#service-notes">Service notes</a></h3>
+<p>Service notes are special notes in Mantle that serve as collateral for Service Declarations. A note can become a service note after being locked by executing a Declare Operation, preventing it from being spent until explicitly released through a Withdraw Operation. The system maintains a mapping of service note IDs to their supporting declarations. Though locked, these notes remain in the Ledger and can still participate in Proof of Stake. When service providers withdraw all their declarations, the associated note(s) become unlocked and available for spending again.</p>
 <h3 id="channel-notes"><a class="header" href="#channel-notes">Channel Notes</a></h3>
-<p>Channel notes are on-ledger notes minted to represent channel funds. They are distinct from Locked Notes as they can’t be used to declare a service. However, they follow the same ageing rule as ordinary notes since they are part of the ledger and can be used for PoL creation once aged enough.</p>
+<p>Channel notes are on-ledger notes minted to represent channel funds. They are distinct from Service Notes as they can’t be used to declare a service. However, they follow the same ageing rule as ordinary notes since they are part of the ledger and can be used for PoL creation once aged enough.</p>
 <p>The system maintains a <code>channel_notes</code> set in the Ledger tracking all active channel <code>NoteId</code> and their respective <code>ChannelId</code>.</p>
 <h2 id="ledger"><a class="header" href="#ledger">Ledger</a></h2>
 <pre><code class="language-python">class Ledger:
     notes: list[Note]
-    locked_notes: dict[NoteId, LockedNote]
+    service_notes: dict[NoteId, ServiceNote]
     channel_notes: dict[NoteId, ChannelId]
 </code></pre>
 <h3 id="input-notes-spendability-validation"><a class="header" href="#input-notes-spendability-validation">Input Notes Spendability Validation</a></h3>
-<p>A note is spendable if and only if it exists, it is not spent or locked. The following function validates that an input of notes can be consumed:</p>
+<p>A note is spendable if and only if it exists, it is not spent or a service note. The following function validates that an input of notes can be consumed:</p>
 <pre><code class="language-python">class Ledger:
     def assert_spendable(inputs: list[NoteId], channel_id: ChannelId | None):
 		# Assert inputs are empty
@@ -1584,10 +1586,10 @@ def derive_note_id(op_id: Hash, output_number: int, note: Note) -&gt; NoteId:
         ## Check there is no duplicate
         assert len(inputs) == len(set(inputs))
 
-            # Check that each note is individualy not locked, for the correct channel and unspent
+            # Check that each note is individualy not a service note, for the correct channel and unspent
             for note_id in inputs:
                 assert ledger.is_unspent(note_id)
-                assert note_id not in locked_notes
+                assert note_id not in service_notes
                 if channel_id is None:
                 	assert note_id not in ledger.channel_notes
                 else:
@@ -1783,7 +1785,7 @@ threshold: u16                     # the number of required signatures
 </tbody></table>
 </div>
 <h3 id="declaration-id"><a class="header" href="#declaration-id">Declaration Id</a></h3>
-<p>The <code>declaration_id</code> (<a href="bedrock-service-declaration-protocol.html#declaration-storage">Declaration Storage</a>) is <code>Hash(service||provider_id||zk_id||locators)</code> (BLAKE2b, 256-bit output, no DST), where <code>service</code> is the one-byte <code>ServiceType</code> discriminant and <code>locators</code> is the <code>Locators</code> production (<a href="mantle-transaction-encoding.html#sdp-operations">Mantle Transaction Encoding</a>): the element count followed by each <code>Locator</code>'s binary form prefixed with its 2-byte little-endian byte length. Note that the preimage field order differs from the <code>SDP_DECLARE</code> wire order and excludes <code>locked_note_id</code>. This vector reuses the fields of the <code>SDP_DECLARE</code> payload from <a href="#operation-id">Operation Id</a>.</p>
+<p>The <code>declaration_id</code> (<a href="bedrock-service-declaration-protocol.html#declaration-storage">Declaration Storage</a>) is <code>Hash(service||provider_id||zk_id||locators)</code> (BLAKE2b, 256-bit output, no DST), where <code>service</code> is the one-byte <code>ServiceType</code> discriminant and <code>locators</code> is the <code>Locators</code> production (<a href="mantle-transaction-encoding.html#sdp-operations">Mantle Transaction Encoding</a>): the element count followed by each <code>Locator</code>'s binary form prefixed with its 2-byte little-endian byte length. Note that the preimage field order differs from the <code>SDP_DECLARE</code> wire order and excludes <code>service_note_id</code>. This vector reuses the fields of the <code>SDP_DECLARE</code> payload from <a href="#operation-id">Operation Id</a>.</p>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
 <tr><td><code>service</code></td><td>0x00</td></tr>
 <tr><td><code>provider_id</code></td><td>0x53470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f3</td></tr>

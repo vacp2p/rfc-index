@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/3cac48f3f3c7db46eddf3bbb70c1567d96e2b213/docs/blockchain/raw/overview-cryptoeconomics.md"><code>3cac48f</code></a> — docs(blockchain): rename locked notes to service notes (#423)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b655e4b0285d2e0bc09a19b5292d46bacc44019b/docs/blockchain/raw/overview-cryptoeconomics.md"><code>b655e4b</code></a> — [RFC] Block Rewards: Replace Burning/Minting with Pooling/Distributing/Releasing (#375)</li>
 <li><strong>2026-08-05</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b4388aae3549e5ebf0307258b825e766efcb9c38/docs/blockchain/raw/overview-cryptoeconomics.md"><code>b4388aa</code></a> — docs(blockchain): round the leader reward share down and align the voucher DST (#395)</li>
 <li><strong>2026-07-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/38916aa474164ac4acd81e62d19715e17626be17/docs/blockchain/raw/overview-cryptoeconomics.md"><code>38916aa</code></a> — docs(blockchain): prevent execution and storage fees from rounding down to zero (#384)</li>
@@ -206,6 +207,7 @@
 <tr><td>1.1.0</td><td>Reflect the upward rounding of the fee market price updates</td><td>2026-07-28</td></tr>
 <tr><td>1.2.0</td><td>Reflect the downward rounding of the leader share</td><td>2026-08-05</td></tr>
 <tr><td>1.2.1</td><td>Changing from burning/minting to pooling/distributing/releasing</td><td>2026-08-25</td></tr>
+<tr><td>1.2.2</td><td>Stated that the minimum stake of a service is locked in a service note</td><td>2026-08-27</td></tr>
 </tbody></table>
 </div>
 <blockquote>
@@ -250,7 +252,7 @@ When an epoch <span class="math-inline" data-tex="e"></span>  ends, Blend valida
 </ul>
 <h1 id="constructions"><a class="header" href="#constructions">Constructions</a></h1>
 <h2 id="minimum-stake"><a class="header" href="#minimum-stake">Minimum Stake</a></h2>
-<p>To provide a service, a node must lock a minimum number of tokens to be considered valid. This stake is locked through the <a href="bedrock-service-declaration-protocol.html">Service Declaration Protocol</a> and can be withdrawn after the node stops providing the service. The minimum stake enhances economic security by increasing the cost of connecting to the network, which makes Sybil attacks more expensive. While the stake value must be sufficiently high for security, it also raises the barrier to network participation, potentially reducing decentralization. We therefore aim to balance security needs with decentralization goals. The <a href="analysis-static-minimum-stake-estimation-for-service-declaration-protocol.html">[Analysis] Static Minimum Stake Estimation for Service Declaration Protocol</a> defines the methodology on how to calculate the minimum stake value.</p>
+<p>To provide a service, a node must lock in a service note a minimum number of tokens to be considered valid. This stake is locked through the <a href="bedrock-service-declaration-protocol.html">Service Declaration Protocol</a> and can be withdrawn after the node stops providing the service. The minimum stake enhances economic security by increasing the cost of connecting to the network, which makes Sybil attacks more expensive. While the stake value must be sufficiently high for security, it also raises the barrier to network participation, potentially reducing decentralization. We therefore aim to balance security needs with decentralization goals. The <a href="analysis-static-minimum-stake-estimation-for-service-declaration-protocol.html">[Analysis] Static Minimum Stake Estimation for Service Declaration Protocol</a> defines the methodology on how to calculate the minimum stake value.</p>
 <h2 id="gas"><a class="header" href="#gas">Gas</a></h2>
 <p>Mantle Transactions (see <a href="bedrock-v1.1-mantle-specification.html">Mantle - Mantle Transaction</a>) consume different types of Gas related to the various fee markets. Gas serves as a unit of measurement to quantify the computational or storage effort required to process a Ledger Transaction or an Operation. Gas is a unit of account that was introduced to normalize and facilitate the pricing of resources. Through the gas, the protocol is defining a way to measure computational demand for Operations and Ledge Transactions. The costs for these computational resources are defined by the leaders/nodes.</p>
 <p>The two types of Gas are:</p>

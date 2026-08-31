@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/3cac48f3f3c7db46eddf3bbb70c1567d96e2b213/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>3cac48f</code></a> — docs(blockchain): rename locked notes to service notes (#423)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-07-30</strong> — <a href="https://github.com/logos-co/logos-lips/blob/87d9ae5c65f304bc4f87ae06a8000a91b070734b/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>87d9ae5</code></a> — docs(blockchain): length-prefix the locators in the declaration_id preimage (#386)</li>
@@ -211,10 +212,11 @@
 <tr><td>1.3.0</td><td>Length-prefix the <code>locators</code> list in the <code>declaration_id</code> preimage</td><td>2026-07-30</td></tr>
 <tr><td>1.4.0</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code></td><td>2026-08-14</td></tr>
 <tr><td>1.4.1</td><td>Replaced the <code>uint64</code> width given to the <code>epoch</code> fields with a reference to <a href="cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a>, which is 32 bits</td><td>2026-08-25</td></tr>
+<tr><td>1.4.2</td><td>Renamed locked notes into service notes: <code>locked_note_id</code> becomes <code>service_note_id</code> in the declaration and withdraw messages and in <code>DeclarationInfo</code></td><td>2026-08-27</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<p>This document defines a mechanism enabling validators to declare their participation in specific protocols that require a known and agreed-upon list of participants. One example of this is the Blend Network. We create a single repository of identifiers which is used to establish secure communication between validators and provide services. Before being admitted to the repository, the validator proves that it locked at least a minimum stake.</p>
+<p>This document defines a mechanism enabling validators to declare their participation in specific protocols that require a known and agreed-upon list of participants. One example of this is the Blend Network. We create a single repository of identifiers which is used to establish secure communication between validators and provide services. Before being admitted to the repository, the validator proves that it locked at least a minimum stake through a service note.</p>
 <h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
 <p>The requirements for the protocol are defined as follows:</p>
 <ul>
@@ -226,7 +228,7 @@
 <h2 id="protocol"><a class="header" href="#protocol">Protocol</a></h2>
 <p>The protocol defines the following actions:</p>
 <ul>
-<li><strong>Declare:</strong> A node sends a declaration that confirms its willingness to provide a specific service, which is confirmed by locking a stake above a certain threshold.</li>
+<li><strong>Declare:</strong> A node sends a declaration that confirms its willingness to provide a specific service, which is confirmed by locking a stake above a certain threshold in a service note.</li>
 <li><strong>Active:</strong> A node marks that its participation in the protocol is active according to the service-specific activity logic. This action enables the protocol to monitor the node’s activity. We utilize this as a non-intrusive differentiator of node activity. It is crucial to exclude inactive nodes from the set of active nodes, as it enhances the stability of services.</li>
 <li><strong>Withdraw:</strong> A node withdraws its declaration and stops providing a service.</li>
 </ul>
@@ -302,19 +304,19 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
     service_type: ServiceType
     locators: list[Locator]
     provider_id: Ed25519PublicKey
-    locked_note_id: NoteId
+    service_note_id: NoteId
     zk_id: ZkPublicKey
 </code></pre>
 <p>The <code>locators</code> list must be non-empty and its length must be limited to reduce the potential for abuse. Therefore, the length of the list cannot be longer than 8.</p>
 <p>The message must be signed by the <code>provider_id</code> key to prove ownership of the key that is used for network-level authentication of the validator.</p>
-<p>The <code>locked_note_id</code> points to a locked note used for minimum stake threshold verification purposes.</p>
+<p>The <code>service_note_id</code> points to a service note used for minimum stake threshold verification purposes.</p>
 <p>The message is also signed by the <code>zk_id</code> key.</p>
 <h3 id="declaration-storage"><a class="header" href="#declaration-storage"><strong>Declaration Storage</strong></a></h3>
 <p>Only valid declaration messages can be stored on the ledger. We define the <code>DeclarationInfo</code> as follows:</p>
 <pre><code class="language-python">class DeclarationInfo:
     service: ServiceType
     provider_id: Ed25519PublicKey
-    locked_note_id: NoteId
+    service_note_id: NoteId
     zk_id: ZkPublicKey
     locators: list[Locator]
     created: EpochNumber
@@ -326,7 +328,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <ul>
 <li><code>service</code> defines the service type of the declaration;</li>
 <li><code>provider_id</code> is an <code>Ed25519PublicKey</code> used to sign the message by the validator;</li>
-<li><code>locked_note_id</code> is a <code>NoteId</code> used for minimum stake threshold verification purposes;</li>
+<li><code>service_note_id</code> is a <code>NoteId</code> used for minimum stake threshold verification purposes;</li>
 <li><code>zk_id</code> is used for zero-knowledge operations by the validator that includes rewarding;</li>
 <li><code>locators</code> is a copy of the <code>locators</code> from the <code>DeclarationMessage</code>;</li>
 <li><code>created</code> refers to the epoch number of the block that contained the declaration;</li>
@@ -365,11 +367,11 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <p>The construction of the withdraw message is as follows:</p>
 <pre><code class="language-python">class WithdrawMessage:
     declaration_id: DeclarationId
-    locked_note_id: NoteId
+    service_note_id: NoteId
     nonce: Nonce
 </code></pre>
 <p>The message must be signed by the <code>zk_id</code> key from the <code>declaration_id</code>.</p>
-<p>The <code>locked_note_id</code> is a <code>NoteId</code> that was used for minimum stake threshold verification purposes and will be unlocked after withdrawal.</p>
+<p>The <code>service_note_id</code> is a <code>NoteId</code> that was used for minimum stake threshold verification purposes and will be unlocked after withdrawal.</p>
 <p>The <code>nonce</code> must increase monotonically by every message sent for the <code>declaration_id</code>.</p>
 <h3 id="indexing"><a class="header" href="#indexing">Indexing</a></h3>
 <p>Every event must be correctly indexed to enable lighter synchronization of the changes. Therefore, we index every <code>declaration_id</code> according to <code>EventType</code>, <code>ServiceType</code>, and <code>Epoch</code>. Where <code>EventType = { "created", "active", "withdrawn" }</code> follows the type of the message.</p>
@@ -388,7 +390,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <p>The Declare action associates a validator with a service it wants to provide. It requires sending a valid <code>DeclarationMessage</code> (as defined in <a href="#declaration-message"><strong>Declaration Message</strong></a>), which is then processed (as defined below) and stored (as defined in <a href="#declaration-storage"><strong>Declaration Storage</strong></a>).</p>
 <p>The declaration message is considered valid when all of the following are met:</p>
 <ul>
-<li>The sender meets the stake requirements and its <code>locked_note_id</code> is valid.</li>
+<li>The sender meets the stake requirements and its <code>service_note_id</code> is valid.</li>
 <li>The <code>declaration_id</code> is unique.</li>
 <li>The <code>provider_id</code> and the <code>zk_id</code> are each unique in the context of the <code>service</code> (as defined in <a href="#identifier-uniqueness">Identifier Uniqueness</a>).</li>
 <li>The sender knows the secret behind the <code>provider_id</code> identifier.</li>
@@ -428,7 +430,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 </li>
 <li>If any of the above is not correct, then discard the message and stop.</li>
 <li>Set the <code>withdraw_at</code> from the <code>DeclarationInfo</code> to the current epoch number (the withdrawal epoch <code>e</code>).</li>
-<li>The <code>DeclarationInfo</code> is removed and the stake unlocked (releasing the <code>locked_note_id</code>) at epoch <code>e+2</code> by the Mantle epoch finalization step, right after the final reward is paid out.</li>
+<li>The <code>DeclarationInfo</code> is removed and the stake unlocked (releasing the <code>service_note_id</code>) at epoch <code>e+2</code> by the Mantle epoch finalization step, right after the final reward is paid out.</li>
 </ol>
 <h3 id="query"><a class="header" href="#query">Query</a></h3>
 <p>The protocol must enable querying the ledger in at least the following manner:</p>

@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/3cac48f3f3c7db46eddf3bbb70c1567d96e2b213/docs/blockchain/raw/mantle-transaction-encoding.md"><code>3cac48f</code></a> — docs(blockchain): rename locked notes to service notes (#423)</li>
 <li><strong>2026-08-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/48fbc82c3545f8512176ce7c707019aefce24650/docs/blockchain/raw/mantle-transaction-encoding.md"><code>48fbc82</code></a> — docs(blockchain): order channel configurations and prevent their replay (#396)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/mantle-transaction-encoding.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-07-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5b20a2d59691c12392d091a6d7352d3de719ad61/docs/blockchain/raw/mantle-transaction-encoding.md"><code>5b20a2d</code></a> — docs(blockchain) Channel Participation in PoS (#364)</li>
@@ -211,6 +212,7 @@
 <tr><td>1.5.0</td><td>Introduce the new Operation <code>CHANNEL_STAKE_ASSIGNATION</code> and update of the channel operations to reflect changes in Mantle</td><td>2026-06-24</td></tr>
 <tr><td>1.5.1</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code>: pin <code>Locator</code> bytes to the multiaddr binary form</td><td>2026-08-14</td></tr>
 <tr><td>1.6.0</td><td>Added the <code>Parent</code> of the <code>ChannelConfig</code> to follow Mantle</td><td>2026-08-27</td></tr>
+<tr><td>1.6.1</td><td>Renamed the <code>LockedNoteId</code> production of the SDP Operations into <code>ServiceNoteId</code></td><td>2026-08-27</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -273,16 +275,16 @@ OutputCount       = Byte
 Inputs            = InputCount *NoteId
 </code></pre>
 <h3 id="sdp-operations"><a class="header" href="#sdp-operations">SDP Operations</a></h3>
-<pre><code class="language-schema">SDPDeclare    = ServiceType Locators ProviderId ZkId LockedNoteId
+<pre><code class="language-schema">SDPDeclare    = ServiceType Locators ProviderId ZkId ServiceNoteId
 ServiceType   = Byte          ; 0 = BN
 Locators      = LocatorCount *Locator
 LocatorCount  = Byte          ; Max 8
 Locator       = 2Byte *BYTE   ; Max 329 bytes, multiaddr binary form
 ProviderId    = Ed25519PublicKey
 ZkId          = ZkPublicKey
-LockedNoteId  = NoteId
+ServiceNoteId = NoteId
 
-SDPWithdraw   = DeclarationId Nonce LockedNoteId
+SDPWithdraw   = DeclarationId Nonce ServiceNoteId
 DeclarationId = Hash32
 Nonce         = UINT64
 

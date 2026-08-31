@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/3cac48f3f3c7db46eddf3bbb70c1567d96e2b213/docs/blockchain/raw/analysis-gas-cost-determination.md"><code>3cac48f</code></a> — docs(blockchain): rename locked notes to service notes (#423)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/analysis-gas-cost-determination.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
 <li><strong>2026-07-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5b20a2d59691c12392d091a6d7352d3de719ad61/docs/blockchain/raw/analysis-gas-cost-determination.md"><code>5b20a2d</code></a> — docs(blockchain) Channel Participation in PoS (#364)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/analysis-gas-cost-determination.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -207,6 +208,7 @@
 <tr><td>1.4.1</td><td><a href="mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html">[RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></td><td>N/A</td></tr>
 <tr><td>1.5.0</td><td>Introduce the new Operation <code>CHANNEL_STAKE_ASSIGNATION</code> and update of the channel operations to reflect changes in Mantle</td><td>2026-06-24</td></tr>
 <tr><td>1.5.1</td><td>Reflect Channel Deposit execution modification. It now consumes inputs to update their NoteId</td><td>2026-07-27</td></tr>
+<tr><td>1.5.2</td><td>Renamed locked notes into service notes and stated that the Input Gas covers the check that a note is neither a service nor a channel note</td><td>2026-08-27</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -255,11 +257,11 @@ LEADER_CLAIM_GAS              = 580
 <li>Verification of the ZK signature: 590,000 cycles.</li>
 </ul>
 <h2 id="input-gas"><a class="header" href="#input-gas">Input Gas</a></h2>
-<p>Input gas covers the computational cost of verifying that one Note Id exists in the Ledger and is not locked. Additionally, it compensates for the removal of one Note Id from the Ledger.</p>
+<p>Input gas covers the computational cost of verifying that one Note Id exists in the Ledger and is not a service or channel note. Additionally, it compensates for the removal of one Note Id from the Ledger.</p>
 <p>Execution: negligible.</p>
 <ul>
 <li>Verification that the note is in the ledger: negligible.</li>
-<li>Verification that the note is unlocked: negligible.</li>
+<li>Verification that the note is not a channel or service note: negligible.</li>
 <li>Removing of the note from the ledger: negligible.</li>
 </ul>
 <h2 id="output-gas"><a class="header" href="#output-gas">Output Gas</a></h2>
@@ -324,30 +326,30 @@ The execution require deriving note Id and adding notes to the ledger.</p>
 </li>
 </ul>
 <h2 id="sdp-declaration"><a class="header" href="#sdp-declaration">SDP Declaration</a></h2>
-<p>This gas covers multiple verification processes: confirming ownership of the locked note through ZkSignature verification, validating the zk_id via a second ZkSignature, and establishing ownership of the provider_id through an Eddsa25519 signature. It also includes verification of the declaration format, confirmation of note existence, validation that the note is not already locked, and verification of its amount. Additionally, it accounts for the computational costs associated with the note locking mechanism and declaration management.</p>
+<p>This gas covers multiple verification processes: confirming ownership of the service note through ZkSignature verification, validating the zk_id via a second ZkSignature, and establishing ownership of the provider_id through an Eddsa25519 signature. It also includes verification of the declaration format, confirmation of note existence, validation that the note is not already used for this service, and verification of its amount. Additionally, it accounts for the computational costs associated with the note service locking mechanism and declaration management.</p>
 <p>Execution: ~ 646k CPU cycles.</p>
 <ul>
 <li>Verification of the Ed25519 signature: 56,000 cycles.</li>
 <li>Verification of the ZK signature: 590,000 cycles.</li>
 <li>Verification that the declaration doesn’t already exist: negligible.</li>
 <li>Verification of locator length: negligible.</li>
-<li>Verification of locked note existence: negligible.</li>
-<li>Verification of locked note value: negligible.</li>
-<li>Verification that the note isn’t already locked for the service: negligible.</li>
-<li>Locking the note: negligible.</li>
+<li>Verification of service note existence: negligible.</li>
+<li>Verification of service note value: negligible.</li>
+<li>Verification that the note isn’t already used for the service: negligible.</li>
+<li>Register the note as a service note: negligible.</li>
 </ul>
 <h2 id="sdp-withdraw"><a class="header" href="#sdp-withdraw">SDP Withdraw</a></h2>
-<p>This gas covers a verification process that includes: confirming ownership of the zk_id through ZkSignature verification, validating the existence of the locked note, verifying that the note has exceeded its lock period, and confirming that the declaration exists and has not been previously withdrawn. The validation process also ensures that the withdrawal message's nonce is greater than any previous nonce, preventing replay attacks. During execution, the system updates the declaration's status to withdrawn, removes the declaration from the locked note's associated declarations, and—if the note has no remaining declarations—removes it from the locked notes dictionary.</p>
+<p>This gas covers a verification process that includes: confirming ownership of the zk_id through ZkSignature verification, validating the existence of the service note, verifying that the note has exceeded its lock period, and confirming that the declaration exists and has not been previously withdrawn. The validation process also ensures that the withdrawal message's nonce is greater than any previous nonce, preventing replay attacks. During execution, the system updates the declaration's status to withdrawn, removes the declaration from the service note's associated declarations, and—if the note has no remaining declarations—removes it from the service notes dictionary.</p>
 <p>Execution: ~ 590k CPU cycles.</p>
 <ul>
-<li>Verification that the note exists, is locked and bound to the declaration: negligible.</li>
+<li>Verification that the service note exists and is bound to the declaration: negligible.</li>
 <li>Verification that the note can be unlocked: negligible.</li>
 <li>Verification that the declaration exist: negligible.</li>
 <li>Verification of the ZK signature: 590,000 cycles.</li>
 <li>Verification that the declaration wasn’t already withdrawn: negligible.</li>
 <li>Verification of nonce incrementation: negligible.</li>
 <li>Update declaration: negligible.</li>
-<li>Remove declaration from locked note: negligible.</li>
+<li>Remove declaration from service note: negligible.</li>
 <li>Unlock the note if not linked to any declaration: negligible.</li>
 </ul>
 <h2 id="sdp-activation"><a class="header" href="#sdp-activation">SDP Activation</a></h2>
