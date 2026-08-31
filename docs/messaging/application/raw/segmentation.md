@@ -57,12 +57,27 @@ A **segment message** is valid only if all of the following hold:
 
 A payload that fits one segment is valid if `segment_count == 1`, `index == 0`, `is_parity == false`.
 
-Two valid segment messages belong to the same **segment set** only if all of the following hold:
-- they carry equal `entire_message_hash`.
-- they carry equal `original_length`.
-- they carry equal `segment_count`, whenever their `is_parity` is equal.
+## Reed–Solomon Coding
 
-Within a set, `(is_parity, index)` MUST be unique; a segment message repeating one already held MUST be ignored.
+A sender that uses parity applies [Reed–Solomon erasure coding](https://github.com/catid/leopard)
+over its data segments to produce `ceil(parityRate * number of data segments)` more,
+or one fewer than the data segments where that is smaller, so a single data segment gets none.
+Parity MUST remain the minority class, fewer parity segments than data ones,
+so a receiver always learns the data-segment count before it can reconstruct.
+
+Reed–Solomon operates on equal-length inputs, called shards.
+The shard length is the chunk size the payload was split into,
+so only the last data segment may be shorter, and the encoder zero-pads it.
+That padding never reaches the wire, data segments being sent at their true length,
+which leaves parity segments as the only ones always exactly shard-length.
+
+Reed–Solomon recovers the data segments from any combination of segments as large as the data-segment count.
+Decoding needs every shard at shard length, but the last data segment may travel shorter than that.
+A receiver takes the shard length from a parity segment, those being always exactly that long,
+re-pads its data segments to it, and decodes.
+It always holds a parity segment when decoding, a missing data segment being what parity made up for.
+
+Receivers MUST support Reed–Solomon decoding, since any sender MAY use parity.
 
 ## Segmentation
 
@@ -77,7 +92,15 @@ To transmit an original payload, the sender:
 
 ## Reconstruction
 
-A receiver retains every valid segment message in its [segment set](#validity).
+A receiver retains every valid segment message.
+
+Two valid segment messages belong to the same **segment set** only if all of the following hold:
+- they carry equal `entire_message_hash`.
+- they carry equal `original_length`.
+- they carry equal `segment_count`, whenever their `is_parity` is equal.
+
+Within a set, `(is_parity, index)` MUST be unique; a segment message repeating one already held MUST be ignored.
+
 A set's `data_segment_count` is the `segment_count` of any segment message with `is_parity == false`.
 - A set reaching that count in data segments alone reconstructs by [concatenation](#all-data-segments-are-received-successfully).
 - A set reaching that count in data plus parity segments together reconstructs [through parity](#recovery-through-parity).
@@ -114,27 +137,25 @@ original set's segments are retransmitted.
 
 The timeout and the other bounds a receiver places on pending sets are covered in [Segment Caching](#segment-caching).
 
-## Reed–Solomon Coding
+## Configuration
 
-A sender that uses parity applies [Reed–Solomon erasure coding](https://github.com/catid/leopard)
-over its data segments to produce `ceil(parityRate * number of data segments)` more,
-or one fewer than the data segments where that is smaller, so a single data segment gets none.
-Parity MUST remain the minority class, fewer parity segments than data ones,
-so a receiver always learns the data-segment count before it can reconstruct.
-
-Reed–Solomon operates on equal-length inputs, called shards.
-The shard length is the chunk size the payload was split into,
-so only the last data segment may be shorter, and the encoder zero-pads it.
-That padding never reaches the wire, data segments being sent at their true length,
-which leaves parity segments as the only ones always exactly shard-length.
-
-Reed–Solomon recovers the data segments from any combination of segments as large as the data-segment count.
-Decoding needs every shard at shard length, but the last data segment may travel shorter than that.
-A receiver takes the shard length from a parity segment, those being always exactly that long,
-re-pads its data segments to it, and decodes.
-It always holds a parity segment when decoding, a missing data segment being what parity made up for.
-
-Receivers MUST support Reed–Solomon decoding, since any sender MAY use parity.
+- `segmentSize`: chosen by the application so that a segment fits the transport's maximum message size.
+- `parityRate`: number of parity segments relative to the number of data segments.
+  MUST be less than `1`, and the count it yields is capped so that parity stays the minority class,
+  see [Reed–Solomon Coding](#reedsolomon-coding).
+  Defaults to `0`, which disables parity.
+  `0.125` is RECOMMENDED where the [guidance below](#when-to-use-parity) favours parity.
+- `reconstructionTimeout`: how long a segment set may go without a new segment message before the receiver
+  drops it, see [Expiry](#expiry).
+- `maxSegmentsPerClass`: greatest `segment_count` a receiver accepts, applied to each segment class, data or parity, separately, so a segment set holds at most twice this many segment messages.
+  256 is RECOMMENDED.
+  An application needing more MAY raise it, so long as `maxSegmentsPerClass` and the parity segments
+  `parityRate` adds to it together stay within the shard limit of the Reed–Solomon implementation,
+  65536 for [Leopard-RS](https://github.com/catid/leopard).
+  All participants in an application MUST use the same value:
+  the wire format and the Keccak256 hash are fixed by this specification,
+  but this is the only configured value one participant enforces against another,
+  so participants interoperate within an application and not across applications.
 
 ## Implementation Suggestions
 
@@ -166,27 +187,7 @@ Received segments accumulate until their set is reconstructible. Implementations
 Segments can be persisted, for example in SQLite, so that partial reconstructions survive a restart.
 In-memory buffering is sufficient otherwise.
 
-### Configuration
-
-- `segmentSize`: chosen by the application so that a segment fits the transport's maximum message size.
-- `parityRate`: number of parity segments relative to the number of data segments.
-  MUST be less than `1`, and the count it yields is capped so that parity stays the minority class,
-  see [Reed–Solomon Coding](#reedsolomon-coding).
-  Defaults to `0`, which disables parity.
-  `0.125` is RECOMMENDED where the [guidance above](#when-to-use-parity) favours parity.
-- `reconstructionTimeout`: how long a segment set may go without a new segment message before the receiver
-  drops it, see [Expiry](#expiry).
-- `maxSegmentsPerClass`: greatest `segment_count` a receiver accepts, applied to each segment class, data or parity, separately, so a segment set holds at most twice this many segment messages.
-  256 is RECOMMENDED.
-  An application needing more MAY raise it, so long as `maxSegmentsPerClass` and the parity segments
-  `parityRate` adds to it together stay within the shard limit of the Reed–Solomon implementation,
-  65536 for [Leopard-RS](https://github.com/catid/leopard).
-  All participants in an application MUST use the same value:
-  the wire format and the Keccak256 hash are fixed by this specification,
-  but this is the only configured value one participant enforces against another,
-  so participants interoperate within an application and not across applications.
-
-## Security Considerations
+## Security/Privacy Considerations
 
 ### Privacy
 
@@ -215,6 +216,10 @@ The limits and timeouts in [Segment Caching](#segment-caching) are the mitigatio
 Rate limiting at the transport, for example [17/WAKU2-RLN-RELAY](../../core/draft/17/rln-relay.md) on Waku,
 additionally bounds how fast an attacker can create pending reconstructions.
 
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
 ## References
 
 1. [64/WAKU2-NETWORK](../../core/draft/64/network.md#message-size)
@@ -223,7 +228,3 @@ additionally bounds how fast an attacker can create pending reconstructions.
 4. [Leopard-RS](https://github.com/catid/leopard) – Fast Reed–Solomon erasure coding library
 5. [RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) – The Use of Forward Error Correction (FEC) in Reliable Multicast
 6. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) – Key words for use in RFCs to Indicate Requirement Levels
-
-## Copyright
-
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
