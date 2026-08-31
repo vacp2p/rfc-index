@@ -152,7 +152,7 @@ An epoch is divided into 3 phases, as outlined below.
 
 The **epoch length** is the sum of the individual phases: $`3\lfloor \frac{k}{f} \rfloor + 3\lfloor \frac{k}{f} \rfloor + 4\lfloor \frac{k}{f} \rfloor =10 \lfloor \frac{k}{f} \rfloor`$ slots.
 
-Since a fraction $`f`$ of slots carries a block in expectation, the **expected number of blocks in an epoch** follows directly: $`10 \lfloor \frac{k}{f} \rfloor \cdot f = 10k = 21{,}600`$ blocks, the simplification being exact because $`k/f`$ is an integer at the specified constants. Specifications that need this quantity — the reward pool arithmetic in [Mantle](bedrock-v1.1-mantle-specification.md#reward-pool), the quota derivations in [Blend Protocol](blend-protocol.md#leadership-quota) — take it from here rather than re-deriving it.
+Since a fraction $`f`$ of slots carries a block in expectation, the **expected number of blocks in an epoch** follows directly: $`10 \lfloor \frac{k}{f} \rfloor \cdot f = 10k = 21{,}600`$ blocks, the simplification being exact because $`k/f`$ is an integer at the specified constants. The count is of blocks on the chain, so the fork blocks a chain references as [uncles](#uncle-references) are not among them; the [Total Stake Inference](#total-stake-inference) counts occupied slots and is the quantity that does include them. Specifications that need this quantity — the reward pool arithmetic in [Mantle](bedrock-v1.1-mantle-specification.md#reward-pool), the quota derivations in [Blend Protocol](blend-protocol.md#leadership-quota) — take it from here rather than re-deriving it.
 
 ### Epoch State
 
