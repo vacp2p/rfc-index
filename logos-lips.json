@@ -518,7 +518,7 @@
     "title": "Common Cryptographic Components",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-07-03",
+    "updated": "2026-08-31",
     "path": "blockchain/raw/common-cryptographic-components.html"
   },
   {
@@ -923,7 +923,7 @@
     "title": "Message Encapsulation Mechanism",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-07-03",
+    "updated": "2026-08-31",
     "path": "blockchain/raw/message-encapsulation.html"
   },
   {

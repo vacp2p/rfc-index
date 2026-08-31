@@ -40172,6 +40172,7 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 </div><!-- timeline:start -->
 <h2 id="timeline-130"><a class="header" href="#timeline-130">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5587d1e5ca2964e38098cd18f81f0fbe19f51fd3/docs/blockchain/raw/blend-protocol.md"><code>5587d1e</code></a> — [RFC] Replace the BLAKE2b-based PRNG with ChaCha20 (ChaCha20Rng) (#425)</li>
 <li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5fa8ee40c1de478b0934d95ddade7ce6a406fd1c/docs/blockchain/raw/blend-protocol.md"><code>5fa8ee4</code></a> — docs(blockchain): compress the block proposal with 16-byte transaction reference prefixes (#389)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/blend-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
 <li><strong>2026-08-25</strong> — <a href="https://github.com/logos-co/logos-lips/blob/796baaac776146dbe6d11f858b41df2b0311af77/docs/blockchain/raw/blend-protocol.md"><code>796baaa</code></a> — docs(blockchain): fix blend token evaluation and active message encoding (#405)</li>
@@ -40191,6 +40192,7 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 <tr><td>1.1.2</td><td>Denominated the encapsulation-overhead calculation against <code>Max_Payload_Length</code> (18195 bytes), the payload that is actually encapsulated, rather than the body it contains, following the compression of transaction references (see <a href="blockchain/raw/bedrock-v1.1-block-construction.html">Block Construction, Validation and Execution</a>).</td><td>2026-08-18</td></tr>
 <tr><td>1.2.0</td><td>Define the token evaluation under a low core quota, and specify the Active Message metadata layout.</td><td>2026-08-19</td></tr>
 <tr><td>1.2.1</td><td>Pointed the <code>EpochNumber</code> of the activity proof at its definition in <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch">Epoch</a></td><td>2026-08-25</td></tr>
+<tr><td>1.3.0</td><td>[RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng)</td><td>2026-08-28</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-70"><a class="header" href="#introduction-70">Introduction</a></h1>
@@ -40689,7 +40691,7 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 <li><span class="math-inline" data-tex="R_D"></span> denote a redundancy parameter for data messages, defining the number of “replications” of the same message;</li>
 <li><span class="math-inline" data-tex="\mathcal{N} = \text{SDP}(s)"></span> denote a set of core nodes providing the Blend service for the epoch <span class="math-inline" data-tex="e"></span> returned by the SDP protocol (<a href="blockchain/raw/bedrock-service-declaration-protocol.html">Service Declaration Protocol</a>);</li>
 <li><span class="math-inline" data-tex="N = |\mathcal N|"></span> denote a number of core nodes providing the Blend service;</li>
-<li><span class="math-inline" data-tex="\text {CSPRNG}()"></span> is a cryptographically secure pseudo-random number generator, implemented as a <a href="blockchain/raw/common-cryptographic-components.html#blake2b-based-prng-construction">BLAKE2b-Based PRNG Construction</a>;</li>
+<li><span class="math-inline" data-tex="\text {CSPRNG}()"></span> is a cryptographically secure pseudo-random number generator, implemented as a <a href="blockchain/raw/common-cryptographic-components.html#chacha20-based-prng-construction">ChaCha20-Based PRNG Construction</a>;</li>
 </ul>
 <h2 id="global-parameters"><a class="header" href="#global-parameters">Global Parameters</a></h2>
 <ul>
@@ -41252,17 +41254,17 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 </tbody></table>
 </div>
 <h2 id="statistical-analysis-of-selection-bias-of-modulo-operation"><a class="header" href="#statistical-analysis-of-selection-bias-of-modulo-operation">Statistical Analysis of Selection Bias of Modulo Operation</a></h2>
-<p>Applying a modulo <span class="math-inline" data-tex="N"></span> operation to the output of a pseudorandom number generator (here the Blake2b hash function) with a large range (here from <span class="math-inline" data-tex="0"></span> to <span class="math-inline" data-tex="2^{256}-1"></span>), introduces a statistical bias when mapping to the smaller domain <span class="math-inline" data-tex="\{0,1,\ldots,N-1\}"></span>. This bias arises because <span class="math-inline" data-tex="2^{256}"></span> is typically not divisible by <span class="math-inline" data-tex="N"></span>, meaning that some residues modulo <span class="math-inline" data-tex="N"></span> will occur slightly more often than others. Specifically, let <span class="math-inline" data-tex="R:=2^{256}"></span>, then <span class="math-inline" data-tex="R=q\cdot N+r"></span> with <span class="math-inline" data-tex="0 \leq r \lt N"></span>. The first <span class="math-inline" data-tex="r"></span> values modulo <span class="math-inline" data-tex="N"></span> will appear <span class="math-inline" data-tex="q+1"></span> times, while the remaining <span class="math-inline" data-tex="N-r"></span> values will appear <span class="math-inline" data-tex="q"></span> times. Thus, the maximum bias between two values <span class="math-inline" data-tex="a\leq r"></span> and <span class="math-inline" data-tex="b \gt r"></span> in <span class="math-inline" data-tex="\{0,1,\ldots,N-1\}"></span> is:</p>
+<p>Applying a modulo <span class="math-inline" data-tex="N"></span> operation to the output of a pseudorandom number generator (here the ChaCha20 keystream) with a large range (here from <span class="math-inline" data-tex="0"></span> to <span class="math-inline" data-tex="2^{64}-1"></span>, since the selection draws <span class="math-inline" data-tex="8"></span> bytes), introduces a statistical bias when mapping to the smaller domain <span class="math-inline" data-tex="\{0,1,\ldots,N-1\}"></span>. This bias arises because <span class="math-inline" data-tex="2^{64}"></span> is typically not divisible by <span class="math-inline" data-tex="N"></span>, meaning that some residues modulo <span class="math-inline" data-tex="N"></span> will occur slightly more often than others. Specifically, let <span class="math-inline" data-tex="R:=2^{64}"></span>, then <span class="math-inline" data-tex="R=q\cdot N+r"></span> with <span class="math-inline" data-tex="0 \leq r \lt N"></span>. The first <span class="math-inline" data-tex="r"></span> values modulo <span class="math-inline" data-tex="N"></span> will appear <span class="math-inline" data-tex="q+1"></span> times, while the remaining <span class="math-inline" data-tex="N-r"></span> values will appear <span class="math-inline" data-tex="q"></span> times. Thus, the maximum bias between two values <span class="math-inline" data-tex="a\leq r"></span> and <span class="math-inline" data-tex="b \gt r"></span> in <span class="math-inline" data-tex="\{0,1,\ldots,N-1\}"></span> is:</p>
 <div class="math-block" data-tex="|Pr[a]-Pr[b]| \leq \left| \frac{q+1}{R} - \frac{q}{R} \right| = \frac{1}{R}"></div>
 <p>Where <span class="math-inline" data-tex="Pr[a]"></span> is the probability that <span class="math-inline" data-tex="a"></span> is the result of the modulo <span class="math-inline" data-tex="N"></span> operation and <span class="math-inline" data-tex="Pr[b]"></span> the probability that <span class="math-inline" data-tex="b"></span> is the result of the modulo <span class="math-inline" data-tex="N"></span> operation.</p>
-<p>The maximum per-value bias is exactly <span class="math-inline" data-tex="\frac{1}{R}"></span>, regardless of <span class="math-inline" data-tex="N"></span>, as long as <span class="math-inline" data-tex="N \lt R"></span>. That means no single output differs from uniform by more than <span class="math-inline" data-tex="2^{-256}"></span>.</p>
+<p>The maximum per-value bias is exactly <span class="math-inline" data-tex="\frac{1}{R}"></span>, regardless of <span class="math-inline" data-tex="N"></span>, as long as <span class="math-inline" data-tex="N \lt R"></span>. That means no single output differs from uniform by more than <span class="math-inline" data-tex="2^{-64}"></span>.</p>
 <p>But now we consider total variation distance, a better global metric of distinguishability between the true distribution and uniform. This is:</p>
 <div class="math-block" data-tex="TV := \frac{1}{2}\sum_{x=0}^{N-1}\left| Pr[x] - \frac{1}{N} \right| = \frac{1}{2} \left( r \cdot \left| \frac{q+1}{R} - \frac{1}{N}\right| + (N-r) \cdot \left| \frac{q}{R} - \frac{1}{N} \right|\right)"></div>
 <p>We know then:</p>
 <div class="math-block" data-tex="\begin{align}&#10;&amp;R=q\cdot N+r \implies \frac{1}{N} = \frac{R}{NR} = \frac{qN+r}{RN} = \frac{q}{R}+\frac{r}{NR}\\&#10;&amp;\frac{q+1}{R}-\frac{1}{N} = \frac{q+1}{R} - \frac{q}{R} - \frac{r}{NR} = \frac{1}{R} - \frac{r}{NR} &gt; 0 \; \text{because} \; \frac{r}{N} &lt; 1 \\&#10;&amp;\frac{1}{N} - \frac{q}{R} = \frac{q}{R} + \frac{r}{NR} - \frac{q}{R} = \frac{r}{NR} &gt; 0&#10;\end{align}"></div>
 <p>Reinjecting in the formula of <span class="math-inline" data-tex="TV"></span>:</p>
 <div class="math-block" data-tex="\begin{aligned}&#10;TV&amp;=\frac{1}{2} \left( r \cdot \left( \frac{1}{R} - \frac{r}{NR} \right) + (N-r) \cdot \frac{r}{NR} \right)\\&#10;&amp;=\frac{1}{2} \left( \frac{r}{R} - \frac{r^2}{NR} + \frac{Nr}{NR} - \frac{r^2}{NR} \right)\\&#10;&amp;= \frac{r}{R} - \frac{r^2}{NR}\leq \frac{r}{R} \leq \frac{N}{R}&#10;\end{aligned}"></div>
-<p>So the distribution deviation is less than <span class="math-inline" data-tex="\frac{N}{R}"></span> which is cryptographically negligible when <span class="math-inline" data-tex="\frac{N}{R} \leq 2^{-128}"></span>. Since <span class="math-inline" data-tex="R=2^{256} \implies N \leq 2^{128}"></span>. Since the number of nodes participating in Blend is expected to be less than 10 million (less than <span class="math-inline" data-tex="N=2^{24}"></span>) we can safely skip the rejection process necessary to draw random numbers uniformly in <span class="math-inline" data-tex="\{0,1,\ldots,N-1\}"></span>.</p>
+<p>So the distribution deviation is less than <span class="math-inline" data-tex="\frac{N}{R}"></span>. Since the number of nodes participating in Blend is expected to be less than 10 million (less than <span class="math-inline" data-tex="N=2^{24}"></span>), the total variation distance is at most <span class="math-inline" data-tex="\frac{2^{24}}{2^{64}} = 2^{-40}"></span>. Distinguishing the selection distribution from uniform then requires on the order of <span class="math-inline" data-tex="2^{40}"></span> observed selections, far beyond what any observer collects in practice, so we can safely skip the rejection process necessary to draw random numbers uniformly in <span class="math-inline" data-tex="\{0,1,\ldots,N-1\}"></span>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="key-types-and-generation"><a class="header" href="#key-types-and-generation">KEY-TYPES-AND-GENERATION</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
 <tr><td>Name</td><td>Key Types and Generation</td></tr>
@@ -41327,6 +41329,7 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 </div><!-- timeline:start -->
 <h2 id="timeline-132"><a class="header" href="#timeline-132">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5587d1e5ca2964e38098cd18f81f0fbe19f51fd3/docs/blockchain/raw/message-encapsulation.md"><code>5587d1e</code></a> — [RFC] Replace the BLAKE2b-based PRNG with ChaCha20 (ChaCha20Rng) (#425)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/message-encapsulation.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-29</strong> — <a href="https://github.com/logos-co/logos-lips/blob/67e498e2d65e447d954e213ea89bbe3b9b285a8a/docs/blockchain/raw/message-encapsulation.md"><code>67e498e</code></a> — chore: fix math issues (#350)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/message-encapsulation.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
@@ -41336,6 +41339,7 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 <div class="table-wrapper"><table><thead><tr><th><strong>Version</strong></th><th><strong>Changes</strong></th><th><strong>Date</strong></th></tr></thead><tbody>
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-04-09</td></tr>
 <tr><td>1.0.1</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
+<tr><td>1.1.0</td><td>[RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng)</td><td>2026-08-28</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-72"><a class="header" href="#introduction-72">Introduction</a></h1>
@@ -41402,25 +41406,25 @@ PROOF_OF_SELECTION_SIZE = 32
 <li>
 <p><span class="math-inline" data-tex="H_{\mathbf N}()"></span> is a domain-separated hash function dedicated to the node index selection (the implementation of the hash function is <code>blake2b</code>).</p>
 <pre><code class="language-python">def hashds(domain=b"BlendNode", data: bytes) -&gt; bytes:
-    return Blake2B.hash512(domain + data)
+    return Blake2B.hash256(domain + data)
 </code></pre>
 </li>
 <li>
 <p><span class="math-inline" data-tex="H_\mathbf{I}()"></span> is a domain-separated hash function dedicated to the initialization of the blend header (the implementation of the hash function is <code>blake2b</code>).</p>
 <pre><code class="language-python">def hashds(domain=b"BlendInitialization", data: bytes) -&gt; bytes:
-    return Blake2b.hash512(domain + data)
+    return Blake2b.hash256(domain + data)
 </code></pre>
 </li>
 <li>
 <p><span class="math-inline" data-tex="H_\mathbf{b}()"></span> is a domain-separated hash function dedicated to the blend header encryption operations (the implementation of the hash function is <code>blake2b</code>).</p>
 <pre><code class="language-python">def hashds(domain=b"BlendHeader", data: bytes) -&gt; bytes:
-    return Blake2b.hash512(domain + data)
+    return Blake2b.hash256(domain + data)
 </code></pre>
 </li>
 <li>
 <p><span class="math-inline" data-tex="H_\mathbf{P}()"></span> is a domain-separated hash function dedicated to the payload encryption operations (the implementation of the hash function is <code>blake2b</code>).</p>
 <pre><code class="language-python">def hashds(domain=b"BlendPayload", data: bytes) -&gt; bytes:
-    return Blake2b.hash512(domain + data)
+    return Blake2b.hash256(domain + data)
 </code></pre>
 </li>
 <li>
@@ -41429,15 +41433,17 @@ PROOF_OF_SELECTION_SIZE = 32
 </code></pre>
 </li>
 <li>
-<p><span class="math-inline" data-tex="\text {CSPRBG}()"></span> is a generalized cryptographically secure pseudo-random bytes generator, it is implemented as <a href="blockchain/raw/common-cryptographic-components.html#blake2b-based-prng-construction">BLAKE2b-Based PRNG Construction</a>.</p>
+<p><span class="math-inline" data-tex="\text {CSPRBG}()"></span> is a generalized cryptographically secure pseudo-random bytes generator, it is implemented as <a href="blockchain/raw/common-cryptographic-components.html#chacha20-based-prng-construction">ChaCha20-Based PRNG Construction</a>.</p>
 </li>
 <li>
-<p><span class="math-inline" data-tex="\text {CSPRBG}()_{x}"></span> is a cryptographically secure pseudo-random bytes generator whose output is restricted to <span class="math-inline" data-tex="x"></span> bytes, it is implemented as <a href="blockchain/raw/common-cryptographic-components.html#blake2b-based-prng-construction">BLAKE2b-Based PRNG Construction</a>.</p>
+<p><span class="math-inline" data-tex="\text {CSPRBG}()_{x}"></span> is a cryptographically secure pseudo-random bytes generator whose output is restricted to <span class="math-inline" data-tex="x"></span> bytes, it is implemented as <a href="blockchain/raw/common-cryptographic-components.html#chacha20-based-prng-construction">ChaCha20-Based PRNG Construction</a>.</p>
 <pre><code class="language-python">def pseudo_random(domain: bytes, key: bytes, size: int) -&gt; bytes:
-    rand = BlakeRng.from_seed(hashds(domain, key)).generate(size)
+    rand = ChaCha20Rng.from_seed(hashds(domain, key)).generate(size)
     assert len(rand) == size
     return rand
 </code></pre>
+<p>The <span class="math-inline" data-tex="\text {CSPRBG}"></span> seed is exactly 32 bytes: the domain-separated hash functions above return 32-byte digests, which are used directly as the seed.</p>
+<p>Every <span class="math-inline" data-tex="\text {CSPRBG}"></span> invocation in this specification generates at most a message-sized output, so the interoperability note of the <a href="blockchain/raw/common-cryptographic-components.html#chacha20-based-prng-construction">ChaCha20-Based PRNG Construction</a> applies: an RFC 8439 (IETF) ChaCha20 with a zero nonce is byte-for-byte compatible.</p>
 </li>
 <li>
 <p><span class="math-inline" data-tex="|t|"></span> returns the length of the <span class="math-inline" data-tex="t"></span> expressed in bytes.</p>
@@ -42800,6 +42806,7 @@ key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
 </div><!-- timeline:start -->
 <h2 id="timeline-137"><a class="header" href="#timeline-137">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5587d1e5ca2964e38098cd18f81f0fbe19f51fd3/docs/blockchain/raw/common-cryptographic-components.md"><code>5587d1e</code></a> — [RFC] Replace the BLAKE2b-based PRNG with ChaCha20 (ChaCha20Rng) (#425)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/common-cryptographic-components.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-06-12</strong> — <a href="https://github.com/logos-co/logos-lips/blob/124f8957915f349347532d802d9e4bb5cc2a5ce7/docs/blockchain/raw/common-cryptographic-components.md"><code>124f895</code></a> — chore: fix broken links (#357)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/common-cryptographic-components.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
@@ -42810,6 +42817,7 @@ key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2025-11-18</td></tr>
 <tr><td>1.0.1</td><td>Renamed Nomos to Logos Blockchain</td><td>2026-04-23</td></tr>
 <tr><td>1.0.2</td><td>Clarification of the Poseidon2 function Add test values</td><td>2026-05-07</td></tr>
+<tr><td>1.1.0</td><td>[RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng)</td><td>2026-08-28</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-77"><a class="header" href="#introduction-77">Introduction</a></h1>
@@ -42819,7 +42827,8 @@ key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
 <p>This document specifies the cryptographic primitives selected for the Logos Blockchain and explains how they interconnect across different layers of the protocol stack. It outlines their technical foundations, rationale, and security considerations to ensure consistent usage across Logos Blockchain components.</p>
 <p>The primitives span multiple domains:</p>
 <ul>
-<li>Hash functions (Poseidon2, BLAKE2b) serve as the base layer for commitments, nullifier derivation, Merkle trees, signature key derivation,  pseudorandom number generator and general purpose hashing.</li>
+<li>Hash functions (Poseidon2, BLAKE2b) serve as the base layer for commitments, nullifier derivation, Merkle trees, signature key derivation and general purpose hashing.</li>
+<li>The stream cipher (ChaCha20) provides deterministic pseudorandom byte generation and keystream encryption.</li>
 <li>Signature schemes (EdDSA, ZkSignature) authenticate messages and participants, with ZkSignature designed specifically for ownership verification within zero-knowledge circuits.</li>
 <li>Proof systems (Groth16) enable succinct and verifiable computation. Groth16 is used in hand-written circuits.</li>
 </ul>
@@ -42827,7 +42836,8 @@ key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
 <p>The table below summarizes the recommended component for each context:</p>
 <div class="table-wrapper"><table><thead><tr><th>Context</th><th>Recommended Component</th></tr></thead><tbody>
 <tr><td>ZK Hashing</td><td><a href="blockchain/raw/common-cryptographic-components.html#poseidon2-zk-friendly-hash-function">Poseidon2</a></td></tr>
-<tr><td>General Hashing &amp; PRNG</td><td><a href="blockchain/raw/common-cryptographic-components.html#blake2bgeneral-purpose-hashing">BLAKE2b</a></td></tr>
+<tr><td>General Hashing</td><td><a href="blockchain/raw/common-cryptographic-components.html#blake2bgeneral-purpose-hashing">BLAKE2b</a></td></tr>
+<tr><td>PRNG &amp; Keystreams</td><td><a href="blockchain/raw/common-cryptographic-components.html#chacha20-based-prng-construction">ChaCha20</a></td></tr>
 <tr><td>General Signatures</td><td><a href="blockchain/raw/common-cryptographic-components.html#eddsa">EdDSA</a></td></tr>
 <tr><td>ZK Signatures</td><td><a href="blockchain/raw/common-cryptographic-components.html#zksignature-zero-knowledge-signature">ZkSignature</a> (see <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Mantle - Zero Knowledge Signature Scheme (ZkSignature)</a>)</td></tr>
 <tr><td>Proof System (SNARK)</td><td><a href="blockchain/raw/common-cryptographic-components.html#groth16-zk-snark">Groth16</a></td></tr>
@@ -42860,26 +42870,31 @@ key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
 <li>Considered secure under standard cryptanalytic models.</li>
 <li>Resistant to collision, preimage, and second-preimage attacks at intended security levels.</li>
 </ul>
-<h3 id="blake2b-based-prng-construction"><a class="header" href="#blake2b-based-prng-construction">BLAKE2b-Based PRNG Construction</a></h3>
-<p>The Logos Blockchain also uses BLAKE2b as the basis for a deterministic pseudorandom byte generator, suitable for different purposes.</p>
+<h3 id="chacha20-based-prng-construction"><a class="header" href="#chacha20-based-prng-construction">ChaCha20-Based PRNG Construction</a></h3>
+<p>The Logos Blockchain uses the <a href="https://cr.yp.to/chacha/chacha-20080128.pdf">ChaCha20</a> stream cipher as a deterministic pseudorandom byte generator, suitable for different purposes, including keystream encryption.</p>
 <p>Construction:</p>
-<p>Given a 64-byte seed and an integer index i, the PRNG output is derived by:</p>
-<pre><code class="language-text">PRNG(seed, i) = BLAKE2b(seed || encode_u64(i), out_len=64)
+<p>Given a 32-byte seed, the PRNG output is the ChaCha20 keystream:</p>
+<pre><code class="language-text">PRNG(seed) = ChaCha20Keystream(key = seed, nonce = 0, initial_counter = 0)
 </code></pre>
 <ul>
-<li>seed: 64-bytes seed (domain-separated if needed).</li>
-<li>encode_u64(i): 8-byte little-endian encoding of the index i.</li>
-<li>out_len: fixed to 64 bytes (maximum output size of BLAKE2b).</li>
+<li>ChaCha20 is used in its original variant: 20 rounds, 256-bit key, 64-bit nonce (fixed to zero), 64-bit block counter (starting at zero).</li>
+<li>seed: exactly 32 bytes, used directly as the ChaCha20 key (in the Logos Blockchain protocols, a domain-separated 32-byte BLAKE2b digest). A protocol deriving the seed from longer material MUST truncate it to 32 bytes explicitly before seeding; this construction performs no truncation itself.</li>
+<li>This construction is byte-for-byte the output of <code>ChaCha20Rng</code> (Rust crate <a href="https://docs.rs/rand_chacha"><code>rand_chacha</code></a>) seeded with the key, using the default stream identifier.</li>
 </ul>
 <p>Output:</p>
 <ul>
-<li>For generating n bytes (bigger than 64 bytes), concatenate outputs of PRNG(seed, i) for i = 0, 1, ... until the desired length is reached.</li>
-<li>For generating k bits, compute enough full 64-byte outputs to cover at least k bits, then truncate the last byte to the required bit-length.</li>
-<li>This minimizes the number of BLAKE2b invocations by using the full 64-byte output capacity.</li>
+<li>For generating n bytes, take the first n bytes of the keystream.</li>
+<li>For generating k bits, take enough keystream bytes to cover at least k bits, then truncate the last byte to the required bit-length.</li>
 </ul>
 <p>Notes:</p>
 <ul>
 <li>Seed choice and domain separation must be handled at the protocol level.</li>
+<li>A seed MUST NOT be reused across two different generation contexts: with the nonce fixed to zero, keystream security relies on each key producing a single stream.</li>
+</ul>
+<p>Interoperability:</p>
+<ul>
+<li>Implementations MAY use the IETF variant of ChaCha20 (<a href="https://datatracker.ietf.org/doc/html/rfc8439">RFC 8439</a>: 32-bit block counter, 96-bit nonce) with the nonce set to zero. With a zero nonce the two variants produce identical keystreams for the first <span class="math-inline" data-tex="2^{32}"></span> blocks (256 GiB) of output: the original variant's upper counter word is zero in that range and coincides with the IETF variant's zero nonce words.</li>
+<li>Every use of this construction in the Logos Blockchain generates far less than <span class="math-inline" data-tex="2^{32}"></span> blocks per seed, so any RFC 8439 implementation with a zero nonce and an initial counter of zero is byte-for-byte compatible with the definition above.</li>
 </ul>
 <h2 id="poseidon2-zk-friendly-hash-function"><a class="header" href="#poseidon2-zk-friendly-hash-function"><a href="https://eprint.iacr.org/2023/323">Poseidon2 (</a><a href="https://eprint.iacr.org/2023/323">ZK Friendly Hash Function)</a></a></h2>
 <p>Description:</p>

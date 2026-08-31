@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5587d1e5ca2964e38098cd18f81f0fbe19f51fd3/docs/blockchain/raw/common-cryptographic-components.md"><code>5587d1e</code></a> — [RFC] Replace the BLAKE2b-based PRNG with ChaCha20 (ChaCha20Rng) (#425)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/common-cryptographic-components.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-06-12</strong> — <a href="https://github.com/logos-co/logos-lips/blob/124f8957915f349347532d802d9e4bb5cc2a5ce7/docs/blockchain/raw/common-cryptographic-components.md"><code>124f895</code></a> — chore: fix broken links (#357)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/common-cryptographic-components.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
@@ -202,6 +203,7 @@
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2025-11-18</td></tr>
 <tr><td>1.0.1</td><td>Renamed Nomos to Logos Blockchain</td><td>2026-04-23</td></tr>
 <tr><td>1.0.2</td><td>Clarification of the Poseidon2 function Add test values</td><td>2026-05-07</td></tr>
+<tr><td>1.1.0</td><td>[RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng)</td><td>2026-08-28</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -211,7 +213,8 @@
 <p>This document specifies the cryptographic primitives selected for the Logos Blockchain and explains how they interconnect across different layers of the protocol stack. It outlines their technical foundations, rationale, and security considerations to ensure consistent usage across Logos Blockchain components.</p>
 <p>The primitives span multiple domains:</p>
 <ul>
-<li>Hash functions (Poseidon2, BLAKE2b) serve as the base layer for commitments, nullifier derivation, Merkle trees, signature key derivation,  pseudorandom number generator and general purpose hashing.</li>
+<li>Hash functions (Poseidon2, BLAKE2b) serve as the base layer for commitments, nullifier derivation, Merkle trees, signature key derivation and general purpose hashing.</li>
+<li>The stream cipher (ChaCha20) provides deterministic pseudorandom byte generation and keystream encryption.</li>
 <li>Signature schemes (EdDSA, ZkSignature) authenticate messages and participants, with ZkSignature designed specifically for ownership verification within zero-knowledge circuits.</li>
 <li>Proof systems (Groth16) enable succinct and verifiable computation. Groth16 is used in hand-written circuits.</li>
 </ul>
@@ -219,7 +222,8 @@
 <p>The table below summarizes the recommended component for each context:</p>
 <div class="table-wrapper"><table><thead><tr><th>Context</th><th>Recommended Component</th></tr></thead><tbody>
 <tr><td>ZK Hashing</td><td><a href="#poseidon2-zk-friendly-hash-function">Poseidon2</a></td></tr>
-<tr><td>General Hashing &amp; PRNG</td><td><a href="#blake2bgeneral-purpose-hashing">BLAKE2b</a></td></tr>
+<tr><td>General Hashing</td><td><a href="#blake2bgeneral-purpose-hashing">BLAKE2b</a></td></tr>
+<tr><td>PRNG &amp; Keystreams</td><td><a href="#chacha20-based-prng-construction">ChaCha20</a></td></tr>
 <tr><td>General Signatures</td><td><a href="#eddsa">EdDSA</a></td></tr>
 <tr><td>ZK Signatures</td><td><a href="#zksignature-zero-knowledge-signature">ZkSignature</a> (see <a href="bedrock-v1.1-mantle-specification.html">Mantle - Zero Knowledge Signature Scheme (ZkSignature)</a>)</td></tr>
 <tr><td>Proof System (SNARK)</td><td><a href="#groth16-zk-snark">Groth16</a></td></tr>
@@ -252,26 +256,31 @@
 <li>Considered secure under standard cryptanalytic models.</li>
 <li>Resistant to collision, preimage, and second-preimage attacks at intended security levels.</li>
 </ul>
-<h3 id="blake2b-based-prng-construction"><a class="header" href="#blake2b-based-prng-construction">BLAKE2b-Based PRNG Construction</a></h3>
-<p>The Logos Blockchain also uses BLAKE2b as the basis for a deterministic pseudorandom byte generator, suitable for different purposes.</p>
+<h3 id="chacha20-based-prng-construction"><a class="header" href="#chacha20-based-prng-construction">ChaCha20-Based PRNG Construction</a></h3>
+<p>The Logos Blockchain uses the <a href="https://cr.yp.to/chacha/chacha-20080128.pdf">ChaCha20</a> stream cipher as a deterministic pseudorandom byte generator, suitable for different purposes, including keystream encryption.</p>
 <p>Construction:</p>
-<p>Given a 64-byte seed and an integer index i, the PRNG output is derived by:</p>
-<pre><code class="language-text">PRNG(seed, i) = BLAKE2b(seed || encode_u64(i), out_len=64)
+<p>Given a 32-byte seed, the PRNG output is the ChaCha20 keystream:</p>
+<pre><code class="language-text">PRNG(seed) = ChaCha20Keystream(key = seed, nonce = 0, initial_counter = 0)
 </code></pre>
 <ul>
-<li>seed: 64-bytes seed (domain-separated if needed).</li>
-<li>encode_u64(i): 8-byte little-endian encoding of the index i.</li>
-<li>out_len: fixed to 64 bytes (maximum output size of BLAKE2b).</li>
+<li>ChaCha20 is used in its original variant: 20 rounds, 256-bit key, 64-bit nonce (fixed to zero), 64-bit block counter (starting at zero).</li>
+<li>seed: exactly 32 bytes, used directly as the ChaCha20 key (in the Logos Blockchain protocols, a domain-separated 32-byte BLAKE2b digest). A protocol deriving the seed from longer material MUST truncate it to 32 bytes explicitly before seeding; this construction performs no truncation itself.</li>
+<li>This construction is byte-for-byte the output of <code>ChaCha20Rng</code> (Rust crate <a href="https://docs.rs/rand_chacha"><code>rand_chacha</code></a>) seeded with the key, using the default stream identifier.</li>
 </ul>
 <p>Output:</p>
 <ul>
-<li>For generating n bytes (bigger than 64 bytes), concatenate outputs of PRNG(seed, i) for i = 0, 1, ... until the desired length is reached.</li>
-<li>For generating k bits, compute enough full 64-byte outputs to cover at least k bits, then truncate the last byte to the required bit-length.</li>
-<li>This minimizes the number of BLAKE2b invocations by using the full 64-byte output capacity.</li>
+<li>For generating n bytes, take the first n bytes of the keystream.</li>
+<li>For generating k bits, take enough keystream bytes to cover at least k bits, then truncate the last byte to the required bit-length.</li>
 </ul>
 <p>Notes:</p>
 <ul>
 <li>Seed choice and domain separation must be handled at the protocol level.</li>
+<li>A seed MUST NOT be reused across two different generation contexts: with the nonce fixed to zero, keystream security relies on each key producing a single stream.</li>
+</ul>
+<p>Interoperability:</p>
+<ul>
+<li>Implementations MAY use the IETF variant of ChaCha20 (<a href="https://datatracker.ietf.org/doc/html/rfc8439">RFC 8439</a>: 32-bit block counter, 96-bit nonce) with the nonce set to zero. With a zero nonce the two variants produce identical keystreams for the first <span class="math-inline" data-tex="2^{32}"></span> blocks (256 GiB) of output: the original variant's upper counter word is zero in that range and coincides with the IETF variant's zero nonce words.</li>
+<li>Every use of this construction in the Logos Blockchain generates far less than <span class="math-inline" data-tex="2^{32}"></span> blocks per seed, so any RFC 8439 implementation with a zero nonce and an initial counter of zero is byte-for-byte compatible with the definition above.</li>
 </ul>
 <h2 id="poseidon2-zk-friendly-hash-function"><a class="header" href="#poseidon2-zk-friendly-hash-function"><a href="https://eprint.iacr.org/2023/323">Poseidon2 (</a><a href="https://eprint.iacr.org/2023/323">ZK Friendly Hash Function)</a></a></h2>
 <p>Description:</p>
