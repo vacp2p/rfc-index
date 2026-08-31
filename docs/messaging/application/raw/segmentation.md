@@ -4,7 +4,7 @@
 | --- | --- |
 | Name | Message Segmentation and Reconstruction |
 | Slug | 243 |
-| Version | 0.2 |
+| Version | 0.1 |
 | Status | raw |
 | Type | RFC |
 | Category | application |
@@ -28,6 +28,9 @@ Erasure-coded parity segments provide resilience against partial loss or reorder
 - **original payload**: the full application payload before segmentation.
 - **data segment**: one chunk of the original payload.
 - **parity segment**: an erasure-coded segment derived from the set of data segments.
+- **class**: the data segments of one payload form one class, its parity segments the other.
+  `is_parity` tells which class a segment message belongs to, and its `index` and `segment_count`
+  are relative to that class alone, never to the two combined.
 - **segment message**: a [`SegmentMessage`](#wire-format) carrying either data or parity segment.
 - **segmentSize**: maximum size in bytes of a serialized segment message, see [Configuration](#configuration).
 
@@ -55,7 +58,12 @@ A **segment message** is valid only if all of the following hold:
 - `1 <= segment_count <= maxSegmentsPerClass` (receiver's configured limit.)
 - `index < segment_count`.
 
+An invalid segment message MUST be discarded.
 A payload that fits one segment is valid if `segment_count == 1`, `index == 0`, `is_parity == false`.
+
+A later revision of this specification MAY add fields.
+A receiver MUST ignore any field it does not recognise rather than treat the segment message as invalid,
+and a field number that is withdrawn MUST be `reserved` and MUST NOT be reused for another meaning.
 
 ## Reed–Solomon Coding
 
