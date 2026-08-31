@@ -25,7 +25,8 @@
 | **Version** | **Changes** | **Date** |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
-| 1.1.0 | Add the transaction `body_type`, bound a carried transaction to `Max_Body_Length`, and state the fixed-length padding cost it inherits | 2026-08-11 |
+| 1.1.0 | Updated `Max_Body_Length` to 34574 bytes, the maximum block proposal size once a proposal carries the signed headers of the uncles it references (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)). | 2026-08-06 |
+| 1.2.0 | Add the transaction `body_type`, bound a carried transaction to `Max_Body_Length`, and state the fixed-length padding cost it inherits | 2026-08-11 |
 
 # Introduction
 
@@ -77,7 +78,7 @@ We define the `body_length` as uint16 (encoded as little-endian). Therefore, the
 
 ## Body
 
-The `Max_Body_Length` parameter defines the maximum length of the `body`. Currently, we assume that the maximal length of a raw data message is 33129 ([Block Proposal](bedrock-v1.1-block-construction.md#block-proposal)), so the `Max_Body_Length=33129`.
+The `Max_Body_Length` parameter defines the maximum length of the `body`. The maximal length of a raw data message is the maximum size of a [Block Proposal](bedrock-v1.1-block-construction.md#block-proposal) — 34574 bytes, reached when the proposal carries `MAX_UNCLES` signed uncle headers — so the `Max_Body_Length=34574`. Because the padding below fixes every `body` to this length, the variable size of a proposal (which depends on the number of referenced uncles) is not observable on the wire, which is what preserves the indistinguishability of proposals required by the [Blend Protocol](blend-protocol.md).
 
 **A transaction carried over the Blend network must not exceed `Max_Body_Length` once encoded.** The body is a fixed-size field, so a longer payload cannot be represented at all: there is no fragmentation across messages and no larger body type. A transaction that does not fit is not sendable over this protocol and must reach the network by other means. A node must check the encoded length before constructing the message rather than discovering the limit at encapsulation, and must discard on receipt any payload whose `body_length` exceeds `Max_Body_Length`, since a well-formed message can never carry one.
 
@@ -90,4 +91,4 @@ If the `body` length is less than the `Max_Body_Length`, then the last `Max_Body
 
 The fixed length is what makes payloads of different types indistinguishable on the wire, and it is the reason a cover message costs exactly as much to send as a block proposal. It applies equally to transactions, which are typically far smaller than the block proposal the parameter is derived from: **every transaction sent through the Blend network occupies a full `Max_Body_Length` payload regardless of its own size.** A node sending transactions this way therefore pays the bandwidth of a block proposal per transaction, and the network's bandwidth cost scales with the number of payloads carried rather than with the number of bytes those payloads contain. Any estimate of the cost of routing transactions through this protocol must use `Max_Body_Length`, not the encoded size of a transaction.
 
-Note also that `body_length` is a `uint16` while `Max_Body_Length` is 33129, so the field can express any permitted length with room to spare. A future payload type larger than 65535 bytes would require widening the field, and therefore a change to the `Header` structure, not only to `Max_Body_Length`.
+Note also that `body_length` is a `uint16` while `Max_Body_Length` is 34574, so the field can express any permitted length with room to spare. A future payload type larger than 65535 bytes would require widening the field, and therefore a change to the `Header` structure, not only to `Max_Body_Length`.

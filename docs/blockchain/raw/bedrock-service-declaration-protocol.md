@@ -28,10 +28,13 @@
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.2.0 | [RFC] Per-service uniqueness of `provider_id` and `zk_id` | 2026-07-08 |
 | 1.3.0 | Length-prefix the `locators` list in the `declaration_id` preimage | 2026-07-30 |
+| 1.4.0 | [RFC] One canonical encoding for `ServiceType` and `Locator` | 2026-08-14 |
+| 1.4.1 | Replaced the `uint64` width given to the `epoch` fields with a reference to [`EpochNumber`](cryptarchia-v1-protocol.md#epoch), which is 32 bits | 2026-08-25 |
+| 1.4.2 | Renamed locked notes into service notes: `locked_note_id` becomes `service_note_id` in the declaration and withdraw messages and in `DeclarationInfo` | 2026-08-27 |
 
 # Introduction
 
-This document defines a mechanism enabling validators to declare their participation in specific protocols that require a known and agreed-upon list of participants. One example of this is the Blend Network. We create a single repository of identifiers which is used to establish secure communication between validators and provide services. Before being admitted to the repository, the validator proves that it locked at least a minimum stake.
+This document defines a mechanism enabling validators to declare their participation in specific protocols that require a known and agreed-upon list of participants. One example of this is the Blend Network. We create a single repository of identifiers which is used to establish secure communication between validators and provide services. Before being admitted to the repository, the validator proves that it locked at least a minimum stake through a service note.
 
 ## Requirements
 
@@ -48,7 +51,7 @@ The SDP enables nodes to declare their eligibility to provide a specific service
 
 The protocol defines the following actions:
 
-- **Declare:** A node sends a declaration that confirms its willingness to provide a specific service, which is confirmed by locking a stake above a certain threshold.
+- **Declare:** A node sends a declaration that confirms its willingness to provide a specific service, which is confirmed by locking a stake above a certain threshold in a service note.
 - **Active:** A node marks that its participation in the protocol is active according to the service-specific activity logic. This action enables the protocol to monitor the node’s activity. We utilize this as a non-intrusive differentiator of node activity. It is crucial to exclude inactive nodes from the set of active nodes, as it enhances the stability of services.
 - **Withdraw:** A node withdraws its declaration and stops providing a service.
 
@@ -78,16 +81,18 @@ We define the following service type:
 
 ```python
 class ServiceType(Enum):
-    BN="BN" # Blend Network
+    BN=0 # Blend Network
 ```
 
 A declaration can be generated for any of the services above. Any declaration that is not one of the above must be rejected. The number of services might grow in the future.
+
+Each service type is assigned a one-byte discriminant, given by the enum value above. This byte is the canonical encoding of a `ServiceType` and is used wherever a `ServiceType` is serialized or hashed: the transaction wire form ([Mantle Transaction Encoding](mantle-transaction-encoding.md)), the `declaration_id` preimage ([Declaration Storage](#declaration-storage)), and the reward `op_id` preimage ([Service Reward Distribution](bedrock-service-reward-distribution.md)).
 
 ### Minimum Stake
 
 The minimum stake is a global value that defines the minimum stake a node must have to perform any service.
 
-The `MinStake` is a structure that holds the value of the stake `stake_threshold` and the `epoch`, which is an epoch number at which the threshold was set; it is `uint64`.
+The `MinStake` is a structure that holds the value of the stake `stake_threshold` and the `epoch`, which is an epoch number at which the threshold was set; it is an [`EpochNumber`](cryptarchia-v1-protocol.md#epoch).
 
 ```python
 class MinStake:
@@ -108,7 +113,7 @@ For more information on how the minimum stake is calculated, please refer to the
 The service parameters structure defines the parameters set necessary for correctly handling interaction between the protocol and services. Each of the service types defined above must be mapped to a set of the following parameters:
 
 - `inactivity_period` defines the maximum time (as a number of epochs) during which an activation message must be sent; otherwise, the declaration is considered inactive. It must be at least 2 epochs long due to finalization reasons.
-- `epoch` defines the epoch number at which the parameter was set; it is `uint64`.
+- `epoch` defines the epoch number at which the parameter was set; it is an [`EpochNumber`](cryptarchia-v1-protocol.md#epoch).
 
 ```python
 class ServiceParameters:
@@ -142,11 +147,13 @@ A `Locator` is the address of a validator which is used to establish secure comm
 
 The `provider_id` must be used as the node identity. Therefore, the `Locator` must be completed by adding the `provider_id` at the end of it, which makes the `Locator` usable in the context of libp2p.
 
-The length of the `Locator` is restricted to 329 characters.
+The canonical form of a `Locator` is the multiaddr **binary (byte) form**. Wherever a `Locator` is serialized or hashed — the transaction wire form ([Mantle Transaction Encoding](mantle-transaction-encoding.md)) and the `declaration_id` preimage ([Declaration Storage](#declaration-storage)) — its binary form is used. The human-readable string form (e.g. `/ip4/203.0.113.10/tcp/4001`) is presentational only and must never appear in an encoding.
 
-**The common formatting of every** `Locator` **must be applied to maintain its unambiguity, to make deterministic ID generation work consistently.** The `Locator` must at least contain only lowercase letters and every part of the address must be explicit (no implicit defaults).
+The length of the binary form of a `Locator` is restricted to 329 bytes.
 
-Canonical formatting makes a single `Locator` unambiguous, but it does not make a *list* of them unambiguous. The byte form of a multiaddr is self-describing, so concatenating two `Locator`s yields the byte form of a single longer one: `[/ip4/203.0.113.10/tcp/4001]` and `[/ip4/203.0.113.10, /tcp/4001]` are the same byte string. Wherever a list of `Locator`s is hashed it must therefore be serialized as the [Mantle Transaction Encoding](mantle-transaction-encoding.md) defines it, prefixed with its element count and with each element prefixed by its byte length.
+**The canonical form makes deterministic ID generation work consistently.** The binary form carries no letter case and no textual shorthand, so two equal multiaddrs always share one byte representation; the string-form ambiguities (case, implicit defaults) cannot arise. Implementations that accept the string form as input must parse it into the binary form before any serialization or hashing, and every part of the address must be explicit (no implicit defaults).
+
+The canonical form makes a single `Locator` unambiguous, but it does not make a *list* of them unambiguous. The byte form of a multiaddr is self-describing, so concatenating two `Locator`s yields the byte form of a single longer one: `[/ip4/203.0.113.10/tcp/4001]` and `[/ip4/203.0.113.10, /tcp/4001]` are the same byte string. Wherever a list of `Locator`s is hashed it must therefore be serialized as the `Locators` production of the [Mantle Transaction Encoding](mantle-transaction-encoding.md#sdp-operations): prefixed with its element count and with each element prefixed by its byte length.
 
 ### **Declaration Message**
 
@@ -157,7 +164,7 @@ class DeclarationMessage:
     service_type: ServiceType
     locators: list[Locator]
     provider_id: Ed25519PublicKey
-    locked_note_id: NoteId
+    service_note_id: NoteId
     zk_id: ZkPublicKey
 ```
 
@@ -165,7 +172,7 @@ The `locators` list must be non-empty and its length must be limited to reduce t
 
 The message must be signed by the `provider_id` key to prove ownership of the key that is used for network-level authentication of the validator.
 
-The `locked_note_id` points to a locked note used for minimum stake threshold verification purposes.
+The `service_note_id` points to a service note used for minimum stake threshold verification purposes.
 
 The message is also signed by the `zk_id` key.
 
@@ -177,7 +184,7 @@ Only valid declaration messages can be stored on the ledger. We define the `Decl
 class DeclarationInfo:
     service: ServiceType
     provider_id: Ed25519PublicKey
-    locked_note_id: NoteId
+    service_note_id: NoteId
     zk_id: ZkPublicKey
     locators: list[Locator]
     created: EpochNumber
@@ -190,7 +197,7 @@ Where:
 
 - `service` defines the service type of the declaration;
 - `provider_id` is an `Ed25519PublicKey` used to sign the message by the validator;
-- `locked_note_id` is a `NoteId` used for minimum stake threshold verification purposes;
+- `service_note_id` is a `NoteId` used for minimum stake threshold verification purposes;
 - `zk_id` is used for zero-knowledge operations by the validator that includes rewarding;
 - `locators` is a copy of the `locators` from the `DeclarationMessage`;
 - `created` refers to the epoch number of the block that contained the declaration;
@@ -204,7 +211,7 @@ We also define the `declaration_id` (of a `DeclarationId` type) that is the uniq
 declaration_id = Hash(service||provider_id||zk_id||locators)
 ```
 
-`locators` is serialized as its element count followed by each `Locator` prefixed with its byte length. Concatenating the locators without those lengths would leave the `declaration_id` not binding the locator list, for the reason given in [Locators](#locators).
+Each component of the preimage is serialized in its canonical encoding, as defined by the [Mantle Transaction Encoding](mantle-transaction-encoding.md#sdp-operations) for the `SDP_DECLARE` operation: `service` as the one-byte `ServiceType` discriminant ([Service Types](#service-types)), and `locators` as the `Locators` production, its element count followed by each `Locator`'s binary form prefixed with its byte length ([Locators](#locators)). Concatenating the locators without those lengths would leave the `declaration_id` not binding the locator list, for the reason given in [Locators](#locators).
 
 The `declaration_id` is not stored as part of the `DeclarationInfo` but it is used to index it.
 
@@ -251,13 +258,13 @@ The construction of the withdraw message is as follows:
 ```python
 class WithdrawMessage:
     declaration_id: DeclarationId
-    locked_note_id: NoteId
+    service_note_id: NoteId
     nonce: Nonce
 ```
 
 The message must be signed by the `zk_id` key from the `declaration_id`.
 
-The `locked_note_id` is a `NoteId` that was used for minimum stake threshold verification purposes and will be unlocked after withdrawal.
+The `service_note_id` is a `NoteId` that was used for minimum stake threshold verification purposes and will be unlocked after withdrawal.
 
 The `nonce` must increase monotonically by every message sent for the `declaration_id`.
 
@@ -285,7 +292,7 @@ The Declare action associates a validator with a service it wants to provide. It
 
 The declaration message is considered valid when all of the following are met:
 
-- The sender meets the stake requirements and its `locked_note_id` is valid.
+- The sender meets the stake requirements and its `service_note_id` is valid.
 - The `declaration_id` is unique.
 - The `provider_id` and the `zk_id` are each unique in the context of the `service` (as defined in [Identifier Uniqueness](#identifier-uniqueness)).
 - The sender knows the secret behind the `provider_id` identifier.
@@ -325,7 +332,7 @@ The logic of the withdraw action is:
     4. The `nonce` increases monotonically.
 3. If any of the above is not correct, then discard the message and stop.
 4. Set the `withdraw_at` from the `DeclarationInfo` to the current epoch number (the withdrawal epoch `e`).
-5. The `DeclarationInfo` is removed and the stake unlocked (releasing the `locked_note_id`) at epoch `e+2` by the Mantle epoch finalization step, right after the final reward is paid out.
+5. The `DeclarationInfo` is removed and the stake unlocked (releasing the `service_note_id`) at epoch `e+2` by the Mantle epoch finalization step, right after the final reward is paid out.
 
 ### Query
 

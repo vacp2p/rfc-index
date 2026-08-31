@@ -37,7 +37,11 @@
 | 1.9.1 | Rename the excess balance left after the mandatory fees into `tx_priority_tip` and convert it back into a `TokenValue` explicitly | 2026-08-05 |
 | 1.9.2 | Required checked arithmetic for all token value, balance, gas, and fee computations. | 2026-08-06 |
 | 1.10.0| Enforce non empty inputs for every operation not only transfer moving the assertion in the validation of input spendability | 2026-08-11 |
-| 1.11.0 | Add the `CLAIM_POW_REWARD` Operation, the proof of work reward pool and its difficulty retargeting, and interleave Operation validation with execution so a note created by one Operation can be spent by a later one in the same transaction | 2026-08-11 |
+| 1.10.1| [RFC] One canonical encoding for `ServiceType` and `Locator`: `ServiceType` is its one-byte discriminant and `Locator` is the multiaddr binary form. Added a `declaration_id` test vector | 2026-08-14 |
+| 1.10.2| Precise the state validation reads: the Operations of a Mantle Transaction are validated and executed one after the other in the order they appear, each against the state the preceding ones left, and a Mantle Transaction against the state the transactions preceding it in the block left. Accumulated the transaction balance along that pass, replacing `get_transaction_balance` | 2026-08-24 |
+| 1.11.0 | Track the configuration lineage of a channel: `ChannelState` gains `config_tip_hash` and the `CHANNEL_CONFIG` payload carries the `parent` configuration it extends, ordering configurations and preventing their replay | 2026-08-27 |
+| 1.11.1 | Renamed locked notes into service notes: `service_notes`, `ServiceNote` and `service_note_id` replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in | 2026-08-27 |
+| 1.12.0 | Add the `CLAIM_POW_REWARD` Operation, the proof of work reward pool and its difficulty retargeting | 2026-08-11 |
 
 # Introduction
 
@@ -51,15 +55,15 @@ Mantle manages assets using a note-based ledger that follows an UTXO model. Each
 
 ## Mantle Transaction
 
-The features of the Logos Blockchain are exposed through Mantle Transactions. Each transaction can contain zero or more **Operations**. Mantle Transactions enable users to execute multiple Operations atomically.
+The features of the Logos Blockchain are exposed through Mantle Transactions. Each transaction can contain zero or more **Operations**. Mantle Transactions enable users to execute multiple Operations atomically: the Operations are applied one after the other in the order they appear, and either all of them take effect or none does.
 
 ## Mantle Operations
 
-Logos Blockchain features are exposed through Mantle Operations, which can be combined and executed together in a single Mantle Transaction atomically. These Operations enable transfers and functions such as on-chain data posting, Cross-Zone interactions, SDP interaction, and leader reward claims.
+Logos Blockchain features are exposed through Mantle Operations, which can be combined in a single Mantle Transaction and executed atomically. These Operations enable transfers and functions such as on-chain data posting, Cross-Zone interactions, SDP interaction, and leader reward claims.
 
 ## Mantle Ledger
 
-The Mantle Ledger enables asset transfers using a transparent UTXO model. While a Transfer Operation can consume more tokens than it creates, the Mantle Transaction excess balance must exactly pay for the fees. The ledger tracks three kinds of notes: regular notes, locked notes (collateral for service declarations) and channel notes (channel bridge funds eligible for PoS participation only).
+The Mantle Ledger enables asset transfers using a transparent UTXO model. While a Transfer Operation can consume more tokens than it creates, the Mantle Transaction excess balance must exactly pay for the fees. The ledger tracks three kinds of notes: regular notes, service notes (collateral for service declarations) and channel notes (channel bridge funds eligible for PoS participation only).
 
 ## Transaction Fees
 
@@ -72,7 +76,7 @@ Mantle Transaction fees are derived from a gas model. The Logos Blockchain has t
 
 # Mantle Transaction
 
-Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes all Operations atomically, while using the Mantle Transaction's excess balance—calculated as the difference between the consumed and created value— as the fee payment.
+Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes the Operations atomically, while using the Mantle Transaction's excess balance, calculated as the difference between the consumed and created value, as the fee payment.
 
 ```python
 class MantleTx:
@@ -145,7 +149,7 @@ def mandatory_fees(signed_tx: SignedMantleTx,
                    permanent_storage_gas_price: TokenValue, # Given by Storage Market
                    execution_gas_base_price: TokenValue) -> uint64:  # Given by Execution Market
     mantle_tx = signed_tx.tx
-    permanent_storage_fees = checked_uint64(len(encode(signed_mantle_tx)) * permanent_storage_gas_price)
+    permanent_storage_fees = checked_uint64(len(encode(signed_tx)) * permanent_storage_gas_price)
     tx_execution_gas = 0
 
     for op in mantle_tx.ops:
@@ -168,7 +172,14 @@ signed_tx = SignedMantleTx(
     tx=MantleTx(ops),
     op_proofs
 )
+
+permanent_storage_gas_price: TokenValue # Given by Storage Market
+execution_gas_base_price: TokenValue    # Given by Execution Market
 ```
+
+The state validation reads is not a fixed snapshot: it advances as the block is processed. A Mantle Transaction is validated against the state left by the Mantle Transactions preceding it in the block, as defined in [Block Proposal Validation](bedrock-v1.1-block-construction.md#block-proposal-validation), and validation and execution then follow one another Operation by Operation, in the order the Operations appear: the Operation at index `i` is validated against the state the Operations at indices `0` to `i-1` left, then executed to produce the state the Operation at index `i+1` is validated against. This is what the `ledger`, `channels`, `service_notes`, `declarations` and `voucher_nullifier_set` given to each Operation below denote.
+
+Atomicity is what a failed check means, not simultaneity. If any of the checks below fails, the whole Mantle Transaction is invalid: none of its Operations takes effect, whether or not it was reached. An invalid Mantle Transaction is never skipped over either, the block including it being invalid and nothing of that block being executed.
 
 Mantle validators will ensure the following:
 
@@ -177,52 +188,42 @@ Mantle validators will ensure the following:
     assert len(op_proofs) == len(ops)
     ```
 
-2. Each Operation is valid, and is executed before the next one is validated.
+2. Each Operation is valid, and takes effect before the next one is validated. The transaction balance is accumulated over the same pass, so a `TRANSFER` consuming a note an earlier Operation created contributes that note's value like any other.
     ```python
-    balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
-
+    tx_balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
     for op, op_proof in zip(ops, op_proofs):
         assert op.opcode in MANTLE_OPCODES
-        # Validated against the state left by the Operations before it.
-        validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof, state)
-        balance = accumulate_balance(balance, op, state)
-        execute_mantle_op(op, state)
+        validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof)
+        if op.opcode == TRANSFER:
+            for inp in op.inputs:
+                tx_balance = checked_int128(tx_balance + get_value_from_note_id(inp))
+            for out in op.outputs:
+                tx_balance = checked_int128(tx_balance - out.value)
+        execute_mantle_op(op.opcode, op.payload)
 
-    def validate_mantle_op(txhash, opcode, payload, op_proof, state):
+    def validate_mantle_op(txhash, opcode, payload, op_proof):
         if opcode == CHANNEL_INSCRIBE:
-            validate_channel_inscribe(txhash, payload, op_proof, state)
+            validate_channel_inscribe(txhash, payload, op_proof)
         # elif opcode == ...
         #    ...
 
-    def accumulate_balance(balance: int128, op, state) -> int128:
-        if op.opcode == TRANSFER:
-            for inp in op.inputs:
-                balance = checked_int128(balance + get_value_from_note_id(inp, state))
-            for out in op.outputs:
-                balance = checked_int128(balance - out.value)
-        return balance
+    def execute_mantle_op(opcode, payload):
+        if opcode == CHANNEL_INSCRIBE:
+            execute_channel_inscribe(payload)
+        # elif opcode == ...
+        #    ...
     ```
 
 3. The Mantle Transaction excess balance pays at least the mandatory fees.
     ```python
-    tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # int128
-    assert tx_mandatory_fee <= balance
-    tx_priority_tip = checked_uint64(balance - tx_mandatory_fee)
+    tx_mandatory_fee = mandatory_fees(signed_tx,                        # uint64
+                                      permanent_storage_gas_price,
+                                      execution_gas_base_price)
+    assert tx_mandatory_fee <= tx_balance
+    tx_priority_tip = checked_uint64(tx_balance - tx_mandatory_fee)
     ```
 
-Validation and execution are **interleaved**: each Operation is validated, its contribution to the balance accumulated, and then executed, before the next Operation is validated. Earlier versions of this specification validated every Operation against the pre-transaction state and only then executed them all.
-
-The reason for the change is that a note created by one Operation must be spendable by a later Operation in the same transaction. Under the previous ordering such a note did not exist at the time any Operation was validated, so it could not be referenced, and an Operation that issues a note could not have that note spent to pay the transaction's own fee. Interleaving is what makes that possible, and it is a general property of Mantle rather than one specific to any single Operation.
-
-Interleaving has a second effect, distinct from the one it was introduced for: an Operation validated against a protocol-maintained reserve sees that reserve as the Operations before it have left it. A transaction carrying several claims against the proof of work reward pool therefore has each of them checked against the pool net of its predecessors, rather than all of them checked against the pool as it stood before the transaction began. Under the previous ordering every such claim would have passed a check the pool could not actually satisfy, and the shortfall would have surfaced only as a failed subtraction during execution. This is a consequence of interleaving rather than a reason for it, but it is what makes the pool guard in [CLAIM_POW_REWARD](#claim_pow_reward) sound within a transaction as well as between them.
-
-Two further consequences follow, and both are load-bearing.
-
-The first is that the balance must be **accumulated as the Operations execute** rather than computed from the ledger afterwards. A `TRANSFER` consumes its input notes when it executes, so by the time the last Operation has run those notes are gone and their values can no longer be looked up. Computing the balance after the fact would therefore fail for every transaction that spends anything, not merely for those that spend a note created within the transaction.
-
-The second is an **ordering rule**: a note created by Operation $`i`$ is spendable only by Operations $`j \gt i`$ in the same transaction. An Operation cannot consume a note created later in the same transaction, because it does not yet exist when that Operation is validated, and it cannot consume its own output.
-
-Atomicity is unaffected. The interleaving changes only what each Operation can see; if any Operation fails validation, or the fee check at the end does not hold, the whole transaction is rejected and none of its effects are applied.
+The state progression above has a consequence for the reserves the protocol maintains: an Operation validated against such a reserve sees it as the Operations preceding it have left it. A transaction carrying several claims against the proof of work reward pool therefore has each of them checked against the pool net of its predecessors, rather than all of them checked against the pool as it stood before the transaction began. Were they all checked against the same starting balance, every claim would pass a check the pool could not actually satisfy, and the shortfall would surface only as a failed subtraction during execution. This is what makes the pool guard in [CLAIM_POW_REWARD](#claim_pow_reward) sound within a transaction as well as between them.
 
 ## Execution
 
@@ -235,7 +236,7 @@ SignedMantleTx(
 )
 ```
 
-Mantle Validators execute each Operation in `ops` according to its opcode, in order, interleaved with validation as described above. An Operation is executed only once the Operations before it have been validated and executed.
+Mantle Validators execute each Operation in `ops` according to its opcode, in the order the Operations appear and along the state progression [Validation](#validation) defines. The subsections below define, for each opcode, what validating and executing an Operation amount to.
 
 # Operations
 
@@ -268,6 +269,8 @@ Channels allow Zones to post their updates on chain. Channels form virtual chain
 
 Channels form virtual chains by having each message reference its parent message. The order of messages in these channels is enforced by the sequencer by building a hash chain of messages, i.e. new messages reference the previous messages through a parent hash. Given that Cryptarchia has long finality times, these message parent references allow Zone sequencers to continue to post new updates to channels without having to wait for finality. No matter how Cryptarchia forks and reorgs, the channel messages from honest sequencers will eventually be re-included in a way that satisfies the virtual chain order.
 
+Configurations form a second hash chain within the channel: each configuration names the configuration it supersedes, so a pending reconfiguration stays valid while the sequencer keeps posting inscriptions.
+
 The first time a message is sent to an unclaimed channel, the key that signs the initial message becomes the only accredited key in the list (Note that this key may correspond to a threshold signature key). Accredited keys of a channel forms a committee that can configure the channel, withdraw funds and take turns to write messages to that channel following a round-robin algorithm. Configuring a channel includes modifying the list of accredited keys, the round-robin parameters and the required number of signatures to withdraw funds or establish a new configuration.
 
 Validators must maintain the following state to process channel Operations:
@@ -282,7 +285,8 @@ class ChannelState:
                                   # required to update the configuration
 
     # Message Ordering
-    tip_hash: hash
+    tip_hash: hash         # Last message of the channel
+    config_tip_hash: hash  # Last configuration of the channel
 
     # Decentralized Sequencing
     tip_slot: Slot
@@ -299,6 +303,7 @@ class ChannelState:
 def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey]) -> ChannelState:
     return ChannelState(
         tip_hash = ZERO,
+        config_tip_hash = ZERO,
         tip_slot = block_slot,
         accredited_keys = keys,
         tip_sequencer = 0,
@@ -506,6 +511,7 @@ Overwrite the configuration of a channel.
 ```python
 class ChannelConfig:
     channel: ChannelId
+    parent: hash             # Previous configuration of the channel
     keys: list[Ed25519PublicKey]
     posting_timeframe: u32
     posting_timeout: u32
@@ -553,12 +559,21 @@ assert config.configuration_threshold <= len(config.keys)
 
 if config.channel in channels:
     chan = channels[config.channel]
+
+    # Ensure the configuration is extending the last configuration
+    # of the channel
+    assert config.parent == chan.config_tip_hash
+
     # Verify the configuration_threshold signatures (see Appendix)
     MultiEd25519_verify(txhash,
                         proof.signatures,
                         proof.indexes,
                         chan.accredited_keys,
                         chan.configuration_threshold)
+else:
+    # Channel will be created automatically upon execution
+    # Ensure that this configuration is the genesis configuration
+    assert config.parent == ZERO
 ```
 
 #### Execution
@@ -591,6 +606,7 @@ block_slot: Slot
       chan.configuration_threshold = config.configuration_threshold
 
       # Update Decentralized Sequencing Parameters
+      chan.tip_slot = block_slot
       chan.tip_sequencer = 0
       chan.tip_sequencer_starting_slot = block_slot
       chan.posting_timeframe = config.posting_timeframe
@@ -600,12 +616,11 @@ block_slot: Slot
       chan.transfer_threshold = config.transfer_threshold
       ```
 
-  3. Update the channel tip.
+  3. Update the configuration tip.
 
       ```python
       chan = channels[config.channel]
-      chan.tip_slot = block_slot
-      chan.tip_hash = hash(encode(config))
+      chan.config_tip_hash = hash(encode(config))
       ```
 
 #### Example
@@ -613,12 +628,14 @@ block_slot: Slot
   Suppose the unique sequencer of Zone A wants to add a key to the list of accredited keys:
 
 ```python
-# Given a key to add
+# Given a key to add and the current configuration tip of the channel
 new_sequencer_pk: Ed25519PublicKey
+zone_a_config_tip: hash
 
 # The unique sequencer encodes the update and builds the payload
 config = ChannelConfig(
     channel=ZONE_A,
+    parent=zone_a_config_tip,
     keys=[old_sequencer_pk, new_sequencer_pk],
     posting_timeframe = 5000,
     posting_timeout = 500,
@@ -1003,10 +1020,10 @@ These Operations implement the [Service Declaration Protocol](bedrock-service-de
 Validators must keep the following state when implementing SDP Operations:
 
 ```python
-locked_notes: dict[NoteID, LockedNote]
+service_notes: dict[NoteID, ServiceNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 
-class LockedNote:
+class ServiceNote:
     declarations: set[DeclarationID]
 ```
 
@@ -1014,9 +1031,11 @@ class LockedNote:
 
 ```python
 class ServiceType(Enum):
-    BN="BN" # Blend Network
+    BN=0 # Blend Network; the one-byte discriminant is the canonical encoding
 
-class Locator(str):
+class Locator(bytes):
+    # multiaddr binary form; the canonical encoding
+    # (see SDP: Locators)
     def validate(self):
         assert len(self) <= 329
         assert validate_multiaddr(self)
@@ -1034,7 +1053,7 @@ class DeclarationInfo:
     locators: list[Locator]
     provider_id: Ed25519PublicKey
     zk_id: ZkPublicKey
-    locked_note_id: NoteId
+    service_note_id: NoteId
     created: EpochNumber
     active: EpochNumber | None
     withdraw_at: EpochNumber | None
@@ -1054,17 +1073,17 @@ class DeclarationMessage:
     locators: list[Locator]
     provider_id: Ed25519PublicKey
     zk_id: ZkPublicKey
-    locked_note_id: NoteId
+    service_note_id: NoteId
 ```
 
-Locked notes are introduced in [Locked notes](#locked-notes) and serve as Service collaterals. They cannot be spent before the owner withdraw its participation from the declared service(s).
+Service notes are introduced in [Service notes](#service-notes) and serve as Service collaterals. They cannot be spent before the owner withdraw its participation from the declared service(s).
 
 #### Proof
 
 ```python
 class DeclarationProof:
     zk_sig: ZkSignature             # signature proving ownership over
-                                    # locked note and zk_id
+                                    # service note and zk_id
     provider_sig: Ed25519Signature  # signature proving ownership of provider key
 ```
 
@@ -1085,7 +1104,7 @@ proof: DeclarationProof
 
 min_stake: MinStake      # the (global) minimum stake setting
 ledger: Ledger           # the set of unspent notes
-locked_notes: dict[NoteId, LockedNote]
+service_notes: dict[NoteId, ServiceNote]
 declarations: dict[NoteId, DeclarationInfo]
 ```
 
@@ -1093,7 +1112,7 @@ declarations: dict[NoteId, DeclarationInfo]
 
   The declaration is verified according to [Declare](bedrock-service-declaration-protocol.md#declare).
 
-  1. Ensure ownership over the locked note, `zk_id` and `provider_id`.
+  1. Ensure ownership over the service note, `zk_id` and `provider_id`.
       ```python
       assert ZkSignature_verify(
           txhash, proof.zk_sig, [note.public_key, declaration.zk_id]
@@ -1112,18 +1131,18 @@ declarations: dict[NoteId, DeclarationInfo]
       assert len(declaration.locators) <= 8
       ```
 
-  4. Ensure the locked note exists and its value is sufficient for joining the service.
+  4. Ensure the service note exists and its value is sufficient for joining the service.
       ```python
-      assert ledger.is_unspent(declaration.locked_note_id)
-      note = ledger.get_note(declaration.locked_note_id)
+      assert ledger.is_unspent(declaration.service_note_id)
+      note = ledger.get_note(declaration.service_note_id)
       assert note.value >= min_stake.stake_threshold
       ```
 
-  5. Ensure the note has not already been locked for this service.
+  5. Ensure the note has not already been used for this service.
       ```python
-      if declaration.locked_note in locked_notes:
-          locked_note = locked_notes[declaration.locked_note]
-          services = [declarations[declare_id] for declare_id in locked_note.declarations]
+      if declaration.service_note in service_notes:
+          service_note = service_notes[declaration.service_note]
+          services = [declarations[declare_id] for declare_id in service_note.declarations]
           assert declaration.service_type not in services
       ```
 
@@ -1134,23 +1153,23 @@ declarations: dict[NoteId, DeclarationInfo]
 ```python
 declaration: DeclarationMessage # the declaration we are executing
 current_epoch: EpochNumber
-locked_notes : dict[NoteId, LockedNote]
+service_notes : dict[NoteId, ServiceNote]
 ```
 
   *Execute*
 
-  1. Create the locked note state if it doesn't already exist.
+  1. Create the service note state if it doesn't already exist.
       ```python
-      if declaration.locked_note not in locked_notes:
-          locked_notes[declaration.locked_note_id] = LockedNote(declarations=set())
+      if declaration.service_note not in service_notes:
+          service_notes[declaration.service_note_id] = ServiceNote(declarations=set())
 
-      locked_note = locked_notes[declaration.locked_note_id]
+      service_note = service_notes[declaration.service_note_id]
       ```
 
-  2. Add this declaration to the locked note.
+  2. Add this declaration to the service note.
       ```python
       declare_id = declaration_id(declaration)
-      locked_note.declarations.add(declare_id)
+      service_note.declarations.add(declare_id)
       ```
 
   3. Store the declaration as explained in [**Declaration Storage**](bedrock-service-declaration-protocol.md#declaration-storage).
@@ -1160,7 +1179,7 @@ locked_notes : dict[NoteId, LockedNote]
           locators: declaration.locators
           provider_id: declaration.provider_id
           zk_id: declaration.zk_id
-          locked_note_id: declaration.locked_note_id
+          service_note_id: declaration.service_note_id
           declaration,
           created=current_epoch,
           active=None,
@@ -1185,7 +1204,7 @@ declaration=DeclarationMessage(
     locators=["/ip4/203.0.113.10/tcp/4001/p2p"],
     provider_id=alice_provider_pk,
     zk_id=alice_pk_2,
-    locked_note_id=alice_note.id()
+    service_note_id=alice_note.id()
 )
 
 # Build the transfer operation to pay the fees
@@ -1220,13 +1239,13 @@ The service withdrawal follows the definition given in [Withdraw Message](bedroc
 ```python
 class WithdrawMessage:
     declaration: DeclarationID
-    locked_note_id: NoteId
+    service_note_id: NoteId
     nonce: int
 ```
 
 #### Proof
 
-  A signature from the `zk_id` and the locked note `pk` attached to the declaration is required for withdrawing from a service, (see [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature)).
+  A signature from the `zk_id` and the service note `pk` attached to the declaration is required for withdrawing from a service, (see [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature)).
 
 ```python
 ZkSignature
@@ -1246,20 +1265,20 @@ withdraw: WithdrawMessage
 signature: ZkSignature
 
 ledger: Ledger
-locked_notes: dict[NoteId, LockedNote]
+service_notes: dict[NoteId, ServiceNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 ```
 
   *Validate*
 
-  1. Ensure that the locked note exists, is locked and bound to this declaration.
+  1. Ensure that the service note exists and is bound to this declaration.
       ```python
-      assert ledger.is_unspent(withdraw.locked_note_id)
-      assert withdraw.locked_note_id in locked_notes
+      assert ledger.is_unspent(withdraw.service_note_id)
+      assert withdraw.service_note_id in service_notes
 
-      locked_note = locked_notes[withdraw.locked_note_id]
+      service_note = service_notes[withdraw.service_note_id]
 
-      assert withdraw.declaration in locked_note.declarations
+      assert withdraw.declaration in service_note.declarations
       ```
 
   2. Validate SDP withdrawal according to [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
@@ -1272,10 +1291,10 @@ declarations: dict[DeclarationID, DeclarationInfo]
           ```python
           assert declare_info.withdraw_at is None
           ```
-      3. Ensure locked note `pk` and `zk_id` attached to this declaration authorized this Operation.
+      3. Ensure service note `pk` and `zk_id` attached to this declaration authorized this Operation.
           ```python
-          locked_note = ledger[withdraw.locked_note_id]
-          assert ZkSignature_verify(txhash, signature, [locked_note.pk, declare_info.zk_id])
+          service_note = ledger[withdraw.service_note_id]
+          assert ZkSignature_verify(txhash, signature, [service_note.pk, declare_info.zk_id])
           ```
       4. Ensure that the nonce is greater than the previous one.
           ```python
@@ -1292,7 +1311,7 @@ signature: ZkSignature
 
 current_epoch: EpochNumber # current epoch
 ledger: Ledger
-locked_notes: dict[NoteId, LockedNote]
+service_notes: dict[NoteId, ServiceNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 ```
 
@@ -1318,12 +1337,12 @@ declarations: dict[DeclarationID, DeclarationInfo]
 ```python
 withdraw=Withdraw(
     declaration=alice_declaration_id,
-    locked_note_id=alices_locked_note_id
+    service_note_id=alices_service_note_id
     nonce=1579532
 )
 
 # Build the transfer operation to pay the fees
-transfer = Transfer(inputs=[alices_locked_note_id],
+transfer = Transfer(inputs=[alices_service_note_id],
                     outputs=[Note(100, alice_note_pk)])
 
 tx = MantleTx(
@@ -1357,7 +1376,7 @@ by the same step, so their stake is always released.
 
 ```python
 current_epoch: EpochNumber
-locked_notes: dict[NoteId, LockedNote]
+service_notes: dict[NoteId, ServiceNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 ```
 
@@ -1366,10 +1385,10 @@ declarations: dict[DeclarationID, DeclarationInfo]
   For every `declare_id`, `declare_info` in `declarations` where
   `declare_info.withdraw_at is not None and declare_info.withdraw_at <= current_epoch - 2`:
 
-  1. Remove the declaration from its locked note.
+  1. Remove the declaration from its service note.
       ```python
-      locked_note = locked_notes[declare_info.locked_note_id]
-      locked_note.declarations.remove(declare_id)
+      service_note = service_notes[declare_info.service_note_id]
+      service_note.declarations.remove(declare_id)
       ```
 
   2. Remove the declaration.
@@ -1379,8 +1398,8 @@ declarations: dict[DeclarationID, DeclarationInfo]
 
   3. Unlock the note once it is no longer bound to any declaration.
       ```python
-      if len(locked_note.declarations) == 0:
-          del locked_notes[declare_info.locked_note_id]
+      if len(service_note.declarations) == 0:
+          del service_notes[declare_info.service_note_id]
       ```
 
 ### SDP_ACTIVE
@@ -2150,13 +2169,13 @@ def derive_note_id(op_id: Hash, output_number: int, note: Note) -> NoteId:
 
 These note identifiers uniquely define notes in the system and cannot be chosen by the user. Nodes maintain the set of notes through a dictionary mapping the NoteId to the note.
 
-### Locked notes
+### Service notes
 
-Locked notes are special notes in Mantle that serve as collateral for Service Declarations. A note can become locked after executing a Declare Operation, preventing it from being spent until explicitly released through a Withdraw Operation. The system maintains a mapping of locked note IDs to their supporting declarations. Though locked, these notes remain in the Ledger and can still participate in Proof of Stake. When service providers withdraw all their declarations, the associated note(s) become unlocked and available for spending again.
+Service notes are special notes in Mantle that serve as collateral for Service Declarations. A note can become a service note after being locked by executing a Declare Operation, preventing it from being spent until explicitly released through a Withdraw Operation. The system maintains a mapping of service note IDs to their supporting declarations. Though locked, these notes remain in the Ledger and can still participate in Proof of Stake. When service providers withdraw all their declarations, the associated note(s) become unlocked and available for spending again.
 
 ### Channel Notes
 
-Channel notes are on-ledger notes minted to represent channel funds. They are distinct from Locked Notes as they can’t be used to declare a service. However, they follow the same ageing rule as ordinary notes since they are part of the ledger and can be used for PoL creation once aged enough.
+Channel notes are on-ledger notes minted to represent channel funds. They are distinct from Service Notes as they can’t be used to declare a service. However, they follow the same ageing rule as ordinary notes since they are part of the ledger and can be used for PoL creation once aged enough.
 
 The system maintains a `channel_notes` set in the Ledger tracking all active channel `NoteId` and their respective `ChannelId`.
 
@@ -2165,13 +2184,13 @@ The system maintains a `channel_notes` set in the Ledger tracking all active cha
 ```python
 class Ledger:
     notes: list[Note]
-    locked_notes: dict[NoteId, LockedNote]
+    service_notes: dict[NoteId, ServiceNote]
     channel_notes: dict[NoteId, ChannelId]
 ```
 
 ### Input Notes Spendability Validation
 
-A note is spendable if and only if it exists, it is not spent or locked. The following function validates that an input of notes can be consumed:
+A note is spendable if and only if it exists, it is not spent or a service note. The following function validates that an input of notes can be consumed:
 
 ```python
 class Ledger:
@@ -2182,10 +2201,10 @@ class Ledger:
         ## Check there is no duplicate
         assert len(inputs) == len(set(inputs))
 
-            # Check that each note is individualy not locked, for the correct channel and unspent
+            # Check that each note is individualy not a service note, for the correct channel and unspent
             for note_id in inputs:
                 assert ledger.is_unspent(note_id)
-                assert note_id not in locked_notes
+                assert note_id not in service_notes
                 if channel_id is None:
                 	assert note_id not in ledger.channel_notes
                 else:
@@ -2413,7 +2432,7 @@ To see what the payloads represent, refer to [Mantle Transaction Encoding](mantl
 | Operation | Payload | `op_id` |
 | ------------------------- | - | - |
 | `TRANSFER`                | 0x0201000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020300000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000600000000000000000000000000000000000000000000000000000000000000 | 0x5e5e1b318aa0c2aec93fbb327e6af5f705e5684269a34e0c1319539d00d06cdb |
-| `CHANNEL_CONFIG`          | 0x070707070707070707070707070707070707070707070707070707070707070702001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00 | 0x0cf0dd115eadfc303eeb4c103a7d2faba3cf3a25b549da79c30857fb9eebc0cb |
+| `CHANNEL_CONFIG`          | 0x0707070707070707070707070707070707070707070707070707070707070707000000000000000000000000000000000000000000000000000000000000000002001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00 | 0x8bac7efe4c3ef10745c0d509ac88e2abaf1d3cda94987ed2eeb9ad71dd31d056 |
 | `CHANNEL_INSCRIBE`        | 0x0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c | 0xfb9af7fb1384fff51780ec8c5afbcba76449ab7603484f797df3a472e48826c1 |
 | `CHANNEL_DEPOSIT`         | 0x1010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d65746164617461 | 0xf14ff0aad9bc5e8e30c5d1aa3710aaa1c1cc1f47c2c256e7d9e73104cb17ccaf |
 | `CHANNEL_WITHDRAW`        | 0x1212121212121212121212121212121212121212121212121212121212121212011300000000000000000000000000000000000000000000000000000000000000 | 0x503d0d08f9faef971864943103965d13be7159fe6e0361c8ea614c6d0431e59c |
@@ -2428,4 +2447,17 @@ To see what the payloads represent, refer to [Mantle Transaction Encoding](mantl
 | Transaction | Payload | Transaction Hash                                                   |
 | - | - | - |
 | Empty transaction | 0x00 | 0x2eba3f667b80a508f3d44d149a1c27a90ea365a51e4fc8209289088142b364e5 |
-| Transaction with one of each operation | 0x0a00020100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002030000000000000004000000000000000000000000000000000000000000000000000000000000000500000000000000060000000000000000000000000000000000000000000000000000000000000010070707070707070707070707070707070707070707070707070707070707070702001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00110e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c121010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d6574616461746113121212121212121212121212121212121212121212121212121212121212121201130000000000000000000000000000000000000000000000000000000000000014141414141414141414141414141414141414141414141414141414141414141401150000000000000000000000000000000000000000000000000000000000000001160000000000000017000000000000000000000000000000000000000000000000000000000000002000010b00047f00000191020bb8cd0353470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000211b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d000000000000001c00000000000000000000000000000000000000000000000000000000000000221e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030330200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000 | 0x5d3ff950e0752dc4ebf8c8d73a8cc7b22445b9245ea317f7ebdaa8d6fd881589 |
+| Transaction with one of each operation | 0x0a000201000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020300000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000600000000000000000000000000000000000000000000000000000000000000100707070707070707070707070707070707070707070707070707070707070707000000000000000000000000000000000000000000000000000000000000000002001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00110e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c121010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d6574616461746113121212121212121212121212121212121212121212121212121212121212121201130000000000000000000000000000000000000000000000000000000000000014141414141414141414141414141414141414141414141414141414141414141401150000000000000000000000000000000000000000000000000000000000000001160000000000000017000000000000000000000000000000000000000000000000000000000000002000010b00047f00000191020bb8cd0353470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000211b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d000000000000001c00000000000000000000000000000000000000000000000000000000000000221e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030330200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000 | 0x11e6013847824badf33aa383cfbdb4b5b74a621acefc8296c21f48c4072e0e92 |
+
+### Declaration Id
+
+The `declaration_id` ([Declaration Storage](bedrock-service-declaration-protocol.md#declaration-storage)) is `Hash(service||provider_id||zk_id||locators)` (BLAKE2b, 256-bit output, no DST), where `service` is the one-byte `ServiceType` discriminant and `locators` is the `Locators` production ([Mantle Transaction Encoding](mantle-transaction-encoding.md#sdp-operations)): the element count followed by each `Locator`'s binary form prefixed with its 2-byte little-endian byte length. Note that the preimage field order differs from the `SDP_DECLARE` wire order and excludes `service_note_id`. This vector reuses the fields of the `SDP_DECLARE` payload from [Operation Id](#operation-id).
+
+| Field | Value |
+| - | - |
+| `service` | 0x00 |
+| `provider_id` | 0x53470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f3 |
+| `zk_id` | 0x1900000000000000000000000000000000000000000000000000000000000000 |
+| `locators` | 0x010b00047f00000191020bb8cd03 |
+| Preimage | 0x0053470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f31900000000000000000000000000000000000000000000000000000000000000010b00047f00000191020bb8cd03 |
+| `declaration_id` | 0x7fb647c069bade94e06685b0825299d220e7cc14752cfc474773b6c4040e37b5 |
