@@ -24,7 +24,7 @@
 
 This document defines the DoS protection architecture for the [libp2p Mix Protocol](mix.md).
 It specifies the requirements, integration architectures, node responsibilities, and standardized interfaces that any DoS protection mechanism must satisfy to integrate with the Mix Protocol.
-Two primary architectural approaches are defined: sender-generated proofs and per-hop generated proofs.
+Four integration architectures are defined: sender-generated proofs, per-hop generated proofs, sender-generated re-randomized proof, and hybrid proofs.
 Concrete instantiation of this architecture, using Rate Limiting Nullifier (RLN), is defined in a separate specification (see [Mix RLN DoS Protection](mix-spam-protection-rln.md)).
 
 ## 1. Introduction
@@ -63,7 +63,7 @@ Any DoS protection mechanism integrated with the Mix Protocol MUST satisfy the f
 
 ## 4. Integration Architecture
 
-Two primary architectural approaches exist for integrating DoS protection with the Mix Protocol, each with distinct trade-offs.
+Four architectural approaches exist for integrating DoS protection with the Mix Protocol, each with distinct trade-offs.
 This section describes each approach in detail, including trade-offs and deployment considerations.
 
 ### 4.1 Sender-Generated Proofs
@@ -76,7 +76,8 @@ These proofs are then independently verified at each hop during Sphinx packet pr
 The proof generation and verification proceed as follows:
 
 1. **Sender Proof Generation and Embedding:**
-   During [Sphinx packet construction](mix.md#85-packet-construction) of the Mix Protocol, the initiating node first computes the ephemeral secrets (step 3.a) and encrypted payload (step 3.d). Note that this deviates from the standard Sphinx construction order.
+   During [Sphinx packet construction](mix.md#85-packet-construction) of the Mix Protocol, the initiating node first computes the ephemeral secrets (step 3.a) and encrypted payload (step 3.d).
+   Note that this deviates from the standard Sphinx construction order.
    Next, it computes the filler strings (step 3.b), where the zero-padding length depends on the size of the DoS protection proof embedded in each hop's routing block (see [Section 4.1.4](#414-impact-on-header-size)).
    Then, during step 3.c, for each hop $i$ in the path, the initiating node:
 
@@ -95,7 +96,7 @@ The proof generation and verification proceed as follows:
 
 - Only the initiating node performs the expensive proof generation.
   All nodes in the path only verify proofs, which is less expensive and also reduces latency per hop.
-- Each hop's proof is encrypted in a separate layer of $β$, making proofs unique per hop and cryptographically isolated.
+- Each hop's proof is encrypted in a separate layer of $β$, making proofs unique per hop and readable only by that hop.
 - Aligns with Sphinx design philosophy, where the initiating node bears the computational complexity while all nodes in the path only perform lightweight operations.
 
 #### 4.1.3 Disadvantages
@@ -103,8 +104,11 @@ The proof generation and verification proceed as follows:
 - The initiating node must generate $L$ proofs, which can be expensive.
 - Each hop's routing block must include DoS protection data, increasing overall header and packet size (see impact analysis below).
 - When packets are sent along [multiple paths for reliability](mix.md#942-no-built-in-retry-or-acknowledgment), the initiating node must generate $L$ fresh proofs for each path.
-- Proofs can only be verified after expensive Sphinx processing operations (session key derivation, replay checking, header integrity verification, and decryption), since they are encrypted within the $β$ field and bound to the decrypted payload state $δ'$.
+- Proofs can only be verified after Sphinx processing operations (session key derivation, replay checking, header integrity verification, and decryption), since they are encrypted within the $β$ field and bound to the decrypted payload state $δ'$.
   Deployments using this approach SHOULD augment with additional network-level protections (connection rate limiting, localized peer reputation) to defend against attacks that can lead to draining nodes' resources.
+- Each hop's proof is bound to a different payload, so the proofs themselves do not link packets across hops.
+  However, if the mechanism detects rate-limit violations through a reusable value, such as a nullifier, that value identifies the sender's rate allowance rather than the individual proof.
+  It is then the same at every hop and allows packets to be correlated across hops, which [Section 3](#3-requirements) prohibits.
 - This approach does not inherently provide Sybil resistance since nodes in the path do not generate any proof using their credentials.
 
 #### 4.1.4 Impact on Header Size
@@ -139,8 +143,6 @@ The proof generation, verification, and forwarding proceed as follows:
 
 - The initiating node only generates one initial proof instead of $L$ proofs.
 - DoS protection data has less overhead on packet header size.
-- Proofs can be verified before Sphinx processing operations (session key derivation, header integrity verification, and decryption).
-  Given that verification is cheaper (see [Section 3](#3-requirements)), this allows nodes to reject invalid packets without performing expensive Sphinx processing.
 - If a membership-based DoS protection mechanism is used (_e.g.,_ Rate Limiting Nullifiers), the same mechanism can provide Sybil resistance as a side effect (see [Section 9.4.3 of the Mix Protocol](mix.md#943-no-sybil-resistance)).
   Nodes must prove membership at each hop, making it infeasible to operate large numbers of Sybil nodes; provided membership carries a cost and offenders can be penalized (see [Section 7](#7-recommended-methods)).
 
@@ -150,31 +152,108 @@ The proof generation, verification, and forwarding proceed as follows:
   Pre-computing proofs offline is not an option, as proofs SHOULD be bound to message contents or an alternative unique signal that cannot be known in advance (see [Section 3](#3-requirements)).
 - When using rate-limiting mechanisms (such as RLN), a node may exhaust its rate limit solely by being selected on multiple independent senders' paths.
   This causes legitimate packets to be dropped, resulting in unpredictable message delivery, even when no individual sender misbehaves.
-  The Mix Protocol's [unlinkability guarantees](mix.md#91-security-guarantees-of-the-core-mix-protocol) make it impossible to distinguish a node forwarding messages from one originating them. This makes mitigations such as assigning differential or reputation-based rate limits infeasible.
+  The Mix Protocol's [unlinkability guarantees](mix.md#91-security-guarantees-of-the-core-mix-protocol) make it impossible to distinguish a node forwarding messages from one originating them.
+  This makes mitigations such as assigning differential or reputation-based rate limits infeasible.
 
-#### 4.2.4 Impact on Packet Size
+#### 4.2.4 Impact on Wire Size
 
 As mentioned in [Section 4.2.1](#421-details), $σ$ consists of the DoS protection proof and all verification metadata.
 Unlike sender-generated proofs, appending $σ$ after the Sphinx packet does not affect the internal Sphinx packet structure.
 
-Consequently, only the total packet size MUST be configured to $4608 + |σ|$ bytes (see [payload size](mix.md#832-payload-size)).
+Consequently, only the total wire size MUST be configured to $4608 + |σ|$ bytes (see [payload size](mix.md#832-payload-size)).
 
 $|σ|$ MUST be fixed for a chosen DoS protection mechanism.
 If the mechanism produces variable-length proofs, they MUST be padded to a fixed size, ensuring all packets remain indistinguishable on the wire.
 
-### 4.3 Comparison
+### 4.3 Sender-Generated Re-Randomized Proof
 
-The following table provides a brief comparison between both integration approaches.
+In this approach, the initiating node generates a single DoS protection proof for the first hop during Sphinx packet construction, and each mix node in the path verifies the proof attached to the incoming packet, re-randomizes it, and re-binds it to the outgoing packet.
 
-| Aspect                             | Sender-Generated Proofs                 | Per-Hop Generated Proofs                   |
-| ---------------------------------- | --------------------------------------- | ------------------------------------------ |
-| **DoS protection**                 | Weaker (verify after Sphinx decryption) | Stronger (verify before Sphinx decryption) |
-| **Sender burden**                  | High (generates $L$ proofs)             | Low (generates 1 proof)                    |
-| **Per-hop computational overhead** | Low (verify only)                       | High (verify + generate)                   |
-| **Per-hop latency**                | Minimal (fast verification)             | Higher                                     |
-| **Total end-to-end latency**       | Lower                                   | Higher                                     |
-| **Sybil resistance**               | Requires separate mechanism             | Can be integrated                          |
-| **Packet size increase**           | $r \times \|\mathrm{dos\_proof}\|$      | $\|σ\|$                               |
+#### 4.3.1 Details
+
+The proof generation, re-randomization, and forwarding proceed as follows:
+
+1. During [Sphinx packet construction](mix.md#85-packet-construction) of the Mix Protocol, after step 3.e, the initiating node generates an initial DoS protection proof $σ$ for the first hop and appends it after the Sphinx packet, forming the wire format: `SphinxPacket || σ`.
+   The proof SHOULD be cryptographically bound to the complete outgoing Sphinx packet $(α_0 | β_0 | γ_0 | δ_0)$ and include any verification metadata required by the DoS protection proof.
+2. The first hop extracts and verifies $σ$ before [processing the Sphinx packet](mix.md#861-shared-preprocessing).
+3. After successful verification and Sphinx processing, the hop re-randomizes $σ$ into a fresh proof $σ'$ bound to the transformed packet.
+4. The updated packet is forwarded to the next hop.
+5. This process repeats at each intermediate hop until the packet reaches the final hop.
+   The exit just verifies the proof in the incoming packet without re-randomizing it.
+
+#### 4.3.2 Advantages
+
+- The initiating node only generates one initial proof instead of $L$ proofs.
+- Re-randomization is less expensive than generating a fresh proof, reducing per-hop computational overhead and latency.
+- Only a single proof $σ$ is carried on the wire at any time, so the wire-size overhead is constant and small.
+
+#### 4.3.3 Disadvantages
+
+- This architecture applies only to mechanisms whose proofs support witness-free re-randomization that re-binds to the outgoing packet: a valid proof can be transformed into another valid proof for the transformed packet, without access to the prover's secret.
+  Plain re-randomization, which preserves the original statement, is insufficient; re-binding a proof to a new packet is a controlled-malleability property the mechanism MUST provide, and it MUST be limited to the legitimate packet transformation (see [Section 8.2.4](#824-proof-re-randomization)).
+- Re-randomization makes the proof differ at each hop, so the proof itself does not link packets across hops.
+  However, to detect when a sender exceeds its rate limit and to penalize the offender, the mechanism must expose a reusable value, such as a nullifier, that can be compared across the proofs it verifies.
+  This value identifies the sender's rate allowance rather than the individual proof, so it is the same at every hop and allows packets to be correlated across hops, which [Section 3](#3-requirements) prohibits.
+- Like [sender-generated proofs](#41-sender-generated-proofs), this approach does not inherently provide Sybil resistance, since intermediary nodes do not prove membership using their own credentials.
+
+#### 4.3.4 Impact on Wire Size
+
+As in [per-hop generated proofs](#424-impact-on-wire-size), $σ$ is appended after the Sphinx packet and does not affect the internal Sphinx packet structure.
+Consequently, only the total wire size MUST be configured to $4608 + |σ|$ bytes (see [payload size](mix.md#832-payload-size)).
+
+$|σ|$ MUST be fixed for a chosen DoS protection mechanism.
+If the mechanism produces variable-length proofs, they MUST be padded to a fixed size.
+Re-randomization MUST also preserve $|σ|$, ensuring all packets remain indistinguishable on the wire.
+
+### 4.4 Hybrid Proofs
+
+In this approach, the packet carries two DoS protection proofs: one is generated by the sender, embedded in the payload $δ$, and verified at the exit; the other is a [per-hop generated proof](#42-per-hop-generated-proofs), appended to the packet, which each mix node verifies and generates fresh for the subsequent hop.
+For example, a sender-generated RLN proof can be combined with a per-hop proof of work (PoW).
+
+#### 4.4.1 Details
+
+The proof generation, verification, and forwarding proceed as follows:
+
+1. During [Sphinx packet construction](mix.md#85-packet-construction) of the Mix Protocol, the initiating node:
+
+   a. Generates the sender-generated proof and embeds it in the encrypted payload $δ$, to be verified at the exit.
+
+   b. Generates the initial per-hop proof $σ$ for the first hop and appends it after the Sphinx packet, as described in [Section 4.2.1](#421-details).
+
+2. Each intermediary hop verifies the incoming per-hop proof $σ$ and generates a fresh one for the subsequent hop as described in [Section 4.2.1](#421-details).
+3. The exit verifies both the incoming per-hop proof and the sender-generated proof carried in $δ$.
+
+#### 4.4.2 Advantages
+
+- The sender-generated proof is produced by the originator while the per-hop proof is produced by each forwarding hop, so origination can be rate-limited through the sender-generated proof without incurring the per-hop rate-amplification gap (see [Section 4.2.3](#423-disadvantages)).
+
+#### 4.4.3 Disadvantages
+
+- The sender-generated part is verified only at the exit.
+  Since the initiating node selects the path, it can be the exit itself or select a colluding exit, and skip this verification.
+  Against such a looping or colluding adversary, the sender-generated part provides no additional protection and the hybrid reduces to per-hop generated proofs (see [Section 4.2](#42-per-hop-generated-proofs)).
+- If the sender-generated part detects rate-limit violations through a reusable value (such as a nullifier), the exits compare it against shared state; this correlates a sender's messages within an epoch across exits, which [Section 3](#3-requirements) prohibits.
+
+#### 4.4.4 Impact on Wire Size
+
+The per-hop proof $σ$ is appended after the Sphinx packet, as in [per-hop generated proofs](#424-impact-on-wire-size), so the total wire size remains $4608 + |σ|$ bytes.
+The sender-generated proof is carried within the existing payload $δ$, so it does not increase the packet size; instead it reduces the payload capacity available for the message.
+
+Both proofs MUST be fixed-size for a chosen pair of mechanisms, ensuring all packets remain indistinguishable on the wire.
+
+### 4.5 Comparison
+
+The following table provides a brief comparison among the integration approaches.
+
+| Aspect | Sender-Generated Proofs | Per-Hop Generated Proofs | Sender-Generated Re-Randomized Proof | Hybrid Proofs |
+| --- | --- | --- | --- | --- |
+| **DoS protection** | Enforced at every hop | Enforced at every hop | Enforced at every hop | Per-hop part at every hop; sender-generated part at the exit only (bypassable by a loop or colluding exit) |
+| **Sender burden** | High (generates $L$ proofs) | Low (generates 1 proof) | Low (generates 1 proof) | Moderate (1 sender-generated proof plus the initial per-hop proof) |
+| **Per-hop computational overhead** | Low (verify only) | High (verify + generate) | Low (verify + re-randomize) | High (verify + generate for the per-hop part) |
+| **Per-hop latency** | Minimal (fast verification) | Higher | Low (re-randomization only) | Higher (per-hop part) |
+| **Total end-to-end latency** | Lower | Higher | Lower | Higher (per-hop part) |
+| **Sybil resistance** | Requires separate mechanism | Can be integrated | Requires separate mechanism | Depends on the constituent mechanisms |
+| **Wire size increase** | $r \times \|\mathrm{dos\_proof}\|$ | $\|σ\|$ | $\|σ\|$ | $\|σ\|$ (sender-generated proof carried within the payload) |
 
 Separate specifications defining concrete DoS protection mechanisms SHOULD specify recommended approaches and provide detailed integration instructions.
 
@@ -184,9 +263,8 @@ In addition to the core Mix Protocol responsibilities defined in [Section 7](mix
 
 ### 5.1 For Sender-Generated Proofs
 
-**[During Sphinx packet construction](mix.md#85-packet-construction):** 
+**[During Sphinx packet construction](mix.md#85-packet-construction):**
 Generate and embed DoS protection proofs for all hops as described in [Section 4.1.1](#411-details).
-The proofs MUST NOT contain any identifying information.
 
 **[During Sphinx packet preprocessing](mix.md#861-shared-preprocessing):**
 Verify the DoS protection proof in its routing block as described in [Section 4.1.1](#411-details).
@@ -206,6 +284,32 @@ If verification fails, discard the packet and apply any penalties or rate-limiti
 - If intermediary, during [intermediary processing](mix.md#863-intermediary-processing), generate a fresh unlinkable proof $σ'$ and append it to the assembled packet before Step 5.
 - If exit, perform [exit processing](mix.md#864-exit-processing) without generating a new proof.
 
+### 5.3 For Sender-Generated Re-Randomized Proof
+
+**[During Sphinx packet construction](mix.md#85-packet-construction):**
+Generate the initial proof $σ$ and append it after the Sphinx packet as described in [Section 4.3.1](#431-details).
+
+**[During Sphinx packet preprocessing](mix.md#861-shared-preprocessing):**
+Extract and verify the incoming proof $σ$ before any Sphinx processing as described in [Section 4.3.1](#431-details).
+If verification fails, discard the packet and apply any penalties or rate-limiting measures.
+
+**[After node role determination](mix.md#862-node-role-determination):**
+- If intermediary, during [intermediary processing](mix.md#863-intermediary-processing), re-randomize the verified proof into an unlinkable proof $σ'$ bound to the transformed packet, and append it to the assembled packet before Step 5.
+- If exit, perform [exit processing](mix.md#864-exit-processing) without re-randomizing the proof.
+
+### 5.4 For Hybrid Proofs
+
+**[During Sphinx packet construction](mix.md#85-packet-construction):**
+Embed the sender-generated proof in the payload $δ$ and append the initial per-hop proof $σ$ as described in [Section 4.4.1](#441-details).
+
+**[During Sphinx packet preprocessing](mix.md#861-shared-preprocessing):**
+Extract and verify the incoming per-hop proof $σ$ before any Sphinx processing as described in [Section 4.2.1](#421-details).
+If verification fails, discard the packet and apply any penalties or rate-limiting measures.
+
+**[After node role determination](mix.md#862-node-role-determination):**
+- If intermediary, during [intermediary processing](mix.md#863-intermediary-processing), generate a fresh unlinkable per-hop proof $σ'$ and append it to the assembled packet before Step 5.
+- If exit, during [exit processing](mix.md#864-exit-processing), verify the sender-generated proof carried in $δ$ without generating a new per-hop proof.
+
 ## 6. Anonymity and Security Considerations
 
 DoS protection mechanisms MUST be carefully designed to avoid introducing correlation risks:
@@ -219,8 +323,8 @@ DoS protection mechanisms MUST be carefully designed to avoid introducing correl
 - **Global state and coordination**: Mechanisms that maintain global state (_e.g.,_ nullifier sets, membership trees) MUST ensure that state reads and writes do not reveal packet processing patterns or enable correlation across hops, in accordance with the [DoS vulnerability considerations](mix.md#944-vulnerability-to-denial-of-service-attacks) of the Mix Protocol.
 
 - **Sybil attacks**: The Mix Protocol provides no built-in [Sybil resistance](mix.md#943-no-sybil-resistance).
-  Sender-generated proofs do not address this limitation.
-  Per-hop generated proofs with membership-based mechanisms MAY provide Sybil resistance as a side effect (see [Section 4.2.2](#422-advantages)).
+  Sender-generated and re-randomized proofs do not address this limitation, since intermediary nodes do not prove membership with their own credentials.
+  Per-hop generated proofs with membership-based mechanisms MAY provide Sybil resistance as a side effect (see [Section 4.2.2](#422-advantages)); for hybrid proofs, it depends on the constituent mechanisms.
 
 ## 7. Recommended Methods
 
@@ -239,7 +343,7 @@ Deployments MUST evaluate each method's computational overhead, latency impact, 
 ## 8. DoS Protection Interface
 
 This section defines the standardized interface that DoS protection mechanisms MUST implement to integrate with the Mix Protocol.
-The interface is designed to be architecture-agnostic, supporting both sender-generated proofs and per-hop generated proofs approaches described in [Section 4](#4-integration-architecture).
+The interface is designed to be architecture-agnostic, supporting the integration architectures described in [Section 4](#4-integration-architecture).
 
 Initialization and configuration of DoS protection mechanisms are out of scope for this interface specification.
 Implementations MUST handle their own initialization, configuration management, and runtime state independently before being integrated with the Mix Protocol.
@@ -253,11 +357,15 @@ The following parameters MUST be agreed upon and configured consistently across 
 
 - **Proof Size**: The fixed size in bytes of `encoded_proof_data` produced by `GenerateProof`.
   This value is used by Mix Protocol implementations to calculate header sizes and payload capacity.
+  A `HYBRID` deployment configures one size per constituent mechanism.
 
 - **Integration Architecture**: The DoS protection integration architecture used by the deployment.
   MUST be one of:
   - `SENDER_GENERATED`: Initiating node generates proofs for each hop (see [Section 8.3.1](#831-for-sender-generated-proofs))
   - `PER_HOP_GENERATED`: Each node generates a fresh proof for the next hop (see [Section 8.3.2](#832-for-per-hop-generated-proofs))
+  - `SENDER_GENERATED_RERANDOMIZED`: Initiating node generates one proof; each node re-randomizes it for the next hop (see [Section 8.3.3](#833-for-sender-generated-re-randomized-proof)).
+  - `HYBRID`: A sender-generated proof verified at the exit is combined with a per-hop generated proof (see [Section 8.3.4](#834-for-hybrid-proofs)).
+    A `HYBRID` deployment MUST additionally specify its two constituent mechanisms; two `HYBRID` deployments with different constituents are not interoperable.
 
 All nodes in a deployment MUST use the same integration architecture.
 Nodes MUST refuse to process packets that do not conform to the deployment's configured architecture.
@@ -275,8 +383,7 @@ Generate a DoS protection proof bound to specific packet data.
 **Parameters**:
 
 - `binding_data`: The packet-specific data to which the proof MAY be cryptographically bound.
-  For sender-generated proofs, this is $δ_{i+1}$ (the decrypted payload that hop $i$ will see).
-  For per-hop generated proofs, this is the complete outgoing Sphinx packet state $(α', β', γ', δ')$.
+  The exact value is defined per architecture in [Section 8.3](#83-integration-points-in-sphinx-processing); for example, $δ_{i+1}$ for sender-generated proofs and the outgoing Sphinx packet state for per-hop generated proofs.
 
 **Returns**:
 
@@ -297,10 +404,9 @@ Verify that a DoS protection proof is valid and correctly bound to the provided 
 
 **Parameters**:
 
-- `encoded_proof_data`: Serialized bytes containing the DoS protection proof and verification metadata, extracted from the routing block $β$ (for sender-generated proofs) or from the appended field $σ$ (for per-hop generated proofs).
+- `encoded_proof_data`: Serialized bytes containing the DoS protection proof and verification metadata, extracted from the routing block $β$ or the appended field $σ$ depending on the architecture (see [Section 8.3](#83-integration-points-in-sphinx-processing)).
 - `binding_data`: The packet-specific data against which the proof MUST be verified.
-  For nodes verifying sender-generated proofs, this is $δ'$ (the decrypted payload).
-  For per-hop verification, this is the received Sphinx packet state $(α', β', γ', δ')$.
+  The exact value is defined per architecture in [Section 8.3](#83-integration-points-in-sphinx-processing); for example, $δ'$ for sender-generated proofs and the received Sphinx packet state for per-hop verification.
 
 **Returns**:
 
@@ -328,6 +434,29 @@ Register a callback to be invoked when the DoS protection mechanism detects an e
 - The DoS protection mechanism MUST notify registered callbacks at every epoch boundary.
 - Callbacks MUST be invoked before any packets are processed in the new epoch.
 - This enables pluggable components (_e.g.,_ cover traffic) to synchronize their internal state with epoch transitions.
+
+#### 8.2.4 Proof Re-Randomization
+
+`ReRandomizeProof(encoded_proof_data, binding_data) -> encoded_proof_data`
+
+Transform a valid DoS protection proof into another valid proof re-bound to the outgoing packet, without regenerating it and without the prover's secret.
+This procedure is REQUIRED only for the sender-generated re-randomized proof architecture (see [Section 4.3](#43-sender-generated-re-randomized-proof)).
+
+**Parameters**:
+
+- `encoded_proof_data`: The verified incoming proof to be re-randomized.
+- `binding_data`: The outgoing (transformed) Sphinx packet state $(α', β', γ', δ')$ to which the re-randomized proof MUST be bound.
+
+**Returns**:
+
+- `encoded_proof_data`: A fresh encoding of a valid proof bound to the outgoing `binding_data`.
+
+**Requirements**:
+
+- The output MUST verify under `VerifyProof` against the provided outgoing `binding_data`.
+- The transformation MUST succeed only when `binding_data` is the legitimate Sphinx transformation of the packet to which the input proof was bound, and MUST fail for any other `binding_data`; this prevents re-binding a captured proof onto an unrelated packet.
+- The output MUST be unlinkable to the input, and MUST preserve the fixed proof length.
+- Mechanisms whose deployment architecture is not `SENDER_GENERATED_RERANDOMIZED` MAY leave this procedure unimplemented.
 
 ### 8.3 Integration Points in Sphinx Processing
 
@@ -376,6 +505,58 @@ Before any Sphinx decryption operations, nodes MUST:
   2. Append the new `encoded_proof_data` to the transformed Sphinx packet and forward
 - [Exit processing](mix.md#864-exit-processing)
   Perform standard Sphinx processing without generating a new proof.
+
+#### 8.3.3 For Sender-Generated Re-Randomized Proof
+
+**[During Sphinx packet construction](mix.md#85-packet-construction):**
+
+After assembling the final Sphinx packet (step 3.e), the initiating node MUST:
+
+1. Call `GenerateProof(binding_data)` where `binding_data` is the complete Sphinx packet bytes
+2. Append `encoded_proof_data` after the Sphinx packet and send to the first hop
+
+**[During Sphinx packet preprocessing](mix.md#861-shared-preprocessing):**
+
+Before any Sphinx decryption operations, nodes MUST:
+
+1. Extract `encoded_proof_data` from the last `proofSize` bytes of the received packet
+2. Call `VerifyProof(encoded_proof_data, binding_data)` where `binding_data` is the received Sphinx packet bytes
+3. If `valid = false`, discard the packet and terminate processing
+4. If `valid = true`, continue with [node role determination](mix.md#862-node-role-determination) and role-specific processing
+
+**Role-specific processing:**
+- [Intermediary processing](mix.md#863-intermediary-processing)
+  1. Perform standard Sphinx processing, then call `ReRandomizeProof(encoded_proof_data, binding_data)` with the transformed packet as `binding_data`, re-binding the proof to the outgoing packet
+  2. Append the re-randomized `encoded_proof_data` to the transformed Sphinx packet and forward
+- [Exit processing](mix.md#864-exit-processing)
+  Perform standard Sphinx processing without re-randomizing the proof.
+
+#### 8.3.4 For Hybrid Proofs
+
+**[During Sphinx packet construction](mix.md#85-packet-construction):**
+
+The initiating node MUST:
+
+1. Call `GenerateProof(binding_data)` for the sender-generated mechanism, where `binding_data` is the message payload, and embed the resulting `encoded_proof_data` in the payload $δ$
+2. Call `GenerateProof(binding_data)` for the per-hop mechanism, where `binding_data` is the complete Sphinx packet bytes, and append the resulting `encoded_proof_data` after the Sphinx packet
+
+**[During Sphinx packet preprocessing](mix.md#861-shared-preprocessing):**
+
+Before any Sphinx decryption operations, nodes MUST:
+
+1. Extract the per-hop `encoded_proof_data` from the last `proofSize` bytes of the received packet
+2. Call `VerifyProof(encoded_proof_data, binding_data)` for the per-hop mechanism, where `binding_data` is the received Sphinx packet bytes
+3. If `valid = false`, discard the packet and terminate processing
+4. If `valid = true`, continue with [node role determination](mix.md#862-node-role-determination) and role-specific processing
+
+**Role-specific processing:**
+- [Intermediary processing](mix.md#863-intermediary-processing)
+  1. Perform standard Sphinx processing, then call `GenerateProof(binding_data)` for the per-hop mechanism with the transformed packet as `binding_data`
+  2. Append the new `encoded_proof_data` to the transformed Sphinx packet and forward
+- [Exit processing](mix.md#864-exit-processing)
+  1. Perform standard Sphinx processing
+  2. Extract the sender-generated `encoded_proof_data` from the payload $δ$ and call `VerifyProof(encoded_proof_data, binding_data)` for the sender-generated mechanism, where `binding_data` is the recovered message payload
+  3. If `valid = false`, discard the packet
 
 ## Copyright
 
