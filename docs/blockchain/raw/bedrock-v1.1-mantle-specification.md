@@ -1687,8 +1687,9 @@ assert pow_reward_pool >= epoch_pow_reward
 # 2. The referenced block must be canonical and within the acceptance window.
 assert accept_claim_pow_op(claim, current_slot)
 
-# 3. The solution must have been found against the current epoch.
-assert claim.epoch_nonce == get_current_epoch_nonce()   # the Cryptarchia epoch nonce
+# 3. The solution must have been found against the current or the previous epoch.
+assert claim.epoch_nonce in (get_current_epoch_nonce(),   # the Cryptarchia epoch nonce
+                             get_previous_epoch_nonce())
 
 # 4. The ticket must satisfy the reward threshold.
 puzzle_ticket = get_puzzle_ticket(claim)
@@ -1710,7 +1711,7 @@ def pow_nullifier(claim: ClaimPowRewardOp) -> zkhash:
 
   The first condition is what prevents the pool being drawn negative, and its two clauses fail in different circumstances. `epoch_pow_reward > 0` fails once the pool has fallen, over many epochs, below the point where the division in [Reward Pool](#reward-pool) rounds down to zero. `pow_reward_pool >= epoch_pow_reward` fails when the pool has been drained within a single epoch to less than one reward, which is possible because the reward is held fixed for the epoch while the pool it is paid from shrinks with every claim. Both are evaluated per claim, against the pool as it stands at that point in the block, so claiming stops the moment either fails and resumes only when the condition holds again. [Reward Pool](#reward-pool) sets out what each requires and how claiming recovers.
 
-  The epoch nonce in step 3 is the Cryptarchia epoch nonce $`\eta`$ defined in [Epoch Nonce](cryptarchia-v1-protocol.md#epoch-nonce), the same value the consensus lottery uses. A claim built against any other epoch is rejected, so a solution is usable only within the epoch it was found in and must be re-mined afterwards.
+  The epoch nonces in step 3 are the Cryptarchia epoch nonce $`\eta`$ defined in [Epoch Nonce](cryptarchia-v1-protocol.md#epoch-nonce) — the same value the consensus lottery uses — for the current epoch and for the epoch before it. Accepting the previous epoch's nonce is what lets a solution mined shortly before an epoch boundary be claimed shortly after it; accepting only the current nonce would void up to the final acceptance window's worth of honest work at every boundary. The allowance costs nothing elsewhere: staleness is bounded by the window on `block_hash` in step 2 whichever nonce a claim names, and there is no replay across the pair, because the ticket binds the nonce — a solution under one nonce is simply a different ticket from a solution under the other, each mined and nullified on its own. A claim built against any older epoch is rejected.
 
   Note that this does not make a solution unpredictable in advance. The epoch nonce is fixed part way through the *preceding* epoch and is public from that moment, so solutions for an epoch can be computed before it begins. What bounds a solution's age is the acceptance window on `block_hash`, which is $`W_b`$ blocks deep and therefore far tighter than an epoch.
 
