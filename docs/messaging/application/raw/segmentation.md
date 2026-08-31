@@ -15,6 +15,14 @@
 This specification defines an application-layer wire format that carries a payload larger than the maximum message size of the underlying transport.
 The payload is split into data segments that can be reconstructed by the receiver even when segments arrive out of order. The data segments can optionally be extended with Reed–Solomon parity ones, in which case, recovery can also happen if the lost segments are under a certain threshold.
 
+## Motivation
+
+Many message transport and delivery protocols impose a maximum message size that restricts the size of application payloads.
+For example, Waku Relay typically propagates messages up to 150 KiB as per [64/WAKU2-NETWORK - Message](../../core/draft/64/network.md#message-size).
+To support larger application payloads, a segmentation layer is required.
+This specification enables larger messages by partitioning them into multiple envelopes and reconstructing them at the receiver.
+Erasure-coded parity segments provide resilience against partial loss or reordering.
+
 ## Terminology
 
 - **original payload**: the full application payload before segmentation.
