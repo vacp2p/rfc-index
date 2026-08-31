@@ -77,10 +77,10 @@ The proof of work reward pool is seeded once, at genesis, with a fixed quantity 
 
 ```python
 POW_REWARD_POOL_GENESIS: TokenValue   # Initial balance of the proof of work reward pool
-                                      # = 5/1000 of the supply at network launch
+                                      # = 5/1000 of the maximum supply
 ```
 
-The seed is **five thousandths of the supply at network launch**. It is stated as a fraction of that supply because that is the form in which it is a decision about how the initial supply is divided: the reward the pool yields per claim follows from the fraction, the distribution rate and the target claim rate alone. Whether that reward is generous enough depends on the price level the fee markets are initialised at, not on the seed, and the constraint that places on genesis governance is given in [Genesis](bedrock-v1.1-mantle-specification.md#genesis) along with the reasoning behind the size.
+The seed is **five thousandths of the maximum supply** $`S_{cap}`$. It is stated as a fraction of that supply because that is the form in which it is a decision about how the initial supply is divided: the reward the pool yields per claim follows from the fraction, the distribution rate and the target claim rate alone. Whether that reward is generous enough depends on the price level the fee markets are initialised at, not on the seed, and the constraint that places on genesis governance is given in [Genesis](bedrock-v1.1-mantle-specification.md#genesis) along with the reasoning behind the size.
 
 This allocation is **drawn from the initial token distribution**, not created in addition to it. The tokens exist from genesis and the seed determines how many of them are held in the pool rather than distributed to stakeholders directly. This is what keeps claiming outside the protocol's emission envelope, as described in [Reward Pool](bedrock-v1.1-mantle-specification.md#reward-pool), and it means the seed is a decision about how the initial supply is divided rather than about how much supply exists.
 
