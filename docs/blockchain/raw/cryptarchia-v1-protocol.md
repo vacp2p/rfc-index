@@ -33,6 +33,7 @@
 | 1.2.1 | Defined `EpochNumber`, the type of an epoch number, as a 32-bit unsigned integer encoded little-endian wherever it is serialized or hashed. | 2026-08-25 |
 | 1.2.2 | Precise, in [Chain Maintenance](#chain-maintenance), that the execution layer validates the block by applying its transactions in the order they appear starting from the parent block's execution state. | 2026-08-25 |
 | 1.2.3 | Update the test vectors to reflect the parent added in the `CHANNEL_CONFIG` payload | 2026-08-27 |
+| 1.2.4 | Reordered the `ProofOfLeadership` fields to the wire order defined by the [Canonical Encoding](bedrock-v1.1-block-construction.md#canonical-encoding), and noted that the [Block ID](#block-id) preimage absorbs the same fields in a different order by design. The `Header` layout and the `block_id` preimage are otherwise unchanged. | 2026-08-28 |
 | 1.3.0 | Scope the Proof of Stake vs. Proof of Work annex to leader election, state that proof of work does not enter fork choice, and define the expected number of blocks in an epoch | 2026-08-10 |
 
 # Introduction
@@ -299,11 +300,13 @@ class Header:                                # 297 bytes
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 
 class ProofOfLeadership:                     # 224 bytes
-    leader_voucher: zkhash                   # 32 bytes
-    entropy_contribution: zkhash             # 32 bytes
     proof: Groth16Proof                      # 128 bytes
+    entropy_contribution: zkhash             # 32 bytes
     leader_key: Ed25519PublicKey             # 32 bytes
+    leader_voucher: zkhash                   # 32 bytes
 ```
+
+The field order above is the wire order defined in [Canonical Encoding](bedrock-v1.1-block-construction.md#canonical-encoding). The [Block ID](#block-id) preimage above absorbs the same `ProofOfLeadership` fields in a different order; that is deliberate, since the preimage is a domain-separated enumeration of header fields rather than a re-serialization of the header.
 
 ### Block
 

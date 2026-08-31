@@ -27,6 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.1.1 | Updated the block proposal message size to 34574 bytes in the encapsulation-overhead calculation, following the addition of carried uncle headers in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md). | 2026-08-06 |
+| 1.1.2 | Denominated the encapsulation-overhead calculation against `Max_Payload_Length` (18195 bytes), the payload that is actually encapsulated, rather than the body it contains, following the compression of transaction references (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)). | 2026-08-18 |
 | 1.2.0 | Define the token evaluation under a low core quota, and specify the Active Message metadata layout. | 2026-08-19 |
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
 | 1.3.0 | Add the proof of work quota and the Blend difficulty, verify the proof of quota before relaying any message, and add transactions as a data message payload; re-derive the nullifier cache bound and align the nullifier retention period | 2026-08-10 |
@@ -598,9 +599,9 @@ Where:
 - $`R_C`$ denotes a redundancy parameter for cover messages, increasing the number of core node messages a node can send;
 - $`N`$ denote a number of core nodes providing the Blend service for the epoch returned by the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
 
-The division must be rounded **up**. Rounding down would collapse $`Q_C`$ to $`0`$ as soon as $`N > C \cdot (\beta_C + R_C \cdot \beta_C)`$ — that is, as soon as the network outgrows the expected number of blending operations for cover messages. Every core node would then be issued an empty key pool and cover traffic would stop entirely, removing the protocol's anonymity guarantee exactly when the network is largest. Rounding up costs at most $`N-1`$ additional messages network-wide per epoch.
+The division must be rounded **up**. Rounding down would collapse $`Q_C`$ to $`0`$ as soon as $`N \gt C \cdot (\beta_C + R_C \cdot \beta_C)`$ — that is, as soon as the network outgrows the expected number of blending operations for cover messages. Every core node would then be issued an empty key pool and cover traffic would stop entirely, removing the protocol's anonymity guarantee exactly when the network is largest. Rounding up costs at most $`N-1`$ additional messages network-wide per epoch.
 
-The parameters must additionally satisfy $`C \cdot \beta_C > 0`$. Together with rounding up, this guarantees $`Q_C \geq 1`$ for every epoch.
+The parameters must additionally satisfy $`C \cdot \beta_C \gt 0`$. Together with rounding up, this guarantees $`Q_C \geq 1`$ for every epoch.
 
 Additionally, we introduce the total core quota, which defines the total number of generated cover messages that the whole network can emit (independently of the number of nodes):
 
@@ -838,7 +839,7 @@ A node $`n`$ constructs a message $`\mathbf M = (\mathbf H, \mathbf h, \mathbf P
 
 3. $`\mathbf P`$ is a payload.
 
->**Encapsulation Overhead Calculation:** Assuming that we use Groth16 SNARKs as a proving system, we need $`160`$ bytes per PoQ ($`128`$ for proof and $`32`$ for nullifier) quota. Which gives us $`289`$ bytes per hop (proof of quota $`160`$ bytes + proof of selection $`32`$ bytes + public key $`32`$ bytes + signature $`64`$ bytes + last flag $`1`$ byte) plus $`256`$ bytes for the public header. Which for $`3`$ hops gives us $`1123`$ bytes in total. That increases the block proposal message defined in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md), of $`34574`$ bytes (the padded `Max_Body_Length` of [Payload Formatting](payload-formatting.md)) by $`\approx 3\%`$.
+>**Encapsulation Overhead Calculation:** Assuming that we use Groth16 SNARKs as a proving system, we need $`160`$ bytes per PoQ ($`128`$ for proof and $`32`$ for nullifier) quota. Which gives us $`289`$ bytes per hop (proof of quota $`160`$ bytes + proof of selection $`32`$ bytes + public key $`32`$ bytes + signature $`64`$ bytes + last flag $`1`$ byte) plus $`256`$ bytes for the public header. Which for $`3`$ hops gives us $`1123`$ bytes in total. That is added to the payload being encapsulated, which is `Max_Payload_Length` = $`18195`$ bytes ([Message Formatting](message-formatting.md)): the padded `Max_Body_Length` of [Payload Formatting](payload-formatting.md), set from the maximum size of the block proposal defined in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md), plus the 3-byte payload header. The encapsulation therefore adds $`\approx 6.2\%`$.
 
 ### Formatting
 
@@ -1055,7 +1056,7 @@ $$
 
   The comparison is inclusive: a token whose distance equals $`{\mathcal A}_{\epsilon}`$ satisfies the proof. The difficulty of the lottery is tuned through the sensitivity parameter $`\theta`$ of the [Activity Threshold](#activity-threshold), not through the choice of comparison operator.
 
-  The requirement $`C \cdot \beta_C > 0`$ (see [Core Quota](#core-quota)) guarantees $`Q_C \geq 1`$ and therefore $`Q^{Total}_C \geq N \geq 1`$. It follows that $`\log_2(Q^{Total}_C+1) \geq 1`$ and hence $`\epsilon \geq 8`$: the digest is always at least one byte wide, which the `blake2b` algorithm requires.
+  The requirement $`C \cdot \beta_C \gt 0`$ (see [Core Quota](#core-quota)) guarantees $`Q_C \geq 1`$ and therefore $`Q^{Total}_C \geq N \geq 1`$. It follows that $`\log_2(Q^{Total}_C+1) \geq 1`$ and hence $`\epsilon \geq 8`$: the digest is always at least one byte wide, which the `blake2b` algorithm requires.
 
 The Hamming distance verification prevents nodes from the grinding or pre-computation attacks due to the unpredictability of the randomness of the next epoch. Even if a node knows the value of the randomness in advance, it will not increase its chance for getting a reward as the node does not control the process of generating blending tokens. However, a dishonest node could use that knowledge to refrain from sending a message with a token that has a potential (probabilistic, not deterministic) of granting a premium reward for the recipient blend node.
 
@@ -1098,7 +1099,7 @@ We assume that setting $`\theta = 1`$ is enough to eliminate nodes that have not
 
 The difference $`\chi - \nu - \theta`$ is negative whenever $`\chi \leq \nu + \theta`$, which happens when the total number of blending tokens is small relative to the network size. Because $`\chi \approx \log_2(Q^{Total}_C)`$ and $`\nu \approx \log_2(N)`$, this regime is reached when the per-node quota $`Q_C`$ is of the order of $`2^{\theta}`$ or smaller. A negative value is not a meaningful Hamming distance, so the threshold is clamped at $`0`$: the lottery becomes maximally difficult instead of undefined. At $`{\mathcal A}_{\epsilon} = 0`$ an activity proof is still attainable, but only for a blending token whose $`\epsilon`$-bit digest matches the digest of the epoch randomness exactly.
 
-The clamped regime is a degenerate operating point rather than a target: it makes rewards nearly unreachable for honest nodes and, in the limit, admits every node at once. Parameters should therefore be chosen so that $`\chi > \nu + \theta`$, which holds comfortably for the expected deployment values.
+The clamped regime is a degenerate operating point rather than a target: it makes rewards nearly unreachable for honest nodes and, in the limit, admits every node at once. Parameters should therefore be chosen so that $`\chi \gt \nu + \theta`$, which holds comfortably for the expected deployment values.
 
 ### Active Message
 
