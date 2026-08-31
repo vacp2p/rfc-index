@@ -33,7 +33,7 @@ syntax = "proto3";
 message SegmentMessage {
   bytes  entire_message_hash  = 1;  // Keccak256 of the original payload, 32 bytes
   uint32 index                = 2;  // position within this segment's own class (data or parity)
-  uint32 segment_count        = 3;  // size of this segment's own class (data or parity)
+  uint32 segment_count        = 3;  // number of items of the given class (data or parity)
   bool   is_parity            = 4;  // selects the class the two fields above refer to
   bytes  payload              = 5;  // data chunk or parity shard
   uint32 payload_length       = 6;  // length in bytes of the original payload
