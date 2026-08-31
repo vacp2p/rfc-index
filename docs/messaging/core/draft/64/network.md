@@ -286,7 +286,7 @@ This field MUST be populated if the message should be persisted by the Waku Netw
 ### Message Size
 
 Any [14/WAKU2-MESSAGE](../../stable/14/message.md) published to the network
-MUST NOT exceed an absolute maximum size of `150` kilobytes.
+MUST NOT exceed an absolute maximum size of `150` KiB (153,600 bytes).
 This limit applies to the entire message after protobuf serialization,
 including attributes.
 It is RECOMMENDED not to exceed an average size of `4` kilobytes

@@ -79,11 +79,11 @@ To transmit an original payload, the sender:
 
 A receiver retains every valid segment message in its [segment set](#validity).
 A set's `data_segment_count` is the `segment_count` of any segment message with `is_parity == false`.
-- A set reaching that count in data segments alone reconstructs by [concatenation](#all-data-segments-received).
+- A set reaching that count in data segments alone reconstructs by [concatenation](#all-data-segments-are-received-successfully).
 - A set reaching that count in data plus parity segments together reconstructs [through parity](#recovery-through-parity).
 - Else, [expires](#expiry) after a configured timeout.
 
-### All data segments are received successfuly
+### All data segments are received successfully
 
 The receiver produces the original payload following these steps:
 
@@ -95,13 +95,13 @@ The receiver produces the original payload following these steps:
 An invalid payload MUST be discarded; only a valid one is delivered to the application.
 Any parity segments the set holds are unused, and the set MAY be released once the payload is delivered.
 
-### Recovery hrough parity
+### Recovery through parity
 
 Where a data segment is missing, parity segments stand in for it:
 the set reconstructs once the number of segment messages it holds, data and parity alike,
 reaches the original data-segment count.
 The receiver [Reed–Solomon decodes](#reedsolomon-coding) the missing data segments from the ones it holds,
-then proceeds as [above](#all-data-segments-received) from step 1.
+then proceeds as [above](#all-data-segments-are-received-successfully) from step 1.
 
 ### Expiry
 
@@ -170,9 +170,8 @@ In-memory buffering is sufficient otherwise.
   `0.125` is RECOMMENDED where the [guidance above](#when-to-use-parity) favours parity.
 - `reconstructionTimeout`: how long a segment set may go without a new segment message before the receiver
   drops it, see [Expiry](#expiry).
-- `maxSegmentsPerClass`: greatest `segment_count` a receiver accepts, applied to each segment class, data or parity, separately, so a segment
-set holds at most twice this many segment messages.
-  **256** is RECOMMENDED.
+- `maxSegmentsPerClass`: greatest `segment_count` a receiver accepts, applied to each segment class, data or parity, separately, so a segment set holds at most twice this many segment messages.
+  256 is RECOMMENDED.
   An application needing more MAY raise it, up to the shard limit of its Reed–Solomon implementation.
   All participants in an application MUST use the same value:
   the wire format and the Keccak256 hash are fixed by this specification,
