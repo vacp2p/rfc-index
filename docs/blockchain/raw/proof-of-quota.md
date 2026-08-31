@@ -57,23 +57,30 @@ A proof attesting that for the following public values derived from blockchain p
 
 ```python
 class ProofOfQuotaPublic:
-    # Output (the first public signal):
+    # Output:
     key_nullifier: zkhash   # derived from epoch, private index and the private branch secret
-    # Public inputs, in signal order:
+    # Public inputs:
     core_quota: int       # Allowed blending operations per epoch for core nodes (20 bits)
     leader_quota: int     # Allowed blending operations per election win (20 bits)
     core_root: zkhash     # Merkle root of zk_id of the core nodes
     pow_quota: int        # Allowed blending operations per proof of work solution (20 bits)
-    pol_ledger_aged: zkhash # Merkle root of the PoL eligible notes
     K_part_one: int       # First part of the signature public key (16 bytes)
     K_part_two: int       # Second part of the signature public key (16 bytes)
     pow_blend_difficulty: zkhash # Blend threshold a PoW ticket must be below
     pol_epoch_nonce: int  # PoL Epoch nonce
     pol_t0: int           # PoL constant t0
     pol_t1: int           # PoL constant t1
+    pol_ledger_aged: zkhash # Merkle root of the PoL eligible notes
 ```
 
-The declaration order above is normative and is exactly the proof's public signal vector: the output `key_nullifier` first, followed by the eleven public inputs. A verifier that assembles them in any other order rejects valid proofs.
+The proof's public signal vector is fixed by the circuit — the output first, then the public inputs in the order the circuit declares them, which places `pol_ledger_aged` sixth:
+
+```python
+[key_nullifier, core_quota, leader_quota, core_root, pow_quota, pol_ledger_aged,
+ K_part_one, K_part_two, pow_blend_difficulty, pol_epoch_nonce, pol_t0, pol_t1]
+```
+
+A verifier must assemble the vector in exactly this order; any other rejects valid proofs. Note that neither the listing above nor the `public [...]` clause of the circuit's main component states this order — the first groups the values as the verifier's input structure declares them, and the second selects which signals are public without ordering them.
 
 `pow_blend_difficulty` is a per-epoch protocol value, identical for every proof produced in that epoch, so it carries no branch-specific signal and a verifier cannot infer from it which branch a given proof used. How its value is set for each epoch is not defined here; it is a consensus quantity supplied to the circuit, and its derivation is specified alongside the other Blend parameters.
 
