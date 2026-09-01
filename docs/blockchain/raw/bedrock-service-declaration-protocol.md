@@ -54,7 +54,7 @@ The SDP enables nodes to declare their eligibility to provide a specific service
 The protocol defines the following actions:
 
 - **Declare:** A node sends a declaration that confirms its willingness to provide a specific service, which is confirmed by locking a stake above a certain threshold in a service note.
-- **Active:** A node marks that its participation in the protocol is active according to the service-specific activity logic. This action enables the protocol to monitor the node’s activity. We utilize this as a non-intrusive differentiator of node activity. It is crucial to exclude inactive nodes from the set of active nodes, as it enhances the stability of services.
+- **Active:** A node marks that its participation in the protocol is active according to the service-specific activity logic. This action enables the protocol to monitor the node’s activity. We utilize this as a non-intrusive differentiator of node activity. It is crucial to exclude inactive nodes from the active set, as it enhances the stability of services.
 - **Withdraw:** A node withdraws its declaration and stops providing a service.
 
 The logic of the protocol is straightforward.
@@ -63,7 +63,7 @@ The logic of the protocol is straightforward.
 2. The declaration is registered on the Ledger, and the node can commence its service according to the service-specific service logic.
 3. After a service-specific service-providing time, the node confirms its activity.
 4. The node must confirm its activity with a service-specific minimum frequency; otherwise, its declaration is inactive.
-5. The node sends a withdrawal message. Its declaration is removed and its service note released two epochs later, and it stops providing the service.
+5. The node sends a withdrawal message. It provides the service through the withdrawal epoch, and its declaration is removed and its service note released two epochs later.
 
 > The protocol messages are subject to a finality that means messages become part of the immutable ledger after a delay. The delay at which it happens is defined by the consensus. Therefore, the protocol’s progress must be tracked from the perspective of the latest finalized block, not the tip of the chain. Otherwise, the protocol and services using it would need to handle chain reorganizations, which we must avoid due to their potential to break services. Hence, the services must use a snapshot from a fully finalized epoch: `finalized_epoch = current_epoch - 2`. For more details about finalization, refer to [Cryptarchia Protocol](cryptarchia-v1-protocol.md).
 
@@ -135,15 +135,6 @@ At the start of epoch $`n`$, each node takes a snapshot of the SDP registry at t
 Each snapshot updates the common view of the registry. Changes to the declaration registry take effect with up to a two-epoch delay: messages sent during epoch `n` are included in the next snapshot (for epoch `n+2`).
 
 Epochs 0 and 1 read the snapshot at the genesis block, because the chain has not yet progressed far enough to provide a later finalized block. While at epoch 2, the last block of epoch 0 is read, and so forth according to the above logic.
-
-### Active Set
-
-The **active set** for an epoch $`n`$ is derived from the snapshot by keeping the declarations for which both of the following hold:
-
-- activity has been reported recently enough: `active + inactivity_period >= n`;
-- the withdrawal has not taken effect: `withdraw_at` is `None`, or `n < withdraw_at + 2`.
-
-Both conditions are evaluated against the epoch $`n`$ the set is being derived for, not against the epoch the snapshot was taken in.
 
 ### Identifiers
 
@@ -222,11 +213,20 @@ declarations: dict[ZkPublicKey, DeclarationInfo]
 
 Within `declarations`, each of the following is bound to at most one `DeclarationInfo`:
 
-- the `zk_id`, which is the key the entry is held under;
+- the `zk_id`;
 - the `provider_id`;
 - the `service_note_id`.
 
 An identifier is held for the lifetime of the declaration, and becomes available for reuse once the declaration has been removed (see [**Withdraw**](#withdraw)).
+
+### Active Set
+
+The **active set** for an epoch $`n`$ is derived from the snapshot by keeping the declarations for which both of the following hold:
+
+- activity has been reported recently enough: `active + inactivity_period >= n`;
+- the withdrawal has not taken effect: `withdraw_at` is `None`, or `n < withdraw_at + 2`.
+
+Both conditions are evaluated against the epoch $`n`$ the set is being derived for, not against the epoch the snapshot was taken in.
 
 ### Active Message
 
@@ -284,13 +284,11 @@ The Declare action associates a validator with a service it wants to provide. It
 The declaration message is considered valid when all of the following are met:
 
 - The sender meets the stake requirements and its `service_note_id` is valid.
-- The `zk_id` is not already registered in `declarations`.
-- The `service_note_id` does not already back another declaration.
-- The `provider_id` is not already bound to another declaration (as defined in [Identifier Uniqueness](#identifier-uniqueness)).
+- The `zk_id`, the `service_note_id` and the `provider_id` are each unbound ([Identifier Uniqueness](#identifier-uniqueness)).
 - The sender knows the secret behind the `provider_id` identifier.
 - The `locators` list is non-empty and not longer than 8 entries.
 
-If all of the above conditions are fulfilled, then the declaration is stored on the ledger under its `zk_id`, with its `nonce` initialised to 0; otherwise, the message is discarded.
+If all of the above conditions are fulfilled, then the declaration is stored on the ledger under its `zk_id`; otherwise, the message is discarded.
 
 ### Active
 
@@ -306,12 +304,12 @@ The SDP active action logic is:
     2. The transaction containing `ActiveMessage` is signed by the `zk_id`.
     3. The `nonce` increases monotonically.
 3. If any of these conditions fail, discard the message and stop processing.
-4. The message is processed by the service-specific activity logic alongside the `active` value indicating the period since the last active message was sent. The `active` value comes from the `DeclarationInfo`.
+4. The message is processed by the service-specific activity logic alongside the `active` value from the `DeclarationInfo`.
 5. If the service-specific activity logic approves the node active message, then the `active` field of the `DeclarationInfo` is set to the epoch number indicated by metadata.
 
 ### **Withdraw**
 
-The withdraw action enables a withdrawal of a service declaration. It requires sending a valid `WithdrawMessage` (as defined in [Withdraw Message](#withdraw-message)). The withdrawal marks the intent to stop providing the service: the node provides the service through the withdrawal epoch `e` and stops afterwards. The `withdraw_at` field records this withdrawal epoch `e`, which is the node's last rewardable epoch. The declaration is removed and its note unlocked at epoch `e+2`, right after the epoch-`e` reward is paid out, by the Mantle epoch finalization step (see [SDP Epoch Finalization](bedrock-v1.1-mantle-specification.md#sdp-epoch-finalization)). Removing the declaration only after its final reward is paid guarantees it is never removed before the payout.
+The withdraw action enables a withdrawal of a service declaration. It requires sending a valid `WithdrawMessage` (as defined in [Withdraw Message](#withdraw-message)). The withdrawal marks the intent to stop providing the service. The node provides the service through the withdrawal epoch `e` and stops afterwards. The `withdraw_at` field records this withdrawal epoch `e`, which is the node's last rewardable epoch.
 
 The logic of the withdraw action is:
 
@@ -319,7 +317,7 @@ The logic of the withdraw action is:
 2. The `WithdrawMessage` is verified by the SDP logic.
     1. The `zk_id` returns an existing `DeclarationInfo`.
     2. The transaction containing `WithdrawMessage` is signed by the `zk_id`.
-    3. The `withdraw_at` from `DeclarationInfo` is set to `None`.
+    3. The `withdraw_at` of the `DeclarationInfo` is `None`.
     4. The `nonce` increases monotonically.
 3. If any of the above is not correct, then discard the message and stop.
 4. Set the `withdraw_at` from the `DeclarationInfo` to the current epoch number (the withdrawal epoch `e`).

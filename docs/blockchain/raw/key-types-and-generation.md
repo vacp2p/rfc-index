@@ -50,7 +50,7 @@ A node generates a Non-ephemeral Quota Key (NQK) that is a ZkSignature ([Zero Kn
 
 The NQK is used to prove that the node is part of the set of core nodes as indicated through the SDP.
 
-A node generates one NQK per declaration, since the `zk_id` identifies the declaration and is unique across the registry.
+A node generates one NQK per declaration.
 
 ## Non-ephemeral Signing Key
 
@@ -58,7 +58,7 @@ A node generates a Non-ephemeral Signing Key (NSK) that is a Ed25519 key. The NS
 
 The NSK is used to authenticate the node on the network level and to derive Non-ephemeral Encryption Key.
 
-A node generates one NSK per declaration, since the `provider_id` is unique across the registry.
+A node generates one NSK per declaration.
 
 ## Ephemeral Signing Key
 

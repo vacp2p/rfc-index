@@ -1016,9 +1016,6 @@ service_notes: dict[NoteId, ZkPublicKey]
 declarations: dict[ZkPublicKey, DeclarationInfo]
 ```
 
-A service note backs exactly one declaration, so `service_notes` maps the note to the
-`zk_id` of that declaration.
-
 ### Common SDP Structures
 
 ```python
@@ -1050,8 +1047,6 @@ class DeclarationInfo:
     # SDP ops updating a declaration must use monotonically increasing nonces
     nonce: int
 ```
-
-A `DeclarationInfo` is held in `declarations` under the `zk_id` of its validator, so the `zk_id` is not one of its fields. See [**Declaration Storage**](bedrock-service-declaration-protocol.md#declaration-storage).
 
 ### SDP_DECLARE
 
@@ -1112,10 +1107,8 @@ declarations: dict[ZkPublicKey, DeclarationInfo]
       assert Ed25519_verify(txhash, proof.provider_sig, provider_id)
       ```
 
-  2. Ensure no identifier is already taken (see
-     [Identifier Uniqueness](bedrock-service-declaration-protocol.md#identifier-uniqueness)).
-     The `zk_id` keys the declaration, the note backs exactly one declaration, and the
-     `provider_id` is one peer identity.
+  2. Ensure no identifier is already taken
+     ([Identifier Uniqueness](bedrock-service-declaration-protocol.md#identifier-uniqueness)).
       ```python
       assert declaration.zk_id not in declarations
       assert declaration.service_note_id not in service_notes
@@ -1339,10 +1332,7 @@ rewards are distributed in the first block of epoch `e+2` (see
 [Service Reward Distribution Protocol](bedrock-service-reward-distribution.md)).
 In that same first block, **after** the rewards have been distributed, every
 declaration whose final reward has been paid out (`withdraw_at <= current_epoch - 2`)
-is removed and its note unlocked. Performing the removal after the reward
-distribution guarantees a declaration is never removed before its final reward
-is paid. Declarations that withdrew without earning a final reward are removed
-by the same step, so their note is always released.
+is removed and its note unlocked.
 
   *Given*
 

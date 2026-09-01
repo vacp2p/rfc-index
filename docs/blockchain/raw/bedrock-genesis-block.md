@@ -94,8 +94,6 @@ BLEND_DECLARATIONS = [
 SERVICE_DECLARATIONS = BLEND_DECLARATIONS
 ```
 
-Every genesis declaration must satisfy [Identifier Uniqueness](bedrock-service-declaration-protocol.md#identifier-uniqueness).
-
 ## Cryptarchia Parameters
 
 Cryptarchia is initialized with the following parameters:
