@@ -42,12 +42,12 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 syntax = "proto3";
 
 message SegmentMessage {
-  bytes  entire_message_hash  = 1;  // Keccak256 of the original payload, 32 bytes
-  uint32 index                = 2;  // position within this segment's own class (data or parity)
-  uint32 segment_count        = 3;  // number of items of the given class (data or parity)
-  bool   is_parity            = 4;  // selects the class the two fields above refer to
-  bytes  payload              = 5;  // data chunk or parity shard
-  uint32 entire_message_length      = 2;  // length in bytes of the original payload
+  bytes  entire_message_hash   = 1;  // Keccak256 of the original payload, 32 bytes
+  uint32 entire_message_length = 2;  // length in bytes of the original payload
+  uint32 index                 = 3;  // position within this segment's own class (data or parity)
+  uint32 segment_count         = 4;  // number of items of the given class (data or parity)
+  bool   is_parity             = 5;  // selects the class the two fields above refer to
+  bytes  payload               = 6;  // data chunk or parity shard
 }
 ```
 
@@ -105,7 +105,7 @@ A receiver retains every valid segment message.
 
 Two valid segment messages belong to the same **segment set** only if all of the following hold:
 - they carry equal `entire_message_hash`.
-- they carry equal `original_length`.
+- they carry equal `entire_message_length`.
 - they carry equal `segment_count`, whenever their `is_parity` is equal.
 
 Within a set, `(is_parity, index)` MUST be unique; a segment message repeating one already held MUST be ignored.
@@ -120,7 +120,7 @@ A set's `data_segment_count` is the `segment_count` of any segment message with 
 The receiver produces the original payload following these steps:
 
 1. Concatenate the data segments' `payload` fields in ascending `index` order.
-2. Truncate to `original_length`, which discards any zero padding left by Reed–Solomon encoding.
+2. Truncate to `entire_message_length`, which discards any zero padding left by Reed–Solomon encoding.
    Fewer assembled bytes than that mean the set is incomplete and MUST NOT be delivered to the application.
 3. Verify that `Keccak256` of the result equals the set's `entire_message_hash`.
 
