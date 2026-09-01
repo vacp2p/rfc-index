@@ -152,50 +152,29 @@ A later segment message of a dropped set starts a new one, which reconstructs on
   MUST be less than `1`, and the count it yields is capped so that parity stays the minority class,
   see [Reed–Solomon Coding](#reedsolomon-coding).
   Defaults to `0`, which disables parity.
-  `0.125` is RECOMMENDED where the [guidance below](#example-configurations) favours parity.
+  `0.125` is RECOMMENDED where the [guidance below](#when-to-use-parity) favours parity.
 - `reconstructionTimeoutSeconds`: how long a segment set may go without a new segment message before the receiver
   drops it, see [Expiry](#expiry).
 - `maxTotalSegments`: greatest number of segments a set may hold, data and parity together.
   Bounds how much memory one sender can make a receiver buffer, see [Segment Caching](#segment-caching).
-  **256** is RECOMMENDED.
+  **256** is RECOMMENDED, the shard ceiling of the smaller field a Reed–Solomon implementation may use,
+  so that any implementation can encode a conforming set.
   An application MAY raise it where its receivers can absorb the larger buffer
-  and its Reed–Solomon implementation has the shards for it,
-  see [Example Configurations](#example-configurations).
+  and its Reed–Solomon implementation has the shards for it.
   All participants in an application MUST use the same value,
   so participants interoperate within an application and not across applications.
 
 ## Implementation Suggestions
 
-### Example Configurations
+### When to Use Parity
 
-What each `parityRate` buys, for a payload split into 128 data segments:
+Parity costs `parityRate` extra bandwidth on every message, whether or not anything is lost,
+and pays off only where losses are independent and a retransmission would cost more;
+[RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) covers the general trade-off.
+Where an end-to-end reliability layer already retransmits missing segments, set `parityRate = 0`.
 
-| `parityRate` | Parity segments | Segments lost and still recovered | Bandwidth added | When to choose it |
-| --- | --- | --- | --- | --- |
-| `0` | 0 | none | none | Default. A reliability layer above already retransmits, or loss is rare |
-| `0.0625` | 8 | up to 8 of 136 | 6% | Occasional independent loss, bandwidth tight |
-| `0.125` | 16 | up to 16 of 144 | 13% | RECOMMENDED where loss is independent and retransmission costs more |
-| `0.25` | 32 | up to 32 of 160 | 25% | Lossy links, or a slow retransmission path |
-| `0.5` | 64 | up to 64 of 192 | 50% | No retransmission path at all, loss expected |
-
-Recovery survives losing any segments up to the parity count, data or parity alike.
-Every row fits any Reed–Solomon implementation.
-[RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) covers the general trade-off behind these choices.
-
-`ceil` rounds small sets up sharply, whichever rate is chosen:
-at `parityRate = 0.125` two data segments still get one parity segment,
+`ceil` rounds small sets up sharply: at `parityRate = 0.125` two data segments still get one parity segment,
 a 50% overhead to tolerate a single loss.
-
-How far `maxTotalSegments` can go, at `parityRate = 0.125` and `segmentSizeBytes` of 128 KiB:
-
-| `maxTotalSegments` | Data segments | Parity segments | Needs a Reed–Solomon implementation over | Carries a payload up to |
-| --- | --- | --- | --- | --- |
-| 256 | 227 | 29 | GF(2^8), 256 shards | 28 MiB |
-| 512 | 455 | 57 | GF(2^16), 65536 shards | 56 MiB |
-| 1024 | 910 | 114 | GF(2^16), 65536 shards | 113 MiB |
-
-Parity shares the budget with data, so a higher `parityRate` leaves room for a smaller payload.
-The default 256 is the ceiling of the smaller field, so any implementation encodes a conforming set.
 
 ### Segment Caching
 
@@ -251,6 +230,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 2. [17/WAKU2-RLN-RELAY](../../core/draft/17/rln-relay.md)
 3. [nim-leopard](https://github.com/status-im/nim-leopard) – Nim bindings for Leopard-RS
 4. [Leopard-RS](https://github.com/catid/leopard) – Fast Reed–Solomon erasure coding library
-5. [klauspost/reedsolomon](https://github.com/klauspost/reedsolomon) – Reed–Solomon coding over GF(2^8) and GF(2^16)
-6. [RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) – The Use of Forward Error Correction (FEC) in Reliable Multicast
-7. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) – Key words for use in RFCs to Indicate Requirement Levels
+5. [RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) – The Use of Forward Error Correction (FEC) in Reliable Multicast
+6. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) – Key words for use in RFCs to Indicate Requirement Levels
