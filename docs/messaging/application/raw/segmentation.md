@@ -53,7 +53,7 @@ message SegmentMessage {
 
 A **segment message** is valid only if all of the following hold:
 - `entire_message_hash` is exactly 32 bytes.
-- `1 <= segment_count <= maxSegmentsPerClass` (receiver's configured limit.)
+- `1 <= segment_count <= maxTotalSegments` (receiver's configured limit.)
 - `index < segment_count`.
 
 An invalid segment message MUST be discarded.
@@ -108,6 +108,10 @@ Two valid segment messages belong to the same **segment set** only if all of the
 
 Within a set, `(is_parity, index)` MUST be unique; a segment message repeating one already held MUST be ignored.
 
+Until a set holds segments of both classes, the per-message `segment_count` bound is all a receiver can apply.
+Once it holds one of each, it knows both counts, and MUST drop the whole set
+where they sum above `maxTotalSegments`: no conforming sender produces such a set.
+
 A set's `data_segment_count` is the `segment_count` of any segment message with `is_parity == false`.
 - A set reaching that count in data segments alone reconstructs by [concatenation](#all-data-segments-are-received-successfully).
 - A set reaching that count in data plus parity segments together reconstructs [through parity](#recovery-through-parity).
@@ -154,14 +158,12 @@ The timeout and the other bounds a receiver places on pending sets are covered i
   `0.125` is RECOMMENDED where the [guidance below](#when-to-use-parity) favours parity.
 - `reconstructionTimeoutSeconds`: how long a segment set may go without a new segment message before the receiver
   drops it, see [Expiry](#expiry).
-- `maxSegmentsPerClass`: greatest `segment_count` a receiver accepts, applied to each segment class, data or parity, separately, so a segment set holds at most twice this many segment messages.
-  256 is RECOMMENDED.
-  An application needing more MAY raise it, so long as `maxSegmentsPerClass` and the parity segments
-  `parityRate` adds to it together stay within the shard limit of the Reed–Solomon implementation,
-  65536 for [Leopard-RS](https://github.com/catid/leopard).
-  All participants in an application MUST use the same value:
-  the wire format and the Keccak256 hash are fixed by this specification,
-  but this is the only configured value one participant enforces against another,
+- `maxTotalSegments`: greatest number of segments a set may hold, data and parity together.
+  Bounds how much memory one sender can make a receiver buffer, see [Segment Caching](#segment-caching).
+  **256** is RECOMMENDED.
+  An application MAY raise it where its receivers can absorb the larger buffer
+  and its Reed–Solomon implementation has the shards for it.
+  All participants in an application MUST use the same value,
   so participants interoperate within an application and not across applications.
 
 ## Implementation Suggestions
@@ -187,7 +189,7 @@ Received segments accumulate until their set is reconstructible. Implementations
 - Bound both the number of segment sets held and the total buffered bytes,
   per sender as well as globally where a sender identity is available.
   Capping the sets bounds the bytes at that cap times
-  `2 * maxSegmentsPerClass * segmentSizeBytes`, being the factor of two covering both classes (data and parity.)
+  `maxTotalSegments * segmentSizeBytes`, one segment more while a set awaits its second class.
 - Evict the least recently updated set first,
   in addition to the `reconstructionTimeoutSeconds` expiry every receiver applies.
 
