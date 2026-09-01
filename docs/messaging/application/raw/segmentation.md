@@ -81,7 +81,6 @@ so only the last data segment may be shorter, and the encoder zero-pads it.
 That padding never reaches the wire, data segments being sent at their true length,
 which leaves parity segments as the only ones always exactly shard-length.
 
-Reed–Solomon recovers the data segments from any combination of segments as large as the data-segment count.
 Decoding needs every shard at shard length, but the last data segment may travel shorter than that.
 A receiver takes the shard length from a parity segment, those being always exactly that long,
 re-pads its data segments to it, and decodes.
@@ -112,9 +111,8 @@ Two valid segment messages belong to the same **segment set** only if all of the
 
 Within a set, `(is_parity, index)` MUST be unique; a segment message repeating one already held MUST be ignored.
 
-Until a set holds segments of both classes, the per-message `segment_count` bound is all a receiver can apply.
-Once it holds one of each, it knows both counts, and MUST drop the whole set
-where they sum above `maxTotalSegments`.
+Once a set holds segments of both classes it knows both counts,
+and MUST drop the set where they sum above `maxTotalSegments`.
 
 A set's **data-segment count** is the `segment_count` of any segment message with `is_parity == false`.
 - A set reaching that count in data segments alone reconstructs by [concatenation](#all-data-segments-are-received-successfully).
@@ -145,10 +143,7 @@ The receiver MUST NOT wait indefinitely for all the required segments to arrive.
 It MUST drop a set that has received no further segments
 within a reconstruction timeout without delivering anything to the application.
 
-A later segment message of a dropped set starts a new set, which reconstructs only if enough of the
-original set's segments are retransmitted.
-
-The timeout and the other bounds a receiver places on pending sets are covered in [Segment Caching](#segment-caching).
+A later segment message of a dropped set starts a new one, which reconstructs only if enough are retransmitted.
 
 ## Configuration
 
@@ -200,12 +195,7 @@ How far `maxTotalSegments` can go, at `parityRate = 0.125` and `segmentSizeBytes
 | 1024 | 910 | 114 | GF(2^16), 65536 shards | 113 MiB |
 
 Parity shares the budget with data, so a higher `parityRate` leaves room for a smaller payload.
-The default 256 is the ceiling of the smaller field, so an implementation counting shards flatly
-encodes any conforming set.
-
-Leopard-style coders round parity up to a power of two and data up to a multiple of it,
-so 227 data with 29 parity occupies 288 shards rather than 256.
-Leopard-RS carries that in GF(2^16); a coder confined to GF(2^8) cannot, and needs a lower `maxTotalSegments`.
+The default 256 is the ceiling of the smaller field, so any implementation encodes a conforming set.
 
 ### Segment Caching
 
