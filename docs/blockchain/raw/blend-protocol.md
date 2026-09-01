@@ -32,6 +32,7 @@
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
 | 1.3.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 | 1.4.0 | [RFC] Detect the failure of the Blend network to deliver block proposals and react to it, by directly broadcasting any proposal the network has not delivered within a fixed deadline, and by routing around the nodes seen to fail. | 2026-09-01 |
+| 1.5.0 | [RFC] Let a core node follow its own messages through the network and react to a failure before the deadline, retrying through shorter paths from a budget of the deadline itself, and attributing each failure to the node that caused it. | 2026-09-01 |
 
 # Introduction
 
@@ -457,9 +458,15 @@ This section defines how a node detects that the Blend network is not delivering
 
 ### Detection
 
-**Delivery failure.** A block proposer knows the identifier of the block it proposed, and every Logos Blockchain node observes the broadcasting channel. If the proposal has not been broadcast within the delivery deadline $`T_D`$ ([Delivery Deadline](#delivery-deadline)), counted from the round in which the message was released, the proposer must treat the message as lost. This is the only signal that sees a node which relays and processes messages correctly but discards the payloads it is the last to decapsulate: such a node damages no cover traffic and is invisible to every traffic measurement.
+**Delivery failure.** A message that is not delivered is detected end to end, and how quickly depends on what the sender can see of the network.
 
-It is also the only signal the reaction uses. A node still monitors its connections and repairs them as [Connectivity Maintenance](#connectivity-maintenance) requires, but nothing it measures about its own connectivity changes how a proposal is transported: a local measurement is exactly what an adversary sitting on those connections can forge, and a reaction that such a measurement could trigger would be a reaction that adversary could trigger.
+- A **core node** follows its own message hop by hop ([Progress Observation](#progress-observation)). It must treat an attempt as failed at the first step it does not observe within the progress deadline $`T_H`$, and it learns from that step which node failed it.
+- An **edge node** sees none of the traffic of the network. It knows the identifier of the block it proposed, and every Logos Blockchain node observes the broadcasting channel, so it must treat a message as lost when the proposal has not been broadcast within the delivery deadline $`T_D`$ ([Delivery Deadline](#delivery-deadline)), counted from the round in which the message was released. A core node applies the same deadline as a backstop.
+
+This signal is what sees a node which relays and processes messages correctly but discards the payloads it is the last to decapsulate: such a node damages no cover traffic and is invisible to every traffic measurement.
+
+A core node observes its own cover messages the same way, which measures the responsiveness of the network and of the nodes it selects continuously and at no cost ([Progress Observation](#progress-observation)). That measurement informs the node and its operator; like every other local measurement it does not change how a proposal is transported, because an adversary sitting on a node's connections could forge it.
+
 
 ### Reaction
 
@@ -470,6 +477,8 @@ It is also the only signal the reaction uses. A node still monitors its connecti
 3. must cancel one scheduled cover message of the core node sending it, exactly as the first did ([Releasing](#releasing)), so that its emission rate does not change. An edge node has no cover schedule, so its second copy is a second emission visible to the core nodes it connects to.
 
 A node must not spend the quota of one lottery win on the proposal of another, and whatever it does not spend stays unspent ([Redundancy](#redundancy)).
+
+**A core node retries instead of committing its allowance in advance.** Seeing each attempt fail in time to react ([Progress Observation](#progress-observation)), a core node releases one path and holds its replication back, spending it on retries through the nodes that have not yet failed it, following the [Reaction Ladder](#reaction-ladder). Each step of an attempt is allotted one slice of the delivery deadline, $`T_D/\beta_{max}=5`$ rounds; an attempt fails at the first step the sender does not observe, is charged one slice per step it consumed, and the retry uses only the slices that remain and is released on the boundary of the slices already charged — never at the moment of detection, which the node that dropped the message would otherwise set. The ladder is therefore decided within the same $`T_D`$ an edge node waits out, and every attempt it makes obeys the rules above.
 
 **A failed path makes its nodes suspect.** After a delivery failure, the sender must record a failure against every node selected by the keys of the message, since nothing tells it which of them dropped it. A node that accumulates $`S_{min}`$ failures becomes suspect and must be avoided when constructing paths, while remaining a neighbor: dropping the connection is what an adversary that has silenced an honest node would want, and it is already excluded by [Connectivity Maintenance](#connectivity-maintenance) for the same reason. Suspicion is bounded and forgetful ([Suspect Nodes](#suspect-nodes)) so that an adversary cannot use it to push senders onto the nodes it controls.
 
@@ -527,6 +536,8 @@ Every active core node receives a reward. The activity of a node is verified in 
 - $`N = |\mathcal N|`$ denote a number of core nodes providing the Blend service;
 - $`\text {CSPRNG}()`$ is a cryptographically secure pseudo-random number generator, implemented as a [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction);
 - $`T_D`$ denotes the delivery deadline, the time a block proposer waits for its proposal to be broadcast before treating the message that carried it as lost;
+- $`T_H`$ denotes the progress deadline, the time within which the sender of a message must observe the next form of it in the network;
+- $`\Lambda=(h_1,...,h_{|\Lambda|})`$ denotes the reaction ladder, where $`h_j \le \beta_{max}`$ is the number of blending operations used by the $`j`$-th attempt of a core node to deliver a proposal;
 - $`d`$ denotes the network dissemination delay, the time for a released message to cross the core network, and $`D`$ the number of relaying hops it crosses;
 - $`S_{min}`$ denotes the number of failed deliveries a node must be involved in before it is treated as suspect, and $`S_{max}`$ the maximum number of suspect nodes held at a time;
 
@@ -542,6 +553,9 @@ Every active core node receives a reward. The activity of a node is verified in 
 - $`\lfloor F_1 \rfloor^W = 3 \cdot \mu`$, the minimum number of messages per-connection during observation is a function of the $`\mu`$, which is defined in the [Releasing](#releasing) section.
 - $`R_D=1`$, the redundancy parameter for data messages, which sets the leadership quota to $`Q_L = \beta_D + \beta_D \cdot R_D = 6`$ blending operations for a single proposal: one message and one independent replication of it ([Redundancy](#redundancy)).
 - $`T_D=15`$ rounds, the delivery deadline, as derived in the [Delivery Deadline](#delivery-deadline) section.
+- $`T_H=\lceil \Delta_{max}+2d \rceil=4`$ rounds for a network of the minimal size, the progress deadline, as derived in the [Progress Observation](#progress-observation) section. It is a function of the network and should be measured rather than assumed.
+- $`T_D/\beta_{max}=5`$ rounds, the hop slice from which the [Reaction Ladder](#reaction-ladder) budget is counted.
+- $`\Lambda=(3,2,1)`$, the worst-case reaction ladder, as derived in the [Reaction Ladder](#reaction-ladder) section.
 - $`S_{min}=2`$ and $`S_{max}=\lfloor N/10 \rfloor`$, as defined in the [Suspect Nodes](#suspect-nodes) section.
 
 ### Core Node Parameters
@@ -1010,9 +1024,48 @@ The broadcasting happens through an independent protocol. All Logos Blockchain n
 
 ## Failure Detection and Reaction
 
+### Progress Observation
+
+Every message is relayed to every core node, so a core node sees the traffic of the whole network. A sender also knows what its own message looks like at every stage of its journey: it computed each encapsulation, and the fill of the unused blending headers is reconstructable from the shared keys ([Message Initialization](message-encapsulation.md#message-initialization)), so the form the message takes after each decapsulation is determined at the moment it is built. The public header of the message released by the $`j`$-th blend node carries the PoQ nullifier of the key the sender used for that layer, and the sender knows every one of them.
+
+A core node therefore follows its own message hop by hop. It matches the nullifiers of the traffic it relays against the $`h-1`$ values it expects — a lookup in the cache it already keeps for duplicate detection ([Relaying](#relaying)) — and each match tells it that one more blend node has processed and released the message. The observation is passive, costs nothing and reveals nothing: the sender learns only what it chose itself, because it selected those nodes when it selected the keys ([Proof of Selection](#proof-of-selection)). No other node can follow a message this way, since linking one encapsulation to the next is precisely what [Processing](#processing) destroys.
+
+The deadline for each step is
+
+$$
+T_H = \left\lceil \Delta_{max} + 2d \right\rceil,
+$$
+
+the time for the message to reach the node that must process it, to be held there for at most the maximal blending delay, and for the result to travel back to the sender. The sender starts the deadline when it releases the message and restarts it at each observation. A data message has one step beyond the last intermediate form: the proposal must appear on the broadcasting channel, which costs the same delay at the last blend node plus the dissemination of the broadcast, and so the same $`T_H`$. An attempt of $`h`$ blending operations is therefore decided in at most $`h \cdot T_H`$ rounds instead of the $`T_D`$ an edge node must wait.
+
+The dissemination delay $`d`$ is not a protocol constant. A message reaches the node that processes it by being relayed across the core network, so $`d`$ is the number of relaying hops between two nodes multiplied by what a hop costs:
+
+$$
+d \approx D \cdot (t_v + t_l + t_x), \qquad D \approx \log_{\Phi_{CC}-1} N,
+$$
+
+where $`D`$ is the distance across the core network — a random regular graph of degree $`\Phi_{CC}`$, whose diameter and average distance both grow with the logarithm of its size — $`t_v`$ is the time a node needs to check the public header before forwarding, $`t_l`$ is the link latency and $`t_x`$ the time to put a message of `Max_Body_Length` bytes on the wire. Measurements put $`t_v`$ at $`10`$ to $`20`$ ms. It stays that small because the forwarding path verifies only the PoQ nullifier and the signature ([Relaying](#relaying)); the proof of quota is verified on the [Processing](#processing) path, which runs concurrently and does not hold the message up.
+
+| $`N`$ | $`\Phi_{CC}`$ | $`D`$ | $`d`$ at $`80`$ ms per hop | $`d`$ at $`150`$ ms per hop | $`T_H`$ |
+| --- | --- | --- | --- | --- | --- |
+| $`32`$ | $`4`$ | $`3.2`$ | $`0.25`$ | $`0.47`$ | $`4`$ |
+| $`1024`$ | $`4`$ | $`6.3`$ | $`0.50`$ | $`0.95`$ | $`5`$ |
+| $`1024`$ | $`8`$ | $`3.6`$ | $`0.28`$ | $`0.53`$ | $`4`$ … $`5`$ |
+| $`10000`$ | $`8`$ | $`4.7`$ | $`0.38`$ | $`0.71`$ | $`4`$ … $`5`$ |
+
+The blending delay dominates, so the deadline is $`4`$ rounds for a network of the minimal size and never more than $`5`$ across three orders of magnitude of growth. That is what makes a fixed default defensible; it is not what makes it correct.
+
+A node should measure $`T_H`$ rather than assume it. It knows the round in which it released each of its own messages and the round in which each following form appeared, and every cover message it generates adds a sample. A high quantile of that distribution — the $`99`$th, say — folds in both the dissemination delay and the blending delay that cannot be observed apart from it, and tracks the deployment as it grows, as the set of core nodes changes and as the node's own connectivity changes. The value computed above is the default, and a node must keep using it until it holds at least $`32`$ observations, so that a handful of fast samples cannot shorten the deadline into false detections. $`T_H`$ must never exceed the hop slice $`T_D/\beta_{max}`$ of the [Reaction Ladder](#reaction-ladder), which its budget is counted in.
+
+A step that passes unobserved names the node that failed it: the node selected by the key of the layer that was never released. This is what makes the evidence of a core node exact, and it holds for the last hop as well, where a proposal that is never broadcast although its last intermediate form was observed identifies the exit node that discarded the payload.
+
+A missed observation is not a proof of failure — the sender can lose the message on its own connections while the message travels on — but the cost of being wrong is one further attempt and the quota it consumes, and the ladder ends the moment the proposal appears on the broadcasting channel, however many attempts are in flight.
+
+The same observation applies to the cover messages a core node generates. It knows their intermediate forms as it knows those of its data messages, so every cover message it emits measures, at no cost and without a single extra message, the responsiveness of the network and of the individual nodes selected to process it. The one limitation is by design: a cover message can be followed as far as the release of its last intermediate form — the message its final blend node receives — but no further, since that node discards the payload instead of broadcasting it. The last node of a cover path is silent by design, so its responsiveness is not probed — which is the reason exit censorship is caught by data messages alone. This is what a core node uses to judge the health of the network and of the nodes it selects.
+
 ### Delivery Deadline
 
-The delivery deadline $`T_D`$ is the time a sender waits for its proposal to appear on the Logos Blockchain broadcasting channel before treating the message that carried it as lost. It is counted from the round in which the message was released, and it is the only detection any sender has: the cryptographic transformation that unlinks a message from its sender ([Processing](#processing)) also hides its progress from that sender, and the protocol acknowledges nothing.
+The delivery deadline $`T_D`$ is the time a sender waits for its proposal to appear on the Logos Blockchain broadcasting channel before treating the message that carried it as lost. It is counted from the round in which the message was released. It is the only detection an edge node has — it holds no connections into the network and sees none of its traffic — and the backstop of a core node, which reaches the same verdict sooner and more precisely through [Progress Observation](#progress-observation).
 
 A message that is not lost is broadcast within the bound derived for the [Transition Period](#transition-period),
 
@@ -1039,17 +1092,69 @@ Whatever the sender does not spend stays unspent. A proposal sent through one pa
 
 Both copies use fewer keys than $`\beta_{max}`$ would allow only if the sender chooses a shorter path; at $`\beta_D = \beta_{max}`$ they use all of them. Either way the message is indistinguishable on the wire: the private header always holds $`\beta_{max}`$ blending headers, the unused ones filled with pseudo-random values and encrypted so that the number of encapsulations does not leak ([Message Initialization](message-encapsulation.md#message-initialization)), and the last flag $`\Omega`$ marks where the encapsulation ends.
 
+### Reaction Ladder
+
+The reaction ladder defines the attempts a core block proposer makes for one proposal; it requires seeing attempts fail, which only [Progress Observation](#progress-observation) provides, so an edge node does not ladder ([Direct Broadcast Deadline](#direct-broadcast-deadline)).
+
+The ladder runs inside the delivery deadline, paid for from a budget of $`B = \beta_{max} = 3`$ slices of $`T_D/\beta_{max} = 5`$ rounds each. Every observable step of an attempt — each blend node's release, and the broadcast for the last — is allotted one slice; an attempt fails at the first step that is not observed in time ([Progress Observation](#progress-observation)) and is charged one slice per step it consumed:
+
+$$
+B \leftarrow B - i, \qquad h_{next} = B,
+$$
+
+where $`i`$ is the step at which the attempt failed. No retry is released when $`B=0`$. The charge counts steps, not elapsed time, so a sender cannot fit more attempts into the deadline than the budget admits however fast it detects failures.
+
+**A retry is released on the boundary of the slices already charged**, not at the moment of detection: after a total of $`c`$ slices have been charged, the retry goes out at round
+
+$$
+c \cdot T_D/\beta_{max}
+$$
+
+counted from the release of the first attempt. Detecting a failure at step $`i`$ takes at most $`i \cdot T_H \le i \cdot T_D/\beta_{max}`$ ([Progress Observation](#progress-observation)), so the release round has always arrived by the time the sender knows it needs it, and the last slice ends exactly at $`T_D`$. Releasing on the boundary rather than on detection is what keeps the emission time out of the hands of the node that dropped the message: that node knows when it dropped, and an immediate retry would be timed by it. The cost is at most one slice of latency and none of the deadline, which is denominated in slices already. The worst case is an attempt dying at its first step every time:
+
+| Attempt | Released | Blending operations $`h_j`$ | Used in total |
+| --- | --- | --- | --- |
+| 1 | $`0`$ | $`3`$ | $`3`$ |
+| 2 | $`T_D/3 = 5`$ | $`2`$ | $`5`$ |
+| 3 | $`2 \cdot T_D/3 = 10`$ | $`1`$ | $`6`$ |
+
+$$
+\Lambda=(3,2,1)
+$$
+
+Later failures leave shorter sequences: an attempt that dies at its second step leaves budget for a single-hop retry, and one that dies at its last step — an exit-censored attempt included — leaves none.
+
+The ladder costs exactly the allowance a lottery win already grants, the same one an edge node spends on a second path ([Redundancy](#redundancy)). With $`R_D=1`$ the [Leadership Quota](#leadership-quota) is $`Q_L = \beta_D + \beta_D \cdot R_D = 6`$ blending operations — one message and one replication of it — and the worst case of the ladder spends the same $`3+2+1=6`$: it re-spends the replication allowance as shorter retries instead of a second full-length copy, which is what makes each retry more likely to arrive than the copy would have been. The budget, not the quota, is what ends the ladder — the slices charged across a sequence never exceed $`\beta_{max}`$, so no sequence the budget admits can exceed those $`6`$ operations however fast the failures are detected — and the quota is sized to the same bound, so neither constrains the other. An edge node, unable to observe anything, still commits its allowance in advance, on one path or two ([Redundancy](#redundancy)).
+
+The keys a sender may choose from narrow as the ladder proceeds: the first attempt selects $`\beta_D`$ keys from the $`Q_L`$ of the win and can avoid suspects freely, while a third attempt, if reached, takes what is left. A sender that would have to route its last attempt through a suspect may stop instead and let the direct broadcast deliver the proposal ([Direct Broadcast](#direct-broadcast)); the block is delivered either way, and the choice is between a likely-wasted attempt and an earlier reveal.
+
+A ladder that ends early leaves keys of its win unspent, exactly as an unused replication does, and those keys stay unspent for the same reasons ([Redundancy](#redundancy)).
+
+The ladder of a proposal must end no later than the end of the [Transition Period](#transition-period) that follows the epoch its keys were issued for. After that period the proofs of the past epoch are no longer accepted, so an attempt released with them would be discarded by the first node that received it.
+
+Attempts $`2`$ and $`3`$ use fewer blending operations than $`\beta_{max}`$, which the message format already accommodates ([Redundancy](#redundancy)): a message with one blending operation is the same size and shape as a message with three, and only the node that decapsulates it learns that it is last.
+
+Shortening the path is what makes the later attempts more likely to arrive: a path of $`h`$ nodes delivers only if none of its nodes fails, so with a fraction $`q_F`$ of nodes failing to pass messages on, an attempt of $`h_j`$ operations delivers with probability $`(1-q_F)^{h_j}`$. The attempts are not independent — an attempt that survives further into its path is charged more of the budget and leaves less for what follows — so the ladder is evaluated over the failure tree rather than over a fixed sequence. The cost of a shorter path is that fewer nodes have to be adversarial for the whole path to be adversarial.
+
+The ladder is decided within $`T_D`$ by construction, because the slices charged bound the time actually spent. An attempt that fails at step $`i`$ is detected within $`i \cdot T_H`$ rounds ([Progress Observation](#progress-observation)) and is charged $`i`$ slices, so as long as
+
+$$
+T_H \le T_D/\beta_{max},
+$$
+
+the failure is detected before the boundary the retry is released on, and a sequence charging at most $`\beta_{max}`$ slices in total cannot outlive $`\beta_{max}`$ slices of wall clock — the deadline itself. This constraint is what ties the two deadlines together; a deployment whose measured $`T_H`$ exceeds the slice must recompute $`T_D`$ ([Delivery Deadline](#delivery-deadline)). Faster detection buys neither earlier retries nor additional ones: it buys the margin that keeps every retry on its boundary.
+
 ### Suspect Nodes
 
-A sender knows which nodes carry each of its messages, because each key it uses selects one ([Proof of Selection](#proof-of-selection)). It does not know which of them dropped a lost message, so the blame is spread across the path and only repetition is treated as evidence:
+A sender knows which nodes carry each of its messages, because each key it uses selects one ([Proof of Selection](#proof-of-selection)). A core node also knows which of them dropped a lost message ([Progress Observation](#progress-observation)); an edge node does not, and must spread the blame across the path. In both cases only repetition is treated as evidence:
 
-1. On a delivery failure, the sender increments a failure counter for each of the nodes selected by the keys of the message, and of its second copy if it sent one.
+1. On a delivery failure, a core node increments a failure counter for the node selected by the key of the layer that was never released. An edge node increments the counter of each of the nodes selected by the keys of its message, and of its second copy if it sent one.
 2. A node whose counter reaches $`S_{min}=2`$ is *suspect*.
 3. The sender must not use keys that select a suspect node while it holds other keys, and must fall back to the keys it has when a path cannot be built without a suspect.
 4. At most $`S_{max}=\lfloor N/10 \rfloor`$ nodes may be suspect at a time. When more qualify, the ones with the lowest counters are forgotten first, ties broken by age.
 5. All counters are cleared at the start of each epoch, together with the key pool and the node selection it induces.
 
-The evidence is rare and coarse: it comes only from a sender's own proposals, at the rate at which it wins lotteries, and each failure implicates a whole path rather than one node. Suspicion is therefore a slow, secondary mechanism, and it protects later proposals rather than the one that was lost — what protects a proposal at the time is the second path, if the sender chose to send one ([Redundancy](#redundancy)).
+A core node collects this evidence from every message it generates, cover messages included, so it accumulates at the rate at which the node emits messages rather than the rate at which it proposes blocks, and each entry names one node rather than a path. For an edge node the evidence is both rare and coarse, since it comes only from its own proposals. What protects a single proposal is the immediate rule of the [Reaction Ladder](#reaction-ladder) for a core node — the nodes of an attempt that failed are excluded from the attempts that follow it, whether or not they are suspect — and the second path for an edge node ([Redundancy](#redundancy)).
 
 Suspicion never affects connections, relaying or processing: a suspect node is served exactly like any other. Isolating it would hand an adversary a way to have honest nodes disconnected by silencing them, which is the same reason [Connectivity Maintenance](#connectivity-maintenance) keeps unhealthy connections open. The cap and the epoch reset bound the opposite abuse: an adversary that makes honest nodes look unresponsive can push a sender away from at most a tenth of the network, and only until the epoch ends.
 
