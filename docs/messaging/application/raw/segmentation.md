@@ -184,7 +184,7 @@ Received segments accumulate until their set is reconstructible. Implementations
 - Evict the least recently updated set first,
   in addition to the `reconstructionTimeoutSeconds` expiry every receiver applies.
 
-Segments can be persisted, for example in SQLite, so that partial reconstructions survive a restart.
+Segments can be persisted in a local storage, so that partial reconstructions survive application restarts.
 In-memory buffering is sufficient otherwise.
 
 ## Security/Privacy Considerations
