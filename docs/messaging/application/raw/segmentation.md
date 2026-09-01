@@ -36,6 +36,8 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Wire Format
 
+Each segment message is encoded as:
+
 ```protobuf
 syntax = "proto3";
 
@@ -45,7 +47,7 @@ message SegmentMessage {
   uint32 index                   = 3;  // position within this segment's own class (data or parity)
   uint32 segment_count           = 4;  // number of items of the given class (data or parity)
   bool   is_parity               = 5;  // selects the class the two fields above refer to
-  bytes  payload                 = 6;  // data chunk or parity shard
+  bytes  segment_payload         = 6;  // data chunk or parity shard
 }
 ```
 
@@ -123,7 +125,7 @@ A set's **data-segment count** is the `segment_count` of any segment message wit
 
 The receiver produces the original payload following these steps:
 
-1. Concatenate the data segments' `payload` fields in ascending `index` order.
+1. Concatenate the data segments' `segment_payload` fields in ascending `index` order.
 2. Truncate to `original_payload_length`, which discards any zero padding left by Reed–Solomon encoding.
    Fewer assembled bytes than that mean the set is incomplete and MUST NOT be delivered to the application.
 3. Verify that `Keccak256` of the result equals the set's `original_payload_hash`.
