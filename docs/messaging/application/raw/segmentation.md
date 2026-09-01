@@ -28,7 +28,7 @@ Erasure-coded parity segments provide resilience against partial loss or reorder
 - **original payload**: the full application payload before segmentation.
 - **data segment**: one chunk of the original payload.
 - **parity segment**: an erasure-coded segment derived from the set of data segments.
-- **class**: each one of the two possible segment types: data or parity.
+- **class**: either of the two groups a payload's segments fall into, data or parity.
 - **segment message**: a [`SegmentMessage`](#wire-format) carrying either data or parity segment.
 - **segmentSizeBytes**: maximum size of a serialized segment message, see [Configuration](#configuration).
 
@@ -84,7 +84,6 @@ which leaves parity segments as the only ones always exactly shard-length.
 Decoding needs every shard at shard length, but the last data segment may travel shorter than that.
 A receiver takes the shard length from a parity segment, those being always exactly that long,
 re-pads its data segments to it, and decodes.
-It always holds a parity segment when decoding, a missing data segment being what parity made up for.
 
 Receivers SHOULD support Reed–Solomon decoding, and MUST where the application sets `parityRate > 0`;
 without it a set reconstructs only once every data segment has arrived.
