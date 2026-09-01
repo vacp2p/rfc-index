@@ -28,9 +28,7 @@ Erasure-coded parity segments provide resilience against partial loss or reorder
 - **original payload**: the full application payload before segmentation.
 - **data segment**: one chunk of the original payload.
 - **parity segment**: an erasure-coded segment derived from the set of data segments.
-- **class**: the data segments of one payload form one class, its parity segments the other.
-  `is_parity` tells which class a segment message belongs to, and its `index` and `segment_count`
-  are relative to that class alone, never to the two combined.
+- **class**: each one of the two possible segment types: data or parity.
 - **segment message**: a [`SegmentMessage`](#wire-format) carrying either data or parity segment.
 - **segmentSizeBytes**: maximum size of a serialized segment message, see [Configuration](#configuration).
 
