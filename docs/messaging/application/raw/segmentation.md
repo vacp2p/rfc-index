@@ -18,7 +18,7 @@ The payload is split into data segments that can be reconstructed by the receive
 ## Motivation
 
 Many message transport and delivery protocols impose a maximum message size that restricts the size of application payloads.
-For example, Waku Relay typically propagates messages up to 150 KiB as per [64/WAKU2-NETWORK - Message](../../core/draft/64/network.md#message-size).
+For example, Logos Delivery propagates messages up to 150 KiB as per [64/WAKU2-NETWORK - Message](../../core/draft/64/network.md#message-size).
 To support larger application payloads, a segmentation layer is required.
 This specification enables larger messages by partitioning them into multiple envelopes and reconstructing them at the receiver.
 Erasure-coded parity segments provide resilience against partial loss or reordering.
@@ -246,7 +246,7 @@ Applications requiring authenticity MUST obtain it from another layer.
 
 A remote sender controls how much memory a receiver buffers, so implementations MUST bound it.
 The limits and timeouts in [Segment Caching](#segment-caching) are the mitigation.
-Rate limiting at the transport, for example [17/WAKU2-RLN-RELAY](../../core/draft/17/rln-relay.md) on Waku,
+Rate limiting at the transport, for example [17/WAKU2-RLN-RELAY](../../core/draft/17/rln-relay.md) in Logos Delivery,
 additionally bounds how fast an attacker can create pending reconstructions.
 
 ## Copyright
