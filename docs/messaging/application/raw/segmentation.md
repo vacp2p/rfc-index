@@ -75,14 +75,11 @@ or one fewer than the data segments where that is smaller, so a single data segm
 Parity MUST remain the minority class, fewer parity segments than data ones,
 so a receiver always learns the data-segment count before it can reconstruct.
 
-Reed–Solomon operates on equal-length inputs, called shards.
-The shard length is the chunk size the payload was split into,
-so only the last data segment may be shorter, and the encoder zero-pads it.
+Reed–Solomon operates on equal-length inputs, called shards, of the chunk size the payload was split into.
+Only the last data segment may be shorter, and the encoder zero-pads it.
 That padding never reaches the wire, data segments being sent at their true length,
 which leaves parity segments as the only ones always exactly shard-length.
-
-Decoding needs every shard at shard length, but the last data segment may travel shorter than that.
-A receiver takes the shard length from a parity segment, those being always exactly that long,
+A decoding receiver therefore takes the shard length from a parity segment,
 re-pads its data segments to it, and decodes.
 
 Receivers SHOULD support Reed–Solomon decoding, and MUST where the application sets `parityRate > 0`;
@@ -147,7 +144,7 @@ A later segment message of a dropped set starts a new one, which reconstructs on
 ## Configuration
 
 - `segmentSizeBytes`: chosen by the application so that a segment fits the transport's maximum message size.
-- `parityRate`: number of parity segments relative to the number of data segments.
+- `parityRate`: parity segments as a fraction of the data segments, so `0.125` is one parity segment per eight data ones.
   MUST be less than `1`, and the count it yields is capped so that parity stays the minority class,
   see [Reed–Solomon Coding](#reedsolomon-coding).
   Defaults to `0`, which disables parity.
