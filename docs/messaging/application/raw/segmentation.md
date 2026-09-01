@@ -57,7 +57,9 @@ A **segment message** is valid only if all of the following hold:
 - `index < segment_count`.
 
 An invalid segment message MUST be discarded.
-A payload that fits one segment is valid if `segment_count == 1`, `index == 0`, `is_parity == false`.
+`segment_count` counts one class, so that bound alone cannot bound a whole set;
+[Reconstruction](#reconstruction) checks the sum once both classes are known.
+A payload that fits one segment is still wrapped, as `segment_count == 1`, `index == 0`, `is_parity == false`.
 
 A later revision of this specification MAY add fields.
 A receiver MUST ignore any field it does not recognise rather than treat the segment message as invalid,
@@ -110,9 +112,9 @@ Within a set, `(is_parity, index)` MUST be unique; a segment message repeating o
 
 Until a set holds segments of both classes, the per-message `segment_count` bound is all a receiver can apply.
 Once it holds one of each, it knows both counts, and MUST drop the whole set
-where they sum above `maxTotalSegments`: no conforming sender produces such a set.
+where they sum above `maxTotalSegments`.
 
-A set's `data_segment_count` is the `segment_count` of any segment message with `is_parity == false`.
+A set's **data-segment count** is the `segment_count` of any segment message with `is_parity == false`.
 - A set reaching that count in data segments alone reconstructs by [concatenation](#all-data-segments-are-received-successfully).
 - A set reaching that count in data plus parity segments together reconstructs [through parity](#recovery-through-parity).
 - Else, [expires](#expiry) after a configured timeout.
@@ -131,9 +133,7 @@ Any parity segments the set holds are unused, and the set MAY be released once t
 
 ### Recovery through parity
 
-Where a data segment is missing, parity segments stand in for it:
-the set reconstructs once the number of segment messages it holds, data and parity alike,
-reaches the `data_segment_count`.
+Where a data segment is missing, parity segments stand in for it.
 The receiver [Reed–Solomon decodes](#reedsolomon-coding) the missing data segments from the ones it holds,
 then proceeds as [above](#all-data-segments-are-received-successfully) from step 1.
 
@@ -185,7 +185,8 @@ Recovery survives losing any segments up to the parity count, data or parity ali
 Every row fits any Reed–Solomon implementation.
 [RFC 3453](https://www.rfc-editor.org/rfc/rfc3453) covers the general trade-off behind these choices.
 
-`ceil` also rounds small sets up sharply: at `parityRate = 0.125` two data segments still get one parity segment,
+`ceil` rounds small sets up sharply, whichever rate is chosen:
+at `parityRate = 0.125` two data segments still get one parity segment,
 a 50% overhead to tolerate a single loss.
 
 How far `maxTotalSegments` can go, at `parityRate = 0.125` and `segmentSizeBytes` of 128 KiB:
@@ -212,8 +213,7 @@ Received segments accumulate until their set is reconstructible. Implementations
   Authenticating the sender is out of scope of this specification.
 - Bound both the number of segment sets held and the total buffered bytes,
   per sender as well as globally where a sender identity is available.
-  Capping the sets bounds the bytes at that cap times
-  `maxTotalSegments * segmentSizeBytes`, one segment more while a set awaits its second class.
+  Capping the sets bounds the bytes at that cap times `maxTotalSegments * segmentSizeBytes`.
 - Evict the least recently updated set first,
   in addition to the `reconstructionTimeoutSeconds` expiry every receiver applies.
 
