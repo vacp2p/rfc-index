@@ -58,7 +58,7 @@ A node generates a Non-ephemeral Signing Key (NSK) that is a Ed25519 key. The NS
 
 The NSK is used to authenticate the node on the network level and to derive Non-ephemeral Encryption Key.
 
-A node generates one NSK per declaration, since the `provider_id` is unique across the registry. It is the peer identity under which that declaration's `locators` are reachable, so a node providing several services presents a distinct network identity for each.
+A node generates one NSK per declaration, since the `provider_id` is unique across the registry.
 
 ## Ephemeral Signing Key
 

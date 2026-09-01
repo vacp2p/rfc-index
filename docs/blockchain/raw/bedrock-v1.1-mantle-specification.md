@@ -1016,8 +1016,8 @@ service_notes: dict[NoteId, ZkPublicKey]
 declarations: dict[ZkPublicKey, DeclarationInfo]
 ```
 
-A locked note backs exactly one declaration, so `service_notes` maps the note to the
-`zk_id` of that declaration. There is no per-note set of declarations to maintain.
+A service note backs exactly one declaration, so `service_notes` maps the note to the
+`zk_id` of that declaration.
 
 ### Common SDP Structures
 
@@ -1045,7 +1045,6 @@ class DeclarationInfo:
     locators: list[Locator]
     provider_id: Ed25519PublicKey
     service_note_id: NoteId
-    # the first epoch this declaration can appear in a snapshot
     active: EpochNumber
     withdraw_at: EpochNumber | None
     # SDP ops updating a declaration must use monotonically increasing nonces
@@ -1265,7 +1264,7 @@ declarations: dict[ZkPublicKey, DeclarationInfo]
           ```python
           assert declare_info.withdraw_at is None
           ```
-      3. Ensure locked note `pk` and the `zk_id` of this declaration authorized this Operation.
+      3. Ensure service note `pk` and the `zk_id` of this declaration authorized this Operation.
           ```python
           service_note = ledger[service_note_id]
           assert ZkSignature_verify(txhash, signature, [service_note.pk, withdraw.zk_id])
@@ -1345,10 +1344,6 @@ distribution guarantees a declaration is never removed before its final reward
 is paid. Declarations that withdrew without earning a final reward are removed
 by the same step, so their note is always released.
 
-Because a declaration locks exactly one note and the note backs exactly that
-declaration, removing the declaration releases the note outright — there is no
-reference count to check.
-
   *Given*
 
 ```python
@@ -1384,9 +1379,6 @@ class Active:
     nonce: int
     metadata: bytes # a service-specific node activeness metadata
 ```
-
-The `zk_id` determines the declaration, and the declaration determines the
-service, so the operation does not name one.
 
 #### Proof
 

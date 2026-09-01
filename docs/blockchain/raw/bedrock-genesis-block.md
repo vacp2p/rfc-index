@@ -94,7 +94,7 @@ BLEND_DECLARATIONS = [
 SERVICE_DECLARATIONS = BLEND_DECLARATIONS
 ```
 
-Each declaration is stored under its `zk_id`, so every genesis declaration must carry a distinct `zk_id`, a distinct `provider_id`, and a distinct locked note, as required by [Identifier Uniqueness](bedrock-service-declaration-protocol.md#identifier-uniqueness).
+Every genesis declaration must satisfy [Identifier Uniqueness](bedrock-service-declaration-protocol.md#identifier-uniqueness).
 
 ## Cryptarchia Parameters
 
