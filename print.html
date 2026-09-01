@@ -25381,6 +25381,7 @@ WithdrawThreshold = UINT16
 </div><!-- timeline:start -->
 <h2 id="timeline-86"><a class="header" href="#timeline-86">Timeline</a></h2>
 <ul>
+<li><strong>2026-09-01</strong> — <a href="https://github.com/logos-co/logos-lips/blob/74f6f939e84d8bb8e494db3108d47ebe7faf071f/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>74f6f93</code></a> — [RFC] Per-Service <code>zk_id</code> Uniqueness Is Normative for Reward Distribution (#406)</li>
 <li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/3cac48f3f3c7db46eddf3bbb70c1567d96e2b213/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>3cac48f</code></a> — docs(blockchain): rename locked notes to service notes (#423)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
@@ -25402,6 +25403,7 @@ WithdrawThreshold = UINT16
 <tr><td>1.4.0</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code></td><td>2026-08-14</td></tr>
 <tr><td>1.4.1</td><td>Replaced the <code>uint64</code> width given to the <code>epoch</code> fields with a reference to <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a>, which is 32 bits</td><td>2026-08-25</td></tr>
 <tr><td>1.4.2</td><td>Renamed locked notes into service notes: <code>locked_note_id</code> becomes <code>service_note_id</code> in the declaration and withdraw messages and in <code>DeclarationInfo</code></td><td>2026-08-27</td></tr>
+<tr><td>1.4.3</td><td>Identifier uniqueness covers every stored declaration, not only activated ones, matching the implementation</td><td>2026-09-01</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-25"><a class="header" href="#introduction-25">Introduction</a></h1>
@@ -25534,7 +25536,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <pre><code class="language-python">declarations: list[declaration_id]
 </code></pre>
 <h3 id="identifier-uniqueness"><a class="header" href="#identifier-uniqueness">Identifier Uniqueness</a></h3>
-<p>The SDP is responsible for enforcing the uniqueness of the <code>provider_id</code> and the <code>zk_id</code> in the context of a service. This means that, for a given <code>service</code>, each <code>provider_id</code> and each <code>zk_id</code> must appear in at most one active <code>DeclarationInfo</code> at a time.</p>
+<p>The SDP is responsible for enforcing the uniqueness of the <code>provider_id</code> and the <code>zk_id</code> in the context of a service. This means that, for a given <code>service</code>, each <code>provider_id</code> and each <code>zk_id</code> must be bound to at most one <code>DeclarationInfo</code> in <code>declarations</code>, whether or not its <code>active</code> field is set.</p>
 <p>The <code>declaration_id</code> uniqueness alone is insufficient to guarantee this property. Because <code>declaration_id = Hash(service||provider_id||zk_id||locators)</code>, two declarations for the same <code>service</code> that reuse the same <code>provider_id</code> (or the same <code>zk_id</code>) but differ in any other component would produce distinct <code>declaration_id</code>s and would therefore not collide. This holds only because each component is committed under an encoding that determines it uniquely: without the length prefixing defined above, two declarations differing only in how the same locator bytes are split across the list would share a <code>declaration_id</code>. The SDP must reject such declarations regardless.</p>
 <p>Consequently, within a single <code>service</code>:</p>
 <ul>
@@ -25659,6 +25661,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 </div><!-- timeline:start -->
 <h2 id="timeline-87"><a class="header" href="#timeline-87">Timeline</a></h2>
 <ul>
+<li><strong>2026-09-01</strong> — <a href="https://github.com/logos-co/logos-lips/blob/74f6f939e84d8bb8e494db3108d47ebe7faf071f/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>74f6f93</code></a> — [RFC] Per-Service <code>zk_id</code> Uniqueness Is Normative for Reward Distribution (#406)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/bedrock-service-reward-distribution.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -25676,6 +25679,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <tr><td>1.3.0</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
 <tr><td>1.3.1</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code></td><td>2026-08-14</td></tr>
 <tr><td>1.3.2</td><td>Pinned the encoding of <code>epoch_number</code> in the reward <code>op_id</code> preimage to the 4 bytes of an <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a></td><td>2026-08-25</td></tr>
+<tr><td>1.3.3</td><td>One reward note per <code>zk_id</code>, and none for a zero reward, matching the implementation</td><td>2026-09-01</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-26"><a class="header" href="#introduction-26">Introduction</a></h1>
@@ -25709,12 +25713,12 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <div class="math-block" data-tex="Rewards^n := serviceReward(n,Rewards\_Epoch)"></div>
 <p>Where <span class="math-inline" data-tex="Rewards\_Epoch"></span> are the total rewards of epoch <strong>N</strong>. The <span class="math-inline" data-tex="Rewards\_Epoch"></span> is determined by the linked reference, which calculates how much each service receives based on fees burnt during epoch N and the blockchain's state. <span class="math-inline" data-tex="Rewards^n"></span> is stored as an array that maps each validator's <code>zk_id</code> to their allocated reward.</p>
 <h2 id="service-reward-distribution"><a class="header" href="#service-reward-distribution">Service Reward Distribution</a></h2>
-<p>Starting immediately after epoch <strong>N+1</strong>, service rewards are distributed in the first block of epoch <strong>N+2.</strong> The rewards are inserted directly in the ledger without triggering any Mantle validation. The <code>NoteId</code> is computed using the result of <code>hash(</code><a href="blockchain/raw/bedrock-service-declaration-protocol.html"><code>ServiceType</code></a><code>|| epoch_number)</code> as the <code>op_id</code>, where <code>ServiceType</code> is serialized as its canonical one-byte discriminant (<a href="blockchain/raw/bedrock-service-declaration-protocol.html#service-types">Service Types</a>) and <code>epoch_number</code> as the 4 bytes of an <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a>. The output number corresponds to the position of the <code>zk_id</code> when sorted in ascending order.</p>
+<p>Starting immediately after epoch <strong>N+1</strong>, service rewards are distributed in the first block of epoch <strong>N+2.</strong> The rewards are inserted directly in the ledger without triggering any Mantle validation. The <code>NoteId</code> is computed using the result of <code>hash(</code><a href="blockchain/raw/bedrock-service-declaration-protocol.html"><code>ServiceType</code></a><code>|| epoch_number)</code> as the <code>op_id</code>, where <code>ServiceType</code> is serialized as its canonical one-byte discriminant (<a href="blockchain/raw/bedrock-service-declaration-protocol.html#service-types">Service Types</a>) and <code>epoch_number</code> as the 4 bytes of an <a href="blockchain/raw/cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a>. A <code>zk_id</code> whose reward amount is zero receives no note. The output number is the position of the <code>zk_id</code> among the rewarded <code>zk_id</code>s, sorted in ascending order.</p>
 <p>The reward must:</p>
 <ul>
 <li>Transfer the correct reward amount according to <a href="blockchain/raw/bedrock-service-reward-distribution.html#service-reward-calculation">Service Reward Calculation</a>.2</li>
 <li>Be sent to the public key <code>zk_id</code> of the validator registered during <a href="blockchain/raw/bedrock-service-declaration-protocol.html">declaration of the service</a>.</li>
-<li>Be distributed into a single note if several rewards share the same <code>zk_id</code>.</li>
+<li>Be distributed as exactly one note per rewarded <code>zk_id</code>. Rewards are never summed or merged into a shared note.</li>
 <li>Be executed identically by every node processing the first block of epoch N+2. This happens by inserting notes in the ledger in ascending order of <code>zk_id</code>.</li>
 </ul>
 <p>Nodes indirectly verify the correct inclusion of rewards because all consensus-validating nodes must maintain the same ledger view to derive the latest ledger root, which serves as input for verifying the <a href="blockchain/raw/cryptarchia-proof-of-leadership.html">Proof of Leadership</a>.</p>

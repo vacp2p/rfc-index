@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-09-01</strong> — <a href="https://github.com/logos-co/logos-lips/blob/74f6f939e84d8bb8e494db3108d47ebe7faf071f/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>74f6f93</code></a> — [RFC] Per-Service <code>zk_id</code> Uniqueness Is Normative for Reward Distribution (#406)</li>
 <li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/3cac48f3f3c7db46eddf3bbb70c1567d96e2b213/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>3cac48f</code></a> — docs(blockchain): rename locked notes to service notes (#423)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
 <li><strong>2026-08-24</strong> — <a href="https://github.com/logos-co/logos-lips/blob/8b6f4f48e6ebb4f290bff4e40f45d8237122db58/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>8b6f4f4</code></a> — docs(blockchain): use one canonical encoding for ServiceType and Locator (#402)</li>
@@ -213,6 +214,7 @@
 <tr><td>1.4.0</td><td>[RFC] One canonical encoding for <code>ServiceType</code> and <code>Locator</code></td><td>2026-08-14</td></tr>
 <tr><td>1.4.1</td><td>Replaced the <code>uint64</code> width given to the <code>epoch</code> fields with a reference to <a href="cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a>, which is 32 bits</td><td>2026-08-25</td></tr>
 <tr><td>1.4.2</td><td>Renamed locked notes into service notes: <code>locked_note_id</code> becomes <code>service_note_id</code> in the declaration and withdraw messages and in <code>DeclarationInfo</code></td><td>2026-08-27</td></tr>
+<tr><td>1.4.3</td><td>Identifier uniqueness covers every stored declaration, not only activated ones, matching the implementation</td><td>2026-09-01</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -345,7 +347,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <pre><code class="language-python">declarations: list[declaration_id]
 </code></pre>
 <h3 id="identifier-uniqueness"><a class="header" href="#identifier-uniqueness">Identifier Uniqueness</a></h3>
-<p>The SDP is responsible for enforcing the uniqueness of the <code>provider_id</code> and the <code>zk_id</code> in the context of a service. This means that, for a given <code>service</code>, each <code>provider_id</code> and each <code>zk_id</code> must appear in at most one active <code>DeclarationInfo</code> at a time.</p>
+<p>The SDP is responsible for enforcing the uniqueness of the <code>provider_id</code> and the <code>zk_id</code> in the context of a service. This means that, for a given <code>service</code>, each <code>provider_id</code> and each <code>zk_id</code> must be bound to at most one <code>DeclarationInfo</code> in <code>declarations</code>, whether or not its <code>active</code> field is set.</p>
 <p>The <code>declaration_id</code> uniqueness alone is insufficient to guarantee this property. Because <code>declaration_id = Hash(service||provider_id||zk_id||locators)</code>, two declarations for the same <code>service</code> that reuse the same <code>provider_id</code> (or the same <code>zk_id</code>) but differ in any other component would produce distinct <code>declaration_id</code>s and would therefore not collide. This holds only because each component is committed under an encoding that determines it uniquely: without the length prefixing defined above, two declarations differing only in how the same locator bytes are split across the list would share a <code>declaration_id</code>. The SDP must reject such declarations regardless.</p>
 <p>Consequently, within a single <code>service</code>:</p>
 <ul>
