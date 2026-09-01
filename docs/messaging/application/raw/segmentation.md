@@ -47,7 +47,7 @@ message SegmentMessage {
   uint32 segment_count        = 3;  // number of items of the given class (data or parity)
   bool   is_parity            = 4;  // selects the class the two fields above refer to
   bytes  payload              = 5;  // data chunk or parity shard
-  uint32 original_length      = 6;  // length in bytes of the original payload
+  uint32 entire_message_length      = 2;  // length in bytes of the original payload
 }
 ```
 
