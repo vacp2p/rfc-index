@@ -1,5 +1,4 @@
 # MEMPOOL
-
 | Field | Value |
 | --- | --- |
 | Name | Mempool |
@@ -12,7 +11,6 @@
 <!-- timeline:start -->
 
 ## Timeline
-
 - **2026-09-04** — [`5de1e93`](https://github.com/logos-co/logos-lips/blob/5de1e9348b010157222d99fbac2649e5e68aa278/docs/blockchain/raw/mempool.md) — docs(blockchain): retire on joining the chain, not on becoming the tip
 - **2026-09-02** — [`15e9269`](https://github.com/logos-co/logos-lips/blob/15e92695a7a5b3c23b0b1528a2dd33beb42eceb9/docs/blockchain/raw/mempool.md) — docs(blockchain): drop mempool state that nothing reads
 - **2026-09-01** — [`6a9d9c9`](https://github.com/logos-co/logos-lips/blob/6a9d9c98df738c49489a1911abff1741fb5d1ae0/docs/blockchain/raw/mempool.md) — docs(blockchain): remove restated and non-normative text
@@ -21,29 +19,23 @@
 <!-- timeline:end -->
 
 # Revision History
-
 | **Version** | **Changes** | **Date** |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-09-01 |
 
 # Introduction
-
 The mempool is a node's store of Mantle Transactions that have been submitted but are not yet in the canonical chain. It disseminates those transactions, supplies them to block building, and resolves the references a block proposal carries in place of transaction bodies.
 
 # Overview
-
 A transaction enters the mempool by local submission, by gossip, or by re-insertion after a fork switch. While it is pending, the node relays and broadcasts it on the mempool topic, offers it to block building, and resolves against it the prefix a block proposal carries. It leaves when a block carrying it enters the canonical chain, when block building finds it can never apply, or when it expires.
 
 # Construction
-
 ## Constants
-
 | Constant | Name | Description | Value |
 | --- | --- | --- | --- |
-| `TRANSACTION_TTL` | Transaction Time To Live | How long a transaction may stay pending before it is retired. | 24 hours |
+| `TRANSACTION_TTL` | Transaction Time To Live | How long a transaction may stay pending before it is retired, regardless of its validity window. | 24 hours |
 
 ## Mempool State
-
 ```python
 class Mempool:
     pending: TimeOrderedSet[TxHash]     # admitted, not yet retired, in admission order
@@ -59,7 +51,6 @@ A transaction is keyed by `mantle_txhash(tx)`, defined in [Mantle](bedrock-v1.1-
 `pending` holds each hash once, ordered by admission time. `insert_by` places a hash at the position its admission time gives it, which is not the end when a [Reorganisation](#reorganisation) re-admits a transaction.
 
 ## Transaction Admission
-
 A transaction reaches the mempool by local submission through the [Node API](#node-api), by gossip on the mempool topic, or by re-insertion after a [Reorganisation](#reorganisation). All three follow this procedure.
 
 ```python
@@ -74,6 +65,12 @@ def admit(mempool, encoded: bytes, at: Timestamp = None) -> Result:
     if not preverify(tx):
         return Reject(FailedStatelessValidation)
 
+    s = current_slot()
+    if tx.expiry_slot % TX_EXPIRY_QUANTUM != 0:
+        return Reject(UnquantizedDeadline)
+    if not (s <= tx.expiry_slot <= s + TX_VALIDITY_WINDOW):
+        return Reject(OutsideValidityWindow)
+
     key = mantle_txhash(tx)
     if key in mempool.pending:
         return Duplicate(key)
@@ -85,16 +82,16 @@ def admit(mempool, encoded: bytes, at: Timestamp = None) -> Result:
     return Accept(key)
 ```
 
-Admission reads the transaction and the mempool. It must not read ledger state. A node must not treat membership of the mempool as evidence that a transaction can be applied.
+Admission reads the transaction, the mempool and the current slot. It must not read ledger state. A node must not treat membership of the mempool as evidence that a transaction can be applied.
 
 `MAX_BLOCK_SIZE` is defined in [Cryptarchia Protocol](cryptarchia-v1-protocol.md#constants).
 
-### Decoding
+The validity window is defined in [Mantle](bedrock-v1.1-mantle-specification.md#transaction-validity-window). Admission applies it with the current slot in place of a block slot.
 
+### Decoding
 The payload is the canonical encoding defined in [Mantle Transaction Encoding](mantle-transaction-encoding.md), carried in the envelope defined in [Network Wire Format](network-wire-format.md). Decoding must consume the payload exactly.
 
 ### Stateless Validation
-
 `preverify` applies the subset of the [Mantle validation rules](bedrock-v1.1-mantle-specification.md#validation) that reads no ledger state:
 
 1. The transaction carries one proof entry per operation, which may be the `None` entry where the opcode admits one.
@@ -102,18 +99,15 @@ The payload is the canonical encoding defined in [Mantle Transaction Encoding](m
 3. Each proof bound only to the transaction hash and the operation payload verifies.
 
 ### Reorganisation
-
-When a fork switch displaces blocks from the canonical chain, the node re-admits the transactions they carried that the blocks now in the canonical chain do not carry, and broadcasts them. It re-admits each with its original admission time.
+When a fork switch displaces blocks from the canonical chain, the node re-admits the transactions they carried that the blocks now in the canonical chain do not carry, and broadcasts them. It re-admits each with its original admission time. It does not re-admit a transaction whose `expiry_slot` has passed.
 
 ### Duplicates
-
 `admit` reports a duplicate. The caller decides what follows:
 
 - A duplicate received by gossip is dropped.
 - A duplicate received by local submission is answered as success, and the transaction is broadcast again.
 
 ## Dissemination
-
 Transactions are disseminated by gossipsub on the mempool topic defined in [P2P Network](../draft/p2p-network.md#gossiping).
 
 The message identity of a message on that topic is the Blake2b-256 digest of its payload bytes. Implementations must not use gossipsub's default source-and-sequence-number identity.
@@ -123,7 +117,6 @@ A node relays a received message to its mesh neighbours on receipt, before admis
 A node broadcasts a transaction it admits by local submission or by re-insertion. It does not broadcast a transaction it received by gossip.
 
 ## Block Building View
-
 The mempool supplies the bodies of every pending transaction in admission order.
 
 A leader makes two determinations over that view.
@@ -139,7 +132,6 @@ No block limit applies to this computation. A transaction that never applies is 
 **Selection.** The leader fills the block from the applicable transactions in the same order, stopping at the first transaction that would exceed `MAX_BLOCK_TXS` or `MAX_BLOCK_SIZE`, both defined in [Cryptarchia Protocol](cryptarchia-v1-protocol.md#constants). A transaction left unselected is not retired.
 
 ## Reference Resolution
-
 A block proposal carries a `REFERENCE_PREFIX_LENGTH`-byte prefix of each transaction hash, as defined in [References](bedrock-v1.1-block-construction.md#references). A validator resolves each reference against the mempool.
 
 ```python
@@ -157,35 +149,36 @@ Resolution reads the proposal, `by_prefix` and `bodies`. It must not read the no
 How a validator uses the result, and what a failure to resolve establishes about the block, are specified in [Block Proposal Reconstruction](bedrock-v1.1-block-construction.md#block-proposal-reconstruction) and [Block Proposal Validation](bedrock-v1.1-block-construction.md#block-proposal-validation).
 
 ## Retirement
-
 A transaction leaves `pending` for one of three reasons.
 
 ### Inclusion in a Canonical Block
-
 When a block enters the node's canonical chain, the transactions it carries are retired.
 
 ### Inapplicability
-
 A transaction that the applicability determination of [Block Building View](#block-building-view) never applies is retired.
 
 ### Expiry
+A pending transaction is retired when the current slot passes its `expiry_slot`. A node evaluates this on the slot clock, not on block arrival.
 
 A pending transaction whose age exceeds `TRANSACTION_TTL` is retired.
 
 ### Effects of Retirement
-
 Retirement removes the hash from `pending` and from `by_prefix`, and discards its `admitted_at` entry and its body.
 
 A retired transaction that is gossiped again is admitted again.
 
 ## Persistence and Recovery
-
 A node persists the pending hashes, their admission timestamps, and the transaction bodies.
 
 A node does not persist `by_prefix`. It rebuilds the index from the recovered pending set.
 
-## Node API
+## Note Release
+A wallet that has submitted a transaction spending a note must not spend that note in another transaction until one of the following holds:
 
+1. A transaction spending the note is included at or below the latest immutable block, defined in [Cryptarchia Protocol](cryptarchia-v1-protocol.md#latest-immutable-block).
+2. The slot of the latest immutable block exceeds the transaction's `expiry_slot`.
+
+## Node API
 A node exposes the mempool to local clients. These endpoints are operational and carry no consensus meaning.
 
 | Operation | Description |
@@ -196,7 +189,6 @@ A node exposes the mempool to local clients. These endpoints are operational and
 | Metrics | The number of pending transactions and the time of the most recent admission. |
 
 # References
-
 - [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)
 - [Cryptarchia Protocol](cryptarchia-v1-protocol.md)
 - [Mantle](bedrock-v1.1-mantle-specification.md)
