@@ -40,19 +40,19 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 syntax = "proto3";
 
 message SegmentMessage {
-  bytes  entire_message_hash   = 1;  // Keccak256 of the original payload, 32 bytes
-  uint32 entire_message_length = 2;  // length in bytes of the original payload
-  uint32 index                 = 3;  // position within this segment's own class (data or parity)
-  uint32 segment_count         = 4;  // number of items of the given class (data or parity)
-  bool   is_parity             = 5;  // selects the class the two fields above refer to
-  bytes  payload               = 6;  // data chunk or parity shard
+  bytes  original_payload_hash   = 1;  // Keccak256 of the original payload, 32 bytes
+  uint32 original_payload_length = 2;  // length in bytes of the original payload
+  uint32 index                   = 3;  // position within this segment's own class (data or parity)
+  uint32 segment_count           = 4;  // number of items of the given class (data or parity)
+  bool   is_parity               = 5;  // selects the class the two fields above refer to
+  bytes  payload                 = 6;  // data chunk or parity shard
 }
 ```
 
 ### Validity
 
 A **segment message** is valid only if all of the following hold:
-- `entire_message_hash` is exactly 32 bytes.
+- `original_payload_hash` is exactly 32 bytes.
 - `1 <= segment_count <= maxTotalSegments` (receiver's configured limit.)
 - `index < segment_count`.
 
@@ -92,7 +92,7 @@ without it a set reconstructs only once every data segment has arrived.
 
 To transmit an original payload, the sender:
 
-- MUST compute `entire_message_hash = Keccak256(original payload)`.
+- MUST compute `original_payload_hash = Keccak256(original payload)`.
 - MUST split the payload into one or more data segments, at a chunk size such that every segment
   it sends, data and parity alike, serializes to at most `segmentSizeBytes`.
 - MAY generate parity segments at `parityRate` as defined in [Reed–Solomon Coding](#reedsolomon-coding).
@@ -104,8 +104,8 @@ To transmit an original payload, the sender:
 A receiver retains every valid segment message.
 
 Two valid segment messages belong to the same **segment set** only if all of the following hold:
-- they carry equal `entire_message_hash`.
-- they carry equal `entire_message_length`.
+- they carry equal `original_payload_hash`.
+- they carry equal `original_payload_length`.
 - they carry equal `segment_count`, whenever their `is_parity` is equal.
 
 Within a set, `(is_parity, index)` MUST be unique; a segment message repeating one already held MUST be ignored.
@@ -124,9 +124,9 @@ A set's **data-segment count** is the `segment_count` of any segment message wit
 The receiver produces the original payload following these steps:
 
 1. Concatenate the data segments' `payload` fields in ascending `index` order.
-2. Truncate to `entire_message_length`, which discards any zero padding left by Reed–Solomon encoding.
+2. Truncate to `original_payload_length`, which discards any zero padding left by Reed–Solomon encoding.
    Fewer assembled bytes than that mean the set is incomplete and MUST NOT be delivered to the application.
-3. Verify that `Keccak256` of the result equals the set's `entire_message_hash`.
+3. Verify that `Keccak256` of the result equals the set's `original_payload_hash`.
 
 An invalid payload MUST be discarded; only a valid one is delivered to the application.
 Any parity segments the set holds are unused, and the set MAY be released once the payload is delivered.
@@ -209,7 +209,7 @@ Leopard-RS carries that in GF(2^16); a coder confined to GF(2^8) cannot, and nee
 
 Received segments accumulate until their set is reconstructible. Implementations typically:
 
-- Index the cache by `entire_message_hash`, and additionally by sender where the transport authenticates one.
+- Index the cache by `original_payload_hash`, and additionally by sender where the transport authenticates one.
   Authenticating the sender is out of scope of this specification.
 - Bound both the number of segment sets held and the total buffered bytes,
   per sender as well as globally where a sender identity is available.
@@ -224,7 +224,7 @@ In-memory buffering is sufficient otherwise.
 
 ### Privacy
 
-`entire_message_hash` links the segments of one payload to each other, but does not reveal the payload.
+`original_payload_hash` links the segments of one payload to each other, but does not reveal the payload.
 This specification does not enforce encryption, but applications SHOULD encrypt each serialized
 `SegmentMessage` before transmission, which hides the hash and the segment counts from observers
 and denies an attacker the hash it would need to [poison a set](#integrity).
@@ -233,12 +233,12 @@ Traffic analysis may still identify a segmented flow by its timing and volume.
 ### Integrity
 
 This specification provides no sender authentication.
-The `entire_message_hash` check on the reconstructed payload detects accidental corruption and mismatched segments,
+The `original_payload_hash` check on the reconstructed payload detects accidental corruption and mismatched segments,
 but an attacker able to inject transport messages can compute a consistent hash over a payload of their own.
 Such an attacker can also deny reconstruction outright: injecting a segment message that occupies an
 `(is_parity, index)` of a set already in flight makes the receiver ignore the genuine one, so the set fails
 its hash check and never reconstructs until it [expires](#expiry).
-Encrypting each segment message, as [Privacy](#privacy) recommends, keeps `entire_message_hash` out of an
+Encrypting each segment message, as [Privacy](#privacy) recommends, keeps `original_payload_hash` out of an
 observer's reach and so out of reach of this attack.
 Applications requiring authenticity MUST obtain it from another layer.
 
