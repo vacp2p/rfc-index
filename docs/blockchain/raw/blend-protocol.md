@@ -32,6 +32,7 @@
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
 | 1.3.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 | 1.3.1 | An Active Message points to a declaration by `zk_id` | 2026-09-01 |
+| 1.3.2 | [RFC] Core node addresses are resolved through libp2p peer routing rather than retrieved from the SDP | 2026-09-02 |
 
 # Introduction
 
@@ -148,7 +149,7 @@ In this section, we briefly discuss the way the network is created and maintaine
 
 The process of creating a network is called bootstrapping.
 
-At the beginning of an epoch, all core nodes retrieve a fresh set of core nodes’ connectivity information from the SDP protocol. Then each core node selects at random a set of other core nodes and connects to them through fully encrypted connections. After some time, when all core nodes connect to other core nodes, a new network is formed.
+At the beginning of an epoch, all core nodes retrieve a fresh set of core node identities from the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)). The SDP carries no addresses. A node resolves the addresses of a `provider_id` through libp2p peer routing, which requires at least one reachable peer to start from; a node obtains those from its configuration. Then each core node selects at random a set of other core nodes and connects to them through fully encrypted connections. After some time, when all core nodes connect to other core nodes, a new network is formed.
 
 ### Minimal Network Size
 
@@ -297,7 +298,7 @@ Since the network is built based on two types of nodes, we define two network ty
 
 The bootstrapping defines the process of creating the network, which happens at the beginning of each epoch.
 
-1. A core node at the beginning of an epoch retrieves a set of core nodes’ information from the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
+1. A core node at the beginning of an epoch retrieves a set of core node identities from the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
 2. If the number of core nodes is below the minimum number of nodes ([Minimal Network Size](#minimal-network-size)), then stop and use regular broadcasting.
 3. It starts opening new connections.
     1. It selects at random (without replacement) a node from the set of core nodes.
@@ -345,7 +346,7 @@ Each core node defines individually the maximum number of edge connections allow
 
 The bootstrapping logic of an edge node:
 
-1. At the beginning of an epoch, the edge node retrieves a set of core nodes’ information from the SDP protocol.
+1. At the beginning of an epoch, the edge node retrieves a set of core node identities from the SDP protocol.
 2. If the number of core nodes is below the minimum number of nodes ([Minimal Network Size](#minimal-network-size)), then stop and use regular broadcasting.
 3. Whenever an edge node needs to send a message, it selects at random (without replacement) a node from that set.
 4. It establishes a secure connection with the selected node.

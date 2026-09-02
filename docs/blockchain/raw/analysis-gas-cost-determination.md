@@ -30,6 +30,7 @@
 | 1.5.1 | Reflect Channel Deposit execution modification. It now consumes inputs to update their NoteId | 2026-07-27 |
 | 1.5.2 | Renamed locked notes into service notes and stated that the Input Gas covers the check that a note is neither a service nor a channel note | 2026-08-27 |
 | 1.5.3 | [RFC] Align the SDP costs with declarations keyed by `zk_id`: no lock-period check, and a note backs one declaration | 2026-09-01 |
+| 1.5.4 | Declaring no longer verifies locators | 2026-09-02 |
 
 # Introduction
 
@@ -182,7 +183,6 @@ Execution: ~ 646k CPU cycles.
 - Verification of the ZK signature: 590,000 cycles.
 - Verification that the `zk_id` is not already registered: negligible.
 - Verification that the `provider_id` is not already bound: negligible.
-- Verification of locator length: negligible.
 - Verification of service note existence: negligible.
 - Verification of service note value: negligible.
 - Verification that the note isn’t already used: negligible.
