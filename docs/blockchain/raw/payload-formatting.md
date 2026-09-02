@@ -27,7 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.1.0 | Updated `Max_Body_Length` to 34574 bytes, the maximum block proposal size once a proposal carries the signed headers of the uncles it references (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)). | 2026-08-06 |
 | 1.1.1 | Updated `Max_Body_Length` to 18192 bytes, following the compression of transaction references to 16-byte prefixes and their encoding as a variable-length list (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)). | 2026-08-18 |
-| 1.1.2 | Updated `Max_Body_Length` to 10000 bytes, following the revised compression of transaction references to 8-byte keyed short IDs (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)). | 2026-08-20 |
+| 1.1.2 | Updated `Max_Body_Length` to 10000 bytes, following the revised compression of transaction references to 8-byte keyed short IDs (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)). | 2026-09-02 |
 
 # Introduction
 
