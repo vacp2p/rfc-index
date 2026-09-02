@@ -120,7 +120,7 @@ Note that every inputs and outputs of zero-knowledge proofs are all scalar field
 
 Such that the following constraints hold:
 
-**Step 1**: The prover selects an `index` for the chosen key. This index must be lower than the allowed quota and not already used. This index is used to derive the key nullifier in step 5. Limiting the possible values of this index also limit the possible nullifier created which produce the desired effect: limiting the generation of keys to a certain quota. `index` is on 20 bits, so a quota may be at most $`2^{20}`$.
+**Step 1**: The prover selects an `index` for the chosen key. This index must be lower than the allowed quota and not already used. This index is used to derive the key nullifier in step 5. Limiting the possible values of this index also limit the possible nullifier created which produce the desired effect: limiting the generation of keys to a certain quota. `index` and the quota it is compared against are both 20-bit values, so a quota may be at most $`2^{20} - 1`$, and that is also the largest number of keys one may permit.
 
 What the quota bounds differs by branch, because what the nullifier is derived from differs by branch. For the core and leadership branches the secret key is a long lived identity — an SDP declared `zk_id` and a note key respectively — so the bound is per node per `epoch`. For the proof of work branch the secret key is ground afresh for every solution, so **the bound is per solution, not per node**: a prover holding $`n`$ solutions may derive $`n \cdot`$ `pow_quota` distinct nullifiers, and nothing ties those solutions to a single identity.
 
@@ -200,7 +200,6 @@ is_leader = would_win_leadership(pol_epoch_nonce,
         pol_ledger_aged,
         pol_sl,
         pol_secret_key,
-        pol_sk_secrets_root,
         pol_note_value,
         pol_note_tx_hash,
         pol_note_output_number,
