@@ -24,7 +24,6 @@ The mempool is a node's store of Mantle Transactions that have been submitted bu
 | Constant | Name | Description | Value |
 | --- | --- | --- | --- |
 | `TRANSACTION_TTL` | Transaction Time To Live | How long a transaction may stay pending before it is retired. | 24 hours |
-| `RETIREMENT_GRACE_PERIOD` | Retirement Grace Period | How long a retired transaction's body is kept before it is discarded. | 10 minutes |
 
 # Mempool State
 
@@ -33,13 +32,14 @@ class Mempool:
     pending: OrderedSet[TxHash]         # admitted, not yet retired, in admission order
     bodies: Map[TxHash, SignedMantleTx] # transaction bodies
     admitted_at: Map[TxHash, Timestamp] # admission time, per pending transaction
-    retired_at: Map[TxHash, Timestamp]  # retirement time, per retired transaction
     by_prefix: Map[bytes, Set[TxHash]]  # pending hashes, keyed by reference prefix
 ```
 
 A transaction is keyed by `mantle_txhash(tx)`, defined in [Mantle](bedrock-v1.1-mantle-specification.md#mantle-transaction-hash).
 
 `by_prefix` maps `prefix(hash, REFERENCE_PREFIX_LENGTH)` to the pending hashes carrying that prefix, where `REFERENCE_PREFIX_LENGTH` is defined in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md#references).
+
+Transactions sharing an admission time are ordered in `pending` by hash.
 
 # Transaction Admission
 
@@ -62,7 +62,6 @@ def admit(mempool, encoded: bytes, at: Timestamp = None) -> Result:
         return Duplicate(key)
 
     mempool.bodies[key] = tx
-    mempool.retired_at.pop(key, None)
     mempool.admitted_at[key] = at if at is not None else now()
     mempool.pending.insert_by(key, mempool.admitted_at[key])
     mempool.by_prefix[prefix(key, REFERENCE_PREFIX_LENGTH)].add(key)
@@ -136,9 +135,7 @@ def resolve(mempool, reference) -> Optional[SignedMantleTx]:
 
 A reference resolves only when the match is unique. Zero matches and two or more matches are both unresolved. A non-unique match must not be searched.
 
-Resolution reads `pending` and the proposal. It must not read the node's chain state, its peer set, or the order in which it received transactions.
-
-Resolution does not read retired transactions.
+Resolution reads the proposal, `by_prefix` and `bodies`. It must not read the node's chain state, its peer set, or the order in which transactions were admitted.
 
 How a validator uses the result, and what a failure to resolve establishes about the block, are specified in [Block Proposal Reconstruction](bedrock-v1.1-block-construction.md#block-proposal-reconstruction) and [Block Proposal Validation](bedrock-v1.1-block-construction.md#block-proposal-validation).
 
@@ -160,13 +157,13 @@ A pending transaction whose age exceeds `TRANSACTION_TTL` is retired.
 
 ## Effects of Retirement
 
-Retirement removes the hash from `pending` and from `by_prefix`, discards its `admitted_at` entry, and records it in `retired_at`. After `RETIREMENT_GRACE_PERIOD` the node discards the body and the `retired_at` entry.
+Retirement removes the hash from `pending` and from `by_prefix`, and discards its `admitted_at` entry and its body.
 
 A retired transaction that is gossiped again is admitted again.
 
 # Persistence and Recovery
 
-A node persists the pending hashes, their admission timestamps, the `retired_at` entries, and the transaction bodies.
+A node persists the pending hashes, their admission timestamps, and the transaction bodies.
 
 A node does not persist `by_prefix`. It rebuilds the index from the recovered pending set.
 
