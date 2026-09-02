@@ -12,8 +12,13 @@
 
 ## Abstract
 
-This specification defines an application-layer wire format that carries a payload larger than the maximum message size of the underlying transport.
-The payload is split into data segments that can be reconstructed by the receiver even when segments arrive out of order. The data segments can optionally be extended with Reed–Solomon parity ones, in which case, recovery can also happen if the lost segments are under a certain threshold.
+This specification defines an application-layer protocol for **segmentation** and **reconstruction**
+of messages carried over a transport/delivery service with a message-size limitation,
+when the original payload exceeds said limitation.
+Applications partition the payload into multiple transport messages and reconstruct the original on receipt,
+even when segments arrive out of order.
+Optional Reed–Solomon erasure coding additionally tolerates the loss
+of up to a predefined percentage of segments.
 
 ## Motivation
 
