@@ -166,8 +166,8 @@ class DeclarationMessage:
     service_type: ServiceType
     locators: list[Locator]
     provider_id: Ed25519PublicKey
-    service_note_id: NoteId
     zk_id: ZkPublicKey
+    service_note_id: NoteId
 ```
 
 The `locators` list must be non-empty and its length must be limited to reduce the potential for abuse. Therefore, the length of the list cannot be longer than 8.
@@ -239,7 +239,7 @@ class ActiveMessage:
     metadata: Metadata
 ```
 
-where `metadata` is service-specific node activeness metadata.
+where `metadata` is service-specific node activeness metadata, encoded as the `Metadata` production of the [Mantle Transaction Encoding](mantle-transaction-encoding.md#sdp-operations).
 
 The message must be signed by the `zk_id` key.
 

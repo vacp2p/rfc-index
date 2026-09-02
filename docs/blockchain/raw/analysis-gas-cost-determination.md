@@ -174,13 +174,14 @@ This gas amount covers the verification of multiple Eddsa25519 signatures and en
 
 ## SDP Declaration
 
-This gas covers multiple verification processes: confirming ownership of the service note through ZkSignature verification, validating the zk_id via a second ZkSignature, and establishing ownership of the provider_id through an Eddsa25519 signature. It also includes verification of the declaration format, confirmation of note existence, validation that the note is not already used for this service, and verification of its amount. Additionally, it accounts for the computational costs associated with the note service locking mechanism and declaration management.
+This gas covers multiple verification processes: confirming ownership of the service note through ZkSignature verification, validating the zk_id via a second ZkSignature, and establishing ownership of the provider_id through an Eddsa25519 signature. It also includes verification of the declaration format, confirmation of note existence, validation that the note is not already used, and verification of its amount. Additionally, it accounts for the computational costs associated with the note service locking mechanism and declaration management.
 
 Execution: ~ 646k CPU cycles.
 
 - Verification of the Ed25519 signature: 56,000 cycles.
 - Verification of the ZK signature: 590,000 cycles.
-- Verification that the declaration doesn’t already exist: negligible.
+- Verification that the `zk_id` is not already registered: negligible.
+- Verification that the `provider_id` is not already bound: linear in the number of declarations, unless the registry is indexed by `provider_id`.
 - Verification of locator length: negligible.
 - Verification of service note existence: negligible.
 - Verification of service note value: negligible.

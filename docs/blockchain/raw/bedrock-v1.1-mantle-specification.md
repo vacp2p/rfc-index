@@ -1063,7 +1063,7 @@ class DeclarationMessage:
     service_note_id: NoteId
 ```
 
-Service notes are introduced in [Service notes](#service-notes) and serve as Service collaterals. They cannot be spent before the owner withdraw its participation from the declared service(s).
+Service notes are introduced in [Service notes](#service-notes) and serve as Service collaterals. They cannot be spent before the owner withdraws its participation from the declared service.
 
 #### Proof
 

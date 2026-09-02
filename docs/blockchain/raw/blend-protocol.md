@@ -152,7 +152,7 @@ At the beginning of an epoch, all core nodes retrieve a fresh set of core nodesâ
 
 ### Minimal Network Size
 
-The minimal network size is $`32`$. This is the minimum number of nodes (unique `ProviderId`s from declarations) that must be retrieved from the SDP to consider the Blend protocol safe to use.
+The minimal network size is $`32`$. This is the minimum number of nodes (`ProviderId`s from declarations) that must be retrieved from the SDP to consider the Blend protocol safe to use.
 
 This minimal size of $`32`$ nodes allows the network to release, on average, a single message per round under the assumption of $`50\%`$ unresponsive nodes. With fewer nodes, the network would need to either release more messages per round or queue them. This would increase the time messages take to traverse the network, potentially compromising the safety of the consensus.
 
@@ -1065,7 +1065,7 @@ The ledger must only accept a single active message per-node per-epoch. Any dupl
 
 The node rewards for epoch $`s`$ are calculated according to the following schema:
 
-1. Rewards are not calculated if the number of nodes (unique `ProviderId`s from declarations) retrieved from the SDP protocol is lower than the [Minimal Network Size](#minimal-network-size).
+1. Rewards are not calculated if the number of nodes (`ProviderId`s from declarations) retrieved from the SDP protocol is lower than the [Minimal Network Size](#minimal-network-size).
 
 2. Count the number of true activity proofs registered on the ledger:
     $$B = \sum_{i=1}^{N}\mathrm{true}(\pi_{A}^{i,t,e})$$
