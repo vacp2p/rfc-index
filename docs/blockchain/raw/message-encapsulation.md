@@ -28,7 +28,6 @@
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.1.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 | 1.2.0 | Add the proof of work case to the Proof of Quota generation procedure | 2026-08-31 |
-| 1.2.1 | Rename the ground secret to the proof of work nonce in the proof generation recipe | 2026-08-31 |
 
 # Introduction
 
