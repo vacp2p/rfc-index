@@ -80,7 +80,7 @@ The proof's public signal vector is fixed by the circuit — the output first, t
  K_part_one, K_part_two, pow_blend_difficulty, pol_epoch_nonce, pol_t0, pol_t1]
 ```
 
-A verifier must assemble the vector in exactly this order; any other rejects valid proofs. Note that neither the listing above nor the `public [...]` clause of the circuit's main component states this order — the first groups the values as the verifier's input structure declares them, and the second selects which signals are public without ordering them.
+A verifier must assemble the vector in exactly this order; any other rejects valid proofs. Neither the listing above nor the `public [...]` clause of the circuit's main component states this order — the first groups the values as the verifier's input structure declares them, and the second selects which signals are public without ordering them.
 
 `pow_blend_difficulty` is a per-epoch protocol value, identical for every proof produced in that epoch, so it carries no branch-specific signal and a verifier cannot infer from it which branch a given proof used. How its value is set for each epoch is not defined here; it is a consensus quantity supplied to the circuit, and its derivation is specified alongside the other Blend parameters.
 
