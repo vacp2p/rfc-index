@@ -268,10 +268,10 @@ The first step is to generate a set of keys alongside all necessary proofs that 
             4. The rest is filled with Proof of Leadership (PoL — [Proof of Leadership](cryptarchia-proof-of-leadership.md)) related data.
         3. If the node is using a proof of work solution then:
             1. The `selector=2` value must be specified.
-            2. The `index` counts the blending operations already drawn against this solution and must be below `pow_quota`. Since `pow_quota` is the per-message blending count, one solution's indices are consumed by a single message.
+            2. The `index` counts the blending operations already drawn against this solution and must be below `pow_quota`. Since `pow_quota` is the per-message blending count, a single message consumes all of one solution's indices.
             3. The `pow_nonce` is the private nonce the node ground to obtain the solution.
             4. The rest of the `ProofOfQuotaWitness` is filled with arbitrary data.
-        3. The `ProofOfQuotaPublic` and `ProofOfQuotaWitness` are passed to the zero-knowledge circuits that generate the proof $`\pi^{K^{n}_{l}}_{Q}`$ which derives the `key_nullifier` ($`\nu_e`$) from `pol_epoch_nonce`, private `index`, private secret key during proof generation.
+        4. The `ProofOfQuotaPublic` and `ProofOfQuotaWitness` are passed to the zero-knowledge circuits that generate the proof $`\pi^{K^{n}_{l}}_{Q}`$ which derives the `key_nullifier` ($`\nu_e`$) from `pol_epoch_nonce`, private `index`, private secret key during proof generation.
 
 2. Select $`h`$ nodes from the set of nodes $`\mathcal{N}`$ in a random and verifiable manner. For $`i \in \{1,…,h\}`$, select $`l_i = \text{CSPRBG}(H_{\mathbf N}(\rho))_{8} \mod N`$, where $`\rho`$ is a [selection randomness](proof-of-quota.md) (using little-endian encoding), a shared secret derived during Proof of Quota generation, the output of the $`\text{CSPRBG}()_8`$ is returns 8 bytes (little-endian).
     ```python

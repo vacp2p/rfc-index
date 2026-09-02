@@ -26,8 +26,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
-| 1.1.0 | Add the Proof of Work Key | 2026-08-31 |
-| 1.1.1 | Rename the proof of work key to the proof of work nonce; it is a secret with no public counterpart, and its generation is unchanged | 2026-08-31 |
+| 1.1.0 | Add the Proof of Work Nonce | 2026-08-31 |
 
 # Introduction
 
@@ -40,7 +39,7 @@ This document ensures that the keys are used and generated in a common manner, w
 - **Non-ephemeral Quota Key (NQK)** — used for proving that a node is a core node.
 - **Non-ephemeral Signing Key (NSK)** — used to authenticate the node on the network level and derive the Non-ephemeral Encryption Key.
 - **Ephemeral Signing Key (ESK)** — used for signing Blend messages, one per encapsulation.
-- **Proof of Work Nonce (PWN)** — used for proving that a node holds a proof of work solution, one per solution. It is a secret, not a key: no public counterpart is ever derived from it.
+- **Proof of Work Nonce (PWN)** — used for proving that a node holds a proof of work solution, one per solution. It is a secret, not a key.
 - **Non-ephemeral Encryption Key (NEK)** — used for deriving shared secrets for message encryption.
 - **Ephemeral Encryption Key (EEK)** — used for encrypting Blend messages, one per encapsulation.
 
@@ -66,7 +65,7 @@ A unique signing key must be generated for every encapsulation as required by th
 
 The key must not be reused. Otherwise, the messages that reuse the same key can be linked together. The node is responsible for not reusing the key.
 
-## Proof of Work Key
+## Proof of Work Nonce
 
 A node obtains a Proof of Work Nonce (PWN) by searching for a nonce whose puzzle ticket falls below the Blend threshold for the epoch, as defined in [Proof of Quota](proof-of-quota.md). Unlike the keys above, it is not chosen but found: the node generates candidates until one satisfies the threshold, and the work of doing so is what the nonce represents.
 
@@ -76,7 +75,7 @@ The PWN must be sampled with full entropy from the scalar field rather than enum
 
 A PWN is bound to the epoch it was found in, since the epoch nonce enters the ticket derivation. It cannot be carried into the following epoch and must be found again.
 
-The relationship between a PWN and an ESK is worth stating explicitly, because it is easy to assume a binding that does not exist. They are unrelated: the PWN proves entitlement, the ESK signs the message, and the circuit does not constrain any relation between them. What enforces the quota is not the ESK but the nullifier: each encapsulation consumes one `index` against the solution and yields a distinct key nullifier derived from the PWN, so reusing an index reveals itself as a duplicate. The ESK is a separate key that is fresh per encapsulation by its own definition above, not because the quota requires it.
+A PWN and an ESK are unrelated: the PWN proves entitlement, the ESK signs the message, and the circuit does not constrain any relation between them. What enforces the quota is not the ESK but the nullifier: each encapsulation consumes one `index` against the solution and yields a distinct key nullifier derived from the PWN, so reusing an index reveals itself as a duplicate. The ESK is a separate key that is fresh per encapsulation by its own definition above, not because the quota requires it.
 
 ## Non-ephemeral Encryption Key
 
