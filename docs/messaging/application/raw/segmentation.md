@@ -124,10 +124,10 @@ Every segment message of a set carries its `data_segment_count`:
 
 The receiver produces the original payload following these steps:
 
-1. Concatenate the data segments' `segment_payload` fields in ascending `index` order.
-2. Truncate to `original_payload_length`, which discards any zero padding left by Reed–Solomon encoding.
-   Fewer assembled bytes than that mean the set is incomplete and MUST NOT be delivered to the application.
-3. Verify that `Keccak256` of the result equals the set's `original_payload_hash`.
+1. Concatenate the data segments' `segment_payload` fields in ascending `index` order,
+   which yields exactly `original_payload_length` bytes;
+   fewer mean the set is incomplete and MUST NOT be delivered to the application.
+2. Verify that `Keccak256` of the result equals the set's `original_payload_hash`.
 
 An invalid payload MUST be discarded; only a valid one is delivered to the application.
 Any parity segments the set holds are unused, and the set MAY be released once the payload is delivered.
@@ -136,7 +136,13 @@ Any parity segments the set holds are unused, and the set MAY be released once t
 
 Where a data segment is missing, parity segments stand in for it.
 The receiver [Reed–Solomon decodes](#reedsolomon-coding) the missing data segments from the ones it holds,
-then proceeds as [above](#all-data-segments-are-received-successfully) from step 1.
+concatenates as [above](#all-data-segments-are-received-successfully),
+then truncates the result to `original_payload_length` before verifying the hash.
+
+Decoding returns every data segment at the [shard length](#reedsolomon-coding),
+so a recovered last data segment comes back carrying zero padding the sender never transmitted.
+Truncating to `original_payload_length` removes it;
+a receiver holding every data segment assembles exactly that many bytes and truncates nothing.
 
 ### Expiry
 
