@@ -1013,8 +1013,12 @@ Validators must keep the following state when implementing SDP Operations:
 
 ```python
 service_notes: dict[NoteId, ZkPublicKey]
+providers: dict[Ed25519PublicKey, ZkPublicKey]
 declarations: dict[ZkPublicKey, DeclarationInfo]
 ```
+
+`service_notes` and `providers` index the declarations by the two identifiers
+that are not their key, so each uniqueness rule is one lookup.
 
 ### Common SDP Structures
 
@@ -1092,6 +1096,7 @@ proof: DeclarationProof
 min_stake: MinStake      # the (global) minimum stake setting
 ledger: Ledger           # the set of unspent notes
 service_notes: dict[NoteId, ZkPublicKey]
+providers: dict[Ed25519PublicKey, ZkPublicKey]
 declarations: dict[ZkPublicKey, DeclarationInfo]
 ```
 
@@ -1112,7 +1117,7 @@ declarations: dict[ZkPublicKey, DeclarationInfo]
       ```python
       assert declaration.zk_id not in declarations
       assert declaration.service_note_id not in service_notes
-      assert all(d.provider_id != declaration.provider_id for d in declarations.values())
+      assert declaration.provider_id not in providers
       ```
 
   3. Ensure the locators list is non-empty and has no more than 8 entries.
@@ -1135,14 +1140,16 @@ declarations: dict[ZkPublicKey, DeclarationInfo]
 ```python
 declaration: DeclarationMessage # the declaration we are executing
 current_epoch: EpochNumber
-service_notes : dict[NoteId, ZkPublicKey]
+service_notes: dict[NoteId, ZkPublicKey]
+providers: dict[Ed25519PublicKey, ZkPublicKey]
 ```
 
   *Execute*
 
-  1. Lock the note to this declaration.
+  1. Index the note and the provider identity by this declaration.
       ```python
       service_notes[declaration.service_note_id] = declaration.zk_id
+      providers[declaration.provider_id] = declaration.zk_id
       ```
 
   2. Store the declaration as explained in [**Declaration Storage**](bedrock-service-declaration-protocol.md#declaration-storage).
@@ -1339,6 +1346,7 @@ is removed and its note unlocked.
 ```python
 current_epoch: EpochNumber
 service_notes: dict[NoteId, ZkPublicKey]
+providers: dict[Ed25519PublicKey, ZkPublicKey]
 declarations: dict[ZkPublicKey, DeclarationInfo]
 ```
 
@@ -1347,9 +1355,10 @@ declarations: dict[ZkPublicKey, DeclarationInfo]
   For every `zk_id`, `declare_info` in `declarations` where
   `declare_info.withdraw_at is not None and declare_info.withdraw_at <= current_epoch - 2`:
 
-  1. Unlock the note the declaration held.
+  1. Release the note and the provider identity the declaration held.
       ```python
       del service_notes[declare_info.service_note_id]
+      del providers[declare_info.provider_id]
       ```
 
   2. Remove the declaration.

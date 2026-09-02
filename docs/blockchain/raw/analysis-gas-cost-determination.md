@@ -181,12 +181,12 @@ Execution: ~ 646k CPU cycles.
 - Verification of the Ed25519 signature: 56,000 cycles.
 - Verification of the ZK signature: 590,000 cycles.
 - Verification that the `zk_id` is not already registered: negligible.
-- Verification that the `provider_id` is not already bound: linear in the number of declarations, unless the registry is indexed by `provider_id`.
+- Verification that the `provider_id` is not already bound: negligible.
 - Verification of locator length: negligible.
 - Verification of service note existence: negligible.
 - Verification of service note value: negligible.
 - Verification that the note isn’t already used: negligible.
-- Register the note as a service note: negligible.
+- Register the note as a service note and index the provider identity: negligible.
 ## SDP Withdraw
 
 This gas covers a verification process that includes: confirming ownership of the zk_id through ZkSignature verification, confirming that the declaration exists and has not been previously withdrawn, and validating that the service note it holds is still bound to it. The validation process also ensures that the withdrawal message's nonce is greater than any previous nonce, preventing replay attacks. During execution, the system records the withdrawal epoch on the declaration; the declaration is removed and its note released at the epoch transition two epochs later.
