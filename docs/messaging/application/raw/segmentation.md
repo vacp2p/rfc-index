@@ -22,10 +22,13 @@ of up to a predefined percentage of segments.
 
 ## Motivation
 
-Many message transport and delivery protocols impose a maximum message size that restricts the size of application payloads.
-For example, Logos Delivery propagates messages up to 150 KiB as per [64/WAKU2-NETWORK - Message](../../core/draft/64/network.md#message-size).
+Many message transport and delivery protocols impose a maximum message size
+that restricts the size of application payloads.
+For example, Logos Delivery propagates messages up to 150 KiB
+as per [64/WAKU2-NETWORK - Message](../../core/draft/64/network.md#message-size).
 To support larger application payloads, a segmentation layer is required.
-This specification enables larger messages by partitioning them into multiple envelopes and reconstructing them at the receiver.
+This specification enables larger messages by partitioning them into multiple envelopes
+and reconstructing them at the receiver.
 Erasure-coded parity segments provide resilience against partial loss or reordering.
 
 ## Terminology
@@ -110,14 +113,17 @@ Two valid segment messages belong to the same **segment set** only if all of the
 - they carry equal `original_payload_length`.
 - they carry equal `segment_count`, whenever their `is_parity` is equal.
 
-Within a set, `(is_parity, index)` MUST be unique; a segment message repeating one already held MUST be ignored.
+Within a set, `(is_parity, index)` MUST be unique;
+a segment message repeating one already held MUST be ignored.
 
 Once a set holds segments of both classes it knows both counts,
 and MUST drop the set where they sum above `maxTotalSegments`.
 
 A set's **data-segment count** is the `segment_count` of any segment message with `is_parity == false`.
-- A set reaching that count in data segments alone reconstructs by [concatenation](#all-data-segments-are-received-successfully).
-- A set reaching that count in data plus parity segments together reconstructs [through parity](#recovery-through-parity).
+- A set reaching that count in data segments alone
+  reconstructs by [concatenation](#all-data-segments-are-received-successfully).
+- A set reaching that count in data plus parity segments together
+  reconstructs [through parity](#recovery-through-parity).
 - Else, [expires](#expiry) after a configured timeout.
 
 ### All data segments are received successfully
@@ -144,18 +150,20 @@ The receiver MUST NOT wait indefinitely for all the required segments to arrive.
 It MUST drop a set that has received no further segments
 within a reconstruction timeout without delivering anything to the application.
 
-A later segment message of a dropped set starts a new one, which reconstructs only if enough are retransmitted.
+A later segment message of a dropped set starts a new one,
+which reconstructs only if enough are retransmitted.
 
 ## Configuration
 
 - `segmentSizeBytes`: chosen by the application so that a segment fits the transport's maximum message size.
-- `parityRate`: parity segments as a fraction of the data segments, so `0.125` is one parity segment per eight data ones.
+- `parityRate`: parity segments as a fraction of the data segments,
+  so `0.125` is one parity segment per eight data ones.
   MUST be less than `1`, and the count it yields is capped so that parity stays the minority class,
   see [Reed–Solomon Coding](#reedsolomon-coding).
   Defaults to `0`, which disables parity.
   `0.125` is RECOMMENDED where the [guidance below](#when-to-use-parity) favours parity.
-- `reconstructionTimeoutSeconds`: how long a segment set may go without a new segment message before the receiver
-  drops it, see [Expiry](#expiry).
+- `reconstructionTimeoutSeconds`: how long a segment set may go without a new segment message
+  before the receiver drops it, see [Expiry](#expiry).
 - `maxTotalSegments`: greatest number of segments a set may hold, data and parity together.
   Bounds how much memory one sender can make a receiver buffer, see [Segment Caching](#segment-caching).
   **256** is RECOMMENDED, the shard ceiling of the smaller field a Reed–Solomon implementation may use,
@@ -181,7 +189,8 @@ a 50% overhead to tolerate a single loss.
 
 Received segments accumulate until their set is reconstructible. Implementations typically:
 
-- Index the cache by `original_payload_hash`, and additionally by sender where the transport authenticates one.
+- Index the cache by `original_payload_hash`,
+  and additionally by sender where the transport authenticates one.
   Authenticating the sender is out of scope of this specification.
 - Bound both the number of segment sets held and the total buffered bytes,
   per sender as well as globally where a sender identity is available.
@@ -205,7 +214,8 @@ Traffic analysis may still identify a segmented flow by its timing and volume.
 ### Integrity
 
 This specification provides no sender authentication.
-The `original_payload_hash` check on the reconstructed payload detects accidental corruption and mismatched segments,
+The `original_payload_hash` check on the reconstructed payload
+detects accidental corruption and mismatched segments,
 but an attacker able to inject transport messages can compute a consistent hash over a payload of their own.
 Such an attacker can also deny reconstruction outright: injecting a segment message that occupies an
 `(is_parity, index)` of a set already in flight makes the receiver ignore the genuine one, so the set fails
@@ -218,7 +228,8 @@ Applications requiring authenticity MUST obtain it from another layer.
 
 A remote sender controls how much memory a receiver buffers, so implementations MUST bound it.
 The limits and timeouts in [Segment Caching](#segment-caching) are the mitigation.
-Rate limiting at the transport, for example [17/WAKU2-RLN-RELAY](../../core/draft/17/rln-relay.md) in Logos Delivery,
+Rate limiting at the transport,
+for example [17/WAKU2-RLN-RELAY](../../core/draft/17/rln-relay.md) in Logos Delivery,
 additionally bounds how fast an attacker can create pending reconstructions.
 
 ## Copyright
