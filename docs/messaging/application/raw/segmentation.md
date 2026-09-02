@@ -71,10 +71,6 @@ An invalid segment message MUST be discarded.
 [Reconstruction](#reconstruction) checks the sum once both classes are known.
 A payload that fits one segment is still wrapped, as `segment_count == 1`, `index == 0`, `is_parity == false`.
 
-A later revision of this specification MAY add fields.
-A receiver MUST ignore any field it does not recognise rather than treat the segment message as invalid,
-and a field number that is withdrawn MUST be `reserved` and MUST NOT be reused for another meaning.
-
 ## Reed–Solomon Coding
 
 A sender that uses parity applies [Reed–Solomon erasure coding](https://github.com/catid/leopard)
