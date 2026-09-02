@@ -247,7 +247,7 @@ Mantle Validators execute each Operation in `ops` according to its opcode, in th
 | CHANNEL_TRANSFER | 0x14 | Consume and create notes belonging to a channel |
 | *RESERVED* | *0x15 - 0x1F* |  |
 | SDP_DECLARE | 0x20 | Declare intention to participate as a node in a Bedrock Service, locking funds as collateral. |
-| SDP_WITHDRAW | 0x21 | Withdraw participation from a Bedrock Service, unlocking your funds in the process. |
+| SDP_WITHDRAW | 0x21 | Withdraw participation from a Bedrock Service, releasing the service note in the process. |
 | SDP_ACTIVE | 0x22 | Signal that you are still an active participant of a Bedrock Service. |
 | *RESERVED* | *0x23 - 0xFF* |  |
 | LEADER_CLAIM | 0x30 | Claim leader reward anonymously. |
@@ -1294,7 +1294,7 @@ declarations: dict[ZkPublicKey, DeclarationInfo]
 
   Withdrawal only records the intent: `withdraw_at` is set to the current
   (withdrawal) epoch `e`, the node's last rewardable epoch. The declaration is
-  removed and its note unlocked at epoch `e+2` by the
+  removed and its note released at epoch `e+2` by the
   [SDP Epoch Finalization](#sdp-epoch-finalization) step, right after the final
   reward is paid out.
 
@@ -1339,7 +1339,7 @@ rewards are distributed in the first block of epoch `e+2` (see
 [Service Reward Distribution Protocol](bedrock-service-reward-distribution.md)).
 In that same first block, **after** the rewards have been distributed, every
 declaration whose final reward has been paid out (`withdraw_at <= current_epoch - 2`)
-is removed and its note unlocked.
+is removed and its note released.
 
   *Given*
 
@@ -1681,7 +1681,7 @@ These note identifiers uniquely define notes in the system and cannot be chosen 
 
 ### Service notes
 
-Service notes are special notes in Mantle that serve as collateral for Service Declarations. A note can become a service note after being locked by executing a Declare Operation, preventing it from being spent until explicitly released through a Withdraw Operation. A note backs at most one declaration, so the system maintains a mapping of each service note ID to the declaration it supports. Though locked, these notes remain in the Ledger and can still participate in Proof of Stake. When a service provider withdraws its declaration, the note it locked becomes unlocked and available for spending again.
+Service notes are special notes in Mantle that serve as collateral for Service Declarations. A note can become a service note after being locked by executing a Declare Operation, preventing it from being spent until explicitly released through a Withdraw Operation. A note backs at most one declaration, so the system maintains a mapping of each service note ID to the declaration it supports. Though locked, these notes remain in the Ledger and can still participate in Proof of Stake. When a service provider withdraws its declaration, the note it held is released and available for spending again.
 
 ### Channel Notes
 
