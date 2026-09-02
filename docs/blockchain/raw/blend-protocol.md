@@ -651,7 +651,7 @@ where $`x`$ is the exact number of leader elections won by the node $`n`$ in an 
 
 ### Proof of Work Quota
 
-**The proof of work quota (**$`Q_W`$**) defines the number of blending operations that a single proof of work solution entitles its holder to perform.** It differs from the two quotas above in what it is attached to. The core quota is attached to a node declared through the SDP, and the leadership quota to a won leader election; both are consequences of something the network already knows about the participant. A proof of work solution is attached to nothing but the work itself, and a participant may hold as many solutions as it is willing to compute. There is therefore no per node bound on this branch, and $`Q_W`$ must be read as a per solution allowance:
+The proof of work quota ($`Q_W`$) defines the number of blending operations that a single proof of work solution entitles its holder to perform. It differs from the two quotas above in what it is attached to. The core quota is attached to a node declared through the SDP, and the leadership quota to a won leader election; both are consequences of something the network already knows about the participant. A proof of work solution is attached to nothing but the work itself, and a participant may hold as many solutions as it is willing to compute. There is therefore no per node bound on this branch, and $`Q_W`$ must be read as a per solution allowance:
 
 $$
 Q^{n}_W = y \cdot Q_W, \qquad Q_W = \beta_{max}
