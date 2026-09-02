@@ -71,7 +71,7 @@ Any other value of type means that the message was not decapsulated correctly an
 
 The `body_type` determines where the content is delivered once a message is fully decapsulated, as defined in the [Blend Protocol](blend-protocol.md#processing): a block proposal is broadcast, and a transaction is both submitted to the node's mempool and broadcast.
 
-Because any unrecognised value must be discarded, the set of values above is closed and a node that does not know a value drops the message rather than ignoring the field. Introducing a new `body_type` is therefore a change to what the network accepts, not only to how a payload is encoded, and nodes must recognise a value before any node emits it.
+The set of values above is therefore closed: a node that does not know a value drops the message rather than ignoring the field. Introducing a new `body_type` is a change to what the network accepts, not only to how a payload is encoded, and nodes must recognise a value before any node emits it.
 
 ### Length
 
@@ -83,8 +83,7 @@ The `Max_Body_Length` parameter defines the maximum length of the `body`. The ma
 
 A transaction carried over the Blend network must not exceed `Max_Body_Length` once encoded. The body is a fixed-size field, so a longer payload cannot be represented at all: there is no fragmentation across messages and no larger body type. A transaction that does not fit is not sendable over this protocol and must reach the network by other means. A node must check the encoded length before constructing the message rather than discovering the limit at encapsulation, and must discard on receipt any payload whose `body_length` exceeds `Max_Body_Length`, since a well-formed message can never carry one.
 
-
-The limit is not restrictive in practice: `Max_Body_Length` is derived from the size of a block proposal, which is far larger than any single transaction, and a transaction is separately bounded by the block it must eventually fit into.
+The limit is not restrictive: `Max_Body_Length` is derived from the size of a block proposal, which is far larger than any single transaction, and a transaction is separately bounded by the block it must eventually fit into.
 
 The `body` length is fixed to `Max_Body_Length` bytes. Therefore, if the length of the raw message is shorter than the `Max_Body_Length`, then it must be padded with random data.
 
