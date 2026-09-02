@@ -24,6 +24,7 @@
 | 1.0.0 | Initial revision. | 2025-11-18 |
 | 1.0.1 | Renamed Nomos to Logos Blockchain | 2026-04-23 |
 | 1.0.2 | Clarification of the Poseidon2 function Add test values | 2026-05-07 |
+| 1.1.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 
 # Introduction
 
@@ -37,7 +38,8 @@ This document specifies the cryptographic primitives selected for the Logos Bloc
 
 The primitives span multiple domains:
 
-- Hash functions (Poseidon2, BLAKE2b) serve as the base layer for commitments, nullifier derivation, Merkle trees, signature key derivation,  pseudorandom number generator and general purpose hashing.
+- Hash functions (Poseidon2, BLAKE2b) serve as the base layer for commitments, nullifier derivation, Merkle trees, signature key derivation and general purpose hashing.
+- The stream cipher (ChaCha20) provides deterministic pseudorandom byte generation and keystream encryption.
 - Signature schemes (EdDSA, ZkSignature) authenticate messages and participants, with ZkSignature designed specifically for ownership verification within zero-knowledge circuits.
 - Proof systems (Groth16) enable succinct and verifiable computation. Groth16 is used in hand-written circuits.
 
@@ -48,7 +50,8 @@ The table below summarizes the recommended component for each context:
 | Context | Recommended Component |
 | --- | --- |
 | ZK Hashing | [Poseidon2](#poseidon2-zk-friendly-hash-function) |
-| General Hashing & PRNG | [BLAKE2b](#blake2bgeneral-purpose-hashing) |
+| General Hashing | [BLAKE2b](#blake2bgeneral-purpose-hashing) |
+| PRNG & Keystreams | [ChaCha20](#chacha20-based-prng-construction) |
 | General Signatures | [EdDSA](#eddsa) |
 | ZK Signatures | [ZkSignature](#zksignature-zero-knowledge-signature) (see [Mantle - Zero Knowledge Signature Scheme (ZkSignature)](bedrock-v1.1-mantle-specification.md)) |
 | Proof System (SNARK) | [Groth16](#groth16-zk-snark) |
@@ -89,31 +92,36 @@ Security Considerations:
 - Considered secure under standard cryptanalytic models.
 - Resistant to collision, preimage, and second-preimage attacks at intended security levels.
 
-### BLAKE2b-Based PRNG Construction
+### ChaCha20-Based PRNG Construction
 
-The Logos Blockchain also uses BLAKE2b as the basis for a deterministic pseudorandom byte generator, suitable for different purposes.
+The Logos Blockchain uses the [ChaCha20](https://cr.yp.to/chacha/chacha-20080128.pdf) stream cipher as a deterministic pseudorandom byte generator, suitable for different purposes, including keystream encryption.
 
 Construction:
 
-Given a 64-byte seed and an integer index i, the PRNG output is derived by:
+Given a 32-byte seed, the PRNG output is the ChaCha20 keystream:
 
 ```text
-PRNG(seed, i) = BLAKE2b(seed || encode_u64(i), out_len=64)
+PRNG(seed) = ChaCha20Keystream(key = seed, nonce = 0, initial_counter = 0)
 ```
 
-- seed: 64-bytes seed (domain-separated if needed).
-- encode_u64(i): 8-byte little-endian encoding of the index i.
-- out_len: fixed to 64 bytes (maximum output size of BLAKE2b).
+- ChaCha20 is used in its original variant: 20 rounds, 256-bit key, 64-bit nonce (fixed to zero), 64-bit block counter (starting at zero).
+- seed: exactly 32 bytes, used directly as the ChaCha20 key (in the Logos Blockchain protocols, a domain-separated 32-byte BLAKE2b digest). A protocol deriving the seed from longer material MUST truncate it to 32 bytes explicitly before seeding; this construction performs no truncation itself.
+- This construction is byte-for-byte the output of `ChaCha20Rng` (Rust crate [`rand_chacha`](https://docs.rs/rand_chacha)) seeded with the key, using the default stream identifier.
 
 Output:
 
-- For generating n bytes (bigger than 64 bytes), concatenate outputs of PRNG(seed, i) for i = 0, 1, ... until the desired length is reached.
-- For generating k bits, compute enough full 64-byte outputs to cover at least k bits, then truncate the last byte to the required bit-length.
-- This minimizes the number of BLAKE2b invocations by using the full 64-byte output capacity.
+- For generating n bytes, take the first n bytes of the keystream.
+- For generating k bits, take enough keystream bytes to cover at least k bits, then truncate the last byte to the required bit-length.
 
 Notes:
 
 - Seed choice and domain separation must be handled at the protocol level.
+- A seed MUST NOT be reused across two different generation contexts: with the nonce fixed to zero, keystream security relies on each key producing a single stream.
+
+Interoperability:
+
+- Implementations MAY use the IETF variant of ChaCha20 ([RFC 8439](https://datatracker.ietf.org/doc/html/rfc8439): 32-bit block counter, 96-bit nonce) with the nonce set to zero. With a zero nonce the two variants produce identical keystreams for the first $`2^{32}`$ blocks (256 GiB) of output: the original variant's upper counter word is zero in that range and coincides with the IETF variant's zero nonce words.
+- Every use of this construction in the Logos Blockchain generates far less than $`2^{32}`$ blocks per seed, so any RFC 8439 implementation with a zero nonce and an initial counter of zero is byte-for-byte compatible with the definition above.
 
 ## [Poseidon2 (](https://eprint.iacr.org/2023/323)[ZK Friendly Hash Function)](https://eprint.iacr.org/2023/323)
 
