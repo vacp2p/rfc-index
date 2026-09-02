@@ -52,10 +52,10 @@ syntax = "proto3";
 message SegmentMessage {
   bytes  original_payload_hash   = 1;  // Keccak256 of the original payload, 32 bytes
   uint32 original_payload_length = 2;  // length in bytes of the original payload
-  uint32 index                   = 3;  // position within this segment's own class (data or parity)
-  uint32 segment_count           = 4;  // number of items of the given class (data or parity)
-  bool   is_parity               = 5;  // `true` if segment is of parity class, `false` if not
-  bytes  segment_payload         = 6;  // data chunk or parity shard
+  uint32 index                   = 3;  // zero-based position within this segment's own class
+  uint32 segment_count           = 4;  // number of segments in this segment's own class
+  bool   is_parity               = 5;  // false for a data segment, true for a parity one
+  bytes  segment_payload         = 6;  // this segment's data chunk or parity shard
 }
 ```
 
