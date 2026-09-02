@@ -75,7 +75,7 @@ A payload that fits one segment is still wrapped, as `data_segment_count == 1`, 
 ## Reed–Solomon Coding
 
 A sender that uses parity applies [Reed–Solomon erasure coding](https://github.com/catid/leopard)
-over its data segments to produce `ceil(parityRate * data_segment_count)` more.
+over its data segments to produce `ceil(parityRate * data_segment_count)` more parity segments.
 Reed–Solomon recovers from any `data_segment_count` segments of a set, data and parity alike,
 so a set reconstructs even where every segment held is a parity one.
 Implementations cap parity at the data-segment count, which `parityRate` respects.
