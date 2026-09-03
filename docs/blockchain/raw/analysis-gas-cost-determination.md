@@ -29,8 +29,9 @@
 | 1.5.0 | Introduce the new Operation `CHANNEL_STAKE_ASSIGNATION` and update of the channel operations to reflect changes in Mantle | 2026-06-24 |
 | 1.5.1 | Reflect Channel Deposit execution modification. It now consumes inputs to update their NoteId | 2026-07-27 |
 | 1.5.2 | Renamed locked notes into service notes and stated that the Input Gas covers the check that a note is neither a service nor a channel note | 2026-08-27 |
-| 1.5.3 | [RFC] Align the SDP costs with declarations keyed by `zk_id`: no lock-period check, and a note backs one declaration | 2026-09-01 |
-| 1.5.4 | Declaring no longer verifies locators | 2026-09-02 |
+| 1.5.3 | Adopted "active message" as the single name for the message | 2026-09-02 |
+| 1.5.4 | [RFC] Align the SDP costs with declarations keyed by `zk_id`: no lock-period check, and a note backs one declaration | 2026-09-03 |
+| 1.5.5 | Declaring no longer verifies locators | 2026-09-03 |
 
 # Introduction
 
@@ -202,7 +203,7 @@ Execution: ~ 590k CPU cycles.
 - Remove the declaration and release its service note: negligible.
 ## SDP Activation
 
-This gas funds the verification of the zk_id signature through the ZkSignature verification process, validates the existence of the declaration in the system, and ensures that the activation message's nonce is greater than any previous nonce to prevent replay attacks. The validation includes confirming that the `zk_id` is present in the declarations dictionary and that the signature corresponds to it.
+This gas funds the verification of the zk_id signature through the ZkSignature verification process, validates the existence of the declaration in the system, and ensures that the active message's nonce is greater than any previous nonce to prevent replay attacks. The validation includes confirming that the `zk_id` is present in the declarations dictionary and that the signature corresponds to it.
 
 - Execution: ~590k CPU cycles.
     - Verification that the declaration exist: negligible.
