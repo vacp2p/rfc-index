@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-09-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/e2e9e0fc0096e42153430689628c0d638d3c4cf4/docs/blockchain/raw/blend-protocol.md"><code>e2e9e0f</code></a> — [RFC] The Epochs <code>active</code> and <code>withdraw_at</code> Record (#422)</li>
 <li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5587d1e5ca2964e38098cd18f81f0fbe19f51fd3/docs/blockchain/raw/blend-protocol.md"><code>5587d1e</code></a> — [RFC] Replace the BLAKE2b-based PRNG with ChaCha20 (ChaCha20Rng) (#425)</li>
 <li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5fa8ee40c1de478b0934d95ddade7ce6a406fd1c/docs/blockchain/raw/blend-protocol.md"><code>5fa8ee4</code></a> — docs(blockchain): compress the block proposal with 16-byte transaction reference prefixes (#389)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/blend-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
@@ -213,6 +214,7 @@
 <tr><td>1.2.0</td><td>Define the token evaluation under a low core quota, and specify the Active Message metadata layout.</td><td>2026-08-19</td></tr>
 <tr><td>1.2.1</td><td>Pointed the <code>EpochNumber</code> of the activity proof at its definition in <a href="cryptarchia-v1-protocol.html#epoch">Epoch</a></td><td>2026-08-25</td></tr>
 <tr><td>1.3.0</td><td>[RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng)</td><td>2026-08-28</td></tr>
+<tr><td>1.3.1</td><td>Judged the active message window by the epoch of the including block, made the one-message-per-epoch rule per attested epoch, and made the transition-period delay a release constraint</td><td>2026-09-02</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -674,14 +676,14 @@
 <li>Use SDP active functionality (<a href="bedrock-service-declaration-protocol.html#active">Active</a>) to request a reward as described in <a href="#rewarding-distribution-logic">Rewarding Distribution Logic</a>, that is:
 <ol>
 <li>Create an <a href="#active-message">Active Message</a>.</li>
-<li>Send it as a part of the reward message (<a href="bedrock-service-declaration-protocol.html#active-message">Active Message</a>).</li>
+<li>Send it as an active message (<a href="bedrock-service-declaration-protocol.html#active-message">Active Message</a>).</li>
 </ol>
 </li>
 <li>The reward is calculated as defined in <a href="#reward-calculation">Reward Calculation</a>, that is:
 <ol>
-<li>The number of correct activity messages is calculated.</li>
+<li>The number of correct active messages is calculated.</li>
 <li>The number of correct and winning messages is calculated, where a winning message is defined by a lottery mechanism.</li>
-<li>Every node that sends a correct activity message receives a base reward.</li>
+<li>Every node that sends a correct active message receives a base reward.</li>
 <li>Every node that sends a correct and winning message receives a premium reward.</li>
 </ol>
 </li>
@@ -815,8 +817,8 @@
 <li><span class="math-inline" data-tex="R_C"></span> denotes a redundancy parameter for cover messages, increasing the number of core node messages a node can send;</li>
 <li><span class="math-inline" data-tex="N"></span> denote a number of core nodes providing the Blend service for the epoch returned by the SDP protocol (<a href="bedrock-service-declaration-protocol.html">Service Declaration Protocol</a>).</li>
 </ul>
-<p>The division must be rounded <strong>up</strong>. Rounding down would collapse <span class="math-inline" data-tex="Q_C"></span> to <span class="math-inline" data-tex="0"></span> as soon as <span class="math-inline" data-tex="N &gt; C \cdot (\beta_C + R_C \cdot \beta_C)"></span> — that is, as soon as the network outgrows the expected number of blending operations for cover messages. Every core node would then be issued an empty key pool and cover traffic would stop entirely, removing the protocol's anonymity guarantee exactly when the network is largest. Rounding up costs at most <span class="math-inline" data-tex="N-1"></span> additional messages network-wide per epoch.</p>
-<p>The parameters must additionally satisfy <span class="math-inline" data-tex="C \cdot \beta_C &gt; 0"></span>. Together with rounding up, this guarantees <span class="math-inline" data-tex="Q_C \geq 1"></span> for every epoch.</p>
+<p>The division must be rounded <strong>up</strong>. Rounding down would collapse <span class="math-inline" data-tex="Q_C"></span> to <span class="math-inline" data-tex="0"></span> as soon as <span class="math-inline" data-tex="N \gt C \cdot (\beta_C + R_C \cdot \beta_C)"></span> — that is, as soon as the network outgrows the expected number of blending operations for cover messages. Every core node would then be issued an empty key pool and cover traffic would stop entirely, removing the protocol's anonymity guarantee exactly when the network is largest. Rounding up costs at most <span class="math-inline" data-tex="N-1"></span> additional messages network-wide per epoch.</p>
+<p>The parameters must additionally satisfy <span class="math-inline" data-tex="C \cdot \beta_C \gt 0"></span>. Together with rounding up, this guarantees <span class="math-inline" data-tex="Q_C \geq 1"></span> for every epoch.</p>
 <p>Additionally, we introduce the total core quota, which defines the total number of generated cover messages that the whole network can emit (independently of the number of nodes):</p>
 <div class="math-block" data-tex="Q^{Total}_C = N \cdot Q_C \geq C \cdot (\beta_C+R_C \cdot \beta_C)"></div>
 <p>The equality holds only when <span class="math-inline" data-tex="N"></span> divides <span class="math-inline" data-tex="C \cdot (\beta_C + R_C \cdot \beta_C)"></span>; otherwise rounding up makes the total larger by at most <span class="math-inline" data-tex="N-1"></span> messages. From <span class="math-inline" data-tex="Q_C \geq 1"></span> it also follows that <span class="math-inline" data-tex="Q^{Total}_C \geq N"></span>, which is relied upon by the <a href="#activity-proof">Activity Proof</a> and the <a href="#activity-threshold">Activity Threshold</a>.</p>
@@ -1143,7 +1145,7 @@
 </ul>
 <div class="math-block" data-tex="\epsilon = \left\lceil \log_2(Q_C^{Total}+1) \over 8\right\rceil\cdot8"></div>
 <p>The comparison is inclusive: a token whose distance equals <span class="math-inline" data-tex="{\mathcal A}_{\epsilon}"></span> satisfies the proof. The difficulty of the lottery is tuned through the sensitivity parameter <span class="math-inline" data-tex="\theta"></span> of the <a href="#activity-threshold">Activity Threshold</a>, not through the choice of comparison operator.</p>
-<p>The requirement <span class="math-inline" data-tex="C \cdot \beta_C &gt; 0"></span> (see <a href="#core-quota">Core Quota</a>) guarantees <span class="math-inline" data-tex="Q_C \geq 1"></span> and therefore <span class="math-inline" data-tex="Q^{Total}_C \geq N \geq 1"></span>. It follows that <span class="math-inline" data-tex="\log_2(Q^{Total}_C+1) \geq 1"></span> and hence <span class="math-inline" data-tex="\epsilon \geq 8"></span>: the digest is always at least one byte wide, which the <code>blake2b</code> algorithm requires.</p>
+<p>The requirement <span class="math-inline" data-tex="C \cdot \beta_C \gt 0"></span> (see <a href="#core-quota">Core Quota</a>) guarantees <span class="math-inline" data-tex="Q_C \geq 1"></span> and therefore <span class="math-inline" data-tex="Q^{Total}_C \geq N \geq 1"></span>. It follows that <span class="math-inline" data-tex="\log_2(Q^{Total}_C+1) \geq 1"></span> and hence <span class="math-inline" data-tex="\epsilon \geq 8"></span>: the digest is always at least one byte wide, which the <code>blake2b</code> algorithm requires.</p>
 <p>The Hamming distance verification prevents nodes from the grinding or pre-computation attacks due to the unpredictability of the randomness of the next epoch. Even if a node knows the value of the randomness in advance, it will not increase its chance for getting a reward as the node does not control the process of generating blending tokens. However, a dishonest node could use that knowledge to refrain from sending a message with a token that has a potential (probabilistic, not deterministic) of granting a premium reward for the recipient blend node.</p>
 <p>The node activity proof construction is:</p>
 <pre><code class="language-python">class ActivityProof:
@@ -1172,7 +1174,7 @@
 </ul>
 <p>We assume that setting <span class="math-inline" data-tex="\theta = 1"></span> is enough to eliminate nodes that have not been active enough without too aggressively eliminating nodes that worked but had less luck with the lottery. However, we are going to revise this parameter in the future version of the protocol.</p>
 <p>The difference <span class="math-inline" data-tex="\chi - \nu - \theta"></span> is negative whenever <span class="math-inline" data-tex="\chi \leq \nu + \theta"></span>, which happens when the total number of blending tokens is small relative to the network size. Because <span class="math-inline" data-tex="\chi \approx \log_2(Q^{Total}_C)"></span> and <span class="math-inline" data-tex="\nu \approx \log_2(N)"></span>, this regime is reached when the per-node quota <span class="math-inline" data-tex="Q_C"></span> is of the order of <span class="math-inline" data-tex="2^{\theta}"></span> or smaller. A negative value is not a meaningful Hamming distance, so the threshold is clamped at <span class="math-inline" data-tex="0"></span>: the lottery becomes maximally difficult instead of undefined. At <span class="math-inline" data-tex="{\mathcal A}_{\epsilon} = 0"></span> an activity proof is still attainable, but only for a blending token whose <span class="math-inline" data-tex="\epsilon"></span>-bit digest matches the digest of the epoch randomness exactly.</p>
-<p>The clamped regime is a degenerate operating point rather than a target: it makes rewards nearly unreachable for honest nodes and, in the limit, admits every node at once. Parameters should therefore be chosen so that <span class="math-inline" data-tex="\chi &gt; \nu + \theta"></span>, which holds comfortably for the expected deployment values.</p>
+<p>The clamped regime is not a target: at <span class="math-inline" data-tex="{\mathcal A}_{\epsilon} = 0"></span> rewards are nearly unreachable. Parameters must be chosen so that <span class="math-inline" data-tex="\chi \gt \nu + \theta"></span>.</p>
 <h3 id="active-message"><a class="header" href="#active-message">Active Message</a></h3>
 <p>A node <span class="math-inline" data-tex="l"></span> for every epoch must construct an active message, which must follow the <a href="bedrock-service-declaration-protocol.html#active-message">Active Message</a> and is carried on the wire by the <code>SDP_ACTIVE</code> operation (<a href="mantle-transaction-encoding.html">Mantle Transaction Encoding</a>). The envelope fields (<code>declaration_id</code>, <code>nonce</code>) and their encoding are defined by those documents and are not restated here. This section defines only the service-specific <code>metadata</code> payload for the Blend service, which carries the <a href="#activity-proof">Activity Proof</a> <span class="math-inline" data-tex="\pi_{A}^{l,t,e}"></span> for a blending token <span class="math-inline" data-tex="t"></span> and an epoch <span class="math-inline" data-tex="e"></span>.</p>
 <p>The <code>metadata</code> field is the concatenation of the following fields, in order:</p>
@@ -1191,10 +1193,10 @@
 <p>The active message is stored on the ledger.</p>
 <p>The active message is used for calculating the node reward.</p>
 <p>The active message is constructed after the current epoch, when the next epoch randomness is known.</p>
-<p>The active message for epoch <span class="math-inline" data-tex="e"></span> must only be sent during epoch <span class="math-inline" data-tex="e+1"></span>; otherwise, it must be rejected.</p>
+<p>The active message for epoch <span class="math-inline" data-tex="e"></span> must be included in a block of epoch <span class="math-inline" data-tex="e+1"></span>; otherwise, it must be rejected.</p>
 <p>The node <span class="math-inline" data-tex="l"></span> selects the activity proof to include in the active message such that the Hamming distance between the proof and the new randomness is minimal.</p>
 <div class="math-block" data-tex="\pi_{A}^{l,t,e} = \min_{\Delta_{\mathcal H}}(\mathrm{true}(\pi_{A}^{i,t,e}))"></div>
-<p>The ledger must only accept a single active message per-node per-epoch. Any duplicate must be rejected.</p>
+<p>The ledger must only accept a single active message per node per attested epoch. Any duplicate must be rejected.</p>
 <h3 id="reward-calculation"><a class="header" href="#reward-calculation">Reward Calculation</a></h3>
 <p>The node rewards for epoch <span class="math-inline" data-tex="s"></span> are calculated according to the following schema:</p>
 <ol>
@@ -1227,7 +1229,7 @@
 <p>The rewards are distributed according to <a href="bedrock-service-reward-distribution.html">Service Reward Distribution Protocol</a>. Here we are briefly sketching the main idea of the reward distribution protocol. For more details refer to the above document.</p>
 <ol>
 <li>To receive a reward, a node must send an Active Message as described in the <a href="bedrock-service-declaration-protocol.html#active-message">Active Message</a>, where the <code>metadata</code> field is encoded as defined in <a href="#active-message">Active Message</a>. The node must point to a single declaration (<code>declaration_id</code>) and use a single provider identity (<code>provider_id</code>) for constructing the Active Message. Any reuse of the <code>provider_id</code> must make the Active Message invalid.</li>
-<li>The Active Message must be sent after the end of an epoch (<span class="math-inline" data-tex="e"></span>), that is, during the next epoch (<span class="math-inline" data-tex="e+1"></span>), and after the epoch transition period as defined in the <a href="#transition-period">Transition Period</a> section. The delay allows nodes to include blending tokens collected during the epoch transition period for rewarding purposes.</li>
+<li>The Active Message must not be released before the epoch transition period of epoch <span class="math-inline" data-tex="e+1"></span> has elapsed (<a href="#transition-period">Transition Period</a>).</li>
 <li>When the following epoch begins (<span class="math-inline" data-tex="e+2"></span>) Mantle distributes rewards (<a href="bedrock-service-reward-distribution.html">Service Reward Distribution Protocol</a>). This delay is required to calculate the partition of rewards as defined in the above section.</li>
 <li>If a node does not send the Active Message on time, then it will not receive a reward.</li>
 </ol>

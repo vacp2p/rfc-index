@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-09-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/e2e9e0fc0096e42153430689628c0d638d3c4cf4/docs/blockchain/raw/analysis-gas-cost-determination.md"><code>e2e9e0f</code></a> — [RFC] The Epochs <code>active</code> and <code>withdraw_at</code> Record (#422)</li>
 <li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/3cac48f3f3c7db46eddf3bbb70c1567d96e2b213/docs/blockchain/raw/analysis-gas-cost-determination.md"><code>3cac48f</code></a> — docs(blockchain): rename locked notes to service notes (#423)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/analysis-gas-cost-determination.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
 <li><strong>2026-07-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5b20a2d59691c12392d091a6d7352d3de719ad61/docs/blockchain/raw/analysis-gas-cost-determination.md"><code>5b20a2d</code></a> — docs(blockchain) Channel Participation in PoS (#364)</li>
@@ -209,6 +210,7 @@
 <tr><td>1.5.0</td><td>Introduce the new Operation <code>CHANNEL_STAKE_ASSIGNATION</code> and update of the channel operations to reflect changes in Mantle</td><td>2026-06-24</td></tr>
 <tr><td>1.5.1</td><td>Reflect Channel Deposit execution modification. It now consumes inputs to update their NoteId</td><td>2026-07-27</td></tr>
 <tr><td>1.5.2</td><td>Renamed locked notes into service notes and stated that the Input Gas covers the check that a note is neither a service nor a channel note</td><td>2026-08-27</td></tr>
+<tr><td>1.5.3</td><td>Adopted "active message" as the single name for the message</td><td>2026-09-02</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -353,7 +355,7 @@ The execution require deriving note Id and adding notes to the ledger.</p>
 <li>Unlock the note if not linked to any declaration: negligible.</li>
 </ul>
 <h2 id="sdp-activation"><a class="header" href="#sdp-activation">SDP Activation</a></h2>
-<p>This gas funds the verification of the zk_id signature through the ZkSignature verification process, validates the existence of the declaration in the system, and ensures that the activation message's nonce is greater than any previous nonce to prevent replay attacks. The validation includes confirming that the declaration ID is present in the declarations dictionary and that the signature corresponds to the declaration's registered zk_id public key.</p>
+<p>This gas funds the verification of the zk_id signature through the ZkSignature verification process, validates the existence of the declaration in the system, and ensures that the active message's nonce is greater than any previous nonce to prevent replay attacks. The validation includes confirming that the declaration ID is present in the declarations dictionary and that the signature corresponds to the declaration's registered zk_id public key.</p>
 <ul>
 <li>Execution: ~590k CPU cycles.
 <ul>

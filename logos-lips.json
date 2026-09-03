@@ -437,7 +437,7 @@
     "title": "[Analysis] Gas Cost Determination",
     "status": "raw",
     "category": "Informational",
-    "updated": "2026-08-31",
+    "updated": "2026-09-03",
     "path": "blockchain/raw/analysis-gas-cost-determination.html"
   },
   {
@@ -878,7 +878,7 @@
     "title": "Service Reward Distribution Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-09-01",
+    "updated": "2026-09-03",
     "path": "blockchain/raw/bedrock-service-reward-distribution.html"
   },
   {
@@ -887,7 +887,7 @@
     "title": "Service Declaration Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-09-01",
+    "updated": "2026-09-03",
     "path": "blockchain/raw/bedrock-service-declaration-protocol.html"
   },
   {
@@ -959,7 +959,7 @@
     "title": "Blend Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-31",
+    "updated": "2026-09-03",
     "path": "blockchain/raw/blend-protocol.html"
   },
   {
@@ -986,7 +986,7 @@
     "title": "Mantle",
     "status": "raw",
     "category": "Informational",
-    "updated": "2026-08-31",
+    "updated": "2026-09-03",
     "path": "blockchain/raw/bedrock-v1.1-mantle-specification.html"
   },
   {

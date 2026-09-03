@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-09-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/e2e9e0fc0096e42153430689628c0d638d3c4cf4/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>e2e9e0f</code></a> — [RFC] The Epochs <code>active</code> and <code>withdraw_at</code> Record (#422)</li>
 <li><strong>2026-09-01</strong> — <a href="https://github.com/logos-co/logos-lips/blob/74f6f939e84d8bb8e494db3108d47ebe7faf071f/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>74f6f93</code></a> — [RFC] Per-Service <code>zk_id</code> Uniqueness Is Normative for Reward Distribution (#406)</li>
 <li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/3cac48f3f3c7db46eddf3bbb70c1567d96e2b213/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>3cac48f</code></a> — docs(blockchain): rename locked notes to service notes (#423)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5e42374e3bb3c674f6369f2ac4ad626f6cc34585/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>5e42374</code></a> — docs(blockchain): specify uint32 for epoch number (#420)</li>
@@ -215,6 +216,7 @@
 <tr><td>1.4.1</td><td>Replaced the <code>uint64</code> width given to the <code>epoch</code> fields with a reference to <a href="cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a>, which is 32 bits</td><td>2026-08-25</td></tr>
 <tr><td>1.4.2</td><td>Renamed locked notes into service notes: <code>locked_note_id</code> becomes <code>service_note_id</code> in the declaration and withdraw messages and in <code>DeclarationInfo</code></td><td>2026-08-27</td></tr>
 <tr><td>1.4.3</td><td>Identifier uniqueness covers every stored declaration, not only activated ones, matching the implementation</td><td>2026-09-01</td></tr>
+<tr><td>1.5.0</td><td>Defined <code>active</code> as the epoch of the block that contained the latest accepted active message, initialised to <code>created + 2</code>, and <code>withdraw_at</code> as the epoch at which the node stops providing the service, matching the implementation. Added the participant-set exclusion rule and <a href="#message-timing">Message Timing</a></td><td>2026-09-02</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -273,7 +275,7 @@
 <h3 id="service-parameters"><a class="header" href="#service-parameters"><strong>Service Parameters</strong></a></h3>
 <p>The service parameters structure defines the parameters set necessary for correctly handling interaction between the protocol and services. Each of the service types defined above must be mapped to a set of the following parameters:</p>
 <ul>
-<li><code>inactivity_period</code> defines the maximum time (as a number of epochs) during which an activation message must be sent; otherwise, the declaration is considered inactive. It must be at least 2 epochs long due to finalization reasons.</li>
+<li><code>inactivity_period</code> defines the number of epochs after the epoch recorded in <code>active</code> for which the declaration remains active; after that, it is inactive and excluded from the service's participant set in the same way as a withdrawn declaration (<a href="#withdraw"><strong>Withdraw</strong></a>). A value of <code>2 + k</code> tolerates <code>k</code> consecutive missed reports (<a href="#message-timing">Message Timing</a>). Any value below 2 excludes every declaration.</li>
 <li><code>epoch</code> defines the epoch number at which the parameter was set; it is an <a href="cryptarchia-v1-protocol.html#epoch"><code>EpochNumber</code></a>.</li>
 </ul>
 <pre><code class="language-python">class ServiceParameters:
@@ -287,6 +289,33 @@
 <p>At the start of epoch <span class="math-inline" data-tex="n"></span>, each node takes a snapshot of the SDP registry at the last block from the finalized epoch.
 Each snapshot updates the common view of the registry. Changes to the declaration registry take effect with up to a two-epoch delay: messages sent during epoch <code>n</code> are included in the next snapshot (for epoch <code>n+2</code>).</p>
 <p>Epochs 0 and 1 read the snapshot at the genesis block, because the chain has not yet progressed far enough to provide a later finalized block. While at epoch 2, the last block of epoch 0 is read, and so forth according to the above logic.</p>
+<h3 id="message-timing"><a class="header" href="#message-timing">Message Timing</a></h3>
+<p>The tables below trace each SDP message from the epoch <code>e</code> of the block that contained it. Reward timing follows the <a href="bedrock-service-reward-distribution.html">Service Reward Distribution Protocol</a>.</p>
+<h4 id="declaration-message"><a class="header" href="#declaration-message">Declaration message</a></h4>
+<div class="table-wrapper"><table><thead><tr><th>Epoch</th><th>What happens</th></tr></thead><tbody>
+<tr><td><code>e</code></td><td>The message is included and the declaration is stored, with <code>created = e</code>.</td></tr>
+<tr><td><code>e+1</code></td><td>The declaration is in no snapshot; the node does not provide the service.</td></tr>
+<tr><td><code>e+2</code></td><td>The first snapshot containing the declaration is taken; the node starts providing the service.</td></tr>
+<tr><td><code>e+3</code></td><td>The node's first report is included; <code>active = e+3</code>.</td></tr>
+<tr><td><code>e+4</code></td><td>The epoch-<code>e+2</code> reward is distributed in the first block.</td></tr>
+</tbody></table>
+</div>
+<h4 id="active-message"><a class="header" href="#active-message">Active message</a></h4>
+<div class="table-wrapper"><table><thead><tr><th>Epoch</th><th>What happens</th></tr></thead><tbody>
+<tr><td><code>e-1</code></td><td>The node provides the service.</td></tr>
+<tr><td><code>e</code></td><td>The message is included, attesting to epoch <code>e-1</code>; on acceptance, <code>active = e</code>.</td></tr>
+<tr><td><code>e+1</code></td><td>The epoch-<code>e-1</code> reward is distributed in the first block.</td></tr>
+<tr><td><code>e+2</code></td><td>The report is included in a snapshot for the first time.</td></tr>
+</tbody></table>
+</div>
+<p>At any epoch <code>n</code>, the most recent report a snapshot can contain was included in epoch <code>n-2</code> and attests to epoch <code>n-3</code>.</p>
+<h4 id="withdraw-message"><a class="header" href="#withdraw-message">Withdraw message</a></h4>
+<div class="table-wrapper"><table><thead><tr><th>Epoch</th><th>What happens</th></tr></thead><tbody>
+<tr><td><code>e</code></td><td>The message is included, with <code>withdraw_at = e+2</code>.</td></tr>
+<tr><td><code>e+1</code></td><td>The node is in the participant set (<code>n &lt; withdraw_at</code>) and provides the service. It reports its epoch-<code>e</code> activity.</td></tr>
+<tr><td><code>e+2</code></td><td>Every service excludes the declaration (<code>n &gt;= withdraw_at</code>). The epoch-<code>e</code> reward is distributed and the declaration is removed in the first block (<a href="bedrock-v1.1-mantle-specification.html#sdp-epoch-finalization">SDP Epoch Finalization</a>).</td></tr>
+</tbody></table>
+</div>
 <h3 id="identifiers"><a class="header" href="#identifiers">Identifiers</a></h3>
 <p>We define the following set of identifiers which are used for service-specific cryptographic operations:</p>
 <ul>
@@ -300,7 +329,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <p>The length of the binary form of a <code>Locator</code> is restricted to 329 bytes.</p>
 <p><strong>The canonical form makes deterministic ID generation work consistently.</strong> The binary form carries no letter case and no textual shorthand, so two equal multiaddrs always share one byte representation; the string-form ambiguities (case, implicit defaults) cannot arise. Implementations that accept the string form as input must parse it into the binary form before any serialization or hashing, and every part of the address must be explicit (no implicit defaults).</p>
 <p>The canonical form makes a single <code>Locator</code> unambiguous, but it does not make a <em>list</em> of them unambiguous. The byte form of a multiaddr is self-describing, so concatenating two <code>Locator</code>s yields the byte form of a single longer one: <code>[/ip4/203.0.113.10/tcp/4001]</code> and <code>[/ip4/203.0.113.10, /tcp/4001]</code> are the same byte string. Wherever a list of <code>Locator</code>s is hashed it must therefore be serialized as the <code>Locators</code> production of the <a href="mantle-transaction-encoding.html#sdp-operations">Mantle Transaction Encoding</a>: prefixed with its element count and with each element prefixed by its byte length.</p>
-<h3 id="declaration-message"><a class="header" href="#declaration-message"><strong>Declaration Message</strong></a></h3>
+<h3 id="declaration-message-1"><a class="header" href="#declaration-message-1"><strong>Declaration Message</strong></a></h3>
 <p>The construction of the declaration message is as follows.</p>
 <pre><code class="language-python">class DeclarationMessage:
     service_type: ServiceType
@@ -322,7 +351,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
     zk_id: ZkPublicKey
     locators: list[Locator]
     created: EpochNumber
-    active: EpochNumber | None
+    active: EpochNumber
     withdraw_at: EpochNumber | None
     nonce: Nonce
 </code></pre>
@@ -334,8 +363,8 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <li><code>zk_id</code> is used for zero-knowledge operations by the validator that includes rewarding;</li>
 <li><code>locators</code> is a copy of the <code>locators</code> from the <code>DeclarationMessage</code>;</li>
 <li><code>created</code> refers to the epoch number of the block that contained the declaration;</li>
-<li><code>active</code> refers to the latest epoch number for which the active message was sent (it is set to <code>None</code> by default);</li>
-<li><code>withdraw_at</code> refers to the epoch number for which the service declaration will be withdrawn (it is set to <code>None</code> by default);</li>
+<li><code>active</code> refers to the epoch of the block that contained the latest accepted active message; it is initialised to <code>created + 2</code> (<a href="#message-timing">Message Timing</a>);</li>
+<li><code>withdraw_at</code> refers to the epoch at which the node stops providing the service (<a href="#withdraw"><strong>Withdraw</strong></a>); it is set to <code>None</code> by default;</li>
 <li>The <code>nonce</code> must be set to 0 for the declaration message and must increase monotonically by every message sent for the <code>declaration_id</code>.</li>
 </ul>
 <p>We also define the <code>declaration_id</code> (of a <code>DeclarationId</code> type) that is the unique identifier of <code>DeclarationInfo</code> calculated as a hash of the concatenation of <code>service</code>, <code>provider_id</code>, <code>zk_id</code> and <code>locators</code>. The implementation of the hash function is <code>blake2b</code> using 256 bits of the output.</p>
@@ -355,7 +384,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <li>A <code>zk_id</code> must not be bound to more than one <code>DeclarationInfo</code>.</li>
 </ul>
 <p>The uniqueness is scoped per-service: the same <code>provider_id</code> or <code>zk_id</code> may be reused across different services, but never more than once within the same service. A <code>provider_id</code> or <code>zk_id</code> becomes available for reuse in a service only once its previous <code>DeclarationInfo</code> for that service has been withdrawn and removed (see <a href="#withdraw">Withdraw</a>).</p>
-<h3 id="active-message"><a class="header" href="#active-message">Active Message</a></h3>
+<h3 id="active-message-1"><a class="header" href="#active-message-1">Active Message</a></h3>
 <p>The construction of the active message is as follows:</p>
 <pre><code class="language-python">class ActiveMessage:
     declaration_id: DeclarationId
@@ -365,7 +394,9 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <p>where <code>metadata</code> is service-specific node activeness metadata.</p>
 <p>The message must be signed by the <code>zk_id</code> key associated with the <code>declaration_id</code>.</p>
 <p>The <code>nonce</code> must increase monotonically by every message sent for the <code>declaration_id</code>.</p>
-<h3 id="withdraw-message"><a class="header" href="#withdraw-message">Withdraw Message</a></h3>
+<p>An active message attests to a single past epoch during which the node provided the service. The service defines when the message may be sent (see <a href="blend-protocol.html#active-message">Active Message</a> for the Blend Network).</p>
+<p>The <code>metadata</code> layout is service-defined; the SDP does not parse it.</p>
+<h3 id="withdraw-message-1"><a class="header" href="#withdraw-message-1">Withdraw Message</a></h3>
 <p>The construction of the withdraw message is as follows:</p>
 <pre><code class="language-python">class WithdrawMessage:
     declaration_id: DeclarationId
@@ -377,6 +408,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <p>The <code>nonce</code> must increase monotonically by every message sent for the <code>declaration_id</code>.</p>
 <h3 id="indexing"><a class="header" href="#indexing">Indexing</a></h3>
 <p>Every event must be correctly indexed to enable lighter synchronization of the changes. Therefore, we index every <code>declaration_id</code> according to <code>EventType</code>, <code>ServiceType</code>, and <code>Epoch</code>. Where <code>EventType = { "created", "active", "withdrawn" }</code> follows the type of the message.</p>
+<p>The <code>Epoch</code> key is the epoch of the block that contained the message, for all three event types.</p>
 <pre><code class="language-python">events = {
     event_type: {
         service_type: {
@@ -402,7 +434,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <p>If all of the above conditions are fulfilled, then the message is stored on the ledger; otherwise, the message is discarded.</p>
 <h3 id="active"><a class="header" href="#active">Active</a></h3>
 <p>The Active action enables marking the provider as actively providing a service. It requires sending a valid <code>ActiveMessage</code> (as defined in <a href="#active-message">Active Message</a>), which is relayed to the service-specific node activity logic (as indicated by the service type in <a href="bedrock-v1.1-mantle-specification.html#common-sdp-structures">Common SDP Structures</a>).</p>
-<p>The Active action updates the <code>active</code> value of the <code>DeclarationInfo</code>, which means that it also activates inactive (but not expired) providers.</p>
+<p>The Active action updates the <code>active</code> value of the <code>DeclarationInfo</code>. A declaration considered inactive is not removed from the registry, and an accepted active message makes it active again. A declaration is removed only by withdrawal (<a href="#withdraw"><strong>Withdraw</strong></a>); a removed declaration cannot become active again.</p>
 <p>The SDP active action logic is:</p>
 <ol>
 <li>A node sends an <code>ActiveMessage</code> transaction.</li>
@@ -414,11 +446,16 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 </ol>
 </li>
 <li>If any of these conditions fail, discard the message and stop processing.</li>
-<li>The message is processed by the service-specific activity logic alongside the <code>active</code> value indicating the period since the last active message was sent. The <code>active</code> value comes from the <code>DeclarationInfo</code>.</li>
-<li>If the service-specific activity logic approves the node active message, then the <code>active</code> field of the <code>DeclarationInfo</code> is set to the epoch number indicated by metadata.</li>
+<li>The message is processed by the service-specific activity logic, together with the epoch of the block that contained the message.</li>
+<li>If the service-specific activity logic rejects the message, discard the message and stop processing.</li>
+<li>The <code>active</code> field of the <code>DeclarationInfo</code> is set to that epoch.</li>
 </ol>
+<p>An active message is valid only while the current epoch is below <code>withdraw_at</code> (see <a href="#withdraw"><strong>Withdraw</strong></a>).</p>
 <h3 id="withdraw"><a class="header" href="#withdraw"><strong>Withdraw</strong></a></h3>
-<p>The withdraw action enables a withdrawal of a service declaration. It requires sending a valid <code>WithdrawMessage</code> (as defined in <a href="#withdraw-message">Withdraw Message</a>). The withdrawal marks the intent to stop providing the service: the node provides the service through the withdrawal epoch <code>e</code> and stops afterwards. The <code>withdraw_at</code> field records this withdrawal epoch <code>e</code>, which is the node's last rewardable epoch. The declaration is removed and the stake unlocked at epoch <code>e+2</code>, right after the epoch-<code>e</code> reward is paid out, by the Mantle epoch finalization step (see <a href="bedrock-v1.1-mantle-specification.html#sdp-epoch-finalization">SDP Epoch Finalization</a>). Removing the declaration only after its final reward is paid guarantees it is never removed before the payout.</p>
+<p>The withdraw action enables a withdrawal of a service declaration. It requires sending a valid <code>WithdrawMessage</code> (as defined in <a href="#withdraw-message">Withdraw Message</a>). The withdrawal marks the intent to stop providing the service.</p>
+<p>Let <code>e</code> be the epoch of the block that contained the <code>WithdrawMessage</code>; <code>withdraw_at</code> records <code>e+2</code> (<a href="#snapshots">Snapshots</a>).</p>
+<p>A service deriving its participant set from a snapshot must exclude every declaration for which <code>withdraw_at</code> is not <code>None</code> and <code>n &gt;= withdraw_at</code>, where <code>n</code> is the epoch the set is derived for.</p>
+<p>The node provides the service through epoch <code>withdraw_at - 1</code>; its last rewardable epoch is <code>withdraw_at - 2</code>. The declaration is removed and the service note unlocked at epoch <code>withdraw_at</code> (<a href="bedrock-v1.1-mantle-specification.html#sdp-epoch-finalization">SDP Epoch Finalization</a>).</p>
 <p>The logic of the withdraw action is:</p>
 <ol>
 <li>A node sends a <code>WithdrawMessage</code> transaction.</li>
@@ -431,8 +468,8 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 </ol>
 </li>
 <li>If any of the above is not correct, then discard the message and stop.</li>
-<li>Set the <code>withdraw_at</code> from the <code>DeclarationInfo</code> to the current epoch number (the withdrawal epoch <code>e</code>).</li>
-<li>The <code>DeclarationInfo</code> is removed and the stake unlocked (releasing the <code>service_note_id</code>) at epoch <code>e+2</code> by the Mantle epoch finalization step, right after the final reward is paid out.</li>
+<li>Set the <code>withdraw_at</code> from the <code>DeclarationInfo</code> to the current epoch number plus two.</li>
+<li>The <code>DeclarationInfo</code> is removed and the stake unlocked (releasing the <code>service_note_id</code>) at epoch <code>withdraw_at</code> (<a href="bedrock-v1.1-mantle-specification.html#sdp-epoch-finalization">SDP Epoch Finalization</a>).</li>
 </ol>
 <h3 id="query"><a class="header" href="#query">Query</a></h3>
 <p>The protocol must enable querying the ledger in at least the following manner:</p>

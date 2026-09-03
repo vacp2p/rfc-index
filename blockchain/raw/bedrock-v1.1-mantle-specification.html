@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-09-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/e2e9e0fc0096e42153430689628c0d638d3c4cf4/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>e2e9e0f</code></a> — [RFC] The Epochs <code>active</code> and <code>withdraw_at</code> Record (#422)</li>
 <li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/3cac48f3f3c7db46eddf3bbb70c1567d96e2b213/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>3cac48f</code></a> — docs(blockchain): rename locked notes to service notes (#423)</li>
 <li><strong>2026-08-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/48fbc82c3545f8512176ce7c707019aefce24650/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>48fbc82</code></a> — docs(blockchain): order channel configurations and prevent their replay (#396)</li>
 <li><strong>2026-08-26</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5a9bee03baa8c6c6267a0574f2bf8fad7f7f0be6/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>5a9bee0</code></a> — docs(blockchain): make execution steps clearer (#417)</li>
@@ -228,6 +229,7 @@
 <tr><td>1.10.2</td><td>Precise the state validation reads: the Operations of a Mantle Transaction are validated and executed one after the other in the order they appear, each against the state the preceding ones left, and a Mantle Transaction against the state the transactions preceding it in the block left. Accumulated the transaction balance along that pass, replacing <code>get_transaction_balance</code></td><td>2026-08-24</td></tr>
 <tr><td>1.11.0</td><td>Track the configuration lineage of a channel: <code>ChannelState</code> gains <code>config_tip_hash</code> and the <code>CHANNEL_CONFIG</code> payload carries the <code>parent</code> configuration it extends, ordering configurations and preventing their replay</td><td>2026-08-27</td></tr>
 <tr><td>1.11.1</td><td>Renamed locked notes into service notes: <code>service_notes</code>, <code>ServiceNote</code> and <code>service_note_id</code> replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in</td><td>2026-08-27</td></tr>
+<tr><td>1.12.0</td><td>Specified the <code>SDP_ACTIVE</code> execution effects, matching the implementation: <code>active</code> is set to the epoch of the including block, and a message the activity logic rejects makes the Operation invalid. Set <code>withdraw_at</code> to <code>current_epoch + 2</code>, the epoch at which the node stops providing the service, and removed declarations at <code>withdraw_at</code></td><td>2026-09-02</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -1027,7 +1029,7 @@ class DeclarationInfo:
     zk_id: ZkPublicKey
     service_note_id: NoteId
     created: EpochNumber
-    active: EpochNumber | None
+    active: EpochNumber
     withdraw_at: EpochNumber | None
     # SDP ops updating a declaration must use monotonically increasing nonces
     nonce: int
@@ -1133,7 +1135,7 @@ service_note.declarations.add(declare_id)
     service_note_id: declaration.service_note_id
     declaration,
     created=current_epoch,
-    active=None,
+    active=current_epoch + 2,
     withdraw_at=None
     nonce=0
 )
@@ -1251,16 +1253,11 @@ declarations: dict[DeclarationID, DeclarationInfo]
 </code></pre>
 <p><em>Execute</em></p>
 <p>Executes the withdrawal protocol <a href="bedrock-service-declaration-protocol.html#withdraw"><strong>Withdraw</strong></a>.</p>
-<p>Withdrawal only records the intent: <code>withdraw_at</code> is set to the current
-(withdrawal) epoch <code>e</code>, the node's last rewardable epoch. The declaration is
-removed and its stake unlocked at epoch <code>e+2</code> by the
-<a href="#sdp-epoch-finalization">SDP Epoch Finalization</a> step, right after the final
-reward is paid out.</p>
 <ol>
 <li>Update the declaration info with the nonce and the withdrawal epoch.
 <pre><code class="language-python">declare_info = declarations[withdraw.declaration]
 declare_info.nonce = withdraw.nonce
-declare_info.withdraw_at = current_epoch
+declare_info.withdraw_at = current_epoch + 2
 </code></pre>
 </li>
 </ol>
@@ -1289,16 +1286,14 @@ SignedMantleTx(
 </code></pre>
 <h3 id="sdp-epoch-finalization"><a class="header" href="#sdp-epoch-finalization">SDP Epoch Finalization</a></h3>
 <p>Withdrawn declarations are removed by Mantle as part of the epoch transition,
-not when the <code>WithdrawMessage</code> is processed. A node that withdrew in epoch <code>e</code>
-has <code>withdraw_at == e</code>, and its last rewardable epoch is <code>e</code>; the epoch-<code>e</code>
-rewards are distributed in the first block of epoch <code>e+2</code> (see
+not when the <code>WithdrawMessage</code> is processed. The rewards of epoch
+<code>withdraw_at - 2</code> (<a href="bedrock-service-declaration-protocol.html#withdraw">Withdraw</a>)
+are distributed in the first block of epoch <code>withdraw_at</code> (see
 <a href="bedrock-service-reward-distribution.html">Service Reward Distribution Protocol</a>).
-In that same first block, <strong>after</strong> the rewards have been distributed, every
-declaration whose final reward has been paid out (<code>withdraw_at &lt;= current_epoch - 2</code>)
-is removed and its stake unlocked. Performing the removal after the reward
-distribution guarantees a declaration is never removed before its final reward
-is paid. Declarations that withdrew without earning a final reward are removed
-by the same step, so their stake is always released.</p>
+In that same block, after the rewards have been distributed, every declaration
+with <code>withdraw_at &lt;= current_epoch</code> is removed and its stake unlocked.
+Declarations that withdrew without earning a final reward are removed by the
+same step.</p>
 <p><em>Given</em></p>
 <pre><code class="language-python">current_epoch: EpochNumber
 service_notes: dict[NoteId, ServiceNote]
@@ -1306,7 +1301,7 @@ declarations: dict[DeclarationID, DeclarationInfo]
 </code></pre>
 <p><em>Execute</em></p>
 <p>For every <code>declare_id</code>, <code>declare_info</code> in <code>declarations</code> where
-<code>declare_info.withdraw_at is not None and declare_info.withdraw_at &lt;= current_epoch - 2</code>:</p>
+<code>declare_info.withdraw_at is not None and declare_info.withdraw_at &lt;= current_epoch</code>:</p>
 <ol>
 <li>
 <p>Remove the declaration from its service note.</p>
@@ -1356,7 +1351,22 @@ assert active.nonce &gt; declaration_info.nonce
 assert ZkSignature_verify(txhash, signature, declaration_info.zk_id)
 </code></pre>
 <h4 id="execution-8"><a class="header" href="#execution-8">Execution</a></h4>
-<p>Executes the active protocol <a href="bedrock-service-declaration-protocol.html#active">Active</a>. The activation, i.e. setting the <code>declaration.active</code>, is handled by the service-specific logic.</p>
+<p><em>Given</em></p>
+<pre><code class="language-python">active: Active
+
+current_epoch: EpochNumber # epoch of the block containing this operation
+declarations: dict[DeclarationID, DeclarationInfo]
+</code></pre>
+<p><em>Execute</em></p>
+<p>Executes the active protocol <a href="bedrock-service-declaration-protocol.html#active">Active</a>. If the service-specific activity logic rejects the message, the Operation is invalid.</p>
+<ol>
+<li>Update the declaration info with the nonce and the epoch.
+<pre><code class="language-python">declaration_info = declarations[active.declaration]
+declaration_info.nonce = active.nonce
+declaration_info.active = current_epoch
+</code></pre>
+</li>
+</ol>
 <h4 id="example-7"><a class="header" href="#example-7">Example</a></h4>
 <pre><code class="language-python">active=Active(
     declaration=alice_declaration_id,
