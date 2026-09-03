@@ -56,7 +56,7 @@ message SegmentMessage {
   uint32          data_segment_count      = 4;  // number of data segments
   optional uint32 parity_segment_count    = 5;  // number of parity segments, unset if no parity
   bool            is_parity               = 6;  // false for a data segment, true for a parity one
-  bytes           segment_payload         = 7;  // this segment's data chunk or parity shard
+  bytes           payload         = 7;  // this segment's data chunk or parity shard
 }
 ```
 
@@ -124,7 +124,7 @@ Every segment message of a set carries its `data_segment_count`:
 
 The receiver produces the original payload following these steps:
 
-1. Concatenate the data segments' `segment_payload` fields in ascending `index` order,
+1. Concatenate the data segments' `payload` fields in ascending `index` order,
    which yields exactly `original_payload_length` bytes;
    fewer mean the set is incomplete and MUST NOT be delivered to the application.
 2. Verify that `Keccak256` of the result equals the set's `original_payload_hash`.
