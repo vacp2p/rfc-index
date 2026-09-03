@@ -41,7 +41,8 @@
 | 1.10.2| Precise the state validation reads: the Operations of a Mantle Transaction are validated and executed one after the other in the order they appear, each against the state the preceding ones left, and a Mantle Transaction against the state the transactions preceding it in the block left. Accumulated the transaction balance along that pass, replacing `get_transaction_balance` | 2026-08-24 |
 | 1.11.0 | Track the configuration lineage of a channel: `ChannelState` gains `config_tip_hash` and the `CHANNEL_CONFIG` payload carries the `parent` configuration it extends, ordering configurations and preventing their replay | 2026-08-27 |
 | 1.11.1 | Renamed locked notes into service notes: `service_notes`, `ServiceNote` and `service_note_id` replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in | 2026-08-27 |
-| 1.12.0 | [RFC] Key SDP declarations by `zk_id` and bind each to a single service note | 2026-09-01 |
+| 1.12.0 | Specified the `SDP_ACTIVE` execution effects, matching the implementation: `active` is set to the epoch of the including block, and a message the activity logic rejects makes the Operation invalid. Set `withdraw_at` to `current_epoch + 2`, the epoch at which the node stops providing the service, and removed declarations at `withdraw_at` | 2026-09-02 |
+| 1.13.0 | [RFC] Key SDP declarations by `zk_id` and bind each to a single service note | 2026-09-03 |
 
 # Introduction
 
@@ -1046,6 +1047,7 @@ class DeclarationInfo:
     locators: list[Locator]
     provider_id: Ed25519PublicKey
     service_note_id: NoteId
+    created: EpochNumber
     active: EpochNumber
     withdraw_at: EpochNumber | None
     # SDP ops updating a declaration must use monotonically increasing nonces
@@ -1159,6 +1161,7 @@ providers: dict[Ed25519PublicKey, ZkPublicKey]
           locators=declaration.locators,
           provider_id=declaration.provider_id,
           service_note_id=declaration.service_note_id,
+          created=current_epoch,
           active=current_epoch + 2,
           withdraw_at=None,
           nonce=0,
@@ -1292,17 +1295,12 @@ declarations: dict[ZkPublicKey, DeclarationInfo]
 
   Executes the withdrawal protocol [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
 
-  Withdrawal only records the intent: `withdraw_at` is set to the current
-  (withdrawal) epoch `e`, the node's last rewardable epoch. The declaration is
-  removed and its note released at epoch `e+2` by the
-  [SDP Epoch Finalization](#sdp-epoch-finalization) step, right after the final
-  reward is paid out.
 
   1. Update the declaration info with the nonce and the withdrawal epoch.
       ```python
       declare_info = declarations[withdraw.zk_id]
       declare_info.nonce = withdraw.nonce
-      declare_info.withdraw_at = current_epoch
+      declare_info.withdraw_at = current_epoch + 2
       ```
 
 #### Example
@@ -1333,13 +1331,14 @@ SignedMantleTx(
 ### SDP Epoch Finalization
 
 Withdrawn declarations are removed by Mantle as part of the epoch transition,
-not when the `WithdrawMessage` is processed. A node that withdrew in epoch `e`
-has `withdraw_at == e`, and its last rewardable epoch is `e`; the epoch-`e`
-rewards are distributed in the first block of epoch `e+2` (see
+not when the `WithdrawMessage` is processed. The rewards of epoch
+`withdraw_at - 2` ([Withdraw](bedrock-service-declaration-protocol.md#withdraw))
+are distributed in the first block of epoch `withdraw_at` (see
 [Service Reward Distribution Protocol](bedrock-service-reward-distribution.md)).
-In that same first block, **after** the rewards have been distributed, every
-declaration whose final reward has been paid out (`withdraw_at <= current_epoch - 2`)
-is removed and its note released.
+In that same block, after the rewards have been distributed, every declaration
+with `withdraw_at <= current_epoch` is removed and its service note released.
+Declarations that withdrew without earning a final reward are removed by the
+same step.
 
   *Given*
 
@@ -1353,7 +1352,7 @@ declarations: dict[ZkPublicKey, DeclarationInfo]
   *Execute*
 
   For every `zk_id`, `declare_info` in `declarations` where
-  `declare_info.withdraw_at is not None and declare_info.withdraw_at <= current_epoch - 2`:
+  `declare_info.withdraw_at is not None and declare_info.withdraw_at <= current_epoch`:
 
   1. Release the note and the provider identity the declaration held.
       ```python
@@ -1414,7 +1413,25 @@ assert ZkSignature_verify(txhash, signature, active.zk_id)
 
 #### Execution
 
-  Executes the active protocol [Active](bedrock-service-declaration-protocol.md#active). The activation, i.e. setting the `active` of the `DeclarationInfo`, is handled by the service-specific logic.
+  *Given*
+
+```python
+active: Active
+
+current_epoch: EpochNumber # epoch of the block containing this operation
+declarations: dict[ZkPublicKey, DeclarationInfo]
+```
+
+  *Execute*
+
+  Executes the active protocol [Active](bedrock-service-declaration-protocol.md#active). If the service-specific activity logic rejects the message, the Operation is invalid.
+
+  1. Update the declaration info with the nonce and the epoch.
+      ```python
+      declaration_info = declarations[active.zk_id]
+      declaration_info.nonce = active.nonce
+      declaration_info.active = current_epoch
+      ```
 
 #### Example
 
