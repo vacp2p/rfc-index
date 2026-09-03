@@ -10659,6 +10659,7 @@ should be transmitted over channels appropriate for the user's threat model.</p>
 </div><!-- timeline:start -->
 <h2 id="timeline-34"><a class="header" href="#timeline-34">Timeline</a></h2>
 <ul>
+<li><strong>2026-09-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/40f1fb63ca0abf64a81ab904c184837c19d5cb5c/docs/messaging/application/raw/segmentation.md"><code>40f1fb6</code></a> — Adjust segmentation spec (#428)</li>
 <li><strong>2026-06-16</strong> — <a href="https://github.com/logos-co/logos-lips/blob/16e8af10af316557eda5813b6039c0bdf435baa1/docs/messaging/application/raw/segmentation.md"><code>16e8af1</code></a> — Chore/separate messaging specs (#361)</li>
 <li><strong>2026-06-12</strong> — <a href="https://github.com/logos-co/logos-lips/blob/124f8957915f349347532d802d9e4bb5cc2a5ce7/docs/messaging/raw/segmentation.md"><code>124f895</code></a> — chore: fix broken links (#357)</li>
 <li><strong>2026-06-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/bb9d20bdef8bdbdf36cab7700eebaada4d46ff28/docs/messaging/raw/segmentation.md"><code>bb9d20b</code></a> — chore: scope linting (#355)</li>
@@ -10666,190 +10667,199 @@ should be transmitted over channels appropriate for the user's threat model.</p>
 </ul>
 <!-- timeline:end -->
 <h2 id="abstract-23"><a class="header" href="#abstract-23">Abstract</a></h2>
-<p>This specification defines an application-layer protocol for <strong>segmentation</strong> and <strong>reconstruction</strong> of messages carried over a transport/delivery service with a message-size limitation, when the original payload exceeds said limitation.
+<p>This specification defines an application-layer protocol for <strong>segmentation</strong> and <strong>reconstruction</strong>
+of messages carried over a transport/delivery service with a message-size limitation,
+when the original payload exceeds said limitation.
 Applications partition the payload into multiple transport messages and reconstruct the original on receipt,
-even when segments arrive out of order or up to a <strong>predefined percentage</strong> of segments are lost.
-The protocol optionally uses <strong>Reed–Solomon</strong> erasure coding for fault tolerance.
-All messages are wrapped in a <code>SegmentMessageProto</code>, including those that fit in a single segment.</p>
+even when segments arrive out of order.
+Optional Reed–Solomon erasure coding additionally tolerates the loss
+of up to a predefined percentage of segments.</p>
 <h2 id="motivation-7"><a class="header" href="#motivation-7">Motivation</a></h2>
-<p>Many message transport and delivery protocols impose a maximum message size that restricts the size of application payloads.
-For example, Waku Relay typically propagates messages up to <strong>150 KB</strong> as per <a href="messaging/application/raw/../../core/draft/64/network.html#message-size">64/WAKU2-NETWORK - Message</a>.
+<p>Many message transport and delivery protocols impose a maximum message size
+that restricts the size of application payloads.
+For example, Logos Delivery propagates messages up to 150 KiB
+as per <a href="messaging/application/raw/../../core/draft/64/network.html#message-size">64/WAKU2-NETWORK - Message</a>.
 To support larger application payloads, a segmentation layer is required.
-This specification enables larger messages by partitioning them into multiple envelopes and reconstructing them at the receiver.
+This specification enables larger messages by partitioning them into multiple envelopes
+and reconstructing them at the receiver.
 Erasure-coded parity segments provide resilience against partial loss or reordering.</p>
 <h2 id="terminology-8"><a class="header" href="#terminology-8">Terminology</a></h2>
 <ul>
 <li><strong>original payload</strong>: the full application payload before segmentation.</li>
-<li><strong>data segment</strong>: one of the partitioned chunks of the original message payload.</li>
+<li><strong>data segment</strong>: one chunk of the original payload.</li>
 <li><strong>parity segment</strong>: an erasure-coded segment derived from the set of data segments.</li>
-<li><strong>segment message</strong>: a wire-message whose <code>payload</code> field carries a serialized <code>SegmentMessageProto</code>.</li>
-<li><strong><code>segmentSize</code></strong>: configured maximum size in bytes of each data segment's <code>payload</code> chunk (before protobuf serialization).</li>
+<li><strong>class</strong>: either of the two groups a payload's segments fall into, data or parity.</li>
+<li><strong>segment message</strong>: a <a href="messaging/application/raw/segmentation.html#wire-format"><code>SegmentMessage</code></a> carrying either data or parity segment.</li>
+<li><strong>segmentSizeBytes</strong>: maximum size of a serialized segment message, see <a href="messaging/application/raw/segmentation.html#configuration">Configuration</a>.</li>
 </ul>
 <p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
 <h2 id="wire-format-3"><a class="header" href="#wire-format-3">Wire Format</a></h2>
-<p>Each segmented message is encoded as a <code>SegmentMessageProto</code> protobuf message:</p>
+<p>Each segment message is encoded as:</p>
 <pre><code class="language-protobuf">syntax = "proto3";
 
-message SegmentMessageProto {
-  // Keccak256(original payload), 32 bytes
-  bytes  entire_message_hash    = 1;
-
-  // Data segment indexing
-  uint32 data_segment_index     = 2; // zero-indexed sequence number for data segments
-  uint32 data_segment_count         = 3; // number of data segments (&gt;= 1)
-
-  // Segment payload (data or parity shard)
-  bytes  payload                = 4;
-
-  // Parity segment indexing
-  uint32 parity_segment_index   = 5; // zero-based sequence number for parity segments
-  uint32 parity_segment_count  = 6; // number of parity segments
-
-  // Segment type
-  bool   is_parity              = 7; // true for parity segments, false (default) for data segments
+message SegmentMessage {
+  bytes           original_payload_hash   = 1;  // Keccak256 of the original payload, 32 bytes
+  uint32          original_payload_length = 2;  // length in bytes of the original payload
+  uint32          index                   = 3;  // zero-based position within this segment's own class
+  uint32          data_segment_count      = 4;  // number of data segments
+  optional uint32 parity_segment_count    = 5;  // number of parity segments, unset if no parity
+  bool            is_parity               = 6;  // false for a data segment, true for a parity one
+  bytes           payload         = 7;  // this segment's data chunk or parity shard
 }
 </code></pre>
-<p><strong>Field descriptions:</strong></p>
+<h3 id="validity"><a class="header" href="#validity">Validity</a></h3>
+<p>A <strong>segment message</strong> is valid only if all of the following hold:</p>
 <ul>
-<li><code>entire_message_hash</code>: A 32-byte Keccak256 hash of the original complete payload, used to identify which segments belong together and verify reconstruction integrity.</li>
-<li><code>data_segment_index</code>: Zero-indexed sequence number identifying this data segment's position (0, 1, 2, ..., data_segment_count - 1). Set only on data segments.</li>
-<li><code>data_segment_count</code>: Total number of data segments the original message was split into. Set on every segment (data and parity).</li>
-<li><code>payload</code>: The actual chunk of data or parity information for this segment.</li>
-<li><code>parity_segment_index</code>: Zero-based sequence number for parity segments. Set only on parity segments.</li>
-<li><code>parity_segment_count</code>: Total number of parity segments generated. Set on every segment (data and parity) when Reed–Solomon parity is used; <code>0</code> (default) otherwise.</li>
-<li><code>is_parity</code>: Explicit segment type marker. <code>false</code> (default) for data segments; <code>true</code> for parity segments.</li>
+<li><code>original_payload_hash</code> is exactly 32 bytes.</li>
+<li><code>data_segment_count &gt;= 1</code>.</li>
+<li><code>data_segment_count + parity_segment_count &lt;= maxTotalSegments</code>, the receiver's configured limit,
+counting an unset <code>parity_segment_count</code> as zero.</li>
+<li><code>index &lt; data_segment_count</code> on a data segment, <code>index &lt; parity_segment_count</code> on a parity one.</li>
 </ul>
-<p>A message is either a <strong>data segment</strong> (when <code>is_parity == false</code>) or a <strong>parity segment</strong> (when <code>is_parity == true</code>).</p>
-<h3 id="validation"><a class="header" href="#validation">Validation</a></h3>
-<p>Receivers MUST enforce:</p>
-<ul>
-<li><code>entire_message_hash.length == 32</code></li>
-<li><code>data_segment_count &gt;= 1</code></li>
-<li><code>data_segment_count + parity_segment_count &lt; maxTotalSegments</code></li>
-<li><strong>Data segments</strong> (<code>is_parity == false</code>):
-<code>data_segment_index &lt; data_segment_count</code></li>
-<li><strong>Parity segments</strong> (<code>is_parity == true</code>):
-<code>parity_segment_count &gt; 0</code> AND <code>parity_segment_index &lt; parity_segment_count</code></li>
-</ul>
-<p>No other combinations are permitted.
-A <code>SegmentMessageProto</code> with <code>data_segment_count == 1</code> and <code>data_segment_index == 0</code> is a valid single-segment data message: the <code>payload</code> field carries the entire original payload (see <a href="messaging/application/raw/segmentation.html#sending">Sending</a>).</p>
+<p>An invalid segment message MUST be discarded.
+A payload that fits one segment is still wrapped, as <code>data_segment_count == 1</code>, <code>index == 0</code>, <code>is_parity == false</code>.</p>
+<h2 id="reedsolomon-coding"><a class="header" href="#reedsolomon-coding">Reed–Solomon Coding</a></h2>
+<p>A sender that uses parity applies <a href="https://github.com/catid/leopard">Reed–Solomon erasure coding</a>
+over its data segments to produce <code>ceil(parityRate * data_segment_count)</code> more parity segments.
+Reed–Solomon recovers from any <code>data_segment_count</code> segments of a set, data and parity alike,
+so a set reconstructs even where every segment held is a parity one.
+Implementations cap parity at the data-segment count, which <code>parityRate</code> respects.</p>
+<p>Reed–Solomon operates on equal-length inputs, called shards, of the chunk size the payload was split into.
+Only the last data segment may be shorter, and the encoder zero-pads it.
+That padding never reaches the wire, data segments being sent at their true length,
+which leaves parity segments as the only ones always exactly shard-length.
+A decoding receiver therefore takes the shard length from a parity segment,
+re-pads any data segments it holds to that length, and decodes.</p>
+<p>Receivers SHOULD support Reed–Solomon decoding, and MUST where the application sets <code>parityRate &gt; 0</code>;
+without it a set reconstructs only once every data segment has arrived.</p>
 <h2 id="segmentation"><a class="header" href="#segmentation">Segmentation</a></h2>
-<h3 id="sending"><a class="header" href="#sending">Sending</a></h3>
-<p>To transmit a payload, the sender:</p>
+<p>To transmit an original payload, the sender:</p>
 <ul>
-<li>MUST compute a 32-byte <code>entire_message_hash = Keccak256(original_payload)</code>.</li>
-<li>MUST split the payload into one or more data segments,
-each of size up to <code>segmentSize</code> bytes.
-A payload of size ≤ <code>segmentSize</code> produces a single data segment (<code>data_segment_count == 1</code>).</li>
-<li>MUST pad the last segment to <code>segmentSize</code> for Reed-Solomon erasure coding (only if Reed-Solomon coding is enabled).</li>
-<li>MAY use Reed–Solomon erasure coding at the predefined parity rate.</li>
-<li>MUST encode every segment as a <code>SegmentMessageProto</code> with:
+<li>MUST compute <code>original_payload_hash = Keccak256(original payload)</code>.</li>
+<li>MUST split the payload into one or more data segments, at a chunk size such that every segment
+it sends, data and parity alike, serializes to at most <code>segmentSizeBytes</code>.</li>
+<li>MAY generate parity segments at <code>parityRate</code> as defined in <a href="messaging/application/raw/segmentation.html#reedsolomon-coding">Reed–Solomon Coding</a>.</li>
+<li>MUST encode every segment as a <code>SegmentMessage</code> that satisfies <a href="messaging/application/raw/segmentation.html#validity">Validity</a>.</li>
+<li>MUST send each segment message as an individual transport message; the order is unconstrained.</li>
+</ul>
+<h2 id="reconstruction"><a class="header" href="#reconstruction">Reconstruction</a></h2>
+<p>A receiver retains every valid segment message.</p>
+<p>Two valid segment messages belong to the same <strong>segment set</strong> only if all of the following hold:</p>
 <ul>
-<li>The <code>entire_message_hash</code></li>
-<li><code>data_segment_count</code> (total number of data segments, always set)</li>
-<li>When Reed–Solomon parity is used, <code>parity_segment_count</code> (total number of parity segments, set on every segment)</li>
-<li>For data segments: <code>is_parity = false</code>, <code>data_segment_index</code></li>
-<li>For parity segments: <code>is_parity = true</code>, <code>parity_segment_index</code></li>
-<li>The raw payload data</li>
+<li>they carry equal <code>original_payload_hash</code>.</li>
+<li>they carry equal <code>original_payload_length</code>.</li>
+<li>they carry equal <code>data_segment_count</code> and equal <code>parity_segment_count</code>.</li>
 </ul>
-</li>
-<li>Send each segment as an individual transport message according to the underlying transport service.</li>
-</ul>
-<p>This yields a deterministic wire format: every transmitted payload is a <code>SegmentMessageProto</code>.</p>
-<h3 id="receiving"><a class="header" href="#receiving">Receiving</a></h3>
-<p>Upon receiving a segmented message, the receiver:</p>
+<p>Within a set, <code>(is_parity, index)</code> MUST be unique;
+a segment message repeating one already held MUST be ignored.</p>
+<p>Every segment message of a set carries its <code>data_segment_count</code>:</p>
 <ul>
-<li>MUST validate each segment according to <a href="messaging/application/raw/segmentation.html#validation">Wire Format -&gt; Validation</a>.</li>
-<li>MUST cache received segments.</li>
-<li>MUST attempt reconstruction once at least <code>data_segment_count</code> distinct segments (data and parity combined) have been received:
+<li>A set reaching that count in data segments alone
+reconstructs by <a href="messaging/application/raw/segmentation.html#all-data-segments-are-received-successfully">concatenation</a>.</li>
+<li>A set reaching that count in data plus parity segments together
+reconstructs <a href="messaging/application/raw/segmentation.html#recovery-through-parity">through parity</a>.</li>
+<li>Else, <a href="messaging/application/raw/segmentation.html#expiry">expires</a> after a configured timeout.</li>
+</ul>
+<h3 id="all-data-segments-are-received-successfully"><a class="header" href="#all-data-segments-are-received-successfully">All data segments are received successfully</a></h3>
+<p>The receiver produces the original payload following these steps:</p>
+<ol>
+<li>Concatenate the data segments' <code>payload</code> fields in ascending <code>index</code> order,
+which yields exactly <code>original_payload_length</code> bytes;
+fewer mean the set is incomplete and MUST NOT be delivered to the application.</li>
+<li>Verify that <code>Keccak256</code> of the result equals the set's <code>original_payload_hash</code>.</li>
+</ol>
+<p>An invalid payload MUST be discarded; only a valid one is delivered to the application.
+Any parity segments the set holds are unused, and the set MAY be released once the payload is delivered.</p>
+<h3 id="recovery-through-parity"><a class="header" href="#recovery-through-parity">Recovery through parity</a></h3>
+<p>Where a data segment is missing, parity segments stand in for it.
+The receiver <a href="messaging/application/raw/segmentation.html#reedsolomon-coding">Reed–Solomon decodes</a> the missing data segments from the ones it holds,
+concatenates as <a href="messaging/application/raw/segmentation.html#all-data-segments-are-received-successfully">above</a>,
+then truncates the result to <code>original_payload_length</code> before verifying the hash.</p>
+<p>Decoding returns every data segment at the <a href="messaging/application/raw/segmentation.html#reedsolomon-coding">shard length</a>,
+so a recovered last data segment comes back carrying zero padding the sender never transmitted.
+Truncating to <code>original_payload_length</code> removes it;
+a receiver holding every data segment assembles exactly that many bytes and truncates nothing.</p>
+<h3 id="expiry"><a class="header" href="#expiry">Expiry</a></h3>
+<p>The receiver MUST NOT wait indefinitely for all the required segments to arrive.
+It MUST drop a set that has received no further segments
+within a reconstruction timeout without delivering anything to the application.</p>
+<p>A later segment message of a dropped set starts a new one,
+which reconstructs only if enough are retransmitted.</p>
+<h2 id="configuration"><a class="header" href="#configuration">Configuration</a></h2>
 <ul>
-<li>If all data segments are present, concatenate their <code>payload</code> fields in <code>data_segment_index</code> order.</li>
-<li>Otherwise, recover the payload via Reed–Solomon decoding over the available data and parity segments.</li>
+<li><code>segmentSizeBytes</code>: chosen by the application so that a segment fits the transport's maximum message size.</li>
+<li><code>parityRate</code>: parity segments as a fraction of the data segments,
+so <code>0.125</code> is one parity segment per eight data ones.
+MUST NOT exceed <code>1</code>, parity segments never outnumbering the data ones,
+see <a href="messaging/application/raw/segmentation.html#reedsolomon-coding">Reed–Solomon Coding</a>.
+Defaults to <code>0</code>, which disables parity.
+<code>0.125</code> is RECOMMENDED where the <a href="messaging/application/raw/segmentation.html#when-to-use-parity">guidance below</a> favours parity.</li>
+<li><code>reconstructionTimeoutSeconds</code>: how long a segment set may go without a new segment message
+before the receiver drops it, see <a href="messaging/application/raw/segmentation.html#expiry">Expiry</a>.</li>
+<li><code>maxTotalSegments</code>: greatest number of segments a set may hold, data and parity together.
+Bounds how much memory one sender can make a receiver buffer, see <a href="messaging/application/raw/segmentation.html#segment-caching">Segment Caching</a>.
+<strong>256</strong> is RECOMMENDED, the shard ceiling of the smaller field a Reed–Solomon implementation may use,
+so that any implementation can encode a conforming set.
+An application MAY raise it where its receivers can absorb the larger buffer
+and its Reed–Solomon implementation has the shards for it.
+All participants in an application MUST use the same value,
+so participants interoperate within an application and not across applications.</li>
 </ul>
-</li>
-<li>MUST verify <code>Keccak256(reconstructed_payload)</code> matches <code>entire_message_hash</code>.
-On mismatch,
-the message MUST be discarded and logged as invalid.</li>
-<li>Once verified,
-the reconstructed payload SHALL be delivered to the application.</li>
-</ul>
-<hr />
 <h2 id="implementation-suggestions-6"><a class="header" href="#implementation-suggestions-6">Implementation Suggestions</a></h2>
-<h3 id="reedsolomon"><a class="header" href="#reedsolomon">Reed–Solomon</a></h3>
-<p>Implementations that apply parity SHALL use fixed-size shards of length <code>segmentSize</code>.
-The reference implementation uses <strong>nim-leopard</strong> (Leopard-RS) with a maximum of <strong>256 total shards</strong>.</p>
-<h3 id="storage--persistence"><a class="header" href="#storage--persistence">Storage / Persistence</a></h3>
-<p>Segments may be persisted (e.g., SQLite) and indexed by <code>entire_message_hash</code> and by sender. Sender may be authenticated, this is out of scope of this spec.
-Implementations SHOULD support:</p>
+<h3 id="when-to-use-parity"><a class="header" href="#when-to-use-parity">When to Use Parity</a></h3>
+<p>Parity costs <code>parityRate</code> extra bandwidth on every message, whether or not anything is lost,
+and pays off only where losses are independent and a retransmission would cost more;
+<a href="https://www.rfc-editor.org/rfc/rfc3453">RFC 3453</a> covers the general trade-off.
+Where an end-to-end reliability layer already retransmits missing segments, set <code>parityRate = 0</code>.</p>
+<p><code>ceil</code> rounds small sets up sharply: at <code>parityRate = 0.125</code> two data segments still get one parity segment,
+a 50% overhead to tolerate a single loss.</p>
+<h3 id="segment-caching"><a class="header" href="#segment-caching">Segment Caching</a></h3>
+<p>Received segments accumulate until their set is reconstructible. Implementations typically:</p>
 <ul>
-<li>Duplicate detection and idempotent saves</li>
-<li>Completion flags to prevent duplicate processing</li>
-<li>Timeout-based cleanup of incomplete reconstructions</li>
-<li>Per-sender quotas for stored bytes and concurrent reconstructions</li>
+<li>Index the cache by <code>original_payload_hash</code>,
+and additionally by sender where the transport authenticates one.
+Authenticating the sender is out of scope of this specification.</li>
+<li>Bound both the number of segment sets held and the total buffered bytes,
+per sender as well as globally where a sender identity is available.
+Capping the sets bounds the bytes at that cap times <code>maxTotalSegments * segmentSizeBytes</code>.</li>
+<li>Evict the least recently updated set first,
+in addition to the <code>reconstructionTimeoutSeconds</code> expiry every receiver applies.</li>
 </ul>
-<h3 id="configuration"><a class="header" href="#configuration">Configuration</a></h3>
-<ul>
-<li><code>segmentSize</code> — maximum size in bytes of each data segment's payload chunk (before protobuf serialization).
-REQUIRED parameter, configurable by the client.</li>
-<li><code>parityRate</code> — fraction of parity shards relative to data shards.
-Configurable by the client. Defaults to <strong>0.125</strong> (12.5%).</li>
-<li><code>maxTotalSegments</code> — maximum number of total shards (data + parity) per message.
-Implementation-specific parameter, fixed. The reference implementation uses <strong>256</strong>.</li>
-</ul>
-<p><strong>Reconstruction capability:</strong>
-With the predefined parity rate, reconstruction is possible if <strong>all data segments</strong> are received or if <strong>any combination of data + parity</strong> totals at least <code>data_segment_count</code> (i.e., up to the predefined percentage of loss tolerated).</p>
-<p><strong>API simplicity:</strong>
-Libraries SHOULD require only <code>segmentSize</code> from the application for normal operation.</p>
-<hr />
-<h2 id="security-considerations-9"><a class="header" href="#security-considerations-9">Security Considerations</a></h2>
+<p>Segments can be persisted in a local storage, so that partial reconstructions survive application restarts.
+In-memory buffering is sufficient otherwise.</p>
+<h2 id="securityprivacy-considerations-5"><a class="header" href="#securityprivacy-considerations-5">Security/Privacy Considerations</a></h2>
 <h3 id="privacy-2"><a class="header" href="#privacy-2">Privacy</a></h3>
-<p><code>entire_message_hash</code> enables correlation of segments that belong to the same original message but does not reveal content.
-To prevent this correlation, applications SHOULD encrypt each segment after segmentation (see <a href="messaging/application/raw/segmentation.html#encryption">Encryption</a>).
-Traffic analysis may still identify segmented flows.</p>
-<h3 id="encryption"><a class="header" href="#encryption">Encryption</a></h3>
-<p>This specification does not provide confidentiality.
-Applications SHOULD encrypt each segment after segmentation
-(i.e., encrypt the serialized <code>SegmentMessageProto</code> prior to transmission),
-so that <code>entire_message_hash</code> and other identifying fields are not visible to observers.</p>
+<p><code>original_payload_hash</code> links the segments of one payload to each other, but does not reveal the payload.
+This specification does not enforce encryption, but applications SHOULD encrypt each serialized
+<code>SegmentMessage</code> before transmission, which hides the hash and the segment counts from observers
+and denies an attacker the hash it would need to <a href="messaging/application/raw/segmentation.html#integrity">poison a set</a>.
+Traffic analysis may still identify a segmented flow by its timing and volume.</p>
 <h3 id="integrity"><a class="header" href="#integrity">Integrity</a></h3>
-<p>Implementations MUST verify the Keccak256 hash post-reconstruction and discard on mismatch.</p>
+<p>This specification provides no sender authentication.
+The <code>original_payload_hash</code> check on the reconstructed payload
+detects accidental corruption and mismatched segments,
+but an attacker able to inject transport messages can compute a consistent hash over a payload of their own.
+Such an attacker can also deny reconstruction outright: injecting a segment message that occupies an
+<code>(is_parity, index)</code> of a set already in flight makes the receiver ignore the genuine one, so the set fails
+its hash check and never reconstructs until it <a href="messaging/application/raw/segmentation.html#expiry">expires</a>.
+Encrypting each segment message, as <a href="messaging/application/raw/segmentation.html#privacy">Privacy</a> recommends, keeps <code>original_payload_hash</code> out of an
+observer's reach and so out of reach of this attack.
+Applications requiring authenticity MUST obtain it from another layer.</p>
 <h3 id="denial-of-service"><a class="header" href="#denial-of-service">Denial of Service</a></h3>
-<p>To mitigate resource exhaustion:</p>
-<ul>
-<li>Limit total concurrent reconstructions and aggregate buffered bytes
-<ul>
-<li>When sender identity is available, apply the same two limits per sender</li>
-</ul>
-</li>
-<li>Enforce timeouts and size caps</li>
-<li>Validate segment counts (≤ 256)</li>
-<li>Consider rate-limiting at the transport layer (for example, via <a href="messaging/application/raw/../../core/draft/17/rln-relay.html">17/WAKU2-RLN-RELAY</a> on Waku)</li>
-</ul>
-<hr />
-<h2 id="deployment-considerations"><a class="header" href="#deployment-considerations">Deployment Considerations</a></h2>
-<p><strong>Overhead:</strong></p>
-<ul>
-<li>Bandwidth overhead ≈ the predefined parity rate from parity (if enabled)</li>
-<li>Additional per-segment overhead ≤ <strong>100 bytes</strong> (protobuf + metadata)</li>
-</ul>
-<p><strong>Network impact:</strong></p>
-<ul>
-<li>Larger messages increase transport traffic and storage;
-operators SHOULD consider policy limits</li>
-</ul>
-<p><strong>Compatibility:</strong></p>
-<ul>
-<li>Nodes that do not implement this specification cannot reconstruct any messages.</li>
-</ul>
-<hr />
+<p>A remote sender controls how much memory a receiver buffers, so implementations MUST bound it.
+The limits and timeouts in <a href="messaging/application/raw/segmentation.html#segment-caching">Segment Caching</a> are the mitigation.
+Rate limiting at the transport,
+for example <a href="messaging/application/raw/../../core/draft/17/rln-relay.html">17/WAKU2-RLN-RELAY</a> in Logos Delivery,
+additionally bounds how fast an attacker can create pending reconstructions.</p>
+<h2 id="copyright-32"><a class="header" href="#copyright-32">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-26"><a class="header" href="#references-26">References</a></h2>
 <ol>
-<li><a href="messaging/application/raw/../../core/draft/10/waku2.html">10/WAKU2 – Waku</a></li>
-<li><a href="messaging/application/raw/../../core/stable/11/relay.html">11/WAKU2-RELAY – Relay</a></li>
-<li><a href="messaging/application/raw/../../core/stable/14/message.html">14/WAKU2-MESSAGE – Message</a></li>
 <li><a href="messaging/application/raw/../../core/draft/64/network.html#message-size">64/WAKU2-NETWORK</a></li>
-<li><a href="https://github.com/status-im/nim-leopard">nim-leopard</a> – Nim bindings for Leopard-RS (Reed–Solomon)</li>
+<li><a href="messaging/application/raw/../../core/draft/17/rln-relay.html">17/WAKU2-RLN-RELAY</a></li>
+<li><a href="https://github.com/status-im/nim-leopard">nim-leopard</a> – Nim bindings for Leopard-RS</li>
 <li><a href="https://github.com/catid/leopard">Leopard-RS</a> – Fast Reed–Solomon erasure coding library</li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc3453">RFC 3453</a> – The Use of Forward Error Correction (FEC) in Reliable Multicast</li>
 <li><a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a> – Key words for use in RFCs to Indicate Requirement Levels</li>
 </ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="messaging-api"><a class="header" href="#messaging-api">MESSAGING-API</a></h1>
@@ -11437,9 +11447,9 @@ As part of this API, it will be expected that a validation object can be passed,
 that would contain all validation parameters including RLN.</p>
 <p>In the time being, parameters specific to RLN are accepted for the message validation.
 RLN can also be disabled.</p>
-<h2 id="securityprivacy-considerations-5"><a class="header" href="#securityprivacy-considerations-5">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-6"><a class="header" href="#securityprivacy-considerations-6">Security/Privacy Considerations</a></h2>
 <p>See <a href="https://github.com/logos-co/logos-lips/blob/master/docs/messaging/informational/raw/adversarial-models.md">WAKU2-ADVERSARIAL-MODELS</a>.</p>
-<h2 id="copyright-32"><a class="header" href="#copyright-32">Copyright</a></h2>
+<h2 id="copyright-33"><a class="header" href="#copyright-33">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="op-chan"><a class="header" href="#op-chan">OP-CHAN</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -11634,7 +11644,7 @@ to send messages to Waku nodes storing the forum's content.</p>
 <p>Message routing and discovery are handled by <a href="https://github.com/logos-co/logos-lips/blob/master/docs/messaging/informational/draft/23/topics.md">23/WAKU2-TOPICS</a>.
 Each channel is assigned a <code>content_topic</code> that clients MUST subscribe to
 in order to discover messages from that channel.</p>
-<h2 id="copyright-33"><a class="header" href="#copyright-33">Copyright</a></h2>
+<h2 id="copyright-34"><a class="header" href="#copyright-34">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-27"><a class="header" href="#references-27">References</a></h2>
 <ul>
@@ -11813,7 +11823,7 @@ SDS uses a <code>sender_id</code> payload field to determine whether a message w
 <p>PRIVATE1 uses bloom filter parameters of <code>n=2000</code> (expected elements) and <code>p=0.001</code> (false positive probability).
 This configuration produces bloom filters of approximately 3.5 KiB per message.</p>
 <p>!TODO: Can the bloom filter be dropped in 1:1 communication?</p>
-<h3 id="encryption-1"><a class="header" href="#encryption-1">Encryption</a></h3>
+<h3 id="encryption"><a class="header" href="#encryption">Encryption</a></h3>
 <p>Payloads are encrypted using the <a href="https://signal.org/docs/specifications/doubleratchet/">Double Ratchet</a> algorithm with the following cryptographic primitive choices:</p>
 <p><strong>Double Ratchet Configuration</strong></p>
 <ul>
@@ -11945,14 +11955,14 @@ Implementations need to choose a strategy which works best for their environment
 Halting operation of the channel is the safest, as it bounds resource utilization in the event of a DOS attack but is not always possible.</p>
 <p>If eventual delivery of messages is not guaranteed, implementers should regularly delete keys that are older than a given time window.
 Unreliable delivery mechanisms will result in increased key storage over time, as more messages are lost with no hope of delivery.</p>
-<h2 id="securityprivacy-considerations-6"><a class="header" href="#securityprivacy-considerations-6">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-7"><a class="header" href="#securityprivacy-considerations-7">Security/Privacy Considerations</a></h2>
 <h3 id="sender-deniability-and-authentication"><a class="header" href="#sender-deniability-and-authentication">Sender Deniability and Authentication</a></h3>
 <p>Encrypted messages do not have a cryptographically provable sender to third parties due to the deniability property of the Double Ratchet algorithm.
 However, participants in a conversation can authenticate each other through the shared cryptographic state.
 When receiving a message, the recipient knows it must have come from the other participant because only they possess the necessary key material to produce valid ciphertexts.</p>
 <p>Because sender identity is implicitly authenticated through shared secrets rather than explicit signatures, it is critical that the initial shared secret <code>sk</code> be derived from an authenticated key exchange process.
 Without proper authentication during initialization, an adversary could perform a man-in-the-middle attack and establish separate sessions with each participant, allowing them to read and modify all messages.</p>
-<h2 id="copyright-34"><a class="header" href="#copyright-34">Copyright</a></h2>
+<h2 id="copyright-35"><a class="header" href="#copyright-35">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-28"><a class="header" href="#references-28">References</a></h2>
 <ul>
@@ -12157,7 +12167,7 @@ The hint provider converts an SDS <code>MessageId</code> into its corresponding 
 <p>When <code>RateLimitConfig.enabled</code> is <code>true</code>, the implementation MUST space segment transmissions
 to comply with the <a href="https://lip.logos.co/messaging/draft/17/rln-relay.html">RLN</a> epoch constraints defined in <code>[epochPeriodSec](https://lip.logos.co/messaging/draft/17/rln-relay.html#epoch-length)</code>.
 Segments MUST NOT be sent at a rate that would violate the RLN message rate limit for the active epoch.</p>
-<h3 id="encryption-2"><a class="header" href="#encryption-2">Encryption</a></h3>
+<h3 id="encryption-1"><a class="header" href="#encryption-1">Encryption</a></h3>
 <p>The <code>encryption</code> parameter in <code>createReliableChannel</code> is intentionally optional.
 The Reliable Channel API is agnostic to encryption mechanisms.</p>
 <p>When an <code>Encryption</code> implementation is provided, it MUST be applied as described in <a href="messaging/application/raw/reliable-channel-api.html#outgoing-message-processing">Outgoing message processing</a> and <a href="messaging/application/raw/reliable-channel-api.html#incoming-message-processing">Incoming message processing</a>.</p>
@@ -12403,14 +12413,14 @@ with <code>sds_config</code> and <code>rate_limit_config</code> fields.</p>
     Implementations MUST provide all functions required to save and retrieve SDS state per channel. Implementations MUST also provide the persistence method of interest, e.g., SQLite, custom encrypted storage, etc.
     Refer to the [SDS spec](https://lip.logos.co/anoncomms/raw/sds.html) for the full definition of what state must be persisted."
 </code></pre>
-<h2 id="securityprivacy-considerations-7"><a class="header" href="#securityprivacy-considerations-7">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-8"><a class="header" href="#securityprivacy-considerations-8">Security/Privacy Considerations</a></h2>
 <ul>
 <li>This API does not provide confidentiality by default. An <code>Encryption</code> implementation MUST be supplied when confidentiality is required.</li>
 <li>Segment metadata (message ID, segment index, total segments) is visible to network observers unless encrypted by the hook.</li>
 <li>SDS acknowledgement messages are sent over the same content topic and are subject to the same confidentiality concerns.</li>
 <li>Rate limiting compliance is required to avoid exclusion from the network by RLN-enforcing relays.</li>
 </ul>
-<h2 id="copyright-35"><a class="header" href="#copyright-35">Copyright</a></h2>
+<h2 id="copyright-36"><a class="header" href="#copyright-36">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="waku-p2p-reliability"><a class="header" href="#waku-p2p-reliability">WAKU-P2P-RELIABILITY</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -12738,7 +12748,7 @@ most p2p reliability strategies can be minimally configured (or even disabled) t
 <li><a href="https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#flood-publishing">GossipSub v1.1</a></li>
 <li><a href="messaging/application/raw/../../core/raw/lightpush.html">WAKU2-LIGHTPUSH</a></li>
 </ol>
-<h2 id="copyright-36"><a class="header" href="#copyright-36">Copyright</a></h2>
+<h2 id="copyright-37"><a class="header" href="#copyright-37">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="waku-rln-keystore"><a class="header" href="#waku-rln-keystore">WAKU-RLN-KEYSTORE</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -13010,7 +13020,7 @@ version: "0.2",
     }
 
 </code></pre>
-<h2 id="security-considerations-10"><a class="header" href="#security-considerations-10">Security Considerations</a></h2>
+<h2 id="security-considerations-9"><a class="header" href="#security-considerations-9">Security Considerations</a></h2>
 <h3 id="1-add-a-password"><a class="header" href="#1-add-a-password">1.) Add a Password</a></h3>
 <p>An attacker can identify which credential belongs to a node with a combination of <code>chainId</code> and
 <code>contractAddress</code> pair by brute forcing the <code>treeIndex</code> iteratively to find a hash match.
@@ -13025,7 +13035,7 @@ The RECOMMENDED solution is to add a password to the construction of <code>membe
 </li>
 <li>The user MUST store the <code>membershipPassword</code> privately.</li>
 </ul>
-<h2 id="copyright-37"><a class="header" href="#copyright-37">Copyright</a></h2>
+<h2 id="copyright-38"><a class="header" href="#copyright-38">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-30"><a class="header" href="#references-30">References</a></h2>
 <ol>
@@ -13316,7 +13326,7 @@ an encrypted payload can be further authenticated by passing the <code>messageNa
 In this way, an attacker would be unable to craft an authenticated Waku message
 even in case the currently used symmetric encryption key is compromised,
 unless <code>mntsInbound</code>, <code>mntsOutbound</code> or the <code>messageNametag</code> buffer lists were compromised too.</p>
-<h2 id="securityprivacy-considerations-8"><a class="header" href="#securityprivacy-considerations-8">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-9"><a class="header" href="#securityprivacy-considerations-9">Security/Privacy Considerations</a></h2>
 <h3 id="assumptions-1"><a class="header" href="#assumptions-1">Assumptions</a></h3>
 <ul>
 <li>
@@ -13408,7 +13418,7 @@ she must securely transfer a copy of such data from one of her device <code>A</c
 <li>securely transfer within such session the 176 bytes serializing the active session with Bob;</li>
 <li>manually instantiate in <code>B</code> a Noise session with Bob from the received session serialization.</li>
 </ul>
-<h2 id="copyright-38"><a class="header" href="#copyright-38">Copyright</a></h2>
+<h2 id="copyright-39"><a class="header" href="#copyright-39">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-31"><a class="header" href="#references-31">References</a></h2>
 <h3 id="normative-1"><a class="header" href="#normative-1">Normative</a></h3>
@@ -13710,7 +13720,7 @@ it SHOULD be decoded as the <code>data</code> field in <a href="https://github.c
 <li><a href="https://tools.ietf.org/html/rfc5234">Augmented Backus-Naur form (ABNF)</a></li>
 <li><a href="https://datatracker.ietf.org/doc/html/rfc2630#section-6.3">RFC2630 - Content-encryption Process and padding</a></li>
 </ol>
-<h2 id="copyright-39"><a class="header" href="#copyright-39">Copyright</a></h2>
+<h2 id="copyright-40"><a class="header" href="#copyright-40">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="waku2-noise-sessions"><a class="header" href="#waku2-noise-sessions">WAKU2-NOISE-SESSIONS</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -14026,7 +14036,7 @@ that MUST be uploaded.
 Other messages types MAY be uploaded, depending on the implementation.</p>
 <h2 id="acknowledgments-1"><a class="header" href="#acknowledgments-1">Acknowledgments</a></h2>
 <p>TBD.</p>
-<h2 id="copyright-40"><a class="header" href="#copyright-40">Copyright</a></h2>
+<h2 id="copyright-41"><a class="header" href="#copyright-41">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="footnotes-3"><a class="header" href="#footnotes-3">Footnotes</a></h2>
 <div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
@@ -14117,7 +14127,7 @@ The flag is <code>false</code> by default.</p>
 however they MUST NOT be shared as part of the message history.</p>
 <p>Nodes SHOULD send ephemeral messages in batch mode.
 As their delivery is not needed to be guaranteed.</p>
-<h2 id="copyright-41"><a class="header" href="#copyright-41">Copyright</a></h2>
+<h2 id="copyright-42"><a class="header" href="#copyright-42">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="footnotes-4"><a class="header" href="#footnotes-4">Footnotes</a></h2>
 <p>1: <a href="messaging/application/draft/4/../../../core/stable/2/mvds.html">2/MVDS</a>
@@ -14352,7 +14362,7 @@ Alice MAY now send an encrypted message to Bob.</p>
 Alice MUST encrypt her message <code>M</code> using Bob's Encryption Public Key <code>B'</code>,
 as per <a href="messaging/application/draft/20/../26/payload.html#asymmetric">26/WAKU-PAYLOAD Asymmetric Encryption specs</a>.</p>
 <p>Alice SHOULD now publish this message on the Private Message content topic.</p>
-<h2 id="copyright-42"><a class="header" href="#copyright-42">Copyright</a></h2>
+<h2 id="copyright-43"><a class="header" href="#copyright-43">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-34"><a class="header" href="#references-34">References</a></h2>
 <ul>
@@ -14501,7 +14511,7 @@ of the SECP-256k1 ECDSA signature, in that order.
 non-normalized and should be either 27 or 28.</p>
 <p>See <a href="https://ethereum.github.io/yellowpaper/paper.pdf">Ethereum "Yellow paper": Appendix F Signing transactions</a>
 for more information on signature generation, parameters and public key recovery.</p>
-<h3 id="encryption-3"><a class="header" href="#encryption-3">Encryption</a></h3>
+<h3 id="encryption-2"><a class="header" href="#encryption-2">Encryption</a></h3>
 <h4 id="symmetric"><a class="header" href="#symmetric">Symmetric</a></h4>
 <p>Symmetric encryption uses AES-256-GCM for
 <a href="https://en.wikipedia.org/wiki/Authenticated_encryption">authenticated encryption</a>.
@@ -14556,7 +14566,7 @@ SHOULD be a multiple of 256 bytes.</p>
 <p>In order to decode a message, a node SHOULD try to apply both symmetric and
 asymmetric decryption operations.
 This is because the type of encryption is not included in the message.</p>
-<h2 id="copyright-43"><a class="header" href="#copyright-43">Copyright</a></h2>
+<h2 id="copyright-44"><a class="header" href="#copyright-44">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-35"><a class="header" href="#references-35">References</a></h2>
 <ol>
@@ -14847,7 +14857,7 @@ described in <a href="messaging/application/draft/53/x3dh.html#2-double-ratchet"
 <p>The message key MUST be derived from a single ratchet step in the symmetric-key ratchet
 as described in <a href="https://signal.org/docs/specifications/doubleratchet/#symmetric-key-ratchet">Symmetric key ratchet</a></p>
 <p>The message key MUST be used to encrypt the next message to be sent.</p>
-<h2 id="security-considerations-11"><a class="header" href="#security-considerations-11">Security Considerations</a></h2>
+<h2 id="security-considerations-10"><a class="header" href="#security-considerations-10">Security Considerations</a></h2>
 <ol>
 <li>
 <p>Inherits the security considerations of <a href="https://signal.org/docs/specifications/x3dh/#security-considerations">X3DH</a>
@@ -14867,7 +14877,7 @@ In this case, the server is trusted.</p>
 <li>This protocol does not provide message unlinkability.
 It is possible to link messages signed by the same keypair.</li>
 </ol>
-<h2 id="copyright-44"><a class="header" href="#copyright-44">Copyright</a></h2>
+<h2 id="copyright-45"><a class="header" href="#copyright-45">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-36"><a class="header" href="#references-36">References</a></h2>
@@ -15043,7 +15053,7 @@ it is possible that a device will receive a message
 that is not targeted to its own <code>installation-id</code>.
 In this case an empty message containing bundle information MUST be sent back,
 which will notify the receiving end not to include the device in any further communication.</p>
-<h2 id="security-considerations-12"><a class="header" href="#security-considerations-12">Security Considerations</a></h2>
+<h2 id="security-considerations-11"><a class="header" href="#security-considerations-11">Security Considerations</a></h2>
 <ol>
 <li>Inherits all security considerations from <a href="messaging/application/draft/54//messaging/application/draft/53/x3dh.html">53/WAKU2-X3DH</a>.</li>
 </ol>
@@ -15057,7 +15067,7 @@ which may not be desirable in a peer-to-peer network.</li>
 </ul>
 </li>
 </ol>
-<h2 id="copyright-45"><a class="header" href="#copyright-45">Copyright</a></h2>
+<h2 id="copyright-46"><a class="header" href="#copyright-46">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-37"><a class="header" href="#references-37">References</a></h2>
@@ -15152,7 +15162,7 @@ since data size alone might reveal important metainformation.
 Padding can be arbitrary size.
 However, it is recommended that the size of Data Field (excluding the Salt)
 before encryption (i.e. plain text) SHOULD be factor of 256 bytes.</p>
-<h2 id="copyright-46"><a class="header" href="#copyright-46">Copyright</a></h2>
+<h2 id="copyright-47"><a class="header" href="#copyright-47">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="8waku-mail"><a class="header" href="#8waku-mail">8/WAKU-MAIL</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -15278,7 +15288,7 @@ payload = "[" request-id last-envelope-hash [ cursor ] "]"
 it means that not all envelopes were sent due to the set <code>Limit</code> in the request.
 One or more consecutive requests MAY be sent with <code>Cursor</code> field filled
 in order to receive the rest of the envelopes.</p>
-<h3 id="security-considerations-13"><a class="header" href="#security-considerations-13">Security considerations</a></h3>
+<h3 id="security-considerations-12"><a class="header" href="#security-considerations-12">Security considerations</a></h3>
 <p>There are several security considerations to take into account when running or
 interacting with Mailservers.
 Chief among them are: scalability, DDoS-resistance and privacy.</p>
@@ -15310,7 +15320,7 @@ This means a malicious or malfunctioning mailserver can overwhelm an individual 
 <ul>
 <li><code>topics</code> option</li>
 </ul>
-<h2 id="copyright-47"><a class="header" href="#copyright-47">Copyright</a></h2>
+<h2 id="copyright-48"><a class="header" href="#copyright-48">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="application-5"><a class="header" href="#application-5">Application</a></h1>
 <p>Application-level messaging deprecated specifications.</p>
@@ -15536,7 +15546,7 @@ pick another node.
 <p>In the hard phase, in addition to sending cheques and activating policy, this is
 done with blockchain integration on a public testnet. More details TBD.</p>
 <p>This also includes settlements where cheques can be redeemed.</p>
-<h2 id="copyright-48"><a class="header" href="#copyright-48">Copyright</a></h2>
+<h2 id="copyright-49"><a class="header" href="#copyright-49">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-38"><a class="header" href="#references-38">References</a></h2>
 <ol>
@@ -15670,7 +15680,7 @@ As such, the <code>messages</code> field of the corresponding
 <a href="messaging/application/deleted/../../core/draft/13/store.html#store-query-response"><code>HistoryResponse</code></a>
 MUST contain historical waku messages that satisfy the indicated  <code>pubsubtopic</code> AND
 <code>contentFilters</code> AND the time range [<code>start_time</code>, <code>end_time</code>].</p>
-<h2 id="copyright-49"><a class="header" href="#copyright-49">Copyright</a></h2>
+<h2 id="copyright-50"><a class="header" href="#copyright-50">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-39"><a class="header" href="#references-39">References</a></h2>
@@ -15908,7 +15918,7 @@ An AS attacker can filter and drop all Waku traffic within its authority, while 
 A countermeasure are censorship resistance techniques like <a href="https://www.pluggabletransports.info/about/">Pluggable Transports</a>.</p>
 <p>An entity trying to censor Waku can employ both the <em>black hole</em> attack and <em>traffic filtering</em>;
 the former is internal while the latter is external.</p>
-<h2 id="copyright-50"><a class="header" href="#copyright-50">Copyright</a></h2>
+<h2 id="copyright-51"><a class="header" href="#copyright-51">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-40"><a class="header" href="#references-40">References</a></h2>
 <ul>
@@ -16006,7 +16016,7 @@ Pax is often used when the specific identity or perspective of the participant i
 <p>The cast of characters SHOULD be diverse, culturally neutral, and avoid reinforcing stereotypes.</p>
 <h3 id="mnemonic-naming"><a class="header" href="#mnemonic-naming">Mnemonic Naming</a></h3>
 <p>Where possible the characters name should hint at their role in order to make them easier to remember.</p>
-<h2 id="copyright-51"><a class="header" href="#copyright-51">Copyright</a></h2>
+<h2 id="copyright-52"><a class="header" href="#copyright-52">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-41"><a class="header" href="#references-41">References</a></h2>
 <p><a href="https://github.com/jhaaaa/alix-and-bo">A global cast of characters for cryptography</a></p>
@@ -16070,10 +16080,10 @@ Pax is often used when the specific identity or perspective of the participant i
 <p><strong>Conversation</strong>: An instance of a chat protocol between a set of participants. Conversations are responsible for protocol operations including encryption, key management, and frame generation.</p>
 <h2 id="wire-format-specification--syntax-4"><a class="header" href="#wire-format-specification--syntax-4">Wire Format Specification / Syntax</a></h2>
 <p>This specification does not define wire format elements. All definitions are semantic and apply to the interpretation of terms used in other specifications that do define wire formats.</p>
-<h2 id="securityprivacy-considerations-9"><a class="header" href="#securityprivacy-considerations-9">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-10"><a class="header" href="#securityprivacy-considerations-10">Security/Privacy Considerations</a></h2>
 <p>This specification defines terminology only and does not introduce security or privacy considerations beyond those present in specifications that reference these definitions.</p>
 <p>The definitions provided in this specification do not alter the security or privacy properties of implementations that adopt the defined terminology.</p>
-<h2 id="copyright-52"><a class="header" href="#copyright-52">Copyright</a></h2>
+<h2 id="copyright-53"><a class="header" href="#copyright-53">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-42"><a class="header" href="#references-42">References</a></h2>
 <p>[RFC2119] Bradner, S., "Key words for use in RFCs to Indicate Requirement Levels", BCP 14, RFC 2119, March 1997.</p>
@@ -16127,7 +16137,7 @@ this document lists static shard index assignments (see <a href="messaging/infor
 <tr><td>18</td><td>Status</td><td></td></tr>
 </tbody></table>
 </div>
-<h2 id="copyright-53"><a class="header" href="#copyright-53">Copyright</a></h2>
+<h2 id="copyright-54"><a class="header" href="#copyright-54">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-43"><a class="header" href="#references-43">References</a></h2>
 <ul>
@@ -16198,7 +16208,7 @@ message Chat2Message {
 <li><code>nick</code>: The nickname of the user sending the message,</li>
 <li><code>payload</code>: The text of the messages, UTF-8 encoded.</li>
 </ul>
-<h2 id="copyright-54"><a class="header" href="#copyright-54">Copyright</a></h2>
+<h2 id="copyright-55"><a class="header" href="#copyright-55">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="23waku2-topics"><a class="header" href="#23waku2-topics">23/WAKU2-TOPICS</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -16366,7 +16376,7 @@ for a description of the bridged fields.</p>
 For example:</p>
 <pre><code class="language-text">/waku/1/0x007f80ff/rfc26
 </code></pre>
-<h2 id="copyright-55"><a class="header" href="#copyright-55">Copyright</a></h2>
+<h2 id="copyright-56"><a class="header" href="#copyright-56">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-44"><a class="header" href="#references-44">References</a></h2>
@@ -16494,7 +16504,7 @@ For example, idle TCP connections often times out after 10 to 15 minutes.</p>
 the <code>nim-waku</code> client currently implements a keep-alive mechanism every <code>5 minutes</code>,
 in response to a TCP connection timeout of <code>10 minutes</code>.</p>
 </blockquote>
-<h2 id="copyright-56"><a class="header" href="#copyright-56">Copyright</a></h2>
+<h2 id="copyright-57"><a class="header" href="#copyright-57">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-45"><a class="header" href="#references-45">References</a></h2>
@@ -16589,7 +16599,7 @@ MAY choose to implement.</p>
 <tr><td><code>IHaveMaxLength</code></td><td>Maximum number of messages to include in an IHAVE message</td><td>5000</td></tr>
 </tbody></table>
 </div>
-<h2 id="copyright-57"><a class="header" href="#copyright-57">Copyright</a></h2>
+<h2 id="copyright-58"><a class="header" href="#copyright-58">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-46"><a class="header" href="#references-46">References</a></h2>
@@ -16703,7 +16713,7 @@ and <a href="messaging/informational/draft/30//messaging/core/draft/15/bridge.ht
 <p>This one shows a cross-section of nodes in different dimensions and
 shows how the connections look different for different protocols.</p>
 <p><img src="messaging/informational/draft/30/images/adaptive_node_cross_section2.png" alt="Node Cross Section" /></p>
-<h2 id="copyright-58"><a class="header" href="#copyright-58">Copyright</a></h2>
+<h2 id="copyright-59"><a class="header" href="#copyright-59">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-47"><a class="header" href="#references-47">References</a></h2>
@@ -17403,7 +17413,7 @@ struct Foo {
 <li><strong>Service Combinations</strong>: Running multiple services simultaneously increases requirements</li>
 <li><strong>Geographic Location</strong>: Network latency affects optimal performance requirements</li>
 </ul>
-<h2 id="security-considerations-14"><a class="header" href="#security-considerations-14">Security Considerations</a></h2>
+<h2 id="security-considerations-13"><a class="header" href="#security-considerations-13">Security Considerations</a></h2>
 <h3 id="hardware-security"><a class="header" href="#hardware-security">Hardware Security</a></h3>
 <ol>
 <li><strong>Secure Storage</strong>: Use encrypted storage for sensitive node data</li>
@@ -17437,7 +17447,7 @@ struct Foo {
 <li><a href="https://docs.libp2p.io/">libp2p protocol</a></li>
 <li><a href="https://docs.libp2p.io/concepts/transports/quic/">QUIC protocol</a></li>
 </ol>
-<h2 id="copyright-59"><a class="header" href="#copyright-59">Copyright</a></h2>
+<h2 id="copyright-60"><a class="header" href="#copyright-60">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="analysis-block-times-blend-network"><a class="header" href="#analysis-block-times-blend-network">ANALYSIS-BLOCK-TIMES-BLEND-NETWORK</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -20711,7 +20721,7 @@ three possible values of the opinion:</p>
 </blockquote>
 <p>the parity summations across network invariants often become easier to
 manipulate.</p>
-<h2 id="security-considerations-15"><a class="header" href="#security-considerations-15">Security Considerations</a></h2>
+<h2 id="security-considerations-14"><a class="header" href="#security-considerations-14">Security Considerations</a></h2>
 <h3 id="privacy-5"><a class="header" href="#privacy-5">Privacy</a></h3>
 <p>In practice, each honest node gossips its current opinion which
 reduces the number of messages that need to be gossiped for a given
@@ -20811,7 +20821,7 @@ Move: a Language for Writing DAG Abstractions</p>
 <p><a href="https://json-ld.org/">json-ld</a></p>
 </li>
 </ol>
-<h2 id="copyright-60"><a class="header" href="#copyright-60">Copyright</a></h2>
+<h2 id="copyright-61"><a class="header" href="#copyright-61">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/public">CC0</a></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="analysis-gas-cost-determination"><a class="header" href="#analysis-gas-cost-determination">ANALYSIS-GAS-COST-DETERMINATION</a></h1>
@@ -21307,7 +21317,7 @@ However, following the recommended format ensures better interoperability with o
 <li>State Transition: The destination channel checks that the message is valid and publishes a corresponding state transition in its own Inscription.</li>
 </ol>
 <p><img src="blockchain/raw/template-cross-channel-messaging/assets/asynchronous-message-flow.svg" alt="Asynchronous cross-channel messaging flow" /></p>
-<h3 id="security-considerations-16"><a class="header" href="#security-considerations-16">Security Considerations</a></h3>
+<h3 id="security-considerations-15"><a class="header" href="#security-considerations-15">Security Considerations</a></h3>
 <p>Asynchronous messaging relies on the finality guarantees of the underlying chain. Destination channels must:</p>
 <ul>
 <li>Wait for sufficient confirmation before processing messages to avoid issues with chain reorganizations. Channels can choose a specific probability threshold or wait for finality to achieve a 100% guarantee.</li>
@@ -21400,7 +21410,7 @@ This coordination requirement is the main trade-off of synchronous messaging: it
 </ul>
 </blockquote>
 <p><img src="blockchain/raw/template-cross-channel-messaging/assets/synchronous-message-flow.svg" alt="Synchronous cross-channel messaging flow" /></p>
-<h3 id="security-considerations-17"><a class="header" href="#security-considerations-17">Security Considerations</a></h3>
+<h3 id="security-considerations-16"><a class="header" href="#security-considerations-16">Security Considerations</a></h3>
 <p>Synchronous messaging introduces additional security considerations:</p>
 <ul>
 <li>While the coordinator cannot forge signatures, they control transaction submission timing. Sequencers should implement timeouts and designate backup coordinators in the case where the coordinator aborts or delays the posting of the transaction.</li>
@@ -21486,7 +21496,7 @@ This coordination requirement is the main trade-off of synchronous messaging: it
 <div class="math-block" data-tex="share = \begin{cases}&#10;  0 &amp;\textbf{if } |voucher\_cm|=|voucher\_nf| \\&#10;\left\lfloor\frac{leader\_rewards}{|voucher\_cm| - |voucher\_nf|}\right\rfloor &amp;\textbf{if } |voucher\_cm| \neq |voucher\_nf|&#10;\end{cases}"></div>
 <p>The division is the integer division over <code>TokenValue</code>, so the share is a whole number of tokens and its computation is deterministic for every node. Rounding down guarantees that <span class="math-inline" data-tex="share \times (|voucher\_cm| - |voucher\_nf|) \leq leader\_rewards"></span>, an inequality that every claim preserves since it decreases both sides by one share and one voucher respectively. The pool can therefore never be overdrawn and every unclaimed voucher remains payable.</p>
 <p>This amount is almost stable through an epoch because when a leader withdraws, both the pool value and the number of unclaimed vouchers decrease proportionally, so the exact price per share remains unchanged and only its rounding may move. Writing <span class="math-inline" data-tex="leader\_rewards = q \times n + r"></span> at the start of the epoch, where <span class="math-inline" data-tex="n"></span> is the number of unclaimed vouchers and <span class="math-inline" data-tex="r &lt; n"></span> the remainder of the division, the first <span class="math-inline" data-tex="n-r"></span> leaders to claim receive <span class="math-inline" data-tex="q"></span> and the last <span class="math-inline" data-tex="r"></span> receive <span class="math-inline" data-tex="q+1"></span>. Two leaders claiming during the same epoch therefore never differ by more than one token, which is small enough not to justify freezing the share for the duration of the epoch. Nothing is lost to the rounding either: the remainder stays in <code>leader_rewards</code> until it is claimed or aggregated with the rewards of the next epoch. The marginally larger reward of the late claimants also mildly encourages leaders to spread their claims over time, which keeps the set of unclaimed vouchers large. However, the share value will vary across epochs if the leader rewards are variable.</p>
-<h2 id="validation-1"><a class="header" href="#validation-1">Validation</a></h2>
+<h2 id="validation"><a class="header" href="#validation">Validation</a></h2>
 <p>Nodes validate a <code>LEADER_CLAIM</code> Operation by:</p>
 <ol>
 <li>Verifying the ZK proof.</li>
@@ -22326,7 +22336,7 @@ def checked_int128(value: int) -&gt; int:
     return checked_uint64(execution_base_fees + permanent_storage_fees)
 </code></pre>
 <p>If the Mantle Transaction is unbalanced (meaning that the Transaction consume more value than it creates) and that the leftover balance cover more than the mandatory fees, the remaining is treated as execution tip fees.</p>
-<h2 id="validation-2"><a class="header" href="#validation-2"><strong>Validation</strong></a></h2>
+<h2 id="validation-1"><a class="header" href="#validation-1"><strong>Validation</strong></a></h2>
 <p><em>Given</em></p>
 <pre><code class="language-python">signed_tx = SignedMantleTx(
     tx=MantleTx(ops),
@@ -22518,7 +22528,7 @@ def round_robin(block_slot: Slot, channel: ChannelState) -&gt; (u16, u64):
 </code></pre>
 <h4 id="execution-gas-1"><a class="header" href="#execution-gas-1">Execution Gas</a></h4>
 <p>Channel Inscribe Operations have a fixed Execution Gas cost of <code>EXECUTION_CHANNEL_INSCRIBE_GAS</code>. See <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
-<h4 id="validation-3"><a class="header" href="#validation-3">Validation</a></h4>
+<h4 id="validation-2"><a class="header" href="#validation-2">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">txhash: hash
 msg: Inscribe
@@ -22628,7 +22638,7 @@ mempool.push(signed_tx)
 </code></pre>
 <h4 id="execution-gas-2"><a class="header" href="#execution-gas-2">Execution Gas</a></h4>
 <p>Channel Config Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_CONFIG_GAS * configuration_threshold</code>. See <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
-<h4 id="validation-4"><a class="header" href="#validation-4">Validation</a></h4>
+<h4 id="validation-3"><a class="header" href="#validation-3">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">txhash: zkhash
 config: ChannelConfig
@@ -22748,7 +22758,7 @@ signed_tx = SignedMantleTx(
 </code></pre>
 <h4 id="execution-gas-3"><a class="header" href="#execution-gas-3">Execution Gas</a></h4>
 <p>Channel Deposit Operations have a fixed Execution Gas cost of <code>EXECUTION_CHANNEL_DEPOSIT_GAS</code>. See <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
-<h4 id="validation-5"><a class="header" href="#validation-5">Validation</a></h4>
+<h4 id="validation-4"><a class="header" href="#validation-4">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">mantle_txhash: zkhash # zkhash of mantle tx containing this ledger tx
 deposit: ChannelDeposit
@@ -22844,7 +22854,7 @@ signed_tx = SignedMantleTx(
 </code></pre>
 <h4 id="execution-gas-4"><a class="header" href="#execution-gas-4">Execution Gas</a></h4>
 <p>Channel Withdraw Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_WITHDRAW_GAS * transfer_threshold</code>. See <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
-<h4 id="validation-6"><a class="header" href="#validation-6">Validation</a></h4>
+<h4 id="validation-5"><a class="header" href="#validation-5">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">txhash: zkhash
 withdrawal: ChannelWithdraw
@@ -22925,7 +22935,7 @@ signed_tx = SignedMantleTx(
 </code></pre>
 <h4 id="execution-gas-5"><a class="header" href="#execution-gas-5">Execution Gas</a></h4>
 <p><code>CHANNEL_TRANSFER</code> Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_TRANSFER_GAS * transfer_threshold</code>. See <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
-<h4 id="validation-7"><a class="header" href="#validation-7">Validation</a></h4>
+<h4 id="validation-6"><a class="header" href="#validation-6">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">txhash: zkhash
 chan_transfer: ChannelTransfer
@@ -23068,7 +23078,7 @@ class DeclarationInfo:
 <p>see: <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#zero-knowledge-signature-scheme-zksignature">Zero Knowledge Signature Scheme (ZkSignature)</a>.</p>
 <h4 id="execution-gas-6"><a class="header" href="#execution-gas-6">Execution Gas</a></h4>
 <p>SDP Declare Operations have a fixed Execution Gas cost of <code>EXECUTION_SDP_DECLARE_GAS</code>. See <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
-<h4 id="validation-8"><a class="header" href="#validation-8">Validation</a></h4>
+<h4 id="validation-7"><a class="header" href="#validation-7">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">txhash: zkhash                  # the txhash of the transaction we are validating
 declaration: DeclarationMessage # the declaration we are validating
@@ -23209,7 +23219,7 @@ SignedMantleTx(
 </code></pre>
 <h4 id="execution-gas-7"><a class="header" href="#execution-gas-7">Execution Gas</a></h4>
 <p>SDP Withdraw Operations have a fixed Execution Gas cost of <code>EXECUTION_SDP_WITHDRAW_GAS</code>. See <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
-<h4 id="validation-9"><a class="header" href="#validation-9">Validation</a></h4>
+<h4 id="validation-8"><a class="header" href="#validation-8">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">txhash: zkhash # Mantle transaction hash of the tx containing this operation
 withdraw: WithdrawMessage
@@ -23348,7 +23358,7 @@ service_note.declarations.remove(declare_id)
 </code></pre>
 <h4 id="execution-gas-8"><a class="header" href="#execution-gas-8">Execution Gas</a></h4>
 <p>SDP Active Operations have a fixed Execution Gas cost of <code>EXECUTION_SDP_ACTIVE_GAS</code>. See <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
-<h4 id="validation-10"><a class="header" href="#validation-10">Validation</a></h4>
+<h4 id="validation-9"><a class="header" href="#validation-9">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">txhash: zkhash # Mantle transaction hash of the tx containing this operation
 active: Active
@@ -23414,7 +23424,7 @@ SignedMantleTx(
 <p>The provider proves that they have won a proof of Leadership before the start of the current epoch, i.e., their reward voucher is indeed in the voucher set: <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#proof-of-claim">Proof of Claim</a>.</p>
 <h4 id="execution-gas-9"><a class="header" href="#execution-gas-9">Execution gas</a></h4>
 <p>Leader Claim Operations have a fixed Execution Gas cost of <code>EXECUTION_LEADER_CLAIM_GAS</code>. See <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
-<h4 id="validation-11"><a class="header" href="#validation-11">Validation</a></h4>
+<h4 id="validation-10"><a class="header" href="#validation-10">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">mantle_txhash: zkhash
 claim : ClaimRequest
@@ -23501,7 +23511,7 @@ SignedMantleTx(
 </code></pre>
 <h3 id="execution-gas-10"><a class="header" href="#execution-gas-10">Execution Gas</a></h3>
 <p>Transfer have a fixed Execution Gas cost of <code>EXECUTION_TRANSFER_GAS</code>. See <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
-<h3 id="validation-12"><a class="header" href="#validation-12">Validation</a></h3>
+<h3 id="validation-11"><a class="header" href="#validation-11">Validation</a></h3>
 <p><em>Given</em></p>
 <pre><code class="language-python">mantle_txhash: zkhash # zkhash of mantle tx containing this ledger tx
 transfer: Transfer
@@ -24257,7 +24267,7 @@ def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey])
 <pre><code class="language-text">None # Indirectly signed through the Transfer signature
 ZkSignature
 </code></pre>
-<h4 id="validation-13"><a class="header" href="#validation-13">Validation</a></h4>
+<h4 id="validation-12"><a class="header" href="#validation-12">Validation</a></h4>
 <p>We now need to check the proof and the validity of the consumed <code>NoteId</code>. This is done in the exact same way as transfer is validated and executed.</p>
 <blockquote>
 </blockquote>
@@ -24341,7 +24351,7 @@ channels[deposit.channel].balance += deposit.amount
 +   outputs: list[Note]
 +   withdrawal_nonce: u32
 </code></pre>
-<h4 id="validation-14"><a class="header" href="#validation-14">Validation</a></h4>
+<h4 id="validation-13"><a class="header" href="#validation-13">Validation</a></h4>
 <p>We update the validation to check the format of outputted Notes and to fit the new payload</p>
 <pre><code class="language-text">+ # Check that the outputs are valid
 + for output in withdrawal.outputs:
@@ -24459,7 +24469,7 @@ ledger.add(output_note_id)
 </code></pre>
 <h4 id="transfer-hash"><a class="header" href="#transfer-hash">Transfer Hash</a></h4>
 <p><strong>We removed this section to match the new <code>derive_operation_id</code> function.</strong></p>
-<h4 id="validation-15"><a class="header" href="#validation-15">Validation</a></h4>
+<h4 id="validation-14"><a class="header" href="#validation-14">Validation</a></h4>
 <p>We need to verify that the transfer is non-empty. So we added this as a first step of the verification:</p>
 <blockquote>
 </blockquote>
@@ -25272,7 +25282,7 @@ for output in transfer.outputs:
 <blockquote>
 </blockquote>
 <p>If the Mantle Transaction is unbalanced (meaning that the Transaction consume more value than it creates) and that the leftover balance cover more than the mandatory fees, the remaining is treated as execution tip fees.</p>
-<h4 id="validation-16"><a class="header" href="#validation-16">Validation</a></h4>
+<h4 id="validation-15"><a class="header" href="#validation-15">Validation</a></h4>
 <blockquote>
 </blockquote>
 <pre><code class="language-text">signed_tx = SignedMantleTx(
@@ -26219,7 +26229,7 @@ However, following the recommended format ensures better interoperability with o
 </ol>
 <pre><code class="language-text">Destination SequencerBedrockSource SequencerDestination SequencerBedrockSource SequencerTransaction is propagatedand eventually finalized1. Generate cross-channel message(for one or more destination channels)12. Include message in Mantle Tx(Inscription Operation)24. Submit Mantle Transaction to chain3Destination channel sequencer observesfinalized inscription(s) to its ChannelId4Validate message, applycorresponding state change5
 </code></pre>
-<h3 id="security-considerations-18"><a class="header" href="#security-considerations-18">Security Considerations</a></h3>
+<h3 id="security-considerations-17"><a class="header" href="#security-considerations-17">Security Considerations</a></h3>
 <p>Asynchronous messaging relies on the finality guarantees of the underlying chain. Destination channels must:</p>
 <ul>
 <li>Wait for sufficient confirmation before processing messages to avoid issues with chain reorganizations. Channels can choose a specific probability threshold or wait for finality to achieve a 100% guarantee.</li>
@@ -26309,7 +26319,7 @@ This coordination requirement is the main trade-off of synchronous messaging: it
 </blockquote>
 <pre><code class="language-text">BedrockCoordinator(one of the sequencers)Sequencer B(Channel B)Sequencer A(Channel A)BedrockCoordinator(one of the sequencers)Sequencer B(Channel B)Sequencer A(Channel A)1. Intention gathering2. Transaction construction3. Signature collectionRepeat for all sequencers4. Submission and atomic executionalt[All checks pass][Any check fails]Propose cross-channel operation(e.g., atomic cross-zone transfer burning tokens in A state)1Propose cross-channel operation(e.g., the same atomic cross-zone transfer minting tokens in B state)2Build MantleTx with ops forall involved channels(CHANNEL_INSCRIBE / WITHDRAW / DEPOSIT, etc.)3Send full MantleTx4Verify MantleTx(channel A logic, fees, etc.)5Proofs for A's Operations(sign mantle_txhash(MantleTx))6Send full MantleTx7Verify MantleTx(channel B logic, fees, etc.)8Proofs for B's Operations(sign mantle_txhash(MantleTx))9Submit fully proved MantleTx10Validate tx + all op proofs11Apply all channel ops atomically(all succeed together)12Reject MantleTx(no state changes applied)13
 </code></pre>
-<h3 id="security-considerations-19"><a class="header" href="#security-considerations-19">Security Considerations</a></h3>
+<h3 id="security-considerations-18"><a class="header" href="#security-considerations-18">Security Considerations</a></h3>
 <p>Synchronous messaging introduces additional security considerations:</p>
 <ul>
 <li>While the coordinator cannot forge signatures, they control transaction submission timing. Sequencers should implement timeouts and designate backup coordinators in the case where the coordinator aborts or delays the posting of the transaction.</li>
@@ -26917,7 +26927,7 @@ def mantle_txhash(tx: MantleTx) -&gt; zkhash:
 
     return execution_fees + da_storage_fees + permanent_storage_fees
 </code></pre>
-<h2 id="validation-17"><a class="header" href="#validation-17">Validation</a></h2>
+<h2 id="validation-16"><a class="header" href="#validation-16">Validation</a></h2>
 <p>Given</p>
 <pre><code class="language-python">signed_tx = SignedMantleTx(
     tx=MantleTx(ops, permanent_storage_gas_price, execution_gas_price, ledger_tx),
@@ -29424,7 +29434,7 @@ def mantle_txhash(tx: MantleTx) -&gt; ZkHash:
 
     return execution_fees + da_storage_fees + permanent_storage_fees
 </code></pre>
-<h2 id="validation-18"><a class="header" href="#validation-18">Validation</a></h2>
+<h2 id="validation-17"><a class="header" href="#validation-17">Validation</a></h2>
 <p>Given</p>
 <pre><code class="language-python">signed_tx = SignedMantleTx(
     tx=MantleTx(ops, permanent_storage_gas_price, execution_gas_price, ledger_tx),
@@ -30738,7 +30748,7 @@ However, following the recommended format ensures better interoperability with o
 </ol>
 <pre><code class="language-text">Destination SequencerBedrockSource SequencerDestination SequencerBedrockSource SequencerTransaction is propagatedand eventually finalized1. Generate cross-channel message(for one or more destination channels)12. Include message in Mantle Tx(Inscription Operation)24. Submit Mantle Transaction to chain3Destination channel sequencer observesfinalized inscription(s) to its ChannelId4Validate message, applycorresponding state change5
 </code></pre>
-<h3 id="security-considerations-20"><a class="header" href="#security-considerations-20">Security Considerations</a></h3>
+<h3 id="security-considerations-19"><a class="header" href="#security-considerations-19">Security Considerations</a></h3>
 <p>Asynchronous messaging relies on the finality guarantees of the underlying chain. Destination channels must:</p>
 <ul>
 <li>Wait for sufficient confirmation before processing messages to avoid issues with chain reorganizations. Channels can choose a specific probability threshold or wait for finality to achieve a 100% guarantee.</li>
@@ -30828,7 +30838,7 @@ This coordination requirement is the main trade-off of synchronous messaging: it
 </blockquote>
 <pre><code class="language-text">BedrockCoordinator(one of the sequencers)Sequencer B(Channel B)Sequencer A(Channel A)BedrockCoordinator(one of the sequencers)Sequencer B(Channel B)Sequencer A(Channel A)1. Intention gathering2. Transaction construction3. Signature collectionRepeat for all sequencers4. Submission and atomic executionalt[All checks pass][Any check fails]Propose cross-channel operation(e.g., atomic cross-zone transfer burning tokens in A state)1Propose cross-channel operation(e.g., the same atomic cross-zone transfer minting tokens in B state)2Build MantleTx with ops forall involved channels(CHANNEL_INSCRIBE / WITHDRAW / DEPOSIT, etc.)3Send full MantleTx4Verify MantleTx(channel A logic, fees, etc.)5Proofs for A's Operations(sign mantle_txhash(MantleTx))6Send full MantleTx7Verify MantleTx(channel B logic, fees, etc.)8Proofs for B's Operations(sign mantle_txhash(MantleTx))9Submit fully proved MantleTx10Validate tx + all op proofs11Apply all channel ops atomically(all succeed together)12Reject MantleTx(no state changes applied)13
 </code></pre>
-<h3 id="security-considerations-21"><a class="header" href="#security-considerations-21">Security Considerations</a></h3>
+<h3 id="security-considerations-20"><a class="header" href="#security-considerations-20">Security Considerations</a></h3>
 <p>Synchronous messaging introduces additional security considerations:</p>
 <ul>
 <li>While the coordinator cannot forge signatures, they control transaction submission timing. Sequencers should implement timeouts and designate backup coordinators in the case where the coordinator aborts or delays the posting of the transaction.</li>
@@ -31188,7 +31198,7 @@ def mantle_txhash(tx: MantleTx) -&gt; ZkHash:
 
     return execution_fees + permanent_storage_fees
 </code></pre>
-<h2 id="validation-19"><a class="header" href="#validation-19">Validation</a></h2>
+<h2 id="validation-18"><a class="header" href="#validation-18">Validation</a></h2>
 <p>Given</p>
 <pre><code class="language-python">signed_tx = SignedMantleTx(
     tx=MantleTx(ops, permanent_storage_gas_price, execution_gas_price, ledger_tx),
@@ -32525,7 +32535,7 @@ def mantle_txhash(tx: MantleTx) -&gt; ZkHash:
 
     return execution_fees + permanent_storage_fees
 </code></pre>
-<h2 id="validation-20"><a class="header" href="#validation-20">Validation</a></h2>
+<h2 id="validation-19"><a class="header" href="#validation-19">Validation</a></h2>
 <p>Given</p>
 <pre><code class="language-python">signed_tx = SignedMantleTx(
     tx=MantleTx(ops, permanent_storage_gas_price, execution_gas_price, ledger_tx),
@@ -33972,7 +33982,7 @@ def mantle_txhash(tx: MantleTx) -&gt; ZkHash:
 
     return execution_fees + permanent_storage_fees
 </code></pre>
-<h2 id="validation-21"><a class="header" href="#validation-21">Validation</a></h2>
+<h2 id="validation-20"><a class="header" href="#validation-20">Validation</a></h2>
 <p>Given</p>
 <pre><code class="language-python">signed_tx = SignedMantleTx(
     tx=MantleTx(ops, permanent_storage_gas_price, execution_gas_price),
@@ -35312,7 +35322,7 @@ def mantle_txhash(tx: MantleTx) -&gt; ZkHash:
 
     return execution_fees + permanent_storage_fees
 </code></pre>
-<h2 id="validation-22"><a class="header" href="#validation-22">Validation</a></h2>
+<h2 id="validation-21"><a class="header" href="#validation-21">Validation</a></h2>
 <p>Given</p>
 <pre><code class="language-python">signed_tx = SignedMantleTx(
     tx=MantleTx(ops, permanent_storage_gas_price, execution_gas_price),
@@ -43541,7 +43551,7 @@ to the secret key <code>0</code>.
 These padding entries are ignored during execution.
 The outputs of the circuit have no size limit,
 as they MUST be included in the hashed <code>msg</code>.</p>
-<h2 id="security-considerations-22"><a class="header" href="#security-considerations-22">Security Considerations</a></h2>
+<h2 id="security-considerations-21"><a class="header" href="#security-considerations-21">Security Considerations</a></h2>
 <h3 id="key-management"><a class="header" href="#key-management">Key Management</a></h3>
 <p>Secret keys MUST be stored securely and never transmitted in plaintext.
 Implementations MUST use secure random number generators for key generation.</p>
@@ -43568,7 +43578,7 @@ to prevent replay attacks across different contexts or time periods.</p>
 <li><a href="blockchain/deprecated/digital-signature/appendices/common-ledger-specification.html">Common Ledger specification</a> - Common Ledger Specification</li>
 <li><a href="https://eprint.iacr.org/2008/013.pdf">Edwards curves</a> - Twisted Edwards Curves</li>
 </ul>
-<h2 id="copyright-61"><a class="header" href="#copyright-61">Copyright</a></h2>
+<h2 id="copyright-62"><a class="header" href="#copyright-62">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="common-ledger-specification"><a class="header" href="#common-ledger-specification">Common Ledger Specification</a></h1>
 <p><strong>Owners:</strong> Thomas Lavaur David Rusu
@@ -44385,7 +44395,7 @@ it does not need to request them again.</p>
 that the column <span class="math-inline" data-tex="s"></span> is correctly encoded and matches the committed data.
 The sampling client can query several columns
 to reach a local opinion on the availability of the entire data.</p>
-<h2 id="security-considerations-23"><a class="header" href="#security-considerations-23">Security Considerations</a></h2>
+<h2 id="security-considerations-22"><a class="header" href="#security-considerations-22">Security Considerations</a></h2>
 <h3 id="fiatshamir-security"><a class="header" href="#fiatshamir-security">Fiat–Shamir Security</a></h3>
 <p>The random scalar <span class="math-inline" data-tex="h"></span> MUST be computed using the Fiat–Shamir heuristic
 with the domain separation tag <code>DA_V1</code> to prevent cross-protocol attacks.
@@ -44568,7 +44578,7 @@ So the verifier actually checks:</p>
 <li><a href="blockchain/deprecated/da-cryptographic-protocol.html">DA Cryptographic Protocol</a> - Original specification document</li>
 <li><a href="https://vitalik.eth.limo/general/2017/01/14/exploring_ecp.html">Elliptic Curve Pairings</a> - Background on elliptic curve pairings</li>
 </ul>
-<h2 id="copyright-62"><a class="header" href="#copyright-62">Copyright</a></h2>
+<h2 id="copyright-63"><a class="header" href="#copyright-63">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="da-network"><a class="header" href="#da-network">DA-NETWORK</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -44801,7 +44811,7 @@ ensures the overlay node distribution is scalable for networks of any size.</p>
 <li><a href="https://docs.libp2p.io/concepts/transports/quic/#quic-native-multiplexing">multiplexed</a></li>
 <li><a href="https://docs.libp2p.io/concepts/transports/quic/">QUIC</a></li>
 </ul>
-<h2 id="copyright-63"><a class="header" href="#copyright-63">Copyright</a></h2>
+<h2 id="copyright-64"><a class="header" href="#copyright-64">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="da-rewarding"><a class="header" href="#da-rewarding">DA-REWARDING</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -45183,7 +45193,7 @@ for at least one of the sessions</li>
 Nodes that have not participated in the previous session
 are not rewarded for the past session.</p>
 </blockquote>
-<h2 id="security-considerations-24"><a class="header" href="#security-considerations-24">Security Considerations</a></h2>
+<h2 id="security-considerations-23"><a class="header" href="#security-considerations-23">Security Considerations</a></h2>
 <h3 id="subjective-opinions"><a class="header" href="#subjective-opinions">Subjective Opinions</a></h3>
 <p>The mechanism intentionally uses subjective node opinions
 rather than strict performance metrics.
@@ -45216,7 +45226,7 @@ to guarantee rewards for malicious nodes.</p>
 <li><a href="blockchain/deprecated/da-rewarding.html">DA Rewarding</a> - Original specification document</li>
 <li><a href="blockchain/deprecated/../raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.html">Analysis of Sampling Strategy</a> - Motivation for sampling 20 subnetworks</li>
 </ul>
-<h2 id="copyright-64"><a class="header" href="#copyright-64">Copyright</a></h2>
+<h2 id="copyright-65"><a class="header" href="#copyright-65">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="lee-v03-specifications"><a class="header" href="#lee-v03-specifications">LEE v0.3 Specifications</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -45572,7 +45582,7 @@ Pda { program_id, seed, ident }: 0x01 || program_id (8 × u32 LE) || seed (32 by
     sha256(bytes)
 }
 <span class="boring">}</span></code></pre></pre>
-<h4 id="encryption-4"><a class="header" href="#encryption-4">Encryption</a></h4>
+<h4 id="encryption-3"><a class="header" href="#encryption-3">Encryption</a></h4>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn encrypt(
@@ -48205,7 +48215,7 @@ to callers only after system-level retries are exhausted</li>
 <li>Network errors trigger automatic peer rotation before surfacing to caller</li>
 <li>Verification errors result in block rejection and peer reputation impact</li>
 </ul>
-<h2 id="security-considerations-25"><a class="header" href="#security-considerations-25">Security Considerations</a></h2>
+<h2 id="security-considerations-24"><a class="header" href="#security-considerations-24">Security Considerations</a></h2>
 <h3 id="block-verification"><a class="header" href="#block-verification">Block Verification</a></h3>
 <ul>
 <li>All dataset blocks MUST include and verify Merkle proofs before acceptance</li>
@@ -48255,7 +48265,7 @@ verification.</p>
 <p><strong>Protocol Buffers:</strong>
 Using Protocol Buffers provides efficient serialization, forward
 compatibility, and wide language support.</p>
-<h2 id="copyright-65"><a class="header" href="#copyright-65">Copyright</a></h2>
+<h2 id="copyright-66"><a class="header" href="#copyright-66">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-74"><a class="header" href="#references-74">References</a></h2>
@@ -48560,7 +48570,7 @@ and store them in their local database.
 Community member nodes SHOULD NOT store the wrapped <code>WakuMessage</code> messages.</p>
 <p>All messages within the same time range MUST be replaced with the messages provided by the message history archive.</p>
 <p>Community members' nodes MUST ignore the expiration state of each archive message.</p>
-<h3 id="security-considerations-26"><a class="header" href="#security-considerations-26">Security Considerations</a></h3>
+<h3 id="security-considerations-25"><a class="header" href="#security-considerations-25">Security Considerations</a></h3>
 <h4 id="multiple-community-owners"><a class="header" href="#multiple-community-owners">Multiple Community Owners</a></h4>
 <p>It is possible for control nodes to export the private key of their owned community and
 pass it to other users so they become control nodes as well.
@@ -48574,7 +48584,7 @@ the hashes presented in the archive indices will look completely different,
 resulting in the community member node downloading the corresponding archive.
 This might be identical to an archive that was already downloaded,
 except for that one message.</p>
-<h2 id="copyright-66"><a class="header" href="#copyright-66">Copyright</a></h2>
+<h2 id="copyright-67"><a class="header" href="#copyright-67">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-75"><a class="header" href="#references-75">References</a></h2>
 <ul>
@@ -48666,7 +48676,7 @@ def getProviders(cid: NodeId): List[SignedPeerRecord]
 }
 </code></pre>
 <p>Returns the list of known providers of the content identified by <code>content_id</code>. <code>total</code> is currently always set to <span class="math-inline" data-tex="1"></span>.</p>
-<h2 id="copyright-67"><a class="header" href="#copyright-67">Copyright</a></h2>
+<h2 id="copyright-68"><a class="header" href="#copyright-68">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-76"><a class="header" href="#references-76">References</a></h2>
 <ul>
@@ -48779,7 +48789,7 @@ by other clients requesting to download the corresponding dataset.</p>
 <p>From the manifest,
 providers storing relevant blocks SHOULD be identified using the <code>treeCid</code> attribute.
 The manifest CID in Codex is similar to the <code>info_hash</code> from BitTorrent.</p>
-<h2 id="security-considerations-27"><a class="header" href="#security-considerations-27">Security Considerations</a></h2>
+<h2 id="security-considerations-26"><a class="header" href="#security-considerations-26">Security Considerations</a></h2>
 <h3 id="content-integrity"><a class="header" href="#content-integrity">Content Integrity</a></h3>
 <p>The <code>treeCid</code> attribute provides cryptographic binding between the manifest and the dataset content.
 Implementations MUST verify that retrieved blocks match the expected hashes
@@ -48802,7 +48812,7 @@ from the received manifest data.</p>
 <li><a href="https://github.com/multiformats/multicodec">Multicodec</a> - Self-describing protocol identifiers</li>
 <li><a href="https://github.com/logos-storage/logos-storage-docs-obsidian/blob/main/10%20Notes/Specs/Codex%20Manifest%20Spec.md">Codex Manifest Spec</a> - Original specification</li>
 </ul>
-<h2 id="copyright-68"><a class="header" href="#copyright-68">Copyright</a></h2>
+<h2 id="copyright-69"><a class="header" href="#copyright-69">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="codex-store"><a class="header" href="#codex-store">CODEX-STORE</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -49275,7 +49285,7 @@ It provides an internal storage abstraction
 for <a href="https://github.com/logos-storage/logos-storage-nim">Codex</a>
 and relies on underlying datastore implementations for serialization
 and persistence.</p>
-<h2 id="securityprivacy-considerations-10"><a class="header" href="#securityprivacy-considerations-10">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-11"><a class="header" href="#securityprivacy-considerations-11">Security/Privacy Considerations</a></h2>
 <ul>
 <li>
 <p>Block Integrity: The Store Module verifies block content integrity
@@ -49325,7 +49335,7 @@ while preventing resource exhaustion.</p>
 </ul>
 <p>The current limitations (lack of dataset-level operations, inconsistent locking)
 are acknowledged and will be addressed in future versions.</p>
-<h2 id="copyright-69"><a class="header" href="#copyright-69">Copyright</a></h2>
+<h2 id="copyright-70"><a class="header" href="#copyright-70">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-78"><a class="header" href="#references-78">References</a></h2>
 <h3 id="normative-7"><a class="header" href="#normative-7">normative</a></h3>
@@ -49507,7 +49517,7 @@ are acknowledged and will be addressed in future versions.</p>
 
 </code></pre>
 <p><strong>Listing 3.</strong> Dataset interface.</p>
-<h2 id="copyright-70"><a class="header" href="#copyright-70">Copyright</a></h2>
+<h2 id="copyright-71"><a class="header" href="#copyright-71">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-79"><a class="header" href="#references-79">References</a></h2>
 <ol>
@@ -49552,7 +49562,7 @@ are acknowledged and will be addressed in future versions.</p>
 <h3 id="identifying-datasets-and-blocks"><a class="header" href="#identifying-datasets-and-blocks">Identifying Datasets and Blocks</a></h3>
 <p>A dataset MUST be identified by the hash of its serialized manifest, <span class="math-inline" data-tex="m"></span>. The encoding of this serialization is specified in its <code>codec</code> attribute, which MUST contain <a href="https://github.com/multiformats/multicodec/blob/master/table.csv">a libp2p multicodec type</a>. This means a block within a file MUST be uniquely addressable within the network by the tuple <span class="math-inline" data-tex="(m, i)"></span>, where <span class="math-inline" data-tex="i"></span> is an integer <span class="math-inline" data-tex="1 \leq i \leq n"></span>.</p>
 <p>It is important to note that different values for <code>file_name</code> and <code>content_type</code> will produce different datasets, even if the set of blocks contained in <span class="math-inline" data-tex="F"></span> remains the same. If this turns out to be undesirable, future versions of this spec might adopt an approach in which a subset of the attributes of the manifest gets hashed instead; akin to how Bittorrent does with its <a href="https://www.bittorrent.org/beps/bep_0003.html">info dictionaries</a>.</p>
-<h2 id="copyright-71"><a class="header" href="#copyright-71">Copyright</a></h2>
+<h2 id="copyright-72"><a class="header" href="#copyright-72">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-80"><a class="header" href="#references-80">References</a></h2>
 <h3 id="normative-8"><a class="header" href="#normative-8">Normative</a></h3>
@@ -49858,7 +49868,7 @@ def verify_proof(
 
 </code></pre>
 <p><strong>Listing 2.</strong> Abstract interface for a Merkle tree.</p>
-<h2 id="copyright-72"><a class="header" href="#copyright-72">Copyright</a></h2>
+<h2 id="copyright-73"><a class="header" href="#copyright-73">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-81"><a class="header" href="#references-81">References</a></h2>
 <p>[<a href="https://eprint.iacr.org/2022/840">Bouvier22</a>]: Bouvier et al. "New Design Techniques for Efficient Arithmetization-Oriented Hash Functions: Anemoi Permutations and Jive Compression Mode", Cryptology ePrint Archive, 2022.</p>
@@ -50173,7 +50183,7 @@ The number of retrieved blocks by the node MUST be greater than <code>k</code>.
 If less than <code>k</code>, the node MAY not be able to reconstruct the dataset.
 The node SHOULD request missing data chunks from the network and
 wait until the threshold is reached.</p>
-<h2 id="security-considerations-28"><a class="header" href="#security-considerations-28">Security Considerations</a></h2>
+<h2 id="security-considerations-27"><a class="header" href="#security-considerations-27">Security Considerations</a></h2>
 <h3 id="adversarial-attack"><a class="header" href="#adversarial-attack">Adversarial Attack</a></h3>
 <p>An adversarial storage provider can remove only the first element from more than half of the block,
 and the slot data can no longer be recovered from the data that the host stores.
@@ -50189,7 +50199,7 @@ Hashing large amounts of data will be expensive to perform in an SNARK, which is
 <p>If data is not encrypted before entering the encoding process, nodes, including storage providers,
 MAY be able to access the data.
 This may lead to privacy concerns and the misuse of data.</p>
-<h2 id="copyright-73"><a class="header" href="#copyright-73">Copyright</a></h2>
+<h2 id="copyright-74"><a class="header" href="#copyright-74">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-82"><a class="header" href="#references-82">References</a></h2>
 <ul>
@@ -50845,7 +50855,7 @@ method requestState*(market: Market, requestId: RequestId): Future[?RequestState
 <p><strong>Protocol Compliance Note</strong>: The Client implementation described above is specific to nim-codex. The only normative requirements for Clients are defined in the <a href="storage/deprecated/codex-marketplace.html#client-role">Client Role</a> section of Part I. Implementations must satisfy those protocol requirements but may use completely different internal designs.</p>
 </blockquote>
 <hr />
-<h2 id="copyright-74"><a class="header" href="#copyright-74">Copyright</a></h2>
+<h2 id="copyright-75"><a class="header" href="#copyright-75">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-83"><a class="header" href="#references-83">References</a></h2>
 <h3 id="normative-9"><a class="header" href="#normative-9">Normative</a></h3>
@@ -51155,7 +51165,7 @@ of an <code>encodeBytes</code> function and the former
 <li><a href="https://github.com/codex-storage/nim-poseidon2">nim-poseidon2</a> (which should be renamed to <code>nim-poseidon2-bn254</code>)</li>
 <li><a href="https://github.com/codex-storage/nim-goldilocks-hash">nim-goldilocks-hash</a></li>
 </ul>
-<h2 id="securityprivacy-considerations-11"><a class="header" href="#securityprivacy-considerations-11">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-12"><a class="header" href="#securityprivacy-considerations-12">Security/Privacy Considerations</a></h2>
 <h3 id="attack-mitigation"><a class="header" href="#attack-mitigation">Attack Mitigation</a></h3>
 <p>The specification addresses three major attack vectors:</p>
 <ol>
@@ -51243,7 +51253,7 @@ This is applied at the byte level before chunking into <code>M</code>-byte piece
 </ul>
 <p>This flexibility allows easy addition of new hash functions
 while maintaining security guarantees.</p>
-<h2 id="copyright-75"><a class="header" href="#copyright-75">Copyright</a></h2>
+<h2 id="copyright-76"><a class="header" href="#copyright-76">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-84"><a class="header" href="#references-84">References</a></h2>
 <h3 id="normative-10"><a class="header" href="#normative-10">normative</a></h3>
@@ -51672,7 +51682,7 @@ samples[]:   # one entry per sampled cell:
 <tr><td><code>BinaryCompare</code></td><td>Compares two n-bit numbers <code>A</code> and <code>B</code> (LSB-first); outputs <code>-1</code> if <code>A&lt;B</code>, <code>0</code> if equal, <code>+1</code> if <code>A&gt;B</code>.</td><td><code>n</code>: bit width of <code>A</code> and <code>B</code></td><td><code>A[n]</code>, <code>B[n]</code></td><td><code>out</code>: comparison result.</td></tr>
 </tbody></table>
 </div>
-<h2 id="securityprivacy-considerations-12"><a class="header" href="#securityprivacy-considerations-12">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-13"><a class="header" href="#securityprivacy-considerations-13">Security/Privacy Considerations</a></h2>
 <h3 id="entropy-binding"><a class="header" href="#entropy-binding">Entropy Binding</a></h3>
 <p>Sample indices must be derived from the on-chain entropy and the slot commitment. This binds the proofs to specific cell indices and time period, and makes the challenge unpredictable until the period begins. This prevents storage providers from precomputing the proofs or selectively retaining a set of cells.</p>
 <h3 id="commitment-integrity"><a class="header" href="#commitment-integrity">Commitment Integrity</a></h3>
@@ -51713,7 +51723,7 @@ samples[]:   # one entry per sampled cell:
 <li>Storage providers cannot selectively retain only a subset of cells</li>
 <li>Any honest party can verify the sampling was done correctly</li>
 </ul>
-<h2 id="copyright-76"><a class="header" href="#copyright-76">Copyright</a></h2>
+<h2 id="copyright-77"><a class="header" href="#copyright-77">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-85"><a class="header" href="#references-85">References</a></h2>
 <h3 id="normative-11"><a class="header" href="#normative-11">Normative</a></h3>
@@ -51835,7 +51845,7 @@ type ProofInputs*[H] = object
 <p>To verify, a node MUST recompute the root hash,
 based on <code>slotProof</code> and the hash of the <code>slotIndex</code>,
 to confirm that the <code>slotIndex</code> is a member of the dataset represented by <code>datasetRoot</code>.</p>
-<h2 id="copyright-77"><a class="header" href="#copyright-77">Copyright</a></h2>
+<h2 id="copyright-78"><a class="header" href="#copyright-78">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-86"><a class="header" href="#references-86">References</a></h2>
 <ul>
@@ -52442,7 +52452,7 @@ within the expected window. Members MAY initiate or re-submit the corresponding 
 </ol>
 <p>Each timer's duration and any tolerance buffer for P2P timing variance are configured per group.
 Escalation beyond Layer 1 follows the Three-Layer Steward Protection Mechanism.</p>
-<h2 id="security-considerations-29"><a class="header" href="#security-considerations-29">Security Considerations</a></h2>
+<h2 id="security-considerations-28"><a class="header" href="#security-considerations-28">Security Considerations</a></h2>
 <p>In this section, the security considerations are shown as de-MLS assurance.</p>
 <ol>
 <li>Malicious Steward: A Malicious steward can act maliciously,
@@ -52456,7 +52466,7 @@ to shuffle stewards in a deterministic and verifiable manner,
 this approach only minimizes election bias; it does not completely eliminate it.
 This design choice is intentional, in order to preserve the efficiency advantages provided by the MLS mechanism.</li>
 </ol>
-<h2 id="copyright-78"><a class="header" href="#copyright-78">Copyright</a></h2>
+<h2 id="copyright-79"><a class="header" href="#copyright-79">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a></p>
 <h3 id="references-87"><a class="header" href="#references-87">References</a></h3>
 <ul>
@@ -53179,7 +53189,7 @@ assumption) and <a href="https://eprint.iacr.org/2023/1400">UPKE from Lattices</
 (based in lattices).
 None of them have been implemented in a secure messaging protocol, and this
 opens the door to some novel research.</p>
-<h2 id="copyright-79"><a class="header" href="#copyright-79">Copyright</a></h2>
+<h2 id="copyright-80"><a class="header" href="#copyright-80">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-88"><a class="header" href="#references-88">References</a></h2>
@@ -54100,7 +54110,7 @@ control mechanisms to restrict who can call the set and get functions.</li>
 224-bit security instead of the 128-bit security provided by X25519.</li>
 <li>It is important that Bob MUST NOT reuse <code>SPK</code>.</li>
 </ul>
-<h2 id="copyright-80"><a class="header" href="#copyright-80">Copyright</a></h2>
+<h2 id="copyright-81"><a class="header" href="#copyright-81">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-89"><a class="header" href="#references-89">References</a></h2>
 <ul>
@@ -54237,7 +54247,7 @@ or that do not advertise the <code>services</code> of interest to the discoverer
 <p>To prevent network topology mapping and eclipse attacks,
 <code>Kad-DHT</code> nodes MUST NOT disclose connection type in <a href="https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#rpc-messages">response messages</a>.
 The <code>connection</code> field of every <code>Peer</code> MUST always be set to <code>NOT_CONNECTED</code>.</p>
-<h2 id="copyright-81"><a class="header" href="#copyright-81">Copyright</a></h2>
+<h2 id="copyright-82"><a class="header" href="#copyright-82">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-90"><a class="header" href="#references-90">References</a></h2>
 <ul>
@@ -54394,7 +54404,7 @@ as the <code>payload_type</code> value.</p>
 <blockquote>
 <p>The payload type is the <a href="https://github.com/multiformats/multicodec/blob/0c6c7d75f1580af329847dbc9900859a445ed980/table.csv">multicodec</a> <code>libp2p-peer-record</code> type</p>
 </blockquote>
-<h2 id="copyright-82"><a class="header" href="#copyright-82">Copyright</a></h2>
+<h2 id="copyright-83"><a class="header" href="#copyright-83">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-91"><a class="header" href="#references-91">References</a></h2>
 <ul>
@@ -54533,7 +54543,7 @@ establishing connections to the newly selected peers
 SHOULD be done during the current epoch
 and be completed before the new epoch starts.
 This avoids adding latency to message transmission.</p>
-<h2 id="securityprivacy-considerations-13"><a class="header" href="#securityprivacy-considerations-13">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-14"><a class="header" href="#securityprivacy-considerations-14">Security/Privacy Considerations</a></h2>
 <h3 id="fingerprinting-attacks"><a class="header" href="#fingerprinting-attacks">Fingerprinting Attacks</a></h3>
 <p>Protocols that feature distinct patterns are prone to fingerprinting attacks
 when using them over Tor Push.
@@ -54584,7 +54594,7 @@ Nodes who want anonymity guarantees even during the roll-out phase
 can use separate network interfaces for their default context and
 Tp-context, respectively.
 For the best protection, these contexts should run on separate physical machines.</p>
-<h2 id="copyright-83"><a class="header" href="#copyright-83">Copyright</a></h2>
+<h2 id="copyright-84"><a class="header" href="#copyright-84">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-92"><a class="header" href="#references-92">References</a></h2>
 <ul>
@@ -57320,7 +57330,7 @@ Block-time and finality parameters are properties of the LEZ and are listed for 
 <tr><td>Host chain finality depth</td><td><code>k</code></td><td>immutable bound (reference)</td><td>Worst-case bound; practical confirmation depth is much shallower.</td></tr>
 </tbody></table>
 </div>
-<h2 id="security-considerations-30"><a class="header" href="#security-considerations-30">Security Considerations</a></h2>
+<h2 id="security-considerations-29"><a class="header" href="#security-considerations-29">Security Considerations</a></h2>
 <p>Two properties matter most for a price oracle network.
 One is liveness, meaning a fresh price is attested every round.
 The other is accuracy, meaning the attested price tracks the real market.
@@ -57447,7 +57457,7 @@ A normal spread in a fast market can look too wide in a calm one.
 Defining this threshold, or a rule that adapts it, is left to future work together with the volatility handling above.</p>
 </li>
 </ul>
-<h2 id="copyright-84"><a class="header" href="#copyright-84">Copyright</a></h2>
+<h2 id="copyright-85"><a class="header" href="#copyright-85">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a></p>
 <h3 id="references-95"><a class="header" href="#references-95">References</a></h3>
 <ul>
@@ -59394,7 +59404,7 @@ so forwarding-count estimates from total emissions carry at least <code>±√N</
 At small <code>R</code>, front-loading and thin-cover epochs are pronounced.
 At large <code>R</code>, these effects become negligible.</p>
 <p>Simulation of real traffic distributions is required before adopting Poisson-Rate as a normative option.</p>
-<h2 id="copyright-85"><a class="header" href="#copyright-85">Copyright</a></h2>
+<h2 id="copyright-86"><a class="header" href="#copyright-86">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-96"><a class="header" href="#references-96">References</a></h2>
 <ul>
@@ -59746,7 +59756,7 @@ The DoS protection mechanism MUST invoke this callback before accepting proofs f
 <li><a href="anoncomms/raw/mix.html#864-exit-processing">Exit processing</a>
 Perform standard Sphinx processing without generating a new proof.</li>
 </ul>
-<h2 id="copyright-86"><a class="header" href="#copyright-86">Copyright</a></h2>
+<h2 id="copyright-87"><a class="header" href="#copyright-87">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-97"><a class="header" href="#references-97">References</a></h2>
 <ul>
@@ -59934,7 +59944,7 @@ slots does not result in additional burns, as their corresponding outputs are
 fully masked and ignored during verification.
 Moreover, <code>message_id</code> values that are provided to the circuit but correspond to unused slots (<code>selector_used[k] = 0</code>)
 are not considered consumed and MAY be reused in subsequent proofs in which the corresponding selector bit is set to <code>1</code>.</p>
-<h2 id="copyright-87"><a class="header" href="#copyright-87">Copyright</a></h2>
+<h2 id="copyright-88"><a class="header" href="#copyright-88">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a></p>
 <h3 id="references-98"><a class="header" href="#references-98">References</a></h3>
 <ul>
@@ -60138,7 +60148,7 @@ MUST be replaced with <code>SK</code> and the output of <code>DH</code> respecti
     state.Ns, state.Nr, state.PN = 0
     state.MKSKIPPED = {}
 </code></pre>
-<h3 id="encryption-5"><a class="header" href="#encryption-5">Encryption</a></h3>
+<h3 id="encryption-4"><a class="header" href="#encryption-4">Encryption</a></h3>
 <p>This function performs the symmetric key ratchet.</p>
 <pre><code class="language-text">RatchetEncrypt(state, plaintext, AD):
    state.CKs, mk = HMAC-SHA256(state.CKs)
@@ -60229,7 +60239,7 @@ IPFS hash, URL or reference in Ethereum.</p>
 <p>The fact of a user not updating the ephemeral information
 can be understood as Bob not willing to participate in any
 communication.</p>
-<h2 id="copyright-88"><a class="header" href="#copyright-88">Copyright</a></h2>
+<h2 id="copyright-89"><a class="header" href="#copyright-89">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-99"><a class="header" href="#references-99">References</a></h2>
 <ul>
@@ -61212,7 +61222,7 @@ function claim(uint256 streamId) external;
 ///      state updates on next interaction, not at exact depletion time).
 function _accrue(uint256 streamId) internal;
 </code></pre>
-<h2 id="copyright-89"><a class="header" href="#copyright-89">Copyright</a></h2>
+<h2 id="copyright-90"><a class="header" href="#copyright-90">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="rln-dos-protection-for-mixnet"><a class="header" href="#rln-dos-protection-for-mixnet">RLN DoS Protection for Mixnet</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -61440,7 +61450,7 @@ message MessagingMetadata {
 <tr><td style="text-align: right"><code>acceptable_root_window_size</code></td><td>the maximum number of past Merkle roots to store</td></tr>
 </tbody></table>
 </div>
-<h2 id="securityprivacy-considerations-14"><a class="header" href="#securityprivacy-considerations-14">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-15"><a class="header" href="#securityprivacy-considerations-15">Security/Privacy Considerations</a></h2>
 <h3 id="known-attack-vectors-and-mitigations"><a class="header" href="#known-attack-vectors-and-mitigations">Known Attack Vectors and Mitigations</a></h3>
 <h4 id="sybil-attacks"><a class="header" href="#sybil-attacks">Sybil Attacks</a></h4>
 <ul>
@@ -61503,7 +61513,7 @@ message MessagingMetadata {
 </ul>
 <p>Additional sybil resistance mechanisms could augment RLN by incorporating reputation-based lists similar to Tor's "directory authorities".</p>
 <p>These help clients build circuits that are less likely to be entirely controlled by sybils through a range of techniques that limit nodes' possible influence based on trustworthiness metrics.</p>
-<h2 id="copyright-90"><a class="header" href="#copyright-90">Copyright</a></h2>
+<h2 id="copyright-91"><a class="header" href="#copyright-91">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-101"><a class="header" href="#references-101">References</a></h2>
 <ul>
@@ -62144,7 +62154,7 @@ lifecycle durations (active duration, grace period) use the same unit.</li>
 <code>0x00</code> is a single separator byte
 (CAIP-10 identifiers cannot contain it),
 and <code>identity_commitment</code> is its 32-byte little-endian representation.</p>
-<h2 id="copyright-91"><a class="header" href="#copyright-91">Copyright</a></h2>
+<h2 id="copyright-92"><a class="header" href="#copyright-92">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-102"><a class="header" href="#references-102">References</a></h2>
 <ul>
@@ -62271,7 +62281,7 @@ which is different than the one used in the Interep group.</p>
 <p>A proof of concept is available at
 <a href="https://github.com/vacp2p/rln-interep-contract">vacp2p/rln-interp-contract</a>
 which integrates Interep with RLN.</p>
-<h2 id="security-considerations-31"><a class="header" href="#security-considerations-31">Security Considerations</a></h2>
+<h2 id="security-considerations-30"><a class="header" href="#security-considerations-30">Security Considerations</a></h2>
 <ol>
 <li>As mentioned in <a href="anoncomms/raw/rln-interep-spec.html#slashing">Slashing</a>,
 the slashing mechanism may not have the intended effect on the user.</li>
@@ -62491,7 +62501,7 @@ authentication method by using the protocol ID
 <p>A client MAY send a <code>GET_ADS</code> request for the <code>/rln/membership/&lt;version&gt;</code>
 service to registrars to discover membership providers that offer
 membership allocation.</p>
-<h2 id="copyright-92"><a class="header" href="#copyright-92">Copyright</a></h2>
+<h2 id="copyright-93"><a class="header" href="#copyright-93">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-104"><a class="header" href="#references-104">References</a></h2>
@@ -62609,10 +62619,10 @@ and the user MUST be able to check ownership with their <code>viewing_public_key
 <p>An implementation of the Stealth Address scheme is available in the
 <a href="https://github.com/rymnc/erc-5564-bn254">erc-5564-bn254</a> repository,
 which also includes a test to generate a stealth commitment for a given user.</p>
-<h2 id="securityprivacy-considerations-15"><a class="header" href="#securityprivacy-considerations-15">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-16"><a class="header" href="#securityprivacy-considerations-16">Security/Privacy Considerations</a></h2>
 <p>This specification inherits the security and privacy considerations of the
 <a href="https://eips.ethereum.org/EIPS/eip-5564">Stealth Address</a> scheme.</p>
-<h2 id="copyright-93"><a class="header" href="#copyright-93">Copyright</a></h2>
+<h2 id="copyright-94"><a class="header" href="#copyright-94">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-105"><a class="header" href="#references-105">References</a></h2>
 <ul>
@@ -62819,7 +62829,7 @@ as it is compared to <code>message_limit</code> in the case of RLN-Same.</p>
 <h2 id="appendix-a-security-considerations-2"><a class="header" href="#appendix-a-security-considerations-2">Appendix A: Security considerations</a></h2>
 <p>Although there are changes in the circuits,
 this spec inherits all the security considerations of <a href="anoncomms/raw/../draft/32/rln-v1.html">32/RLN-V1</a>.</p>
-<h2 id="copyright-94"><a class="header" href="#copyright-94">Copyright</a></h2>
+<h2 id="copyright-95"><a class="header" href="#copyright-95">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-106"><a class="header" href="#references-106">References</a></h2>
 <ul>
@@ -63282,7 +63292,7 @@ if its corresponding response timestamp, <code>T_resp</code>, has expired
 it SHOULD send the message according to <a href="anoncomms/raw/sds.html#sds-r-send-message">SDS-R send message</a>
 if there are any eligible items in the outgoing repair request buffer,
 regardless of whether other participants have also recently broadcast a Periodic Sync message.</p>
-<h2 id="copyright-95"><a class="header" href="#copyright-95">Copyright</a></h2>
+<h2 id="copyright-96"><a class="header" href="#copyright-96">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="service-discovery-api"><a class="header" href="#service-discovery-api">SERVICE-DISCOVERY-API</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -63364,7 +63374,7 @@ in advance of any <code>lookup</code> for each <code>service_id</code>
 as a way to speed up search.</p>
 <h3 id="advertisementlist-lookup_random"><a class="header" href="#advertisementlist-lookup_random"><code>AdvertisementList lookup_random()</code></a></h3>
 <p>Unused, reserved for future use.</p>
-<h2 id="copyright-96"><a class="header" href="#copyright-96">Copyright</a></h2>
+<h2 id="copyright-97"><a class="header" href="#copyright-97">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-107"><a class="header" href="#references-107">References</a></h2>
 <ul>
@@ -64455,7 +64465,7 @@ SHOULD increment with each message.
 In Multi message-id mode a single proof covers a batch of message ids,
 with <code>selector_used</code> marking the active slots.</p>
 <p>Applications MUST persist the <code>message_id</code> counter to avoid violations after restarts.</p>
-<h2 id="securityprivacy-considerations-16"><a class="header" href="#securityprivacy-considerations-16">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-17"><a class="header" href="#securityprivacy-considerations-17">Security/Privacy Considerations</a></h2>
 <p>The security of Zerokit depends on the correct implementation of the RLN-V2 protocol
 and the underlying zero-knowledge proof system.
 Applications MUST ensure that:</p>
@@ -64497,7 +64507,7 @@ implement safeguards to prevent accidental violations.</p>
 <li><a href="anoncomms/raw/rln-v2.html">RLN-V2 Specification</a> - Rate Limit Nullifier V2 protocol</li>
 <li><a href="https://sled.rs">Sled Database</a> - Embedded database for persistent Merkle tree storage</li>
 </ul>
-<h2 id="copyright-97"><a class="header" href="#copyright-97">Copyright</a></h2>
+<h2 id="copyright-98"><a class="header" href="#copyright-98">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="anoncomms-draft-specifications"><a class="header" href="#anoncomms-draft-specifications">AnonComms Draft Specifications</a></h1>
 <p>AnonComms specifications that have reached <strong>draft</strong> status live here.</p>
@@ -65154,7 +65164,7 @@ assert!(verified);
 <span class="boring">}</span></code></pre></pre>
 <p>For more details please visit the
 <a href="https://github.com/vacp2p/zerokit"><code>zerokit</code></a> library.</p>
-<h2 id="copyright-98"><a class="header" href="#copyright-98">Copyright</a></h2>
+<h2 id="copyright-99"><a class="header" href="#copyright-99">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a></p>
 <h2 id="references-110"><a class="header" href="#references-110">References</a></h2>
 <ul>
@@ -65312,7 +65322,7 @@ and verify that the content matches the hash.</li>
 <li><code>matree-branch</code>: parse the list of hashes and continue resolving them (step 3).</li>
 <li><code>ma</code>: import the <code>multiaddr</code> and add it to a local list of discovered nodes.</li>
 </ul>
-<h2 id="copyright-99"><a class="header" href="#copyright-99">Copyright</a></h2>
+<h2 id="copyright-100"><a class="header" href="#copyright-100">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-111"><a class="header" href="#references-111">References</a></h2>
@@ -65558,7 +65568,7 @@ MUST be replaced with <code>SK</code> and the output of <code>DH</code> respecti
     state.Ns, state.Nr, state.PN = 0
     state.MKSKIPPED = {}
 </code></pre>
-<h4 id="encryption-6"><a class="header" href="#encryption-6">Encryption</a></h4>
+<h4 id="encryption-5"><a class="header" href="#encryption-5">Encryption</a></h4>
 <p>This function performs the symmetric key ratchet.</p>
 <pre><code class="language-text">RatchetEncrypt(state, plaintext, AD):
    state.CKs, mk = HMAC-SHA256(state.CKs)
@@ -66528,7 +66538,7 @@ the prospective key package has not been already used.</li>
 </ul>
 </li>
 </ul>
-<h2 id="copyright-100"><a class="header" href="#copyright-100">Copyright</a></h2>
+<h2 id="copyright-101"><a class="header" href="#copyright-101">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-112"><a class="header" href="#references-112">References</a></h2>
 <ul>
@@ -66960,7 +66970,7 @@ on how to approach implementation details, and,
 if available, point to existing implementations for reference.</p>
 <h2 id="implementation-suggestions-optional"><a class="header" href="#implementation-suggestions-optional">Implementation Suggestions (optional)</a></h2>
 <h2 id="further-optional-sections"><a class="header" href="#further-optional-sections">(Further Optional Sections)</a></h2>
-<h2 id="securityprivacy-considerations-17"><a class="header" href="#securityprivacy-considerations-17">Security/Privacy Considerations</a></h2>
+<h2 id="securityprivacy-considerations-18"><a class="header" href="#securityprivacy-considerations-18">Security/Privacy Considerations</a></h2>
 <p>A standard track RFC in <code>stable</code> status MUST feature this section.
 A standard track RFC in <code>raw</code> or <code>draft</code> status SHOULD feature this section.
 Informational LIPs (in any state) may feature this section.
@@ -66968,7 +66978,7 @@ If there are none, this section MUST explicitly state that fact.
 This section MAY contain additional relevant information,
 e.g. an explanation as to why there are no security consideration
 for the respective document.</p>
-<h2 id="copyright-101"><a class="header" href="#copyright-101">Copyright</a></h2>
+<h2 id="copyright-102"><a class="header" href="#copyright-102">Copyright</a></h2>
 <p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
 <h2 id="references-113"><a class="header" href="#references-113">References</a></h2>
 <p>References MAY be subdivided into normative and informative.</p>
