@@ -80,7 +80,7 @@ POW_REWARD_POOL_GENESIS: TokenValue   # Initial balance of the proof of work rew
                                       # = 5/1000 of the maximum supply
 ```
 
-The seed is five thousandths of the maximum supply $`S_{cap}`$, stated as a fraction because that is the form in which it is a decision about how the initial supply is divided. Its size, the floors that bound it and the constraint it places on genesis governance are given in [Genesis](bedrock-v1.1-mantle-specification.md#genesis). That size governs how generous claiming is during the network's earliest epochs, and therefore how quickly a participant with no tokens can accumulate a usable balance.
+The seed is five thousandths of the maximum supply $`S_{cap}`$, as specified in [Genesis](bedrock-v1.1-mantle-specification.md#genesis).
 
 This allocation is drawn from the initial token distribution, not created in addition to it: the tokens exist from genesis, and the seed determines how many of them are held in the pool rather than distributed to stakeholders directly. This keeps claiming outside the protocol's emission envelope, as described in [Reward Pool](bedrock-v1.1-mantle-specification.md#reward-pool).
 
