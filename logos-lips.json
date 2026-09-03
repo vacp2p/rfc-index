@@ -209,6 +209,15 @@
   {
     "component": "anoncomms",
     "slug": "245",
+    "title": "LOGOS-MIXNET",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-09-03",
+    "path": "anoncomms/raw/logos-mixnet.html"
+  },
+  {
+    "component": "anoncomms",
+    "slug": "246",
     "title": "RLN Module API",
     "status": "raw",
     "category": "Standards Track",
