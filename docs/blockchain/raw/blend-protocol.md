@@ -31,6 +31,7 @@
 | 1.2.0 | Define the token evaluation under a low core quota, and specify the Active Message metadata layout. | 2026-08-19 |
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
 | 1.3.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
+| 1.3.1 | Judged the active message window by the epoch of the including block, made the one-message-per-epoch rule per attested epoch, and made the transition-period delay a release constraint | 2026-09-02 |
 | 1.4.0 | Add the proof of work quota and the Blend difficulty, verify the proof of quota before relaying any message, and add transactions as a data message payload; re-derive the nullifier cache bound and align the nullifier retention period | 2026-08-31 |
 
 # Introduction
@@ -439,11 +440,11 @@ Every active core node receives a reward. The activity of a node is verified in 
 1. Generate a proof of its activity for a specific epoch as defined in [Activity Proof](#activity-proof). The proof confirms that the node was processing messages during the epoch. The node activity confirmation is probabilistic, and the odds increase with the number of collected blending tokens.
 2. Use SDP active functionality ([Active](bedrock-service-declaration-protocol.md#active)) to request a reward as described in [Rewarding Distribution Logic](#rewarding-distribution-logic), that is:
     1. Create an [Active Message](#active-message).
-    2. Send it as a part of the reward message ([Active Message](bedrock-service-declaration-protocol.md#active-message)).
+    2. Send it as an active message ([Active Message](bedrock-service-declaration-protocol.md#active-message)).
 3. The reward is calculated as defined in [Reward Calculation](#reward-calculation), that is:
-    1. The number of correct activity messages is calculated.
+    1. The number of correct active messages is calculated.
     2. The number of correct and winning messages is calculated, where a winning message is defined by a lottery mechanism.
-    3. Every node that sends a correct activity message receives a base reward.
+    3. Every node that sends a correct active message receives a base reward.
     4. Every node that sends a correct and winning message receives a premium reward.
 4. The rewards are distributed by the mechanisms provided by the [Service Reward Distribution Protocol](bedrock-service-reward-distribution.md).
 
@@ -1100,7 +1101,7 @@ We assume that setting $`\theta = 1`$ is enough to eliminate nodes that have not
 
 The difference $`\chi - \nu - \theta`$ is negative whenever $`\chi \leq \nu + \theta`$, which happens when the total number of blending tokens is small relative to the network size. Because $`\chi \approx \log_2(Q^{Total}_C)`$ and $`\nu \approx \log_2(N)`$, this regime is reached when the per-node quota $`Q_C`$ is of the order of $`2^{\theta}`$ or smaller. A negative value is not a meaningful Hamming distance, so the threshold is clamped at $`0`$: the lottery becomes maximally difficult instead of undefined. At $`{\mathcal A}_{\epsilon} = 0`$ an activity proof is still attainable, but only for a blending token whose $`\epsilon`$-bit digest matches the digest of the epoch randomness exactly.
 
-The clamped regime is a degenerate operating point rather than a target: it makes rewards nearly unreachable for honest nodes and, in the limit, admits every node at once. Parameters should therefore be chosen so that $`\chi \gt \nu + \theta`$, which holds comfortably for the expected deployment values.
+The clamped regime is not a target: at $`{\mathcal A}_{\epsilon} = 0`$ rewards are nearly unreachable. Parameters must be chosen so that $`\chi \gt \nu + \theta`$.
 
 ### Active Message
 
@@ -1129,7 +1130,7 @@ The active message is used for calculating the node reward.
 
 The active message is constructed after the current epoch, when the next epoch randomness is known.
 
-The active message for epoch $`e`$ must only be sent during epoch $`e+1`$; otherwise, it must be rejected.
+The active message for epoch $`e`$ must be included in a block of epoch $`e+1`$; otherwise, it must be rejected.
 
 The node $`l`$ selects the activity proof to include in the active message such that the Hamming distance between the proof and the new randomness is minimal.
 
@@ -1137,7 +1138,7 @@ $$
 \pi_{A}^{l,t,e} = \min_{\Delta_{\mathcal H}}(\mathrm{true}(\pi_{A}^{i,t,e}))
 $$
 
-The ledger must only accept a single active message per-node per-epoch. Any duplicate must be rejected.
+The ledger must only accept a single active message per node per attested epoch. Any duplicate must be rejected.
 
 ### Reward Calculation
 
@@ -1168,7 +1169,7 @@ The reward is paid out to the node $`n`$ based on the node's activity declaratio
 The rewards are distributed according to [Service Reward Distribution Protocol](bedrock-service-reward-distribution.md). Here we are briefly sketching the main idea of the reward distribution protocol. For more details refer to the above document.
 
 1. To receive a reward, a node must send an Active Message as described in the [Active Message](bedrock-service-declaration-protocol.md#active-message), where the `metadata` field is encoded as defined in [Active Message](#active-message). The node must point to a single declaration (`declaration_id`) and use a single provider identity (`provider_id`) for constructing the Active Message. Any reuse of the `provider_id` must make the Active Message invalid.
-2. The Active Message must be sent after the end of an epoch ($`e`$), that is, during the next epoch ($`e+1`$), and after the epoch transition period as defined in the [Transition Period](#transition-period) section. The delay allows nodes to include blending tokens collected during the epoch transition period for rewarding purposes.
+2. The Active Message must not be released before the epoch transition period of epoch $`e+1`$ has elapsed ([Transition Period](#transition-period)).
 3. When the following epoch begins ($`e+2`$) Mantle distributes rewards ([Service Reward Distribution Protocol](bedrock-service-reward-distribution.md)). This delay is required to calculate the partition of rewards as defined in the above section.
 4. If a node does not send the Active Message on time, then it will not receive a reward.
 
