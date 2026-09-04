@@ -69,7 +69,7 @@ Below, we present a high-level description of the block lifecycle. The main focu
 
 ## Hash
 
-We are using two hashing algorithms that have the same output length of 256 bits (32 bytes) that are [Poseidon2 and Blake2b](common-cryptographic-components.md). Throughout this document `hash` is Blake2b with that output length, and the short transaction IDs of the [References](#references) introduce no further primitive.
+We are using two hashing algorithms that have the same output length of 256 bits (32 bytes) that are [Poseidon2 and Blake2b](common-cryptographic-components.md). Throughout this document `hash` is Blake2b with that output length.
 
 ## Block Proposal
 
@@ -93,7 +93,7 @@ Where:
 
 - `header` is the header of the proposal; defined below: [Header](#header).
 - `uncle_headers` is a variable-size list carrying the full signed headers of the referenced uncles, with at most `MAX_UNCLES` entries. Each entry holds an uncle block header together with the signature of that header under its `leader_key` — the header and signature as originally received with the uncle's own proposal. This list *is* the reference: the block ID ([Cryptarchia Protocol](cryptarchia-v1-protocol.md#block-id)) of an uncle is derived from its carried header and is not recorded separately. Like every list, it is serialized as a 1-byte little-endian element count followed by that many entries, and a decoder must reject a count exceeding `MAX_UNCLES`. The `uncles` field having been removed from the [Header](#header), each entry is a fixed 361 bytes — a 297-byte header plus a 64-byte signature — so the list of carried headers parses unambiguously from its element count alone. The whole list, signatures included, is committed by `header.body_root` and therefore by the block ID, so no two blocks sharing an ID can differ in a carried signature. The proposal length reveals how many uncles are referenced — proposal indistinguishability is provided by the message-layer padding of [Payload Formatting](payload-formatting.md), not by the encoding. The proposer chooses which uncles to reference according to [Uncle Selection](cryptarchia-v1-protocol.md#uncle-selection), and every entry must satisfy the validity rules of [Uncle References](cryptarchia-v1-protocol.md#uncle-references) or the block is rejected. The same list is carried over into the reconstructed [Block](#block), which is what makes every referenced uncle structurally available: those rules can be evaluated by any node holding the chain, including nodes bootstrapping from genesis that never receive the proposal.
-- `references` is a variable-length list of up to `MAX_BLOCK_TXS` [references](#references) to transactions, each being an 8-byte (`SHORT_ID_LENGTH`) keyed short transaction ID, derived under a key specific to this proposal from the transaction hash defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction).
+- `references` is a variable-length list of up to `MAX_BLOCK_TXS` short transaction IDs of the selected transactions; defined below: [References](#references).
 - `signature` is the signature of the complete `header` using the `leader_key` from the `ProofOfLeadership`; the size of the `Ed25519Signature` type is 64 bytes.
 
 The proposal carries no padding of its own. Proposal indistinguishability is provided at the message layer: [Payload Formatting](payload-formatting.md#body) already mandates a fixed body length (`Max_Body_Length`) for every dispersed payload, with shorter messages padded with **random** data and the true length carried in `body_length`. An in-proposal zero-padded layout would duplicate that guarantee while charging every proposal the full `MAX_BLOCK_TXS` cost even when it references few transactions. The padding lies outside the signed proposal and is discarded via `body_length` on decapsulation, so no consensus meaning ever attaches to it.
@@ -121,40 +121,37 @@ Where:
 
 ### References
 
-Each reference is a keyed **short transaction ID** rather than the transaction hash or a prefix of it. A short ID is the leading `SHORT_ID_LENGTH` bytes of the hash of the transaction hash, taken under a 128-bit key specific to this proposal:
+Each reference is a keyed **short transaction ID**: the leading `SHORT_ID_LENGTH` bytes of a keyed hash of the transaction hash defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction), under a key derived from the proposal's header:
 
 ```python
 SHORT_ID_LENGTH = 8                   # bytes retained from the digest
+REFERENCE_KEY_LENGTH = 16             # bytes retained for the key
 
-def reference_key(header) -> bytes:                       # 16 bytes
+def reference_key(header) -> bytes:                       # REFERENCE_KEY_LENGTH bytes
     pol = header.proof_of_leadership
     return prefix(hash(b"REFKEY_V1",
-                       header.parent_block,
+                       encode(header.parent_block),       # 32 bytes
                        encode(header.slot),               # UINT64, little-endian
                        encode(pol.leader_key),            # 32 bytes
                        encode(pol.entropy_contribution)), # 32 bytes
-                  16)
+                  REFERENCE_KEY_LENGTH)
 
-def short_id(key: bytes, tx) -> bytes:                    # key is 16 bytes
-    return prefix(hash(key, mantle_txhash(tx)), SHORT_ID_LENGTH)
+def short_id(key: bytes, tx) -> bytes:                    # key is REFERENCE_KEY_LENGTH bytes
+    return prefix(hash(b"SHORTID_V1", key, mantle_txhash(tx)), SHORT_ID_LENGTH)
 ```
 
-Where `hash` is the Blake2b of [Hash](#hash), `encode` is the canonical encoding of [Canonical Encoding](#canonical-encoding), and `prefix` takes the leading bytes of its argument. The digest is computed at the 256-bit output length of `hash` and then truncated. A Blake2b configured to emit `SHORT_ID_LENGTH` bytes is a different function, because the digest length is bound into Blake2b's parameter block.
+Where `hash` is the Blake2b of [Hash](#hash), `encode` is the canonical encoding of [Canonical Encoding](#canonical-encoding), and `prefix` takes the leading bytes of its argument. The digest is computed at the 256-bit output length of `hash` and then truncated. The tag and the key are prefixed to the hash input; Blake2b's native keyed mode must not be used.
 
-The key is prefixed to the message; Blake2b's native keyed mode must not be used. Both operands are fixed-length — a 16-byte key and a 32-byte hash — so no two distinct `(key, hash)` pairs share a preimage.
-
-The key is **derived, not carried**. Every field of its preimage is part of the signed header, so the key is authenticated by `signature` and by `block_id` exactly as the header is, and adds no bytes to the wire. The preimage excludes `body_root`, so the key is fixed before transaction selection begins and the builder can compute short IDs while selecting. It excludes `proof`, which Groth16 re-randomisation lets anyone holding it vary without proving again; `leader_key` and `entropy_contribution` are public inputs to the proof of leadership ([Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation)), so neither can be changed without a fresh proof.
-
-A key is therefore one per (`parent_block`, `slot`, `leader_key`), not one per proposal, and is unknowable to anyone but the — still secret — leader until the proposal is broadcast. [Why the short ID is 8 bytes](#why-the-short-id-is-8-bytes) derives `SHORT_ID_LENGTH` from that.
+The key is **derived, not carried**: every field of its preimage is part of the signed header, so the key is authenticated by `signature` and by `block_id` exactly as the header is, and adds no bytes to the wire. [Why the short ID is 8 bytes](#why-the-short-id-is-8-bytes) derives `SHORT_ID_LENGTH`.
 
 ```python
 class References:                            # 2..8194 bytes
     mempool_transactions: list[bytes]        # UINT16 count + len * SHORT_ID_LENGTH
 ```
 
-Where `mempool_transactions` is a variable-length list of up to `MAX_BLOCK_TXS` references to transactions, each being `short_id(key, tx)` for a selected transaction `tx`. As specified in [Canonical Encoding](#canonical-encoding), it is serialized as a 2-byte little-endian element count followed by that many `SHORT_ID_LENGTH`-byte entries, so its encoded size is `2 + len(mempool_transactions) * SHORT_ID_LENGTH` bytes — 2 bytes when the proposal references no transaction, and `2 + 1024 * 8 = 8194` bytes at `MAX_BLOCK_TXS`.
+Where `mempool_transactions` is a variable-length list of up to `MAX_BLOCK_TXS` entries, `short_id(key, tx)` for each selected transaction `tx` in order. Its serialization and sizes are given in [Canonical Encoding](#canonical-encoding).
 
-A decoder must reject a count greater than `MAX_BLOCK_TXS` **before** allocating for it or performing any mempool lookup, on every ingress path. A decoder must equally reject a list containing the same reference value twice, which [Proposal Construction](#proposal-construction) forbids an honest proposal to carry.
+A decoder must reject a count greater than `MAX_BLOCK_TXS` **before** allocating for it or performing any mempool lookup, on every ingress path. A decoder must equally reject a list containing the same entry twice.
 
 ### Proof of Leadership
 
@@ -284,13 +281,13 @@ Only after the PoL is generated can the block proposal be constructed (see [Proo
     - Choose up to `MAX_BLOCK_TXS` valid `SignedMantleTx` from the local mempool.
     - Ensure the selected transactions, in the order they are placed in, form a sequence that is valid under [Block Proposal Validation](#block-proposal-validation).
 
-3. Derive the reference key and the short IDs, and clear the selection of collisions:
+3. Derive the reference key and the short IDs, and remove colliding transactions from the selection:
 ```python
 key = reference_key(header)      # its preimage fields are all set by step 1
 references: list[bytes] = [short_id(key, tx) for tx in mempool_transactions]
 ```
 
-  The selection **must not** contain two transactions with the same short ID: on a duplicate, drop or replace one of the pair and recompute. The builder **should** also avoid selecting a transaction whose short ID collides with any *other* transaction in its own mempool, which would resolve ambiguously at every validator holding both. That is best effort, since the builder cannot see other mempools, and [Reference Resolution](#reference-resolution) handles what it cannot prevent.
+  The selection **must not** contain two transactions with the same short ID: on a duplicate, drop or replace one of the pair, restore the sequence validity required by step 2, and recompute the `references` list. The builder **should** also avoid selecting a transaction whose short ID collides with that of any other transaction in its own mempool. [Reference Resolution](#reference-resolution) resolves the collisions that remain.
 
 4. Compute the `header.body_root` over both parts of the body, as defined in step 4 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation): the serialized `uncle_headers` list from step 1, combined with the root of the Merkle tree constructed over the full transaction hashes of the selected transactions used to build `references`. The `references` list is left exactly as long as the selection; it is not padded. This step therefore comes after both uncle selection and transaction selection.
 5. Sign the block proposal header, where `header` is its canonical encoding as defined in [Canonical Encoding](#canonical-encoding) — the 297 bytes of the header alone, without `uncle_headers`, without `references` and without the signature itself.
@@ -329,35 +326,36 @@ The process works as follows:
 5. Block builder constructs a block proposal with references to selected transactions.
 6. Block proposal is sent through the Blend Network, which requires multiple rounds of gossiping. This introduces a delay that ensures the transaction has reached most of the network participants' mempools.
 7. Block proposal is received by validators.
-8. Validators derive the proposal's reference key from its header, recompute the short IDs of the transactions in their local mempool under it, and match each reference in `references` against them.
+8. After validating the signed header, validators derive the proposal's reference key from it, compute the short IDs of the transactions in their local mempool under that key, and match each reference in `references` against them.
 9. If every reference resolves to a mempool transaction — uniquely, or through the bounded combination search — and the resolved sequence reproduces `header.body_root`, the block proposal is reconstructed and proceeds to further validation steps; otherwise the validator rejects it, without that being a finding of invalidity — see [Reference Resolution](#reference-resolution).
 
 ### Reference Resolution
 
-A reference is the short ID of a transaction under the proposal's reference key, as defined in [References](#references). The key is derived from the proposal's header, so resolution begins by recomputing the short IDs of the local mempool under that key:
+A reference is the short ID of a transaction under the proposal's reference key ([References](#references)). Resolution begins with the **rehash**: computing the short ID of every local mempool transaction under that key, and indexing the mempool by the result:
 
 ```python
 MAX_RECONSTRUCTION_COMBINATIONS = 8192
 
-def resolve_candidates(proposal, mempool):
-    key = reference_key(proposal.header)
+def short_id_index(key, mempool):                # cached per key; see Binding of the reference list
     index = {}                                   # short ID -> local transactions
     for tx in mempool:
         index.setdefault(short_id(key, tx), []).append(tx)
+    return index
+
+def resolve_candidates(proposal, mempool):
+    index = short_id_index(reference_key(proposal.header), mempool)
     return [index.get(r, []) for r in proposal.references]
 ```
 
-A mempool holds at most one transaction per `mantle_txhash`. Transactions that differ only in their proofs or signatures share a hash, and Groth16 proofs are re-randomisable, so without this rule one transaction could be admitted under unboundedly many encodings, each of which would enter the candidate sets below and inflate the combination count of the search.
-
-The rehash is per reference key and costs one Blake2b compression per mempool transaction over its cached 32-byte hash. It is linear in the size of the mempool and nothing of it can be reused across keys, so reconstruction makes mempool size a per-proposal CPU cost.
+A mempool must hold at most one transaction per `mantle_txhash`; which received encoding it keeps is not constrained.
 
 Each reference then has a set of local candidates:
 
 - **Exactly one candidate** — the reference resolves to that transaction.
 - **No candidate** — the referenced transaction is absent locally, and the proposal cannot be reconstructed here.
-- **Two or more candidates** — a short-ID collision between a referenced transaction and another local transaction. It is resolved, not rejected.
+- **Two or more candidates** — a short-ID collision between a referenced transaction and another local transaction; the search below resolves it.
 
-Distinct references are distinct short IDs — decoders reject duplicates — and a transaction has exactly one short ID under the key, so the candidate sets of different references are disjoint and ambiguity is resolved by trying the combinations independently per reference:
+Distinct references are distinct short IDs ([References](#references)), and a transaction has exactly one short ID under the key. The candidate sets of different references are therefore disjoint, and the search below is an independent choice per reference:
 
 ```python
 def reconstruct(proposal, candidates):
@@ -373,23 +371,19 @@ def reconstruct(proposal, candidates):
 
 The product runs over up to `MAX_BLOCK_TXS` factors and must be evaluated so that it cannot overflow: stop multiplying as soon as the bound is exceeded.
 
-At most one assignment can reproduce `header.body_root`, because two assignments differ in at least one full 32-byte transaction hash and the body root binds them all ([Why `body_root` alone binds the reference list](#why-body_root-alone-binds-the-reference-list)); the order in which combinations are tried therefore does not matter, and an assignment containing the wrong transaction never reproduces the root whatever the origin of the collision.
+At most one assignment can reproduce `header.body_root`: two assignments differ in at least one full transaction hash, and the body root binds them all ([Why `body_root` alone binds the reference list](#why-body_root-alone-binds-the-reference-list)). The order in which assignments are tried therefore does not matter.
 
-A complete reconstruction must stay within one second on validator-class hardware. `MAX_RECONSTRUCTION_COMBINATIONS = 8192` is set from that budget, against which the mempool rehash and not the combination search is the dominant term. A validator too slow to finish fails to reconstruct, exactly as one missing a transaction does.
-
-Resolution is a function of the proposal and the validator's mempool alone, so two validators holding the same mempool always reach the same decision.
-
-A reference resolving to no local transaction, and a combination count above the bound, are both properties of the local mempool rather than of the block. The validator rejects the proposal and does not build on it, and **must not** record that outcome as a verdict on `block_id`: the block may be received again — another copy of the proposal, or the full block through chain synchronisation — and is then validated on its merits. [Block Proposal Validation](#block-proposal-validation) classifies every rejection.
+A reference resolving to no local transaction, a combination count above the bound, and a rehash bound already spent ([Binding of the reference list](#binding-of-the-reference-list)) are properties of the validator's mempool and rehash history rather than of the block. The validator rejects the proposal and does not build on it, and **must not** record that outcome as a verdict on `block_id`: the block may be received again — another copy of the proposal, or the full block through chain synchronisation — and is then validated on its merits. [Block Proposal Validation](#block-proposal-validation) classifies every rejection.
 
 ### Binding of the reference list
 
 Neither the reference entries nor their count are covered by `signature` or by `block_id`, both of which range over `header` only. `header.body_root` is therefore the **sole** mechanism binding a proposal to its reference list and to the number of references: any altered reference set, and any altered count, fails to reproduce `header.body_root` and the proposal is rejected. The argument is given in [Why `body_root` alone binds the reference list](#why-body_root-alone-binds-the-reference-list).
 
-Three operational consequences follow:
+The following rules apply:
 
-- Tampered copies of a genuine proposal are cheap to produce, since `references` is unauthenticated, and every one of them carries the `block_id` of the block it names. Once a copy has been **accepted**, every later copy carrying that `block_id` may be dropped unexamined. A *rejected* copy must not suppress later ones, or the first tampered variant to arrive would censor the genuine proposal behind it. Duplicate suppression on `block_id` is therefore keyed on acceptance, never on receipt.
+- Duplicate suppression on `block_id` must be keyed on acceptance, never on receipt. Once a copy has been **accepted**, every later copy carrying that `block_id` may be dropped unexamined. A *rejected* copy must not suppress later ones: that would let the first tampered variant to arrive censor the genuine proposal behind it.
 - Reconstruction must not be the first expensive step. It begins with a full mempool rehash under the proposal's key, so it must follow signature and proof-of-leadership verification, and an unauthenticated proposal must be discarded before any rehashing takes place.
-- A validator **must** cache the short-ID index against the reference key, and **must** rehash its mempool at most once per (`slot`, `entropy_contribution`) pair. Every field of the key preimage is signed, so a tampered copy cannot change the key: all copies of one proposal share an index, and the rehash is paid once for them together. A leader can still mint distinct keys within its slot, by varying `parent_block` or by proving leadership again under a fresh `leader_key`, and no cache reaches across those. `entropy_contribution` does: it is derived from the winning note and the slot ([Proof of Leadership](cryptarchia-proof-of-leadership.md)), so every proposal a single lottery win can produce carries the same value, and a second reference key under that value can only come from its leader equivocating. Bounding the rehash there makes the work of a slot proportional to the lottery wins in it rather than to the proposals received.
+- A validator **must** cache the short-ID index against the reference key and reuse it for every copy carrying that key, and **must not** rehash its mempool more than once per (`slot`, `entropy_contribution`) pair. A proposal whose key differs from the one already indexed for its pair is treated as a failure to reconstruct. A transaction admitted to the mempool while an index is held is added to that index, at one `short_id` evaluation. An index may be discarded once a copy carrying its key has been accepted; a validator that discards it earlier treats later copies under that key as arriving with the rehash bound spent.
 
 Reconstruction assembles the [Block](#block) from the proposal's `header` and `signature`, its `uncle_headers` copied over verbatim, and the transactions resolved from `references` in the order the references appear. The `uncle_headers` list is retained rather than discarded: it is not recoverable from the mempool, it is committed by `header.body_root` and so cannot be dropped without invalidating the block, and once the proposal has been consumed the block is the only carrier of the signed uncle headers that [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation) and the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) need.
 
@@ -423,7 +417,7 @@ The order is constrained as well as economical. [Block Header Validation](crypta
 
   In order to verify ZK proofs, they are batched for verification as explained in [Batch verification of ZK proofs](#batch-verification-of-zk-proofs) to get better performance. Batching covers the proof checks alone and does not change the state a transaction is validated in: the public inputs of every proof are taken from the state its transaction is reached in, and the state-dependent assertions still run in sequence.
 
-If any of the above checks fail, the block proposal must be rejected. What the rejection establishes depends on which bytes the failed check read. `block_id` is computed from the 297-byte header alone, so every byte outside the header — `uncle_headers`, `references`, `signature`, trailing bytes — can be altered in a copy without changing the `block_id` it names, and none of those bytes are authenticated until `header.body_root` is confirmed in step 4. A failure detected in them is a property of the received copy, not of the block: a frame that does not decode (step 1), a bad `signature` (step 2), an invalid uncle entry (step 3) and a failure to reconstruct (step 4) each discard the copy **without** recording a verdict against `block_id`. Only a failure implied by the header bytes themselves — a wrong version, an invalid proof of leadership — condemns the block the header names, identically at every node. Independently of what a rejection establishes about the block, **nothing of the proposal is executed**. The state progression the pass builds is a working one, adopted as the new chain state only once the last transaction of the block has validated: a single failed check anywhere in the block, in any transaction, in any Operation of any transaction, invalidates the whole block, so a node rejecting it holds exactly the state it held before it started processing it.
+If any of the above checks fail, the block proposal must be rejected. What the rejection establishes depends on which bytes the failed check read. `block_id` is computed from the 297-byte header alone, so every byte outside the header — `uncle_headers`, `references`, `signature`, trailing bytes — can be altered in a copy without changing the `block_id` it names, and none of those bytes are authenticated until `header.body_root` is confirmed in step 4. A failure detected in them is a property of the received copy, not of the block: a frame that does not decode (step 1), a bad `signature` (step 2), an invalid uncle entry (step 3) and a failure to reconstruct (step 4) each discard the copy **without** recording a verdict against `block_id`. Only a failure implied by the header bytes themselves — a wrong version, an invalid proof of leadership — condemns the block the header names, identically at every node. Steps 5 and 6 run only after `header.body_root` has confirmed their operands, and their failures are judged as for a block received in full through chain synchronisation. Independently of what a rejection establishes about the block, **nothing of the proposal is executed**. The state progression the pass builds is a working one, adopted as the new chain state only once the last transaction of the block has validated: a single failed check anywhere in the block, in any transaction, in any Operation of any transaction, invalidates the whole block, so a node rejecting it holds exactly the state it held before it started processing it.
 
 This ordering is specific to the proposal path. A block received in full through chain synchronisation carries its transactions from the start, so [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation) applies to it as written, with no ordering constraint.
 
@@ -449,17 +443,13 @@ The carried `uncle_headers` are not executed. A referenced uncle is not part of 
 
 This annex derives `SHORT_ID_LENGTH` of [References](#references).
 
-A short ID is a keyed function of the transaction under a key that does not exist until the proposal does. Until the proposal is broadcast the winning leader is unknown, so no other party can evaluate `short_id` for the coming block at all: collisions can be neither pre-ground nor pre-planted, and transactions placed in mempools beforehand meet the eventual key as uniformly random 64-bit values. An unkeyed prefix admits the opposite — a birthday search at leisure, finding a colliding pair in $`2^{32}`$ hashes at 8 unkeyed bytes, which is why the preceding revision of this specification had to spend 16 bytes per reference.
+A short ID is a keyed function of the transaction, under a key that no party other than the still-secret leader can evaluate until the proposal is broadcast. Collisions can therefore be neither found nor planted in advance: under the eventual key, the short IDs of transactions already sitting in mempools are uniformly random 64-bit values. An unkeyed 8-byte prefix admits the opposite — a birthday search before the proposal exists, finding a colliding pair in $`2^{32}`$ hashes.
 
-After broadcast the birthday shortcut still does not apply, because only collisions against the $`N`$ *referenced* short IDs matter: resolution looks up exactly the values the proposal carries, and a pair of transactions colliding with each other but with no reference is never consulted. Hitting a fixed set of $`N`$ targets is a targeted search costing $`2^{64}/N`$ attempts, and every attempt must be a distinct valid transaction, so each costs at least one `mantle_txhash` evaluation over a whole `MantleTx`. At $`N`$ = `MAX_BLOCK_TXS` that is $`2^{54}`$ transaction hashes.
+After broadcast the birthday shortcut still does not apply, because only collisions against the $`N`$ *referenced* short IDs matter: resolution looks up exactly the values the proposal carries. Hitting a fixed set of $`N`$ targets is a targeted search costing $`2^{64}/N`$ attempts, each at least one `mantle_txhash` evaluation over a distinct `MantleTx` — $`2^{54}`$ transaction hashes at $`N`$ = `MAX_BLOCK_TXS`. The search is useful only until validators reconstruct, seconds after broadcast, and no attainable hardware completes $`2^{54}`$ transaction hashes within seconds. Each byte removed divides the cost by 256: at six bytes it falls to $`2^{38}`$, within reach of rentable hardware and repeatable against every proposal, because each carries a fresh key. Eight bytes is therefore the shortest reference this construction can carry.
 
-That search is useful only while a ground transaction can still reach a validator's mempool before that validator reconstructs, so it is bounded by the time for the proposal to complete its final gossip broadcast plus the one-second reconstruction budget of [Reference Resolution](#reference-resolution) — at a gossip degree of 8 and 100 ms per hop, $`\lceil \log_8 |\mathcal{V}| \rceil`$ hops over a validator set $`\mathcal{V}`$, that is under two seconds from a thousand validators to a million. No attainable hardware completes $`2^{54}`$ transaction hashes within that window. Each byte removed divides the cost by 256; at six bytes it falls to $`2^{38}`$ and within reach of rentable hardware, repeatable every slot because each proposal carries a fresh key and a fresh window. Eight bytes is therefore the shortest reference this construction can carry, and the reason it does not adopt the 48-bit short IDs of Bitcoin's [BIP-152](https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki), which it otherwise follows.
+The leader knows its own keys in advance and can grind collisions under them at birthday cost. A key is used only by its own proposal, so the grind can only sabotage that proposal, and the search it imposes on each validator is capped at `MAX_RECONSTRUCTION_COMBINATIONS`.
 
-Flooding a mempool does not improve on this. Among $`M`$ entries the expected number of colliding pairs grows as $`M^2/2^{65}`$, but a pair matters only if one of its members is referenced, which holds with probability $`\approx 2N/M`$; the quadratic term cancels and leaves the cross-collision rate $`N \cdot M / 2^{64}`$, linear in $`M`$. What a flood does cost is the rehash, which is linear in $`M`$ whether or not a collision is found.
-
-A leader knows its own future keys — they are fixed by its own `leader_key` and `entropy_contribution` — and can grind collisions under them at birthday cost. A key is used only by its own proposal, so all it can do with them is have its own proposal rejected: the search it imposes on each validator is capped at `MAX_RECONSTRUCTION_COMBINATIONS` body-root evaluations, and referencing collisions beyond that achieves what not proposing achieves.
-
-What remains is chance. A validator holding $`M`$ transactions sees an ambiguous reference with probability $`\approx N \cdot M / 2^{64}`$ per proposal, and each such reference has two candidates, so breaching `MAX_RECONSTRUCTION_COMBINATIONS` needs the smallest $`k`$ with $`2^{k} > 8192`$, which is fourteen collisions at once. The cap is not a security parameter: the combinations grow as $`2^{k}`$ while manufacturing the collisions is linear in $`k`$, costing $`k \cdot 2^{54}`$, so no attainable value of the cap moves the adversary's cost by more than that factor. What the cap decides is how much honest ambiguity a validator tolerates before failing locally, which is why it is set from the reconstruction budget of [Reference Resolution](#reference-resolution).
+A validator holding $`M`$ transactions expects $`\approx N \cdot M / 2^{64}`$ ambiguous references per proposal by chance, each with two candidates, so exceeding `MAX_RECONSTRUCTION_COMBINATIONS` takes fourteen simultaneous collisions ($`2^{14} \gt 8192`$), while manufacturing fourteen costs $`14 \cdot 2^{54}`$ hashes inside the same window.
 
 ## Why `body_root` alone binds the reference list
 
