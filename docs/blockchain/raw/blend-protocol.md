@@ -356,7 +356,7 @@ The bootstrapping logic of an edge node:
         3. A core node might drop the connection if the maximum number of edge connections, defined by the core node, is reached.
         4. An edge node must drop the connection if the neighbor is not the intended core node. Please note that technically it is done during TLS handshake, where the handshake will fail if the core node is using a different key than provided in the SDP declaration.
 5. When the connection is established, it sends the message and closes the connection.
-6. Concurrently to the above, it repeats steps 4 and 5 until it is sends the message to a number of nodes equal to the communication redundancy number defined by the edge node. It stops connecting to each node after a certain number of tries, which is defined by the edge node.
+6. Concurrently to the above, it repeats steps 4 and 5 until it has sent the message to $`\Phi_{EC}^{Min}`$ core nodes. It stops connecting to a node after $`\Omega_E`$ tries.
 
 ## Message Lifecycle
 
@@ -495,7 +495,7 @@ Implementations should choose a default based on the deployment they operate in,
 
 An edge node maintains the following parameters:
 
-- $`\Phi_{EC}`$ denotes the connection redundancy number for the edge node. A node must send a single message that needs to be blended to this number of core nodes.
+- $`\Phi_{EC}^{Min}`$ denotes the number of core nodes an edge node sends each message to. It is set by the edge node individually.
 - $`\Omega_E`$ denotes the maximum number of retries an edge node will do to establish a connection with a core node.
 
 Implementations should choose a default based on the deployment they operate in, and users can override these defaults before joining.
