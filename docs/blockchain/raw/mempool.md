@@ -29,7 +29,7 @@ The mempool is a node's store of Mantle Transactions that have been submitted bu
 
 ```python
 class Mempool:
-    pending: OrderedSet[TxHash]         # admitted, not yet retired, in admission order
+    pending: TimeOrderedSet[TxHash]     # admitted, not yet retired, in admission order
     bodies: Map[TxHash, SignedMantleTx] # transaction bodies
     admitted_at: Map[TxHash, Timestamp] # admission time, per pending transaction
     by_prefix: Map[bytes, Set[TxHash]]  # pending hashes, keyed by reference prefix
@@ -39,7 +39,7 @@ A transaction is keyed by `mantle_txhash(tx)`, defined in [Mantle](bedrock-v1.1-
 
 `by_prefix` maps `prefix(hash, REFERENCE_PREFIX_LENGTH)` to the pending hashes carrying that prefix, where `REFERENCE_PREFIX_LENGTH` is defined in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md#references).
 
-Transactions sharing an admission time are ordered in `pending` by hash.
+`pending` holds each hash once, ordered by admission time. `insert_by` places a hash at the position its admission time gives it, which is not the end when a [Reorganisation](#reorganisation) re-admits a transaction.
 
 # Transaction Admission
 
@@ -86,7 +86,7 @@ The payload is the canonical encoding defined in [Mantle Transaction Encoding](m
 
 ## Reorganisation
 
-When a fork switch displaces blocks from the canonical chain, the node re-admits the transactions they carried and broadcasts them. It re-admits each with its original admission time.
+When a fork switch displaces blocks from the canonical chain, the node re-admits the transactions they carried that the blocks now in the canonical chain do not carry, and broadcasts them. It re-admits each with its original admission time.
 
 ## Duplicates
 
@@ -145,7 +145,7 @@ A transaction leaves `pending` for one of three reasons.
 
 ## Inclusion in a Canonical Block
 
-When an applied block becomes the node's tip, the transactions it carries are retired. When an applied block does not become the tip, its transactions stay pending.
+When a block enters the node's canonical chain, the transactions it carries are retired.
 
 ## Inapplicability
 
