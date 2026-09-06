@@ -71,9 +71,8 @@ and [RLN-v2](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105
   `R_min` is the smallest multiple of `T` greater than or equal to `R_base`.
   `R_min = ⌈R_base / T⌉ × T`.
 
-- **`R_max`**: The maximum rate limit any node may be assigned, regardless of stake,
-  expressed as `f × R_base` where `f ≥ 1` is a deployment-defined multiplier.
-  `R_max` MUST be a multiple of `T`.
+- **`R_max`**: The maximum rate limit any node may be assigned, regardless of stake.
+  `R_max` MUST be a multiple of `T` and MUST be at least `R_min`.
 
 - **floor-stake**: The minimum stake required to register, `R_min × S_unit`.
   Nodes with stake below floor-stake are rejected at registration.
@@ -216,22 +215,21 @@ All per-hop verification and slashing logic are as defined in [RLN Per-Hop DoS P
 | `S_unit` | Stake required per message per epoch. Deployment-defined. |
 | `T` | Stake tier size, `T ≥ 1`. Granularity at which stakes cluster. |
 | `R_min` | Minimum rate, `R_min = ⌈R_base / T⌉ × T`. Nodes with stake `S < R_min × S_unit` MUST be rejected. |
-| `R_max` | `f × R_base`. Maximum rate regardless of stake. MUST be a multiple of `T`. |
-| `f` | Deployment multiplier `f ≥ 1`. Controls the maximum rate relative to the base rate. |
+| `R_max` | Maximum rate regardless of stake. MUST be a multiple of `T` and at least `R_min`. |
 
 `S_unit` SHOULD be set such that a floor-stake node generating only mandatory cover traffic at the rate specified in [Mix Cover Traffic](./mix-cover-traffic.md)
 can sustain operation at `R_min`.
 
-`f` MUST be set such that a single node operating at `R_max` cannot individually saturate the network's forwarding capacity.
-`f = 10` is a reasonable starting point:
+`R_max` MUST be set such that a single node operating at `R_max` cannot individually saturate the network's forwarding capacity.
+A value near `10 × R_base`, rounded to a multiple of `T`, is a reasonable starting point:
 it allows a high-stake operator to handle `10×` the base forwarding load without dominating the network.
-Values above `f = 50` SHOULD be avoided without careful analysis of the deployment's expected node count and forwarding load distribution.
+Values above `50 × R_base` SHOULD be avoided without careful analysis of the deployment's expected node count and forwarding load distribution.
 
 `T = 1` provides full rate granularity.
 Deployments concerned with registered-stake privacy SHOULD use `T ≥ 10`;
 see [Section 5.3](#53-registered-stake-privacy).
 
-`S_unit`, `R_base`, `T`, `R_min`, `R_max`, and `f` MUST be published in a deployment configuration accessible to all participants
+`S_unit`, `R_base`, `T`, `R_min`, and `R_max` MUST be published in a deployment configuration accessible to all participants
 before the network accepts registrations.
 The membership registry MUST reject registrations inconsistent with the published parameters.
 Verifiers trust the membership registry to enforce the correct value of these parameters at registration time.
@@ -304,7 +302,6 @@ A complete fix at the registry layer requires a shielded membership registry tha
 The following are explicitly out of scope for this specification:
 
 - Dynamic rate adjustment without re-registration
-- Reputation-based rate multipliers
 - Stake token selection and blockchain infrastructure
 - Detailed migration procedures and tooling for networks upgrading from flat-rate RLN
 - Voluntary deregistration mechanisms (a [RLN Per-Hop DoS Protection](./mix-dos-protection-rln.md) responsibility)
@@ -324,6 +321,13 @@ The following are explicitly out of scope for this specification:
 
 - **Dynamic stake top-up**:
   A mechanism for incrementally increasing stake without full deregistration would improve operational ergonomics.
+
+- **Reputation-based rate differentiation**:
+  Stake need not be the only path to a higher rate limit.
+  Nodes with a sustained record of good service could earn a higher limit than their stake alone would buy,
+  complementing the stake-based mapping defined here.
+  This requires a verifiable reputation signal,
+  and a way to adjust a node's rate limit without re-registration.
 
 - **Rate-weighted path selection**:
   The [Mix Protocol](./mix.md) currently specifies uniform random path selection,
