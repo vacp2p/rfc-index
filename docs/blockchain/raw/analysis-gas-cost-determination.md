@@ -28,6 +28,8 @@
 | 1.4.1 | [\[RFC\] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | N/A |
 | 1.5.0 | Introduce the new Operation `CHANNEL_STAKE_ASSIGNATION` and update of the channel operations to reflect changes in Mantle | 2026-06-24 |
 | 1.5.1 | Reflect Channel Deposit execution modification. It now consumes inputs to update their NoteId | 2026-07-27 |
+| 1.5.2 | Renamed locked notes into service notes and stated that the Input Gas covers the check that a note is neither a service nor a channel note | 2026-08-27 |
+| 1.5.3 | Adopted "active message" as the single name for the message | 2026-09-02 |
 
 # Introduction
 
@@ -96,12 +98,12 @@ Execution: ~590k CPU cycles.
 - Verification of the ZK signature: 590,000 cycles.
 ## Input Gas
 
-Input gas covers the computational cost of verifying that one Note Id exists in the Ledger and is not locked. Additionally, it compensates for the removal of one Note Id from the Ledger.
+Input gas covers the computational cost of verifying that one Note Id exists in the Ledger and is not a service or channel note. Additionally, it compensates for the removal of one Note Id from the Ledger.
 
 Execution: negligible.
 
 - Verification that the note is in the ledger: negligible.
-- Verification that the note is unlocked: negligible.
+- Verification that the note is not a channel or service note: negligible.
 - Removing of the note from the ledger: negligible.
 ## Output Gas
 
@@ -172,7 +174,7 @@ This gas amount covers the verification of multiple Eddsa25519 signatures and en
 
 ## SDP Declaration
 
-This gas covers multiple verification processes: confirming ownership of the locked note through ZkSignature verification, validating the zk_id via a second ZkSignature, and establishing ownership of the provider_id through an Eddsa25519 signature. It also includes verification of the declaration format, confirmation of note existence, validation that the note is not already locked, and verification of its amount. Additionally, it accounts for the computational costs associated with the note locking mechanism and declaration management.
+This gas covers multiple verification processes: confirming ownership of the service note through ZkSignature verification, validating the zk_id via a second ZkSignature, and establishing ownership of the provider_id through an Eddsa25519 signature. It also includes verification of the declaration format, confirmation of note existence, validation that the note is not already used for this service, and verification of its amount. Additionally, it accounts for the computational costs associated with the note service locking mechanism and declaration management.
 
 Execution: ~ 646k CPU cycles.
 
@@ -180,28 +182,28 @@ Execution: ~ 646k CPU cycles.
 - Verification of the ZK signature: 590,000 cycles.
 - Verification that the declaration doesn’t already exist: negligible.
 - Verification of locator length: negligible.
-- Verification of locked note existence: negligible.
-- Verification of locked note value: negligible.
-- Verification that the note isn’t already locked for the service: negligible.
-- Locking the note: negligible.
+- Verification of service note existence: negligible.
+- Verification of service note value: negligible.
+- Verification that the note isn’t already used for the service: negligible.
+- Register the note as a service note: negligible.
 ## SDP Withdraw
 
-This gas covers a verification process that includes: confirming ownership of the zk_id through ZkSignature verification, validating the existence of the locked note, verifying that the note has exceeded its lock period, and confirming that the declaration exists and has not been previously withdrawn. The validation process also ensures that the withdrawal message's nonce is greater than any previous nonce, preventing replay attacks. During execution, the system updates the declaration's status to withdrawn, removes the declaration from the locked note's associated declarations, and—if the note has no remaining declarations—removes it from the locked notes dictionary.
+This gas covers a verification process that includes: confirming ownership of the zk_id through ZkSignature verification, validating the existence of the service note, verifying that the note has exceeded its lock period, and confirming that the declaration exists and has not been previously withdrawn. The validation process also ensures that the withdrawal message's nonce is greater than any previous nonce, preventing replay attacks. During execution, the system updates the declaration's status to withdrawn, removes the declaration from the service note's associated declarations, and—if the note has no remaining declarations—removes it from the service notes dictionary.
 
 Execution: ~ 590k CPU cycles.
 
-- Verification that the note exists, is locked and bound to the declaration: negligible.
+- Verification that the service note exists and is bound to the declaration: negligible.
 - Verification that the note can be unlocked: negligible.
 - Verification that the declaration exist: negligible.
 - Verification of the ZK signature: 590,000 cycles.
 - Verification that the declaration wasn’t already withdrawn: negligible.
 - Verification of nonce incrementation: negligible.
 - Update declaration: negligible.
-- Remove declaration from locked note: negligible.
+- Remove declaration from service note: negligible.
 - Unlock the note if not linked to any declaration: negligible.
 ## SDP Activation
 
-This gas funds the verification of the zk_id signature through the ZkSignature verification process, validates the existence of the declaration in the system, and ensures that the activation message's nonce is greater than any previous nonce to prevent replay attacks. The validation includes confirming that the declaration ID is present in the declarations dictionary and that the signature corresponds to the declaration's registered zk_id public key.
+This gas funds the verification of the zk_id signature through the ZkSignature verification process, validates the existence of the declaration in the system, and ensures that the active message's nonce is greater than any previous nonce to prevent replay attacks. The validation includes confirming that the declaration ID is present in the declarations dictionary and that the signature corresponds to the declaration's registered zk_id public key.
 
 - Execution: ~590k CPU cycles.
     - Verification that the declaration exist: negligible.
