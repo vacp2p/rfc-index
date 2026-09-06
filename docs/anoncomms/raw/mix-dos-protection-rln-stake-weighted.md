@@ -3,7 +3,6 @@
 | Field | Value |
 | --- | --- |
 | Name | Stake-Weighted Mix RLN DoS Protection |
-| Slug | TBD |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Akshaya Mani <akshaya@status.im> |
