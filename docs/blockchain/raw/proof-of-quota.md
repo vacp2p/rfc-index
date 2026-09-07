@@ -29,6 +29,7 @@
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 
 
+| 1.2.0 | [RFC] Dual-key notes: the PoL note's STARK-field public key is a witness and enters the note identifier derivation | 2026-09-07 |
 # Introduction
 
 This document defines an implementation-friendly specification of the Proof of Quota (PoQ), which is introduced in [Proof of Quota](blend-protocol.md#proof-of-quota).
@@ -85,6 +86,7 @@ class ProofOfQuotaWitness:
     pol_note_value: int                   # PoL note value
     pol_note_tx_hash: zkhash              # PoL note transaction
     pol_note_output_number: int           # PoL note transaction output number
+    pol_note_stark_pk: list[zkhash]       # PoL note STARK-field public key packed into 2 field elements (see Mantle Note Id)
     pol_noteid_path: list[zkhash]         # PoL Merkle path proving noteID membership in ledger aged (len = 32)
     pol_noteid_path_selectors: list[bool] # Indicates how to read the note_path (if Merkle nodes are left or right in the path)
 ```
@@ -128,6 +130,8 @@ key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
 
 **Step 5**: The prover attaches a one-time signature key used in the blend protocol. This public key is split into two 16-byte parts: `K_part_one` and `K_part_two`. When written in little-endian byte order, the complete public key equals the concatenation `K_part_one||K_part_two`.
 
+After the proof-system transition ([Mantle - Proof-System Transition](bedrock-v1.1-mantle-specification.md#proof-system-transition)) the core-node tree is built from the `stark_zk_id` of every declaration, ordered as 256-bit little-endian integers with four zero elements as the empty leaf, the PoL branch uses the STARK-field note key and identifier, and the selection randomness and key nullifier move to `starkhash` with `STARK_SELECTION_RANDOMNESS_V1` and `STARK_KEY_NULLIFIER_V1` tags. The statement is otherwise unchanged.
+
 ### Pseudocode
 
 ```python
@@ -154,6 +158,7 @@ is_leader = would_win_leadership(pol_epoch_nonce,
         pol_note_value,
         pol_note_tx_hash,
         pol_note_output_number,
+        pol_note_stark_pk,
         pol_noteid_path,
         pol_noteid_path_selectors)
 

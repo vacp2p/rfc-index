@@ -27,6 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-02-05 |
 | 1.0.1 | Updated project references to Logos Blockchain | 2026-04-17 |
 | 1.1.0 | Fixed the master key generation personalization string to a valid 16-byte value; aligned the public key derivation with the [Mantle specification](bedrock-v1.1-mantle-specification.md#zero-knowledge-signature-scheme-zksignature) (`KDF` DST, compression mode, applied to the Logos key); specified the final Poseidon2 step as hash mode with the `WALLET_ZK_SK_V1` DST; clarified that extended public keys derive no children | 2026-09-03 |
+| 1.2.0 | [RFC] Dual-key notes: STARK-field key derivation from the same leaf as the `ZkSecretKey`; both keys in every payment request; a note is the wallet's only when both keys are | 2026-09-07 |
 
 # Introduction
 
@@ -124,6 +125,33 @@ public_key = zkhash(FiniteField(b"KDF", byte_order="little", modulus=p), k_logos
 This wallet-side step is not part of any circuit, so the DST costs nothing in proving time while preventing $`k_{\text{logos}}`$ from colliding with any other Poseidon2 output computed over the same field elements. Only the `KDF` derivation of the public key is evaluated inside proofs, and it hashes a single field element thanks to this compression.
 
   **Why not use Poseidon2 for the full derivation?** While Poseidon2 is optimized for ZK circuits, its long-term stability and parameterization are still evolving. General-purpose hash functions like Blake2b offer a more stable and audited base layer. By introducing Poseidon2 only at the last compression step we isolate ZK-dependencies from the rest of the key derivation path. This ensures the wallet hierarchy remains valid even if Poseidon2 parameters are updated.
+
+## STARK-Field Key Derivation
+
+Every key that owns notes exists twice, in the two fields the protocol proves over: the `ZkSecretKey` of the previous section, whose public key is the `public_key` of a [Mantle](bedrock-v1.1-mantle-specification.md#notes) `Note`, and a STARK-field secret key whose public key is the note's `stark_public_key`. Both are derived from the same 32 bytes $`k_i`$ of a leaf, so a leaf is found once and owns its notes under both proof systems.
+
+The STARK-field hash `starkhash` ([Common Cryptographic Components](common-cryptographic-components.md#rescue-prime-optimized-stark-field-hash-function)) operates on Goldilocks field elements, so $`k_i`$ is first split into four 8-byte limbs. Let $`k_i = b_0 || b_1 || b_2 || b_3`$ with every $`b_j`$ 8 bytes, $`n_j`$ its value as a little-endian unsigned integer and $`g_j := n_j \bmod q`$ with $`q = 2^{64} - 2^{32} + 1`$. The reduction touches at most one limb in $`2^{32}`$ and its bias is irrelevant since the limbs only seed a hash.
+
+```python
+sk_stark = starkhash(DST(b"WALLET_STARK_SK_V1"), g_0, g_1, g_2, g_3)  # four Goldilocks elements
+stark_public_key = starkhash(DST(b"STARK_KDF_V1"), *sk_stark)        # four Goldilocks elements, 32 bytes
+```
+
+- $`sk_{stark}`$ is the STARK-field secret key of the leaf. After the proof-system transition it is the witness that proves ownership of the leaf's notes, so it MUST be protected exactly as the `ZkSecretKey` from the moment a note commits to its public key: whoever holds it owns those notes after the transition. Since both keys come from $`k_i`$, exposure of the leaf exposes both and protecting the leaf protects both.
+- `stark_public_key` is the field of the same name in every note the leaf owns and in the `LEADER_CLAIM` payload; `STARK_KDF_V1` plays for the STARK-field key the role `KDF` plays for the BN254 key. The `stark_zk_id` of a service declaration is derived the same way from the leaf that holds the `zk_id`.
+- Recovery needs nothing new: scanning by index derives both keys of a leaf together, and a wallet never stores a mapping between them.
+
+**Both keys or neither.** Nothing on the ledger proves that the two keys of a note belong to the same party; the ledger commits to the pair, and the wallet is the only place the pair is checked. Therefore:
+
+- A payment request MUST carry the `public_key` and the `stark_public_key` of the same leaf; a sender MUST copy both into the output note.
+- A wallet MUST treat a note as received, spendable and part of its balance only if both keys are those of one of its leaves.
+- A note whose `public_key` is the wallet's but whose `stark_public_key` is not is spendable before the transition and lost at the transition. A wallet MUST NOT count it as received and SHOULD warn the user, who may still spend it before the transition.
+
+This wallet-side check is what binds the two keys before the transition, and it is what lets the second key cost one derivation instead of one proof.
+
+**At the transition.** A wallet has nothing to migrate: its notes keep their place in the ledger under identifiers re-keyed by the nodes ([Mantle - Proof-System Transition](bedrock-v1.1-mantle-specification.md#proof-system-transition)), and $`sk_{stark}`$ is the witness the new proofs take. A wallet MUST switch to the post-transition encoding and prover from the first block of `TRANSITION_EPOCH`, MUST rebuild any transaction still pending with pre-transition proofs, and SHOULD spend or otherwise resolve notes it flagged as mismatched before the transition, since they are lost to it afterwards.
+
+  **Why not derive the second key from the first?** `stark_public_key` could be a hash of $`k_{\text{logos}}`$, but nothing could check that cheaply: the point of a second key is that the STARK-field hash never runs inside a Groth16 circuit, and a link that no circuit verifies is worth no more than two independent derivations. Deriving both from the leaf bytes gives the same recoverability with no link to prove.
 
 # References
 

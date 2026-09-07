@@ -33,6 +33,7 @@
 | 1.6.1 | Renamed the `LockedNoteId` production of the SDP Operations into `ServiceNoteId` | 2026-08-27 |
 | 1.7.0 | Added the `ChannelConfigOpProof` and `ChannelTransferOpProof` variants and factored the three channel threshold proofs into `ChannelMultiSigProof`, carrying the index of the signing key alongside each signature | 2026-08-31 |
 
+| 1.7.0 | [RFC] Dual-key notes: `Note`, `LeaderClaim` and `SDPDeclare` carry a `StarkPublicKey`; new `StarkPublicKey` common structure | 2026-09-07 |
 # Introduction
 
 This document specifies the canonical encoding of Mantle transactions (see [Mantle - Mantle Transaction](bedrock-v1.1-mantle-specification.md)) and its sub-components. Transactions sent through the mempool and included in blocks use this encoding.
@@ -111,13 +112,14 @@ Inputs            = InputCount *NoteId
 ### SDP Operations
 
 ```schema
-SDPDeclare    = ServiceType Locators ProviderId ZkId ServiceNoteId
+SDPDeclare    = ServiceType Locators ProviderId ZkId StarkZkId ServiceNoteId
 ServiceType   = Byte          ; 0 = BN
 Locators      = LocatorCount *Locator
 LocatorCount  = Byte          ; Max 8
 Locator       = 2Byte *BYTE   ; Max 329 bytes, multiaddr binary form
 ProviderId    = Ed25519PublicKey
 ZkId          = ZkPublicKey
+StarkZkId     = StarkPublicKey
 ServiceNoteId = NoteId
 
 SDPWithdraw   = DeclarationId Nonce ServiceNoteId
@@ -131,7 +133,7 @@ Metadata      = UINT32 *BYTE  ; Service-specific node activeness metadata
 ### Leader operations
 
 ```schema
-LeaderClaim      = RewardsRoot VoucherNullifier PublicKey
+LeaderClaim      = RewardsRoot VoucherNullifier PublicKey StarkPublicKey
 RewardsRoot      = FieldElement ; Merkle root for voucher membership proof
 VoucherNullifier = FieldElement
 PublicKey        = ZkPublicKey
@@ -150,10 +152,30 @@ OutputCount = Byte
 ## Ledger
 
 ```schema
-Note   = Value ZkPublicKey
+Note   = Value ZkPublicKey StarkPublicKey
 Value  = UINT64
 NoteId = FieldElement
 ```
+
+## Post-Transition Layout
+
+From the first block of `TRANSITION_EPOCH` ([Mantle - Proof-System Transition](bedrock-v1.1-mantle-specification.md#proof-system-transition)) the productions below replace the ones of the same name above; every other production is unchanged. The BN254 key disappears from the wire and a `NoteId` becomes a `starkhash` digest.
+
+```schema
+Note        = Value StarkPublicKey
+NoteId      = StarkDigest
+LeaderClaim = RewardsRoot VoucherNullifier StarkPublicKey
+SDPDeclare  = ServiceType Locators ProviderId StarkZkId ServiceNoteId
+SDPActive   = StarkZkId Nonce Metadata   ; the declaration is addressed by its STARK-field identity
+SDPWithdraw = StarkZkId Nonce            ; (shape follows [RFC] SDP Declarations Are Keyed by zk_id)
+
+StarkDigest = 4GoldilocksElement ; starkhash output, 32 bytes
+ZkSignature       = StarkProof
+ProofOfClaimProof = StarkProof
+StarkProof        = UINT32 *BYTE ; length-prefixed proof bytes; format defined by the zk-path transition document
+```
+
+`RewardsRoot` and `VoucherNullifier` keep their 32-byte width; whether they are read as a BN254 field element (a claim against the legacy voucher tree) or as a `StarkDigest` follows the Proof of Claim variant, as the transition document specifies.
 
 ## Op Proofs
 
@@ -194,6 +216,8 @@ ZkSignature = Groth16
 ; Cryptographic primitives
 Groth16          = 128BYTE      ; pi_a (32) + pi_b (64) + pi_c (32)
 ZkPublicKey      = FieldElement
+StarkPublicKey   = 4GoldilocksElement ; four Goldilocks field elements, 32 bytes in total
+GoldilocksElement = 8BYTE       ; Goldilocks field element (little-endian), canonical: value < 2^64 - 2^32 + 1
 Ed25519PublicKey = 32BYTE
 Ed25519Signature = 64BYTE
 FieldElement     = 32BYTE      ; BN254 field element (little-endian)

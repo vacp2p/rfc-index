@@ -26,6 +26,7 @@
 | 1.0.2 | Clarification of the Poseidon2 function Add test values | 2026-05-07 |
 | 1.1.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 
+| 1.1.0 | [RFC] Dual-key notes: added Rescue-Prime Optimized over the Goldilocks field as the STARK-field hash function (`starkhash`) | 2026-09-07 |
 # Introduction
 
 The Logos Blockchain relies on a variety of cryptographic primitives to ensure security, privacy, and verifiability across its components. This document defines the common cryptographic building blocks used throughout the Logos Blockchain design.
@@ -38,7 +39,7 @@ This document specifies the cryptographic primitives selected for the Logos Bloc
 
 The primitives span multiple domains:
 
-- Hash functions (Poseidon2, BLAKE2b) serve as the base layer for commitments, nullifier derivation, Merkle trees, signature key derivation and general purpose hashing.
+- Hash functions (Poseidon2, Rescue-Prime Optimized, BLAKE2b) serve as the base layer for commitments, nullifier derivation, Merkle trees, signature key derivation and general purpose hashing.
 - The stream cipher (ChaCha20) provides deterministic pseudorandom byte generation and keystream encryption.
 - Signature schemes (EdDSA, ZkSignature) authenticate messages and participants, with ZkSignature designed specifically for ownership verification within zero-knowledge circuits.
 - Proof systems (Groth16) enable succinct and verifiable computation. Groth16 is used in hand-written circuits.
@@ -50,6 +51,7 @@ The table below summarizes the recommended component for each context:
 | Context | Recommended Component |
 | --- | --- |
 | ZK Hashing | [Poseidon2](#poseidon2-zk-friendly-hash-function) |
+| STARK-Field Hashing | [Rescue-Prime Optimized](#rescue-prime-optimized-stark-field-hash-function) |
 | General Hashing | [BLAKE2b](#blake2bgeneral-purpose-hashing) |
 | PRNG & Keystreams | [ChaCha20](#chacha20-based-prng-construction) |
 | General Signatures | [EdDSA](#eddsa) |
@@ -169,9 +171,59 @@ Security Considerations:
 - Current research demonstrates security at 100-bit+ levels when using recommended round parameters.
 - Resistant to collision, preimage, and second-preimage attacks at intended security levels.
 
+## [Rescue-Prime Optimized (](https://eprint.iacr.org/2022/1577)[STARK-Field Hash Function)](https://eprint.iacr.org/2022/1577)
+
+Description:
+
+Rescue-Prime Optimized (RPO) is an arithmetization-oriented sponge hash function of the Rescue family, defined over the Goldilocks prime field. It is designed to be cheap to prove in STARK-based proof systems, where the cost of a hash is driven by the number of rounds rather than by the number of multiplications. Every round applies a power-map S-box in its first half and the inverse power map in its second half, so the permutation has a low-degree description in both directions.
+
+Technical Details:
+
+- Field: the Goldilocks prime field $`\mathbb{F}_q`$ with $`q = 2^{64} - 2^{32} + 1`$.
+- Structure: sponge over a state of $`m = 12`$ field elements, with capacity $`c = 4`$ (positions 0–3) and rate $`r = 8`$ (positions 4–11).
+- Rounds: 7. Each round is an MDS matrix multiplication, a round-constant addition, the S-box $`x \mapsto x^{7}`$ on every state element, a second MDS multiplication, a second round-constant addition and the inverse S-box $`x \mapsto x^{1/7}`$. The exponent 7 is the smallest integer coprime with $`q - 1`$.
+- Digest: the four rate elements at positions 4–7, i.e. 256 bits.
+- Security level: 128 bits (collision and preimage), as claimed by the RPO specification for these parameters.
+- MDS matrix and round constants: those fixed by the RPO specification for $`(m, c) = (12, 4)`$ at the 128-bit level; they are not restated here and MUST be taken from the specification or from a reference implementation that reproduces its test vectors.
+
+Use in the Logos Blockchain:
+
+RPO is the hash function of the STARK-field keys: the `stark_public_key` of a `Note` ([Mantle - Notes](bedrock-v1.1-mantle-specification.md#notes)) and the `stark_zk_id` of a service declaration ([Service Declaration Protocol](bedrock-service-declaration-protocol.md#declaration-storage)) are RPO digests, derived as the [Wallet Technical Standard](wallet-technical-standard.md#stark-field-key-derivation) specifies. Before the proof-system transition no circuit evaluates RPO; wallets compute it when deriving keys and nodes only parse its digests. Throughout the Logos Blockchain specifications RPO is referred to as `starkhash`.
+
+`starkhash` takes a list of Goldilocks field elements and returns four:
+
+1. Initialize the state to twelve zeros, then set the first capacity element (position 0) to the number of input elements modulo 8.
+2. Absorb the input eight elements at a time, adding each element into the rate positions 4–11 in order, and apply the permutation after every full block of eight.
+3. If the number of input elements is not a multiple of eight, add the remaining elements into positions 4, 5, … and apply the permutation once more. No padding element is appended: the capacity value set in step 1 separates inputs of different lengths.
+4. Return the state elements at positions 4–7.
+
+This is the `hash_elements` procedure of the RPO specification and of its reference implementations.
+
+Domain separation tags are byte strings (ASCII by convention) converted to field elements as follows: the string is zero-padded on the right to a multiple of 8 bytes and every 8-byte block is read as a little-endian unsigned integer. The most significant byte of an ASCII block is below `0x80`, so every value is below $`2^{63} \lt q`$ and canonical. The elements of the DST are the first inputs of `starkhash`; the notation `DST(b"...")` in the specifications stands for this conversion. Every tag used under `starkhash` carries the `STARK_` prefix (`STARK_KDF_V1`, `STARK_NOTE_ID_V1`, …) and its own version counter, so a tag never names the same derivation under two hash functions.
+
+Bytes and Goldilocks elements are converted as follows: an element is serialized as 8 bytes little-endian, and 8 bytes are a valid element only if their value is strictly smaller than $`q`$ (canonical form). A `StarkPublicKey` ([Mantle Transaction Encoding](mantle-transaction-encoding.md#common-structures)) is the 32-byte serialization of a four-element digest, and every rule that parses one rejects a non-canonical element.
+
+Integers and classical hash digests become Goldilocks elements without any reduction: `elements_u64(x)` is the pair $`(x \bmod 2^{32},\ \lfloor x / 2^{32} \rfloor)`$, and `elements_hash(h)` for a 32-byte digest is its eight 32-bit little-endian words in order. Every such element is below $`2^{32} \lt q`$, so the encoding is canonical and injective, and unlike a reduction modulo $`q`$ it loses no bits.
+
+`starkhash_compress(a, b)`, for two four-element digests, is `starkhash(a_0, …, a_3, b_0, …, b_3)`: the eight elements fill exactly one rate block, so it costs one permutation. It is the node function of every Merkle tree over Goldilocks digests after the proof-system transition ([Mantle - Proof-System Transition](bedrock-v1.1-mantle-specification.md#proof-system-transition)), with four zero elements as the empty leaf.
+
+Rationale for Use:
+
+- Native to the Goldilocks field of the STARK-based proof system the protocol is moving to, so a key derived today is provable natively after the transition, without emulating a foreign field inside a circuit.
+- Rescue-family designs need few rounds, which is what STARK proving cost tracks; RPO fixes concrete parameters with public reference implementations and test vectors.
+- A four-element digest is 256 bits, the size of a `ZkPublicKey`, so a STARK-field key costs the same 32 bytes on the wire and in the ledger.
+
+Security Considerations:
+
+- The 128-bit claim rests on the algebraic cryptanalysis of the Rescue family (Gröbner basis and interpolation attacks); RPO includes a security margin above the minimal round count and remains under analysis in the STARK ecosystem.
+- Keys derived with `starkhash` are hash-based: their security against a quantum adversary reduces to preimage resistance, exactly as for the Poseidon2-based keys.
+- The field and the hash are a protocol-wide commitment. Because notes commit to STARK-field keys from the start, changing either after the network launches would require the very key migration this construction exists to avoid; the choice must be made together with the proof-system roadmap.
+
 ## References
 
 - Poseidon2: [https://eprint.iacr.org/2023/323](https://eprint.iacr.org/2023/323)
+- Rescue-Prime Optimized: [https://eprint.iacr.org/2022/1577](https://eprint.iacr.org/2022/1577)
+- Rescue-Prime: [https://eprint.iacr.org/2020/1143](https://eprint.iacr.org/2020/1143)
 - Poseidon Cryptanalysis Initiative: [https://www.poseidon-initiative.info/](https://www.poseidon-initiative.info/)
 - Algebraic Cryptanalysis of Poseidon: [https://eprint.iacr.org/2023/537](https://eprint.iacr.org/2023/537)
 - BLAKE2b Specification: [https://eprint.iacr.org/2013/322](https://eprint.iacr.org/2013/322)
