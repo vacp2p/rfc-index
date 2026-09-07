@@ -32,7 +32,7 @@
 | 1.6.0 | Added the `Parent` of the `ChannelConfig` to follow Mantle | 2026-08-27 |
 | 1.6.1 | Renamed the `LockedNoteId` production of the SDP Operations into `ServiceNoteId` | 2026-08-27 |
 | 1.7.0 | [RFC] SDP Operations address a declaration by `ZkId` instead of `DeclarationId`, and `SDPWithdraw` drops the redundant `ServiceNoteId` | 2026-09-01 |
-| 1.8.0 | [RFC] `SDPDeclare` drops the `Locators` production | 2026-09-02 |
+| 1.8.0 | [RFC] `SDPDeclare` drops the `Locators` production, and `ProviderId` becomes the 38-byte libp2p `PeerId` | 2026-09-07 |
 
 # Introduction
 
@@ -114,7 +114,7 @@ Inputs            = InputCount *NoteId
 ```schema
 SDPDeclare    = ServiceType ProviderId ZkId ServiceNoteId
 ServiceType   = Byte          ; 0 = BN
-ProviderId    = Ed25519PublicKey
+ProviderId    = 38BYTE          ; libp2p PeerId: 0x002408011220 || Ed25519PublicKey
 ZkId          = ZkPublicKey
 ServiceNoteId = NoteId
 

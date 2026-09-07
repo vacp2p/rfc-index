@@ -43,7 +43,7 @@
 | 1.11.1 | Renamed locked notes into service notes: `service_notes`, `ServiceNote` and `service_note_id` replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in | 2026-08-27 |
 | 1.12.0 | Specified the `SDP_ACTIVE` execution effects, matching the implementation: `active` is set to the epoch of the including block, and a message the activity logic rejects makes the Operation invalid. Set `withdraw_at` to `current_epoch + 2`, the epoch at which the node stops providing the service, and removed declarations at `withdraw_at` | 2026-09-02 |
 | 1.13.0 | [RFC] Key SDP declarations by `zk_id` and bind each to a single service note | 2026-09-03 |
-| 1.14.0 | [RFC] `SDP_DECLARE` carries no addresses; the `Locator` structure is removed | 2026-09-03 |
+| 1.14.0 | [RFC] `SDP_DECLARE` carries no addresses; the `Locator` structure is removed, and the `provider_id` is a `PeerId` whose Ed25519 key is recovered for verification | 2026-09-03 |
 
 # Introduction
 
@@ -1036,9 +1036,21 @@ class ServiceParameters:
     inactivity_period: NumberOfEpochs # number of epochs
     epoch: EpochNumber                # epoch number at which the Service Parameters were set
 
+class PeerId(bytes):
+    # identity multihash of the protobuf-encoded Ed25519 public key
+    # (see SDP: Identifiers)
+    PREFIX = bytes.fromhex("002408011220")
+
+    def validate(self):
+        assert len(self) == 38
+        assert self[:6] == PeerId.PREFIX
+
+    def ed25519_key(self) -> bytes:
+        return self[6:]
+
 class DeclarationInfo:
     service: ServiceType
-    provider_id: Ed25519PublicKey
+    provider_id: PeerId
     service_note_id: NoteId
     created: EpochNumber
     active: EpochNumber
@@ -1056,7 +1068,7 @@ The service registration follows the definition given in [**Declaration Message*
 ```python
 class DeclarationMessage:
     service_type: ServiceType
-    provider_id: Ed25519PublicKey
+    provider_id: PeerId
     zk_id: ZkPublicKey
     service_note_id: NoteId
 ```
@@ -1098,12 +1110,16 @@ declarations: dict[ZkPublicKey, DeclarationInfo]
 
   The declaration is verified according to [Declare](bedrock-service-declaration-protocol.md#declare).
 
-  1. Ensure ownership over the service note, `zk_id` and `provider_id`.
+  1. Ensure the `provider_id` carries a recoverable key, and ownership over the
+     service note, `zk_id` and `provider_id`.
       ```python
+      declaration.provider_id.validate()
       assert ZkSignature_verify(
           txhash, proof.zk_sig, [note.public_key, declaration.zk_id]
       )
-      assert Ed25519_verify(txhash, proof.provider_sig, provider_id)
+      assert Ed25519_verify(
+          txhash, proof.provider_sig, declaration.provider_id.ed25519_key()
+      )
       ```
 
   2. Ensure no identifier is already taken
@@ -1166,7 +1182,7 @@ alice_note = Utxo(
 # Alice wishes to lock it to join the Blend network
 declaration=DeclarationMessage(
     service_type=ServiceType.BN,
-    provider_id=alice_provider_pk,
+    provider_id=alice_peer_id,
     zk_id=alice_pk_2,
     service_note_id=alice_note.id()
 )

@@ -175,7 +175,11 @@ At any epoch `n`, the most recent report a snapshot can contain was included in 
 
 We define the following set of identifiers which are used for service-specific cryptographic operations:
 
-- `provider_id`: used to sign the SDP messages and to establish secure links between validators; it is `Ed25519PublicKey`. It is the libp2p node identity of the validator, and the addresses it is reachable at are resolved through libp2p peer routing rather than carried by the protocol.
+- `provider_id`: the libp2p node identity of the validator; it is a `PeerId`. The addresses it is reachable at are resolved through libp2p peer routing rather than carried by the protocol.
+
+A `PeerId` is the identity multihash of the protobuf-encoded public key, and must use the `Ed25519` key type. It is therefore 38 bytes: the six-byte prefix `0x002408011220`, then the 32-byte Ed25519 public key. A `PeerId` whose prefix differs must be rejected: any other multihash code digests the key rather than carrying it, and a key that cannot be recovered can neither verify a signature nor derive an encryption key.
+
+The Ed25519 public key of a `provider_id` is its last 32 bytes. Signing and verification of SDP messages, and the derivation of the Non-ephemeral Encryption Key ([Key Types and Generation](key-types-and-generation.md)), use that key.
 - `zk_id`: used for zero-knowledge operations by the validator that includes rewarding ([Zero Knowledge Signature Scheme (ZkSignature)](bedrock-v1.1-mantle-specification.md#zero-knowledge-signature-scheme-zksignature)).
 
 ### **Declaration Message**
@@ -185,7 +189,7 @@ The construction of the declaration message is as follows.
 ```python
 class DeclarationMessage:
     service_type: ServiceType
-    provider_id: Ed25519PublicKey
+    provider_id: PeerId
     zk_id: ZkPublicKey
     service_note_id: NoteId
 ```
@@ -203,7 +207,7 @@ Only valid declaration messages can be stored on the ledger. A declaration cover
 ```python
 class DeclarationInfo:
     service: ServiceType
-    provider_id: Ed25519PublicKey
+    provider_id: PeerId
     service_note_id: NoteId
     created: EpochNumber
     active: EpochNumber
@@ -214,7 +218,7 @@ class DeclarationInfo:
 Where:
 
 - `service` defines the service type of the declaration;
-- `provider_id` is the `Ed25519PublicKey` the validator signs its messages with;
+- `provider_id` is the `PeerId` of the validator, whose Ed25519 public key signs its messages;
 - `service_note_id` is the `NoteId` of the note that meets the minimum stake threshold;
 - `created` is the epoch of the block that contained the declaration;
 - `active` is the epoch of the block that contained the latest accepted active message, initialised to `created + 2` ([Message Timing](#message-timing));
@@ -309,7 +313,7 @@ The declaration message is considered valid when all of the following are met:
 
 - The `service_note_id` names an unspent note whose value meets the minimum stake threshold.
 - The `zk_id`, the `service_note_id` and the `provider_id` are each unbound ([Identifier Uniqueness](#identifier-uniqueness)).
-- The sender holds the private key corresponding to the `provider_id`.
+- The `provider_id` carries the prefix `0x002408011220`, and the sender holds the private key corresponding to the Ed25519 public key it carries.
 
 If all of the above conditions are fulfilled, then the declaration is stored on the ledger under its `zk_id`; otherwise, the message is discarded.
 
