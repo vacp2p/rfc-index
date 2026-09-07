@@ -131,8 +131,8 @@
     "title": "RLN DoS Protection for Mixnet",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-06-12",
-    "path": "anoncomms/raw/mix-spam-protection-rln.html"
+    "updated": "2026-09-07",
+    "path": "anoncomms/raw/mix-dos-protection-rln.html"
   },
   {
     "component": "anoncomms",
@@ -158,7 +158,7 @@
     "title": "Mix DoS Protection",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-05-28",
+    "updated": "2026-09-07",
     "path": "anoncomms/raw/mix-dos-protection.html"
   },
   {
@@ -185,7 +185,7 @@
     "title": "Mix Cover Traffic",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-24",
+    "updated": "2026-09-07",
     "path": "anoncomms/raw/mix-cover-traffic.html"
   },
   {
@@ -212,12 +212,21 @@
     "title": "LOGOS-MIXNET",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-09-03",
+    "updated": "2026-09-07",
     "path": "anoncomms/raw/logos-mixnet.html"
   },
   {
     "component": "anoncomms",
     "slug": "246",
+    "title": "Stake-Weighted Mix RLN DoS Protection",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-09-07",
+    "path": "anoncomms/raw/mix-dos-protection-rln-stake-weighted.html"
+  },
+  {
+    "component": "anoncomms",
+    "slug": "247",
     "title": "RLN Module API",
     "status": "raw",
     "category": "Standards Track",
