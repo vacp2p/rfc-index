@@ -27,6 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.1.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
+| 1.1.1 | The public key of a selected node is carried by its `provider_id` | 2026-09-07 |
 
 # Introduction
 
