@@ -32,7 +32,7 @@
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
 | 1.3.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 | 1.3.1 | Judged the active message window by the epoch of the including block, made the one-message-per-epoch rule per attested epoch, and made the transition-period delay a release constraint | 2026-09-02 |
-| 1.4.0 | Add the proof of work quota and the Blend difficulty, verify the proof of quota before relaying any message, and add transactions as a data message payload; re-derive the nullifier cache bound and align the nullifier retention period | 2026-09-04 |
+| 1.4.0 | Add the proof of work quota and the Blend difficulty, verify the proof of quota before relaying any message, add a transaction as a data message payload, and align the nullifier retention period | 2026-09-08 |
 
 # Introduction
 
@@ -889,29 +889,15 @@ The added per-hop verification latency lies within the delay budget of [Delaying
 
 Deduplication by nullifier, step 1.4, remains before this check, but only as a lookup: insertion happens strictly after the proof has verified, so a cache entry attests that a fully verified message already used that nullifier and a lookup hit is a true duplicate. The lookup runs first because reading the cache is cheap and a hit makes the expensive verification unnecessary.
 
-What this ordering does **not** address is a flood of messages whose proofs are valid. Such messages pass every check in step 1 and are relayed normally, so verifying earlier does not reduce their cost; it only ensures the network carries messages that someone genuinely paid to create. Nor does the [Blend Difficulty](#blend-difficulty) controller respond to them: it is driven by transactions that reach a block, and messages sent only to consume capacity never do, so admission does not tighten however many are sent. Verifying before relaying therefore bounds the amplification an invalid proof can achieve, and does not by itself bound the volume a determined participant can generate.
-
-Closing that gap requires an admission cost each node can raise on its own in response to the resources it is actually spending, rather than one derived from a value the whole network agrees on and which lags what any individual node observes. Such a mechanism is not specified here.
-
 The node must cache the PoQ nullifiers ($`\nu_i`$) of every message it relays — and only of messages it relays — for a duration of a single epoch plus the [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that the size of the cache must be at least:
 
 $$
 \begin{aligned}
-(E + \mathrm{TP})\cdot (F_C +F_D + F_W) \cdot \beta_{max} \cdot |\nu_i|
+(E + \mathrm{TP})\cdot (F_C +F_D) \cdot \beta_{max} \cdot |\nu_i|
+&=(648000 + 30) \cdot \left(1+\dfrac{1}{30}\right) \cdot 3 \cdot 32 \\
+&= 64284576 \approx 65\,\mathrm{MB}
 \end{aligned}
 $$
-
-where $`F_W`$ is the rate at which proof of work backed messages enter the network. Taking $`F_W = 0`$ recovers the figure for a network without the proof of work branch:
-
-$$
-\begin{aligned}
-(648000 + 30) \cdot \left(1+\dfrac{1}{30}\right) \cdot 3 \cdot 32 = 64284576 \approx 65\,\mathrm{MB}
-\end{aligned}
-$$
-
-That figure is not an upper bound once the proof of work branch is in use. The $`F_C`$ and $`F_D`$ terms are bounded by quantities the protocol knows: the number of declared core nodes, published by the SDP, and the rate of leader elections, fixed by the consensus parameters. $`F_W`$ has no such bound. It is determined by how much work participants choose to perform and by $`Q_W`$, neither of which the protocol constrains, so the cache size becomes a function of the Blend threshold $`d_{blend}`$ rather than of a count of registered nodes.
-
-A node therefore cannot size this cache from protocol constants alone. Two consequences follow. First, $`d_{blend}`$ must be set with the resulting memory cost in mind, not only with the anonymity-set objective of [Blend Difficulty](#blend-difficulty). Second, a node must bound the cache by its own resources rather than assuming the derived figure will hold, and the behaviour when that bound is reached is not specified here.
 
 ### Processing
 
