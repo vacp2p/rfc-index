@@ -31,7 +31,7 @@
 | 1.5.1 | [RFC] One canonical encoding for `ServiceType` and `Locator`: pin `Locator` bytes to the multiaddr binary form | 2026-08-14 |
 | 1.6.0 | Added the `Parent` of the `ChannelConfig` to follow Mantle | 2026-08-27 |
 | 1.6.1 | Renamed the `LockedNoteId` production of the SDP Operations into `ServiceNoteId` | 2026-08-27 |
-| 1.7.0 | Added the `ClaimPowReward` Operation payload and the empty `NoOpProof` it carries | 2026-09-08 |
+| 1.7.0 | Added the `ClaimPowReward` Operation payload; its proof is a `ZkSigProof` | 2026-09-08 |
 
 # Introduction
 
@@ -175,15 +175,13 @@ OpProof   = Ed25519SigProof /
             ZkSigProof /
             ZkAndEd25519SigsProof /
             ChannelWithdrawOpProof /
-            ProofOfClaimProof /
-            NoOpProof
+            ProofOfClaimProof
 
 Ed25519SigProof         = Ed25519Signature
 ZkSigProof              = ZkSignature
 ZkAndEd25519SigsProof   = ZkSignature Ed25519Signature
 ChannelWithdrawOpProof  = SignatureCount *Ed25519Signature
 ProofOfClaimProof       = Groth16
-NoOpProof               = 0BYTE          ; the Operation carries no proof
 
 SignatureCount = UINT16
 ```
