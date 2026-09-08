@@ -25797,6 +25797,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 </div><!-- timeline:start -->
 <h2 id="timeline-88"><a class="header" href="#timeline-88">Timeline</a></h2>
 <ul>
+<li><strong>2026-09-08</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d6e824293579e5f53b8d278d0f710467fcae5fb8/docs/blockchain/raw/wallet-technical-standard.md"><code>d6e8242</code></a> — [RFC] Wallet: Fix key derivation constants and Poseidon2 mode (#437)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/wallet-technical-standard.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
 </ul>
 <!-- timeline:end -->
@@ -25804,6 +25805,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <div class="table-wrapper"><table><thead><tr><th><strong>Version</strong></th><th><strong>Changes</strong></th><th><strong>Date</strong></th></tr></thead><tbody>
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-02-05</td></tr>
 <tr><td>1.0.1</td><td>Updated project references to Logos Blockchain</td><td>2026-04-17</td></tr>
+<tr><td>1.1.0</td><td>Fixed the master key generation personalization string to a valid 16-byte value; aligned the public key derivation with the <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#zero-knowledge-signature-scheme-zksignature">Mantle specification</a> (<code>KDF</code> DST, compression mode, applied to the Logos key); specified the final Poseidon2 step as hash mode with the <code>WALLET_ZK_SK_V1</code> DST; clarified that extended public keys derive no children</td><td>2026-09-03</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-27"><a class="header" href="#introduction-27">Introduction</a></h1>
@@ -25825,7 +25827,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <p>To maintain compatibility, we will still use the same structure but non-hardened children will not be available.</p>
 <p><strong>Extended Keys (from BIP32)</strong></p>
 <p>In what follows, we will define a function that derives a number of child keys from a parent key. In order to prevent these from depending solely on the key itself, we extend both private and public keys first with an extra 256 bits of entropy. This extension, called the chain code, is identical for corresponding private and public keys, and consists of 32 bytes.</p>
-<p>We represent an extended private key as (k, c), with k the normal private key, and c the chain code. An extended public key is represented as <span class="math-inline" data-tex="(K, c)"></span>, with <span class="math-inline" data-tex="K = zkhash(&quot;KDF\_V1&quot;, k)"></span> the public key and <span class="math-inline" data-tex="c"></span> the chain code.</p>
+<p>We represent an extended private key as <span class="math-inline" data-tex="(k, c)"></span>, with <span class="math-inline" data-tex="k"></span> the normal private key, and <span class="math-inline" data-tex="c"></span> the chain code. An extended public key is represented as <span class="math-inline" data-tex="(K, c)"></span>, with <span class="math-inline" data-tex="K"></span> the public key derived from <span class="math-inline" data-tex="k"></span> as described in <a href="blockchain/raw/wallet-technical-standard.html#zk-compatible-secret-key-derivation-in-the-logos-blockchain">ZK-Compatible Secret Key Derivation in the Logos Blockchain</a> and <span class="math-inline" data-tex="c"></span> the chain code. Since only hardened children exist, an extended public key cannot derive any child key: it is an identifier and export format, not a derivation input.</p>
 <p>Each extended key has <span class="math-inline" data-tex="2^{31}"></span> hardened children keys. Each of these child key has an index. The hardened child keys use indices from <span class="math-inline" data-tex="2^{31}"></span> through <span class="math-inline" data-tex="2^{32} -1"></span>.</p>
 <h1 id="details-7"><a class="header" href="#details-7">Details</a></h1>
 <p>The main novelty with respect to the aforementioned protocols is one last additional step before obtaining a secret key that can be used in the Logos Blockchain network, described in <a href="blockchain/raw/wallet-technical-standard.html#zk-compatible-secret-key-derivation-in-the-logos-blockchain">ZK-Compatible Secret Key Derivation in the Logos Blockchain</a>.</p>
@@ -25860,7 +25862,7 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <h2 id="master-key-generation"><a class="header" href="#master-key-generation">Master Key Generation</a></h2>
 <ul>
 <li>Generate a seed byte sequence <span class="math-inline" data-tex="S"></span> of a chosen length (e.g. with BIP0039)</li>
-<li>Calculate <span class="math-inline" data-tex="I = Blake2b\_512(&quot;Logos Blockchain\_MasterKGen&quot;, S)"></span></li>
+<li>Calculate <span class="math-inline" data-tex="I = Blake2b\_512(&quot;Logos\_MasterKGen&quot;, S)"></span> (the personalization string is exactly 16 bytes, the maximum BLAKE2b allows)</li>
 <li>Split <span class="math-inline" data-tex="I"></span> into two 32-byte sequences, <span class="math-inline" data-tex="I_L"></span> and <span class="math-inline" data-tex="I_R"></span>.</li>
 <li>Use <span class="math-inline" data-tex="I_L"></span> as master secret key, and <span class="math-inline" data-tex="I_R"></span> as master chain code.</li>
 </ul>
@@ -25868,7 +25870,17 @@ Each snapshot updates the common view of the registry. Changes to the declaratio
 <p>Since we make extensive use of ZK proofs, we need our secret → public derivation to be efficient. For this purpose, we use a ZK-optimized hash function: Poseidon2.</p>
 <p>However, Poseidon2 operates on field elements rather than raw bytes, so we cannot simply input <span class="math-inline" data-tex="k_i"></span> as specified above. Instead, we must encode these bytes into field elements. Using the parameters described in <a href="blockchain/raw/common-cryptographic-components.html"><strong>Use in the Logos Blockchain:</strong></a>, we need two field elements to encode 32 bytes (the size of <span class="math-inline" data-tex="k_i"></span>). This creates inefficiency because although a single field element provides adequate security, we must use twice as many, increasing computation costs to accommodate the entire key.</p>
 <p>To reduce this additional cost inside the proof, we apply one final hash function that compresses these two field elements into a single one, which becomes the actual key used in the Logos Blockchain network:</p>
-<p>Let <span class="math-inline" data-tex="k_L, k_R"></span> be 16-byte sequences such that <span class="math-inline" data-tex="k_i = k_L || k_R"></span> and <span class="math-inline" data-tex="n_L, n_R"></span> be their values when interpreted as little-endian unsigned integers. Let <span class="math-inline" data-tex="e_L, e_R"></span> be scalar field elements in BN254 such that <span class="math-inline" data-tex="e_L := n_L \in \mathbb F_r, e_R := n_R \in \mathbb F_r"></span>. The Logos key can be obtained as <span class="math-inline" data-tex="k_{\text{logos}} = \text{Poseidon2}(e_L, e_R)"></span>, where <span class="math-inline" data-tex="\text{Poseidon2}"></span> outputs a single field element.</p>
+<p>Let <span class="math-inline" data-tex="k_L, k_R"></span> be 16-byte sequences such that <span class="math-inline" data-tex="k_i = k_L || k_R"></span> and <span class="math-inline" data-tex="n_L, n_R"></span> be their values when interpreted as little-endian unsigned integers. Let <span class="math-inline" data-tex="e_L, e_R"></span> be scalar field elements in BN254 such that <span class="math-inline" data-tex="e_L := n_L \in \mathbb F_r, e_R := n_R \in \mathbb F_r"></span>. The Logos key is obtained with Poseidon2 in hash mode, domain separated from every other use of Poseidon2 in the protocol:</p>
+<pre><code class="language-python">k_logos = zkhash(
+    FiniteField(b"WALLET_ZK_SK_V1", byte_order="little", modulus=p),
+    e_L,
+    e_R,
+)  # Poseidon2 hash mode, a single field element
+</code></pre>
+<p><span class="math-inline" data-tex="k_{\text{logos}}"></span> is the <code>ZkSecretKey</code> used on the network. The corresponding public key is derived exactly as the <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#zero-knowledge-signature-scheme-zksignature">Mantle specification</a> prescribes, with Poseidon2 in compression mode and the <code>KDF</code> DST:</p>
+<pre><code class="language-python">public_key = zkhash(FiniteField(b"KDF", byte_order="little", modulus=p), k_logos)  # compression mode
+</code></pre>
+<p>This wallet-side step is not part of any circuit, so the DST costs nothing in proving time while preventing <span class="math-inline" data-tex="k_{\text{logos}}"></span> from colliding with any other Poseidon2 output computed over the same field elements. Only the <code>KDF</code> derivation of the public key is evaluated inside proofs, and it hashes a single field element thanks to this compression.</p>
 <p><strong>Why not use Poseidon2 for the full derivation?</strong> While Poseidon2 is optimized for ZK circuits, its long-term stability and parameterization are still evolving. General-purpose hash functions like Blake2b offer a more stable and audited base layer. By introducing Poseidon2 only at the last compression step we isolate ZK-dependencies from the rest of the key derivation path. This ensures the wallet hierarchy remains valid even if Poseidon2 parameters are updated.</p>
 <h1 id="references-56"><a class="header" href="#references-56">References</a></h1>
 <p><a href="https://zips.z.cash/zip-0032">ZIP 32: Shielded Hierarchical Deterministic Wallets</a></p>
