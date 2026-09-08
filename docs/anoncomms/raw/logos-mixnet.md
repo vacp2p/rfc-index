@@ -37,7 +37,7 @@ are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/
 
 This document uses the terms defined in [LIBP2P-MIX](https://lip.logos.co/anoncomms/raw/mix.html),
 [Mix DoS Protection](https://lip.logos.co/anoncomms/raw/mix-dos-protection.html), and
-[Mix RLN DoS Protection](https://lip.logos.co/anoncomms/raw/mix-spam-protection-rln.html).
+[Mix RLN DoS Protection](https://lip.logos.co/anoncomms/raw/mix-dos-protection-rln.html).
 
 ## Protocol Composition
 
@@ -133,7 +133,7 @@ The Logos Mixnet MUST use DoS protection as defined in [Mix DoS Protection](http
 ### Architecture
 
 Nodes MUST use the per-hop generated proof architecture ([Mix DoS Protection §4.2](https://lip.logos.co/anoncomms/raw/mix-dos-protection.html#42-per-hop-generated-proofs)).
-Nodes MUST use Rate Limiting Nullifiers (RLN) as the proof mechanism, as defined in [Mix RLN DoS Protection](https://lip.logos.co/anoncomms/raw/mix-spam-protection-rln.html).
+Nodes MUST use Rate Limiting Nullifiers (RLN) as the proof mechanism, as defined in [Mix RLN DoS Protection](https://lip.logos.co/anoncomms/raw/mix-dos-protection-rln.html).
 
 Each node MUST have an RLN membership to send or to forward messages.
 Each node in the path MUST verify the incoming RLN proof before Sphinx packet processing.
@@ -161,7 +161,7 @@ This section will define the registration blockchain, the membership contract, t
 ### Coordination Layer
 
 Intermediary nodes and exit nodes MUST participate in the coordination layer
-([Mix RLN DoS Protection, Coordination Layer](https://lip.logos.co/anoncomms/raw/mix-spam-protection-rln.html#coordination-layer)).
+([Mix RLN DoS Protection, Coordination Layer](https://lip.logos.co/anoncomms/raw/mix-dos-protection-rln.html#coordination-layer)).
 
 The Logos Mixnet MUST use [RLN Relay](https://lip.logos.co/messaging/core/draft/17/rln-relay.html) for its coordination layer.
 Nodes MUST send and receive messaging metadata on the content topic `TBD`,
@@ -215,7 +215,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [LIBP2P-MIX](https://lip.logos.co/anoncomms/raw/mix.html)
 - [LIONESS-PAYLOAD-ENCRYPTION-FOR-MIX](https://lip.logos.co/anoncomms/raw/mix-lioness.html)
 - [Mix DoS Protection](https://lip.logos.co/anoncomms/raw/mix-dos-protection.html)
-- [Mix RLN DoS Protection](https://lip.logos.co/anoncomms/raw/mix-spam-protection-rln.html)
+- [Mix RLN DoS Protection](https://lip.logos.co/anoncomms/raw/mix-dos-protection-rln.html)
 - [Mix Cover Traffic](https://lip.logos.co/anoncomms/raw/mix-cover-traffic.html)
 - [Logos Service Discovery](https://lip.logos.co/anoncomms/raw/logos-service-discovery.html)
 - [Extensible Peer Records](https://lip.logos.co/anoncomms/raw/extensible-peer-records.html)
