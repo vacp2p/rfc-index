@@ -31,6 +31,7 @@
 | 1.5.1 | [RFC] One canonical encoding for `ServiceType` and `Locator`: pin `Locator` bytes to the multiaddr binary form | 2026-08-14 |
 | 1.6.0 | Added the `Parent` of the `ChannelConfig` to follow Mantle | 2026-08-27 |
 | 1.6.1 | Renamed the `LockedNoteId` production of the SDP Operations into `ServiceNoteId` | 2026-08-27 |
+| 1.7.0 | Added the `ClaimPowReward` Operation payload and the empty `NoOpProof` it carries | 2026-09-08 |
 
 # Introduction
 
@@ -74,7 +75,8 @@ OpPayload = Transfer /
             SDPDeclare /
             SDPWithdraw /
             SDPActive /
-            LeaderClaim 
+            LeaderClaim /
+            ClaimPowReward
 ```
 
 ### Channel Operations
@@ -136,6 +138,14 @@ VoucherNullifier = FieldElement
 PublicKey        = ZkPublicKey
 ```
 
+### Proof of work operations
+
+```schema
+ClaimPowReward = EpochNonce BlockHash PublicKey
+EpochNonce     = FieldElement ; the epoch nonce the solution was found against
+BlockHash      = Hash32       ; recent canonical block the solution is anchored to
+```
+
 ### Transfer Operations
 
 ```schema
@@ -165,13 +175,15 @@ OpProof   = Ed25519SigProof /
             ZkSigProof /
             ZkAndEd25519SigsProof /
             ChannelWithdrawOpProof /
-            ProofOfClaimProof
+            ProofOfClaimProof /
+            NoOpProof
 
 Ed25519SigProof         = Ed25519Signature
 ZkSigProof              = ZkSignature
 ZkAndEd25519SigsProof   = ZkSignature Ed25519Signature
 ChannelWithdrawOpProof  = SignatureCount *Ed25519Signature
 ProofOfClaimProof       = Groth16
+NoOpProof               = 0BYTE          ; the Operation carries no proof
 
 SignatureCount = UINT16
 ```

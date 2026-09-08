@@ -28,7 +28,7 @@
 | 1.0.1 | Remove the protection against adaptive adversary from PoL. It impacts the PoL section of PoQ. Update the performance according to the new circuit. Remove old project name from DSTs | 2026-04-09 |
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.2.0 | Add the proof of work branch: third selector value, `pow_quota` and `pow_blend_difficulty` public inputs, `pow_sk` witness, Lagrange branch selection, and the binding and precomputation properties | 2026-08-31 |
-| 1.3.0 | Replace the proof of work secret key and its key derivation with a single private nonce, and give the puzzle ticket a domain separation tag | 2026-09-04 |
+| 1.3.0 | Replace the proof of work secret key and its key derivation with a single private nonce, and give the puzzle ticket a domain separation tag | 2026-09-08 |
 
 
 # Introduction
@@ -282,6 +282,6 @@ The material used for the benchmarks is the following:
 
 ![Diagram](proof-of-quota/assets/2e9261aa-09df-8023-91a7-e7f6c11c4056.png)
 
-The figure above measures the two branch circuit. The three branch circuit in its earlier, key-based form compiled to 20590 R1CS constraints. The nonce form removes the branch's key derivation and adds a domain separation constant, so its count is lower; it has not been re-measured, and the published figure should be read as an upper bound for the current circuit.
+The figure above measures the two branch circuit. The three branch circuit specified here is release v0.5.6 of the circuits repository, whose proving key holds 20123 R1CS constraints; its earlier key-based form compiled to 20590.
 
 A like for like proving time comparison against the figure above has not been produced: the measurements taken of the three branch circuit used a different statistic, sample count and thread range, so no conclusion about the change in proving time should be drawn from placing them side by side. The proof of work branch also has no benchmark of its own — the published measurements exercise the core and leadership branches only. Since all three branches are evaluated for every proof regardless of which one is selected, per proof cost is not expected to differ by branch, but this has not been measured.
