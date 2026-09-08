@@ -99,7 +99,7 @@ To have a **truly privacy-preserving system, we need to apply both techniques si
 ## Networking
 
 - *Blending* is an operation of cryptographically transforming and randomly delaying messages. This shuffles the temporal order of incoming and outgoing messages so that they cannot be linked back to the sender based on the network statistical analysis or message content inspection. The key difference between blending and mixing (as defined in mixnets) is in the source of the anonymity. In mixing, the anonymity comes from processing multiple messages by the same node, while in blending the anonymity comes from processing the same message by multiple nodes.
-- *Broadcasting* is the process of sending a data message payload (a block proposal or a transaction) to all Logos Blockchain nodes.
+- *Broadcasting* is the process of sending a block proposal extracted from a data message to all Logos Blockchain nodes.
 - *Disseminating* is the process of relaying messages by core nodes through the network to edge and core nodes.
 - *Communication failure* is an event when a message that is disseminated through the network is not finally broadcast. The communication failure might be due to lazy, malicious, or unresponsive nodes.
 - *Anonymity failure* is an event when an adversary can link the sender to the broadcast message.
@@ -225,14 +225,15 @@ A message is relayed according to the following logic.
 
 3. **Else,** the message is discarded as the node cannot process the message. Note that the message was previously relayed according to the [Relaying](#relaying) logic.
 4. After $`k-1`$ decryptions, the last node can determine the type of the message by examining the payload $`p`$:
-1. If the payload contains a block proposal or a transaction, then it is broadcast to the entire Logos Blockchain network;
-2. Otherwise, the message is discarded.
+1. If the payload contains a block proposal, then it is broadcast to the entire Logos Blockchain network;
+2. If the payload contains a transaction, then it is submitted to the node's mempool;
+3. Otherwise, the message is discarded.
 
 ### Broadcasting
 
-Broadcasting is a process of delivering the content extracted from a data message — a block proposal or a transaction — to the entire Logos Blockchain network by the core node that received it. Only content that is constructed correctly can be broadcast. Any badly constructed content must be rejected. The logic behind the verification of the content is out of the scope of the Blend protocol. It is defined by the Logos Blockchain Bedrock ([\[Overview\] Bedrock Architecture](bedrock-architecture-overview.md)).
+Broadcasting is a process of delivering a block proposal extracted from a data message to the entire Logos Blockchain network by the core node that received it. Only content that is constructed correctly can be broadcast. Any badly constructed content must be rejected. The logic behind the verification of the content is out of the scope of the Blend protocol. It is defined by the Logos Blockchain Bedrock ([\[Overview\] Bedrock Architecture](bedrock-architecture-overview.md)).
 
-A transaction is additionally submitted to the mempool of the broadcasting node, so that it can be included in a block. Broadcasting alone would deliver it to the network but would not make it available to the node that received it for block building.
+A transaction extracted from a data message is not broadcast by this protocol. It is submitted to the mempool of the node that received it, and the mempool disseminates it as its own rules specify.
 
 ## Rewarding
 
@@ -249,7 +250,7 @@ We address the above motivations in the following manner:
 
 1. Cover message **generation** is motivated by the node’s individual need for privacy.
   - The node must generate and emit cover messages to keep itself private. Otherwise, it will lose the protection given by the protocol.
-  - The node must also limit the number of cover messages to generate to be indistinguishable from all other nodes. That is, for every data message a node generates it must generate one less cover message; otherwise the node could be distinguished from other nodes based on the number of emitted messages.
+  - The node must also limit the number of cover messages to generate to be indistinguishable from all other nodes. That is, for every block proposal a node generates it must generate one less cover message; otherwise the node could be distinguished from other nodes based on the number of emitted messages.
 
 2. Message **relaying** is motivated by monitoring the connection quality with the node by its neighbors.
   - The node must relay messages according to a network-defined limit. Otherwise, the neighbors will close the connection with the node. This will lead to a network-level isolation of that node, and if the node is isolated, it will not receive any messages to process, so it will earn no rewards.
@@ -411,7 +412,7 @@ Every message that passes Relaying verification is processed as follows:
     2. Information is extracted from the message and saved as proof of processing a blending token and is used to claim rewards.
     3. If the *last flag* of the decrypted *blending header* is turned on, **the message is completely decapsulated.** The *payload* can then be processed according to the [Payload Formatting](payload-formatting.md):
         1. If the type is a block proposal, add the payload to the broadcasting queue.
-        2. If the type is a transaction, add the payload to the mempool and to the broadcasting queue.
+        2. If the type is a transaction, submit the payload to the mempool; a payload that does not parse as a transaction is discarded.
         3. If the type is a cover message, discard the payload.
     4. Otherwise, examine the decapsulated header:
         1. Verify the proof of quota is valid; if not, discard the message.
@@ -428,8 +429,8 @@ For a complete description of the processing logic, refer to [Processing](#proce
 
 Every payload that is added to the broadcasting queue is processed as follows:
 
-1. The payload is checked to be structurally well formed for its declared type: it must parse as a block proposal or as a transaction. A payload that fails this check is discarded. Whether the parsed content is *valid* — whether the proposal or the transaction would be accepted — is not evaluated here; that judgement belongs to the consensus and mempool logic the content is handed to in the next step.
-2. The content is extracted from the payload and is broadcasted to the Logos Blockchain broadcasting channel after a random delay. A transaction is additionally submitted to the node's mempool.
+1. The payload is checked to be structurally well formed: it must parse as a block proposal. A payload that fails this check is discarded. Whether the parsed proposal is *valid* is not evaluated here; that judgement belongs to the consensus logic the proposal is handed to in the next step.
+2. The proposal is extracted from the payload and is broadcasted to the Logos Blockchain broadcasting channel after a random delay.
 
 For a complete description of the processing logic, refer to [Broadcasting](#broadcasting).
 
@@ -913,7 +914,7 @@ When a message $`\mathbf M`$ has passed the [Relaying](#relaying) checks, it is 
 
     3. If the last flag is set ($`\Omega == 1`$) then examine the header type of the payload as defined in the [Payload Formatting](payload-formatting.md), then:
         1. If the payload is a block proposal, then the payload structure is verified and broadcast, as defined in the [Broadcasting](#broadcasting) section.
-        2. If the payload is a transaction, then the payload structure is verified, the transaction is submitted to the node's mempool, and it is broadcast as defined in the [Broadcasting](#broadcasting) section. As with a block proposal, only the structure is checked here; whether the transaction is valid against the ledger is decided by Mantle and is out of scope for this protocol. A transaction must fit within the fixed payload body defined in [Payload Formatting](payload-formatting.md), so one that does not is not sendable over this protocol at all.
+        2. If the payload is a transaction, then the payload structure is verified and the transaction is submitted to the node's mempool, which disseminates it as its own rules specify. As with a block proposal, only the structure is checked here; whether the transaction is valid against the ledger is decided by Mantle and is out of scope for this protocol. A transaction must fit within the fixed payload body defined in [Payload Formatting](payload-formatting.md), so one that does not is not sendable over this protocol at all.
         3. If the payload is a cover message, then the payload is discarded.
 
     4. Else:
@@ -957,7 +958,7 @@ The process of releasing messages involves the following steps:
 - Upon **receiving** a message, it is immediately released to all neighboring.
 - All **processed** messages are queued and released at the next release round determined by the [Delaying](#delaying) logic.
 - Every **generated** message is released at the beginning of the next round after its generation.
-- As soon as a **data** message is generated, one random unreleased (future) **cover** message must be removed from the release schedule to maintain the node’s statistical indistinguishability.
+- As soon as a **data** message carrying a block proposal is generated, one random unreleased (future) **cover** message must be removed from the release schedule to maintain the node’s statistical indistinguishability. A data message carrying a transaction removes no cover message.
 - If more than one message needs to be released for the same round, they must be randomly shuffled before release.
 
 The cover and data message generation processes are **independent**, and there is a non-zero probability that more than one message will be scheduled for the same round. Therefore, the number of messages that can be released during a single round is **not restricted**.
@@ -999,8 +1000,8 @@ We use the $`\mu`$ estimator for calculating the maximum and minimum number of m
 
 Every payload that is added to the broadcasting queue is processed as follows:
 
-1. The content — a block proposal or a transaction — is extracted from the payload.
-2. The content is sent to a Logos Blockchain broadcasting channel after a random delay, as defined in the [Releasing](#releasing) section.
+1. The block proposal is extracted from the payload.
+2. The block proposal is sent to a Logos Blockchain broadcasting channel after a random delay, as defined in the [Releasing](#releasing) section.
 
 The broadcasting happens through an independent protocol. All Logos Blockchain nodes form the broadcasting network, which means that it is larger than the blend network.
 

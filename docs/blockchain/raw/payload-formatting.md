@@ -69,7 +69,7 @@ We define the following values of the `body_type`:
 
 Any other value of type means that the message was not decapsulated correctly and must be discarded.
 
-The `body_type` determines where the content is delivered once a message is fully decapsulated, as defined in the [Blend Protocol](blend-protocol.md#processing): a block proposal is broadcast, and a transaction is both submitted to the node's mempool and broadcast.
+The `body_type` determines where the content is delivered once a message is fully decapsulated, as defined in the [Blend Protocol](blend-protocol.md#processing): a block proposal is broadcast, and a transaction is submitted to the node's mempool.
 
 The set of values above is therefore closed: a node that does not know a value drops the message rather than ignoring the field. Introducing a new `body_type` is a change to what the network accepts, not only to how a payload is encoded, and nodes must recognise a value before any node emits it.
 
