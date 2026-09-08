@@ -32,8 +32,8 @@
 | 1.6.0 | Added the `Parent` of the `ChannelConfig` to follow Mantle | 2026-08-27 |
 | 1.6.1 | Renamed the `LockedNoteId` production of the SDP Operations into `ServiceNoteId` | 2026-08-27 |
 | 1.7.0 | Added the `ChannelConfigOpProof` and `ChannelTransferOpProof` variants and factored the three channel threshold proofs into `ChannelMultiSigProof`, carrying the index of the signing key alongside each signature | 2026-08-31 |
+| 1.8.0 | [RFC] Dual-key notes: `Note`, `LeaderClaim` and `SDPDeclare` carry a `StarkPublicKey`; new `StarkPublicKey` common structure | 2026-09-07 |
 
-| 1.7.0 | [RFC] Dual-key notes: `Note`, `LeaderClaim` and `SDPDeclare` carry a `StarkPublicKey`; new `StarkPublicKey` common structure | 2026-09-07 |
 # Introduction
 
 This document specifies the canonical encoding of Mantle transactions (see [Mantle - Mantle Transaction](bedrock-v1.1-mantle-specification.md)) and its sub-components. Transactions sent through the mempool and included in blocks use this encoding.
@@ -156,26 +156,6 @@ Note   = Value ZkPublicKey StarkPublicKey
 Value  = UINT64
 NoteId = FieldElement
 ```
-
-## Post-Transition Layout
-
-From the first block of `TRANSITION_EPOCH` ([Mantle - Proof-System Transition](bedrock-v1.1-mantle-specification.md#proof-system-transition)) the productions below replace the ones of the same name above; every other production is unchanged. The BN254 key disappears from the wire and a `NoteId` becomes a `starkhash` digest.
-
-```schema
-Note        = Value StarkPublicKey
-NoteId      = StarkDigest
-LeaderClaim = RewardsRoot VoucherNullifier StarkPublicKey
-SDPDeclare  = ServiceType Locators ProviderId StarkZkId ServiceNoteId
-SDPActive   = StarkZkId Nonce Metadata   ; the declaration is addressed by its STARK-field identity
-SDPWithdraw = StarkZkId Nonce            ; (shape follows [RFC] SDP Declarations Are Keyed by zk_id)
-
-StarkDigest = 4GoldilocksElement ; starkhash output, 32 bytes
-ZkSignature       = StarkProof
-ProofOfClaimProof = StarkProof
-StarkProof        = UINT32 *BYTE ; length-prefixed proof bytes; format defined by the zk-path transition document
-```
-
-`RewardsRoot` and `VoucherNullifier` keep their 32-byte width; whether they are read as a BN254 field element (a claim against the legacy voucher tree) or as a `StarkDigest` follows the Proof of Claim variant, as the transition document specifies.
 
 ## Op Proofs
 

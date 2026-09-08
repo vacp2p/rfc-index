@@ -27,7 +27,6 @@
 | 1.0.0 | Initial revision. | 2026-12-09 |
 | 1.1.0 | Remove the protection against adaptive adversary from PoL removing a non-enforced feature, simplifying work for engineers, improving UX and performances of PoL and PoQ. Update the performance according to the new circuit. Remove the notion of NOMOS in DSTs | 2026-01-29 |
 | 1.1.1 | Introduced a discussion for when the value of a participating note is way higher than the total estimated stake | 2026-06-24 |
-
 | 1.2.0 | [RFC] Dual-key notes: the note's STARK-field public key is a private input and enters the note identifier derivation | 2026-09-07 |
 # Introduction
 
@@ -185,8 +184,6 @@ The proof confirms the following relations:
 
 6. The check that indeed $`ticket \lt t`$.
 7. Compute and output the entropy contribution $`\rho_{LEAD} := \text{hash}(\text{NONCE\_CONTRIB\_V1} || sl||noteID||sk)`$
-
-After the proof-system transition ([Mantle - Proof-System Transition](bedrock-v1.1-mantle-specification.md#proof-system-transition)) the same statement is proven in the STARK-based system with the STARK-field objects: the secret is $`sk_{stark}`$, the public key derivation and the note identifier (constraints 1 and 2) are the `starkhash` derivations of that section, the Merkle trees use `starkhash_compress`, and the ticket and entropy hashes (constraints 4 and 7) move to `starkhash` with `STARK_LEAD_V1` and `STARK_NONCE_CONTRIB_V1` tags. The aged and latest roots a post-transition proof refers to are the re-keyed roots, so eligibility is unchanged across the transition.
 
 # Linking the Proof of Leadership to a Block
 

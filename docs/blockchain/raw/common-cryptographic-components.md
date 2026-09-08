@@ -25,8 +25,7 @@
 | 1.0.1 | Renamed Nomos to Logos Blockchain | 2026-04-23 |
 | 1.0.2 | Clarification of the Poseidon2 function Add test values | 2026-05-07 |
 | 1.1.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
-
-| 1.1.0 | [RFC] Dual-key notes: added Rescue-Prime Optimized over the Goldilocks field as the STARK-field hash function (`starkhash`) | 2026-09-07 |
+| 1.2.0 | [RFC] Dual-key notes: added Rescue-Prime Optimized over the Goldilocks field as the STARK-field hash function (`starkhash`) | 2026-09-07 |
 # Introduction
 
 The Logos Blockchain relies on a variety of cryptographic primitives to ensure security, privacy, and verifiability across its components. This document defines the common cryptographic building blocks used throughout the Logos Blockchain design.
@@ -183,12 +182,12 @@ Technical Details:
 - Structure: sponge over a state of $`m = 12`$ field elements, with capacity $`c = 4`$ (positions 0–3) and rate $`r = 8`$ (positions 4–11).
 - Rounds: 7. Each round is an MDS matrix multiplication, a round-constant addition, the S-box $`x \mapsto x^{7}`$ on every state element, a second MDS multiplication, a second round-constant addition and the inverse S-box $`x \mapsto x^{1/7}`$. The exponent 7 is the smallest integer coprime with $`q - 1`$.
 - Digest: the four rate elements at positions 4–7, i.e. 256 bits.
-- Security level: 128 bits (collision and preimage), as claimed by the RPO specification for these parameters.
+- Security level: 128 bits classical (collision and preimage), as claimed by the RPO specification for these parameters. Against a quantum adversary the generic bounds of a 256-bit digest apply: $`2^{128}`$ for preimage (Grover) and $`2^{85}`$ for collision (BHT, with a matching quantum-memory requirement that makes it impractical); no quantum speed-up of the algebraic attacks on the Rescue family is known.
 - MDS matrix and round constants: those fixed by the RPO specification for $`(m, c) = (12, 4)`$ at the 128-bit level; they are not restated here and MUST be taken from the specification or from a reference implementation that reproduces its test vectors.
 
 Use in the Logos Blockchain:
 
-RPO is the hash function of the STARK-field keys: the `stark_public_key` of a `Note` ([Mantle - Notes](bedrock-v1.1-mantle-specification.md#notes)) and the `stark_zk_id` of a service declaration ([Service Declaration Protocol](bedrock-service-declaration-protocol.md#declaration-storage)) are RPO digests, derived as the [Wallet Technical Standard](wallet-technical-standard.md#stark-field-key-derivation) specifies. Before the proof-system transition no circuit evaluates RPO; wallets compute it when deriving keys and nodes only parse its digests. Throughout the Logos Blockchain specifications RPO is referred to as `starkhash`.
+RPO is the hash function of the STARK-field keys: the `stark_public_key` of a `Note` ([Mantle - Notes](bedrock-v1.1-mantle-specification.md#notes)) and the `stark_zk_id` of a service declaration ([Service Declaration Protocol](bedrock-service-declaration-protocol.md#declaration-storage)) are RPO digests, derived as the [Wallet Technical Standard](wallet-technical-standard.md#stark-field-key-derivation) specifies. No circuit evaluates RPO; wallets compute it when deriving keys and nodes only parse its digests. Throughout the Logos Blockchain specifications RPO is referred to as `starkhash`.
 
 `starkhash` takes a list of Goldilocks field elements and returns four:
 
@@ -199,17 +198,19 @@ RPO is the hash function of the STARK-field keys: the `stark_public_key` of a `N
 
 This is the `hash_elements` procedure of the RPO specification and of its reference implementations.
 
-Domain separation tags are byte strings (ASCII by convention) converted to field elements as follows: the string is zero-padded on the right to a multiple of 8 bytes and every 8-byte block is read as a little-endian unsigned integer. The most significant byte of an ASCII block is below `0x80`, so every value is below $`2^{63} \lt q`$ and canonical. The elements of the DST are the first inputs of `starkhash`; the notation `DST(b"...")` in the specifications stands for this conversion. Every tag used under `starkhash` carries the `STARK_` prefix (`STARK_KDF_V1`, `STARK_NOTE_ID_V1`, …) and its own version counter, so a tag never names the same derivation under two hash functions.
+Domain separation tags are byte strings (ASCII by convention) converted to field elements by `dst_elements`: the string is zero-padded on the right to a multiple of 8 bytes and every 8-byte block is read as a little-endian unsigned integer. The most significant byte of an ASCII block is below `0x80`, so every value is below $`2^{63} \lt q`$ and canonical. The elements of the tag are the first inputs of `starkhash`. Every tag used under `starkhash` carries the `STARK_` prefix and its own `_V1` suffix (`STARK_KDF_V1`, `STARK_WALLET_SK_V1`).
+
+```python
+def dst_elements(tag: bytes) -> list[GoldilocksElement]:
+    tag = tag + b"\x00" * (-len(tag) % 8)
+    return [int.from_bytes(tag[i:i + 8], "little") for i in range(0, len(tag), 8)]
+```
 
 Bytes and Goldilocks elements are converted as follows: an element is serialized as 8 bytes little-endian, and 8 bytes are a valid element only if their value is strictly smaller than $`q`$ (canonical form). A `StarkPublicKey` ([Mantle Transaction Encoding](mantle-transaction-encoding.md#common-structures)) is the 32-byte serialization of a four-element digest, and every rule that parses one rejects a non-canonical element.
 
-Integers and classical hash digests become Goldilocks elements without any reduction: `elements_u64(x)` is the pair $`(x \bmod 2^{32},\ \lfloor x / 2^{32} \rfloor)`$, and `elements_hash(h)` for a 32-byte digest is its eight 32-bit little-endian words in order. Every such element is below $`2^{32} \lt q`$, so the encoding is canonical and injective, and unlike a reduction modulo $`q`$ it loses no bits.
-
-`starkhash_compress(a, b)`, for two four-element digests, is `starkhash(a_0, …, a_3, b_0, …, b_3)`: the eight elements fill exactly one rate block, so it costs one permutation. It is the node function of every Merkle tree over Goldilocks digests after the proof-system transition ([Mantle - Proof-System Transition](bedrock-v1.1-mantle-specification.md#proof-system-transition)), with four zero elements as the empty leaf.
-
 Rationale for Use:
 
-- Native to the Goldilocks field of the STARK-based proof system the protocol is moving to, so a key derived today is provable natively after the transition, without emulating a foreign field inside a circuit.
+- Native to the Goldilocks field of STARK-based proof systems, so a key derived today can be proven natively in one, without emulating a foreign field inside a circuit.
 - Rescue-family designs need few rounds, which is what STARK proving cost tracks; RPO fixes concrete parameters with public reference implementations and test vectors.
 - A four-element digest is 256 bits, the size of a `ZkPublicKey`, so a STARK-field key costs the same 32 bytes on the wire and in the ledger.
 
@@ -217,7 +218,7 @@ Security Considerations:
 
 - The 128-bit claim rests on the algebraic cryptanalysis of the Rescue family (Gröbner basis and interpolation attacks); RPO includes a security margin above the minimal round count and remains under analysis in the STARK ecosystem.
 - Keys derived with `starkhash` are hash-based: their security against a quantum adversary reduces to preimage resistance, exactly as for the Poseidon2-based keys.
-- The field and the hash are a protocol-wide commitment. Because notes commit to STARK-field keys from the start, changing either after the network launches would require the very key migration this construction exists to avoid; the choice must be made together with the proof-system roadmap.
+- The field and the hash are a protocol-wide commitment. Because notes commit to STARK-field keys from the start, changing either after the network launches would require a key migration; the choice must be made together with the proof-system roadmap.
 
 ## References
 

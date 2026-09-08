@@ -43,8 +43,8 @@
 | 1.11.1 | Renamed locked notes into service notes: `service_notes`, `ServiceNote` and `service_note_id` replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in | 2026-08-27 |
 | 1.12.0 | Specified the `SDP_ACTIVE` execution effects, matching the implementation: `active` is set to the epoch of the including block, and a message the activity logic rejects makes the Operation invalid. Set `withdraw_at` to `current_epoch + 2`, the epoch at which the node stops providing the service, and removed declarations at `withdraw_at` | 2026-09-02 |
 | 1.13.0 | Removed the `None` case of `op_proofs`, every Operation carrying exactly one proof. A `CHANNEL_CONFIG` creating a channel is verified against a threshold of `0` and its proof carries no signature and no index. Execution Gas is derived from the Operation and the state it is validated against, the thresholds pricing the channel Operations being the ones held in the channel state | 2026-08-31 |
+| 1.14.0 | [RFC] Dual-key notes: every `Note`, the `LEADER_CLAIM` output and the SDP declaration commit to a STARK-field public key next to the BN254 one; the `NoteId` binds both; canonical-form validation of the new key; test vectors regenerated | 2026-09-07 |
 
-| 1.12.0 | [RFC] Dual-key notes: every `Note`, the `LEADER_CLAIM` output and the SDP declaration commit to a STARK-field public key next to the BN254 one; the `NoteId` binds both; canonical-form validation of the new key; test vectors regenerated | 2026-09-07 |
 # Introduction
 
 Mantle is a foundational element of Bedrock, designed to provide a minimal and efficient execution layer that connects together Bedrock Services in order to provide the necessary functionality for Zones. It can be viewed as the system call interface of Bedrock, exposing a safe and constrained set of Operations to interact with lower-level Bedrock services, similar to syscalls in an operating system.
@@ -1134,7 +1134,7 @@ declarations: dict[NoteId, DeclarationInfo]
       assert declaration_id(declaration) not in declarations
       ```
 
-  3. Ensure the locators list is non-empty and has no more than 8 entries, and that the STARK-field identity is in canonical form ([Notes](#notes)).
+  3. Ensure the locators list is non-empty and has no more than 8 entries, and that `stark_zk_id` is in canonical form, i.e. each of its four Goldilocks elements is below $`q`$ ([Common Cryptographic Components](common-cryptographic-components.md#rescue-prime-optimized-stark-field-hash-function)).
       ```python
       assert len(declaration.locators) >= 1
       assert len(declaration.locators) <= 8
@@ -1715,11 +1715,11 @@ class Note:
     stark_public_key: StarkPublicKey  # 32 bytes, four Goldilocks field elements
 ```
 
-A note names its owner twice. `public_key` is the key every proof verifies today: it is derived with Poseidon2 over BN254 ([ZkSignature](#zero-knowledge-signature-scheme-zksignature)) and it is the key the ZkSignature, the [Proof of Leadership](cryptarchia-proof-of-leadership.md) and the [Proof of Quota](proof-of-quota.md) prove knowledge of. `stark_public_key` is the same owner's key in the field of the proof system the protocol will transition to: it is a digest of the [STARK-field hash](common-cryptographic-components.md#rescue-prime-optimized-stark-field-hash-function) over the Goldilocks field, derived as the [Wallet Technical Standard](wallet-technical-standard.md#stark-field-key-derivation) specifies.
+A note names its owner twice. `public_key` is the key every proof verifies today: it is derived with Poseidon2 over BN254 ([ZkSignature](#zero-knowledge-signature-scheme-zksignature)) and it is the key the ZkSignature, the [Proof of Leadership](cryptarchia-proof-of-leadership.md) and the [Proof of Quota](proof-of-quota.md) prove knowledge of. `stark_public_key` is the same owner's key over the Goldilocks field: it is a digest of the [STARK-field hash](common-cryptographic-components.md#rescue-prime-optimized-stark-field-hash-function) over the Goldilocks field, derived as the [Wallet Technical Standard](wallet-technical-standard.md#stark-field-key-derivation) specifies.
 
 A `StarkPublicKey` is the four-element digest of the STARK-field hash serialized as 32 bytes: four Goldilocks field elements, each 8 bytes little-endian, each strictly smaller than $`q = 2^{64} - 2^{32} + 1`$ (canonical form, see [Mantle Transaction Encoding](mantle-transaction-encoding.md#common-structures)).
 
-Before the proof-system transition no proof verifies `stark_public_key` and no rule reads it beyond its encoding: it is carried, and bound by the [Note Id](#note-id), so that at the transition ownership continues under the new key without any per-user migration ([Proof-System Transition](#proof-system-transition)). Nothing on the ledger proves that the two keys of a note belong to the same party; a wallet MUST treat a note as its own only when both keys are its own ([Wallet Technical Standard](wallet-technical-standard.md#stark-field-key-derivation)).
+No proof verifies `stark_public_key` and no rule reads it beyond its encoding: it is carried, and bound by the [Note Id](#note-id), so that every note already commits to a key native to a STARK-field proof system. Nothing on the ledger proves that the two keys of a note belong to the same party; a wallet MUST treat a note as its own only when both keys are its own ([Wallet Technical Standard](wallet-technical-standard.md#stark-field-key-derivation)).
 
 ### Note Id
 
@@ -1734,23 +1734,19 @@ def derive_op_id(operation: Op) -> Hash:
     return h.digest()
 
 def derive_note_id(op_id: Hash, output_number: int, note: Note) -> NoteId:
-    g = note.stark_public_key.elements()  # four Goldilocks elements g[0..3], each < 2**64
+    spk = note.stark_public_key.elements()  # the four Goldilocks elements of the key, canonical (each < q)
     return zkhash(
         FiniteField(b"NOTE_ID_V1", byte_order="little", modulus= p),
         FiniteField(op_id, byte_order="little", modulus= p),
         FiniteField(output_number, byte_order="little", modulus= p),
         FiniteField(note.value, byte_order="little", modulus= p),
         note.public_key,
-        FiniteField(g[0] + g[1] * 2**64, byte_order="little", modulus= p),  # new
-        FiniteField(g[2] + g[3] * 2**64, byte_order="little", modulus= p),  # new
+        FiniteField(spk[0] + spk[1] * 2**64, byte_order="little", modulus= p),  # new
+        FiniteField(spk[2] + spk[3] * 2**64, byte_order="little", modulus= p),  # new
     )
 ```
 
-The STARK-field public key enters the derivation as two field elements: the four 64-bit Goldilocks elements are packed in pairs, $`g_0 + g_1 \cdot 2^{64}`$ and $`g_2 + g_3 \cdot 2^{64}`$. Each packed value is below $`2^{128} \lt p`$, so it is a canonical BN254 field element, and the packing is injective because every $`g_j`$ is in canonical form (below $`q \lt 2^{64}`$). The note identifier therefore commits to both keys: the owner of a note under either proof system is fixed when the note is created. The two-element extension keeps the `NOTE_ID_V1` tag: the sponge's 10* padding separates the seven-element preimage from the five-element one, so no identifier of the previous derivation can coincide with one of this derivation.
-
-The extension adds two absorbed elements, i.e. two Poseidon2 permutations, to every in-circuit derivation of a note identifier ([Proof of Leadership](cryptarchia-proof-of-leadership.md#circuit-constraints), [Proof of Quota](proof-of-quota.md#witness)). The [ZkSignature](#zero-knowledge-signature-scheme-zksignature) does not derive note identifiers and is unchanged.
-
-After the proof-system transition the note identifier is derived with the STARK-field hash over the same `(op_id, output_number, value, stark_public_key)` and the `public_key` field is dropped; nodes re-key the note set and every ledger Merkle tree from the new identifiers. The derivation, the re-keying procedure and the carry-over of note ageing are specified in [Proof-System Transition](#proof-system-transition).
+The STARK-field public key enters the derivation as two field elements, its four Goldilocks elements packed in pairs. Each packed value is below $`2^{128} \lt p`$ and the packing is injective because the elements are canonical, so the note identifier commits to both keys.
 
 `op_id` is a classical 256-bit hash digest and must be reduced to a field element before being passed to the ZkHasher. We apply a direct modular reduction mod `p` (via `FiniteField(..., modulus=p)`). Since $`p \approx2^{-254}`$, the reduction is slightly non-uniform, values in $`[0, 2^{256} \mod p)`$ appear one extra time, but this is inconsequential in practice: the collision probability remains around $`2^{-254}`$, and `NoteId` uniqueness is not derived from uniformity of `op_id` over $`𝔽_p`$ but from the collision-resistance of the underlying hash and per-operation payload uniqueness.
 
@@ -1809,10 +1805,10 @@ class Ledger:
         for note in outputs:
             assert note.value > 0
             assert note.value <= 2**64-1
-            assert note.stark_public_key.is_canonical()  # every Goldilocks element < 2**64 - 2**32 + 1
+            assert note.stark_public_key.is_canonical()  # every Goldilocks element < q, see Common Cryptographic Components
 ```
 
-The canonical-form check makes the byte encoding of `stark_public_key` unique, so the [Note Id](#note-id) commits to exactly one byte string per key and a serialized note round-trips. No other validation rule reads the field before the proof-system transition.
+The canonical-form check ([Common Cryptographic Components](common-cryptographic-components.md#rescue-prime-optimized-stark-field-hash-function)) makes the byte encoding of `stark_public_key` unique, so the [Note Id](#note-id) commits to exactly one byte string per key and a serialized note round-trips. No other validation rule reads the field.
 
 ### Consuming Input Notes Execution
 
@@ -1842,71 +1838,6 @@ class Ledger:
             if channel_id is not None:
                 ledger.channel_notes[output_note_id] = channel_id
 ```
-
-## Proof-System Transition
-
-This section specifies what happens to notes, note identifiers and zero-knowledge identities when the hand-written circuits move from Groth16 over BN254 to a STARK-based proof system over the Goldilocks field. It covers everything that follows from the two keys a note carries: the post-transition derivations, the re-keying of the ledger, and what is retained for legacy claims. The proof system itself (the full circuit statements beyond the derivations below, proof serialization and size, verification cost, retirement of the trusted setup) is specified by the zk-path transition document, which this section is written to be consistent with.
-
-### Transition point
-
-The transition is fixed by a protocol parameter `TRANSITION_EPOCH`, an `EpochNumber`. Blocks of slots before the first slot of `TRANSITION_EPOCH` follow the pre-transition rules of this specification; blocks from that slot on follow the post-transition rules below. The parameter MUST be announced at least `TRANSITION_NOTICE_EPOCHS` epochs in advance so that wallets and leaders can prepare (value fixed by the transition document). If the transition takes place before the network launches, the post-transition rules are simply the rules at genesis and the re-keying below is empty.
-
-### Post-transition derivations
-
-**Keys.** The owner of a note is its `stark_public_key`; the `public_key` field is dropped from notes, from the `LEADER_CLAIM` payload and from declarations ([Mantle Transaction Encoding](mantle-transaction-encoding.md#post-transition-layout)). The key derivation is the one wallets already perform, `stark_public_key = starkhash(DST(b"STARK_KDF_V1"), *sk_stark)` ([Wallet Technical Standard](wallet-technical-standard.md#stark-field-key-derivation)), and the `StarkSecretKey` is the four-element `sk_stark`.
-
-**Note identifier.** The same function derives the identifier of every note, whether re-keyed at the transition or created after it:
-
-```python
-def derive_note_id_v2(op_id: Hash, output_number: int, note: Note) -> NoteId:
-    return starkhash(
-        DST(b"STARK_NOTE_ID_V1"),                 # 2 elements
-        *elements_hash(op_id),              # 8 elements of 32 bits each
-        *elements_u64(output_number),       # 2 elements
-        *elements_u64(note.value),          # 2 elements
-        *note.stark_public_key.elements(),  # 4 elements
-    )
-```
-
-`elements_hash` and `elements_u64` are the canonical Goldilocks encodings of a 256-bit digest and of a 64-bit integer ([Common Cryptographic Components](common-cryptographic-components.md#rescue-prime-optimized-stark-field-hash-function)); none of them reduces modulo the field, so the preimage is injective. A post-transition `NoteId` is a four-element digest (32 bytes). `op_id` keeps its definition: it is a BLAKE2b digest of the Operation and does not depend on the proof system.
-
-**Merkle trees.** Every tree over identifiers (`ledger_AGED`, `ledger_LATEST`, the core-node tree of the [Proof of Quota](proof-of-quota.md)) uses `starkhash_compress` as its node function and four zero elements as the empty leaf; depths are unchanged.
-
-**ZkSignature.** The statement keeps its shape ([Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature)) with the STARK-field objects in place of the BN254 ones:
-
-```python
-class ZkSignaturePublic:
-    stark_public_keys: list[StarkPublicKey]  # len = 32, padded with the key of the zero secret
-    msg: list[GoldilocksElement]             # elements_hash(mantle_txhash), 8 elements
-
-class ZkSignatureWitness:
-    stark_secret_keys: list[StarkSecretKey]  # len = 32, four elements each
-
-assert all(
-    stark_public_keys[i] == starkhash(DST(b"STARK_KDF_V1"), *stark_secret_keys[i])
-    for i in range(32)
-)
-```
-
-**Other derivations.** The Proof of Leadership and Proof of Quota hashes that take the note secret key (lottery ticket, entropy contribution, selection randomness, key nullifier) move to `starkhash` under `STARK_`-prefixed domain separation tags with `sk_stark` as the secret; the reward voucher commitment and nullifier of vouchers created after the transition move to `starkhash` under `STARK_`-prefixed tags as well. Their statements are given in the transition document; nothing in this section depends on their exact form.
-
-### Re-keying at the transition
-
-Before validating the first block of `TRANSITION_EPOCH`, every node applies the following transformation to its state. Every step is a deterministic function of the ledger, so two honest nodes obtain identical state and identical roots.
-
-1. **Notes.** For every note in the ledger (unspent notes, channel notes and service notes alike), `new_id = derive_note_id_v2(op_id, output_number, value, stark_public_key)`, and the `public_key` field is removed. The derivation needs the `op_id` and `output_number` of every note; a node MUST keep them with the note, or reconstruct them from history, from the moment this specification applies.
-2. **Trees.** Every note tree that a post-transition proof may reference is re-keyed leaf-wise: `ledger_LATEST`, and every frozen `ledger_AGED` snapshot taken before the transition that a Proof of Leadership or Proof of Quota of `TRANSITION_EPOCH` or a later epoch refers to. Each leaf is replaced by the new identifier of the same note at the same index, and the root is recomputed with `starkhash_compress`. A node MUST retain the ordered leaf lists of those snapshots, not only their roots. Because the map is a bijection applied at fixed positions, membership is preserved: a note eligible in the aged snapshot stays eligible, and no note restarts ageing.
-3. **References.** `channel_notes`, `service_notes`, the `service_note_id` of every declaration, and every other state keyed by or pointing at a `NoteId` are re-keyed by the same map.
-4. **Declarations.** The `zk_id` field is dropped and `stark_zk_id` becomes the identity of the declaration: with declarations keyed by their zero-knowledge identity ([Service Declaration Protocol](bedrock-service-declaration-protocol.md#declaration-storage)), `declarations` is re-keyed from `zk_id` to `stark_zk_id`, every index that maps a `service_note_id` or a `provider_id` to a `zk_id` now maps it to the `stark_zk_id` of the same declaration, and `SDP_ACTIVE` / `SDP_WITHDRAW` address the declaration by `stark_zk_id` ([Mantle Transaction Encoding](mantle-transaction-encoding.md#post-transition-layout)). The core-node tree is rebuilt from the `stark_zk_id` values ordered as 256-bit little-endian integers ([Proof of Quota](proof-of-quota.md#constraints)).
-5. **Vouchers.** The reward voucher tree and the voucher nullifier set are not re-keyed: their leaves are commitments to secrets only the leaders know, so no node can recompute them. The pre-transition reward state is frozen instead. After the vouchers and the rewards of the last pre-transition epoch have been added ([Voucher creation and inclusion](bedrock-anonymous-leaders-reward.md#voucher-creation-and-inclusion), [Leaders Reward](bedrock-anonymous-leaders-reward.md#leaders-reward)), the node keeps the voucher root as `legacy_voucher_root`, the nullifier set as `legacy_voucher_nullifier_set` and the value of `leaders_rewards` as `legacy_leaders_rewards`; `leaders_rewards` restarts at zero, and vouchers created from the transition on go to a new `starkhash` tree with its own nullifier set. A legacy voucher is claimed with a `LEADER_CLAIM` whose Proof of Claim proves the pre-transition statement ([Proof of Claim](#proof-of-claim), Poseidon2 over BN254) inside the new proof system against `legacy_voucher_root`; the claim is checked against `legacy_voucher_nullifier_set` and paid from `legacy_leaders_rewards`, with the share formula of [Leaders Reward](bedrock-anonymous-leaders-reward.md#leaders-reward) applied to the legacy sets. Nodes MUST accept legacy claims until every legacy voucher is claimed, that is until the number of legacy voucher commitments equals the size of `legacy_voucher_nullifier_set`, or until `LEGACY_CLAIM_EPOCHS` epochs have passed since the transition, whichever comes first. At that point the legacy circuit, the legacy sets and the legacy pool are dropped, and any remainder of `legacy_leaders_rewards` is added to `leaders_rewards`. The circuit and the value of the parameter are fixed by the transition document.
-
-### Ownership after the transition
-
-Ownership follows `stark_public_key` uniformly. A note whose two keys were not set by the same party belongs, after the transition, to the holder of the STARK-field secret; the protocol neither detects nor special-cases such notes, and the wallet acceptance rule ([Wallet Technical Standard](wallet-technical-standard.md#stark-field-key-derivation)) is the protection. For a correctly formed note no user action is required: the wallet that received it already holds `sk_stark`, and its note keeps its identifier's place in every tree.
-
-### Legacy proofs
-
-From the first block of `TRANSITION_EPOCH` no Groth16 proof is accepted: not as a ZkSignature, a Proof of Leadership, a Proof of Quota or a Proof of Claim. Transactions in the mempool that carry such proofs are dropped and MUST be rebuilt by their wallets. The soundness of Groth16 rests on assumptions a quantum adversary breaks; the transition is the point at which the protocol stops relying on them, and accepting legacy proofs beyond it would reopen every note to forgery.
 
 # Appendix
 
@@ -1964,7 +1895,7 @@ Such that the following constraints hold:
 
   For implementation, the ZkSignature circuit will take a maximum of 32 public keys as inputs. To prove ownership of fewer keys, the remaining inputs will be padded with the public key corresponding to the secret key `0` and ignored during execution. The outputs have no size limit since they are included in the hashed message.
 
-  The ZkSignature proves knowledge of the BN254 secret key only. The `stark_public_key` a note carries ([Notes](#notes)) is not an input of this circuit and is not verified by any proof before the proof-system transition.
+  The ZkSignature proves knowledge of the BN254 secret key only. The `stark_public_key` a note carries ([Notes](#notes)) is not an input of this circuit and is not verified by any proof.
 
 ### Benchmark
 

@@ -33,8 +33,7 @@
 | 1.4.2 | Renamed locked notes into service notes: `locked_note_id` becomes `service_note_id` in the declaration and withdraw messages and in `DeclarationInfo` | 2026-08-27 |
 | 1.4.3 | Identifier uniqueness covers every stored declaration, not only activated ones, matching the implementation | 2026-09-01 |
 | 1.5.0 | Defined `active` as the epoch of the block that contained the latest accepted active message, initialised to `created + 2`, and `withdraw_at` as the epoch at which the node stops providing the service, matching the implementation. Added the participant-set exclusion rule and [Message Timing](#message-timing) | 2026-09-02 |
-
-| 1.5.0 | [RFC] Dual-key notes: `DeclarationMessage` and `DeclarationInfo` carry a `stark_zk_id`, bound to at most one declaration; the identity of a declaration moves to it at the proof-system transition | 2026-09-07 |
+| 1.6.0 | [RFC] Dual-key notes: `DeclarationMessage` and `DeclarationInfo` carry a `stark_zk_id`, the declaration's STARK-field zero-knowledge identity, bound to at most one declaration | 2026-09-07 |
 # Introduction
 
 This document defines a mechanism enabling validators to declare their participation in specific protocols that require a known and agreed-upon list of participants. One example of this is the Blend Network. We create a single repository of identifiers which is used to establish secure communication between validators and provide services. Before being admitted to the repository, the validator proves that it locked at least a minimum stake through a service note.
@@ -237,7 +236,7 @@ Where:
 - `provider_id` is an `Ed25519PublicKey` used to sign the message by the validator;
 - `service_note_id` is a `NoteId` used for minimum stake threshold verification purposes;
 - `zk_id` is used for zero-knowledge operations by the validator that includes rewarding;
-- `stark_zk_id` is the STARK-field counterpart of `zk_id`, derived as a note's `stark_public_key` ([Wallet Technical Standard](wallet-technical-standard.md#stark-field-key-derivation)); no proof verifies it before the proof-system transition, it is carried so that the declaration keeps a zero-knowledge identity after it;
+- `stark_zk_id` is the STARK-field counterpart of `zk_id`, derived as a note's `stark_public_key` ([Wallet Technical Standard](wallet-technical-standard.md#stark-field-key-derivation)); no proof verifies it, it is carried so that the declaration already commits to a STARK-field zero-knowledge identity;
 - `locators` is a copy of the `locators` from the `DeclarationMessage`;
 - `created` refers to the epoch number of the block that contained the declaration;
 - `active` refers to the epoch of the block that contained the latest accepted active message; it is initialised to `created + 2` ([Message Timing](#message-timing));
@@ -272,7 +271,7 @@ Consequently, within a single `service`:
 - A `zk_id` must not be bound to more than one `DeclarationInfo`.
 - A `stark_zk_id` must not be bound to more than one `DeclarationInfo`.
 
-The `stark_zk_id` is not part of the `declaration_id` preimage: it is carried as data, and its binding to the declaration is the uniqueness rule above. After the proof-system transition ([Mantle - Proof-System Transition](bedrock-v1.1-mantle-specification.md#proof-system-transition)) the `zk_id` field is dropped and `stark_zk_id` is the zero-knowledge identity of a declaration: the key the ZkSignature of every SDP Operation proves, the value the active and withdraw messages address the declaration by, the key of `declarations`, and the leaf of the core-node tree. This is written against declarations being keyed by their zero-knowledge identity (`[RFC] SDP Declarations Are Keyed by zk_id`); the derived `declaration_id`, while it exists, is unaffected.
+The `stark_zk_id` is not part of the `declaration_id` preimage: it is carried as data, bound to the declaration by the ZkSignature that covers the whole `SDP_DECLARE` payload and by the uniqueness rule above. This is written against declarations being keyed by their zero-knowledge identity (`[RFC] SDP Declarations Are Keyed by zk_id`); the derived `declaration_id`, while it exists, is unaffected.
 
 The uniqueness is scoped per-service: the same `provider_id` or `zk_id` may be reused across different services, but never more than once within the same service. A `provider_id` or `zk_id` becomes available for reuse in a service only once its previous `DeclarationInfo` for that service has been withdrawn and removed (see [Withdraw](#withdraw)).
 
