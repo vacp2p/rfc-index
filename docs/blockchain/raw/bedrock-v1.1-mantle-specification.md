@@ -2073,7 +2073,7 @@ class Note:
 
 The indivisible unit is the lepton, and one LGO is $`10^{9}`$ lepta. `TokenValue` counts lepta: every quantity of that type — note values, balances, fees, prices and pool balances — is an integer number of lepta, and no representable amount is smaller than one lepton. The unit system, its derivation and the canonical naming are specified by *Logos Token: Units and Precision*, which this document defers to; amounts written in LGO here are a display convenience for $`10^{9}`$ lepta.
 
-Two consequences for the arithmetic here. The per-block reserve release cap derived in [Block Rewards](block-rewards.md) is $`62500/657`$ LGO, which is not a whole number of lepta either; where an integer is required it is rounded down, losing less than one lepton per block. And because the fee floor is one lepton rather than one LGO, the floor is a safeguard against a zero price becoming absorbing, several orders of magnitude below any price the markets would discover — not an economically meaningful price itself.
+One consequence for the arithmetic here: the per-block reserve release cap derived in [Block Rewards](block-rewards.md) is $`62500/657`$ LGO, which is not a whole number of lepta; where an integer is required it is rounded down, losing less than one lepton per block.
 
 The genesis reward pool is given as a fraction of the maximum supply in [Genesis](#genesis), so that it is independent of the unit in which the pool is counted.
 
