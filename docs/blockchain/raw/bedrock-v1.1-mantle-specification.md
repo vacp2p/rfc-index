@@ -42,7 +42,7 @@
 | 1.11.0 | Track the configuration lineage of a channel: `ChannelState` gains `config_tip_hash` and the `CHANNEL_CONFIG` payload carries the `parent` configuration it extends, ordering configurations and preventing their replay | 2026-08-27 |
 | 1.11.1 | Renamed locked notes into service notes: `service_notes`, `ServiceNote` and `service_note_id` replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in | 2026-08-27 |
 | 1.12.0 | Specified the `SDP_ACTIVE` execution effects, matching the implementation: `active` is set to the epoch of the including block, and a message the activity logic rejects makes the Operation invalid. Set `withdraw_at` to `current_epoch + 2`, the epoch at which the node stops providing the service, and removed declarations at `withdraw_at` | 2026-09-02 |
-| 1.13.0 | Add the `CLAIM_POW_REWARD` Operation, the proof of work reward pool and its difficulty retargeting | 2026-09-04 |
+| 1.13.0 | Add the `CLAIM_POW_REWARD` Operation, the proof of work reward pool and its difficulty retargeting | 2026-09-08 |
 
 # Introduction
 
@@ -1605,7 +1605,7 @@ block_slots: dict[hash, SlotNumber]  # Slots of recently seen blocks, for the wi
 
 `PowTarget` is a scalar field element, and every operation on one is defined over its **canonical integer representative** in $`[0, p-1]`$. A field has no order and no floor division, so neither the comparison below nor the controller arithmetic in [Reward Difficulty](#reward-difficulty) and [Blend Difficulty](#blend-difficulty) is field arithmetic: a ticket is accepted when its representative is strictly below the target's, targets are multiplied and floor-divided as arbitrary-precision integers in accordance with [Arithmetic](#arithmetic), and each controller caps its result below $`p`$, so the representative converts back to a field element without modular reduction ever occurring. A **smaller** target is a **harder** puzzle.
 
-The reward pool is a reserve of tokens the protocol pays claims from. It is seeded once at genesis and refilled at each epoch boundary from a share of the fees collected over the previous epoch, as specified in [Reward Pool](#reward-pool). It is not created on demand: a claim transfers tokens that already exist into circulation, and cannot be executed if the pool cannot cover it.
+The reward pool is a reserve of tokens the protocol pays claims from. It is seeded once at genesis, as specified in [Reward Pool](#reward-pool). It is not created on demand: a claim transfers tokens that already exist into circulation, and cannot be executed if the pool cannot cover it.
 
 ### Acceptance Window
 
@@ -1821,20 +1821,14 @@ def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
 
 The division rounds down, and what the flooring withholds is not lost: it remains in the pool, to be counted again at the next boundary. `TARGET_CLAIMS_PER_BLOCK` is the same value the reward difficulty steers toward, so the two uses are consistent by construction: the reward is sized for the rate the controller is targeting.
 
-At each epoch boundary, before any block of the new epoch is processed, the pool is credited with the refill accrued over the previous epoch and the per-claim reward is then recomputed from the refilled pool:
+At each epoch boundary, before any block of the new epoch is processed, the per-claim reward is recomputed from the pool:
 
 ```python
-POW_SHARE: uint64 = 10                    # beta, as the fraction POW_SHARE / SHARE_DEN
-SHARE_DEN: uint64 = 100
-
-def on_epoch_boundary(epoch_blocks: list[Block]):
-    pow_reward_pool = checked_uint64(pow_reward_pool + get_pow_pool_refill(epoch_blocks))
+def on_epoch_boundary():
     epoch_pow_reward = compute_epoch_pow_reward(pow_reward_pool)
 ```
 
-`get_pow_pool_refill` sums, over the blocks of the epoch that just ended, the fraction `POW_SHARE / SHARE_DEN` of the fees each block collected, as specified in [Proof of Work Reward Pool](overview-cryptoeconomics.md#proof-of-work-reward-pool). Those tokens are diverted before the fees reach the rewards pool rather than created, so refilling never adds to the supply; who bears the cost of the diversion is set out in that section.
-
-All arithmetic here is checked, in accordance with [Arithmetic](#arithmetic). The pool must not saturate: saturating at the maximum representable value would create tokens that were never allocated, which is precisely the failure the checked-arithmetic rule exists to prevent.
+All arithmetic here is checked, in accordance with [Arithmetic](#arithmetic).
 
 Fixing the reward for the whole epoch allows a wallet to compute a reward note's identifier before submitting a claim, and therefore what makes a self-funding claim possible at all. The pool is drawn down by claims within the epoch, but the per-claim value is not recomputed until the next boundary.
 
@@ -1846,7 +1840,7 @@ The rejection is not a special case. It is the first condition of [Validation](#
 
 At the specified constants no sequence of valid blocks can drain the pool within an epoch. The guard nevertheless remains normative, so that if a future change to `MAX_BLOCK_TXS` or to these constants reopened the path, the result would be that claiming stops, rather than that the pool goes negative or the protocol pays out tokens it does not hold.
 
-Claiming recovers by itself. At the next epoch boundary the refill is credited and `epoch_pow_reward` is recomputed from the refilled pool, so a pool that was drained to a fraction of one reward yields a correspondingly smaller reward in the epoch that follows, and claiming resumes at that lower value. The mechanism degrades to a smaller reward rather than stopping permanently, and it stops permanently only when the pool falls so far that the recomputed reward rounds down to zero.
+Claiming recovers by itself. At the next epoch boundary `epoch_pow_reward` is recomputed from the pool, so a pool that was drained to a fraction of one reward yields a correspondingly smaller reward in the epoch that follows, and claiming resumes at that lower value. The mechanism degrades to a smaller reward rather than stopping permanently, and it stops permanently only when the pool falls so far that the recomputed reward rounds down to zero.
 
 An epoch running at the target claim rate distributes exactly the fraction $`\rho`$ of the pool, whatever the target is set to; the target governs how many claims share the distribution, not its total.
 
@@ -1856,11 +1850,9 @@ The relationship the three must satisfy is that a claim's reward exceeds its fee
 
 ### Genesis
 
-The pool is seeded once, at genesis, with `POW_REWARD_POOL_GENESIS`, as specified in [Bedrock Genesis Block](bedrock-genesis-block.md). After that it changes only through the epoch-boundary refill and through claims.
+The pool is seeded once, at genesis, with `POW_REWARD_POOL_GENESIS`, as specified in [Bedrock Genesis Block](bedrock-genesis-block.md). After that it changes only through claims.
 
 The seed is **five thousandths of the maximum supply** $`S_{cap}`$, the hard cap of [Block Rewards](block-rewards.md).
-
-The seed is drawn from the initial token distribution rather than created for the purpose, so claiming redirects tokens that already exist and never raises issuance above what the emission model allows.
 
 ### Reward Difficulty
 
