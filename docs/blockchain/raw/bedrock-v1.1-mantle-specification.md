@@ -1872,7 +1872,6 @@ The seed is drawn from the initial token distribution rather than created for th
 ```python
 EMA_SMOOTHING_FACTOR: uint64 = 9      # F, the weight given to the previous estimate
 EMA_SMOOTHING_PRECISION: uint64 = 10  # P, the scale F is expressed against; F < P
-REWARD_TARGET_FLOOR: uint64 = 9       # ceil(F / (P - F)); derived below, not a tuning knob
 
 def compute_new_reward_difficulty(claims_in_block: uint64,
                                   current_target: PowTarget) -> PowTarget:
@@ -1886,22 +1885,16 @@ def compute_new_reward_difficulty(claims_in_block: uint64,
                     + EMA_SMOOTHING_FACTOR * TARGET_CLAIMS_PER_BLOCK)
     new_target = (TARGET_CLAIMS_PER_BLOCK * current_target
                   * EMA_SMOOTHING_PRECISION) // demand
-    # Clamped at both ends: capped so that converting back into the field cannot
-    # reduce modulo p and turn a very easy target into a very hard one, and
-    # floored so that zero -- which is absorbing -- stays unreachable, at the
-    # smallest value the empty-block easing still lifts under floor division.
-    return min(max(new_target, REWARD_TARGET_FLOOR), p - 1)
+    # Capped so that converting back into the field cannot reduce modulo p and
+    # turn a very easy target into a very hard one.
+    return min(new_target, p - 1)
 ```
 
 The ordering is part of consensus. Every claim in a block is validated against the target produced by the previous block's update; the update from a block's own accepted count is applied after the block is processed and governs the next block. Genesis supplies the value the first block is validated against.
 
 The controller holds no state of its own beyond the current target. Rather than remembering a running estimate of demand, it reconstructs one from the target in force, on the assumption that the target was calibrated to the intended rate. This keeps it a single value in consensus state.
 
-Two properties follow, and both matter for its safety. When a block accepts exactly the target number of claims the target is unchanged, so the intended rate is a fixed point. When a block accepts none, the numerator is floored at 1 and the target moves up by a factor of $`P/F`$ — bounded, and in the direction of making claiming easier, so a period without claims eases rather than locks; the floor below makes that hold all the way down. The smoothing means a single unusual block moves the target only slightly, so no separate per-block rate clamp is required.
-
-Both ends of the update are clamped, and the two clamps guard against different failures. The cap at $`p-1`$ keeps a run of empty blocks from pushing the representative out of the field. The floor guards the other end: the update is multiplicative in the current target, so **zero is absorbing twice over** — arithmetically, every subsequent update multiplies by it, and physically, no ticket lies strictly below a zero target, so the claims whose absence would ease it can never arrive — and the easing that exists to revive a too-hard target is the branch that multiplies by the stuck value. Nor would a floor of one suffice: under floor division the empty-block easing $`\lfloor t \cdot P/F \rfloor`$ returns $`t`$ unchanged for every $`t \lt F/(P-F)`$, so flooring at one would replace an absorbing point with an absorbing band. `REWARD_TARGET_FLOOR` is the smallest value the easing strictly lifts, $`\lceil F/(P-F) \rceil = 9`$ at the specified smoothing.
-
-The [Blend Difficulty](#blend-difficulty) controller needs no such floor: it is recomputed from `BLEND_DIFFICULTY_BASE` every epoch, and its clamp only bounds the step away from the previous value, so there is no multiplicative state for a collapse to absorb.
+Two properties follow, and both matter for its safety. When a block accepts exactly the target number of claims the target is unchanged, so the intended rate is a fixed point. When a block accepts none, the numerator is floored at 1 and the target moves up by a factor of $`P/F`$ — bounded, and in the direction of making claiming easier, so a period without claims eases rather than locks. The smoothing means a single unusual block moves the target only slightly, so no separate per-block rate clamp is required.
 
 The rate the controller observes is the rate of claims **included in blocks**, not the rate at which solutions are found. Solutions that are never included, because a block builder declined to include them or because block space was exhausted, are invisible to it. Difficulty therefore tracks accepted demand rather than offered demand, and the two diverge when block space is contended.
 
