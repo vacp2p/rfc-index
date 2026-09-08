@@ -43,6 +43,7 @@
 | 1.11.1 | Renamed locked notes into service notes: `service_notes`, `ServiceNote` and `service_note_id` replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in | 2026-08-27 |
 | 1.12.0 | Specified the `SDP_ACTIVE` execution effects, matching the implementation: `active` is set to the epoch of the including block, and a message the activity logic rejects makes the Operation invalid. Set `withdraw_at` to `current_epoch + 2`, the epoch at which the node stops providing the service, and removed declarations at `withdraw_at` | 2026-09-02 |
 | 1.13.0 | Add the `CLAIM_POW_REWARD` Operation, the proof of work reward pool and its difficulty retargeting | 2026-09-08 |
+| 1.14.0 | Set the reference load of the Blend difficulty to the transaction rate the Blend network carries, `F_T / F_D = 130` transactions per block | 2026-09-08 |
 
 # Introduction
 
@@ -1900,11 +1901,11 @@ Unlike the reward difficulty, `difficulty_blend` is recomputed **once per epoch*
 
 The value for epoch $`N`$ is fixed at the same moment as epoch $`N`$'s nonce — the lottery-constants snapshot taken during epoch $`N-1`$, as specified in [Epoch](cryptarchia-v1-protocol.md#epoch) — and its input is the transaction load of epoch $`N-2`$, the last epoch complete at that snapshot; publishing it with the nonce keeps the [precomputation window](proof-of-quota.md#precomputation-of-proof-of-work-solutions) usable. For the first two epochs no complete input epoch exists, so `difficulty_blend` is `BLEND_DIFFICULTY_BASE` for epochs 0 and 1, and the schedule begins with epoch 2, computed during epoch 1 from epoch 0's load. The same value applies at genesis: the network begins at `BLEND_DIFFICULTY_BASE` rather than at a guess about the first epoch's traffic.
 
-The control objective is transaction load, for the anonymity-set reason given in [Blend Difficulty](blend-protocol.md#blend-difficulty). At the reference load the threshold sits at a baseline; above it admission tightens, below it admission loosens.
+The reference load is the transaction rate the Blend network carries, $`F_T / F_D = 130`$ transactions per block ([Global Parameters](blend-protocol.md#global-parameters)). At the reference load the threshold sits at a baseline; above it admission tightens, below it admission loosens.
 
 ```python
 BLEND_DIFFICULTY_BASE: PowTarget = p // 2**19   # Threshold at the reference load
-TARGET_TXS_PER_BLOCK: uint64 = 512              # Reference transactions per block
+TARGET_TXS_PER_BLOCK: uint64 = 130              # Reference transactions per block, F_T / F_D
 BLEND_DAMPING_NUM: uint64 = 1                   # a, where the exponent is alpha = a / b
 BLEND_DAMPING_DEN: uint64 = 2                   # b, with 0 < a <= b so that alpha <= 1
 BLEND_MAX_STEP: uint64 = 2                      # Max factor the threshold may move per epoch
