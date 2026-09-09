@@ -26,21 +26,21 @@ The era schedule is embedded in the node software and is not read from the chain
 
 The schedule is a strictly increasing list of epoch numbers. The first entry is 0. Entry $`n`$ (1-based) is the first epoch of era $`n`$, denoted $`E_n`$. Era $`n`$ comprises the epochs from $`E_n`$ up to, but not including, $`E_{n+1}`$; the last era of the schedule is unbounded.
 
-The era of an epoch $`ep`$ is $`\textbf{era}(ep) = \max\{n : E_n \le ep\}`$. The era of a slot $`sl`$ is the era of its epoch: $`\textbf{era}(sl) = \textbf{era}(\lfloor sl / \text{EPOCH\_LENGTH} \rfloor)`$, with the epoch length defined in [Epoch Schedule](cryptarchia-v1-protocol.md#epoch-schedule). Era $`n`$ begins at slot $`E_n \cdot \text{EPOCH\_LENGTH}`$. An era must not change the epoch length; a change moves the first slot of every scheduled era. The **era in force** is $`\textbf{era}(sl)`$ of the current slot.
+The era of an epoch $`ep`$ is $`\textbf{era}(ep) = \max\{n : E_n \le ep\}`$. The era of a slot $`sl`$ is the era of its epoch: $`\textbf{era}(sl) = \textbf{era}(\lfloor sl / \text{EPOCH\_LENGTH} \rfloor)`$, with the epoch length defined in [Epoch Schedule](cryptarchia-v1-protocol.md#epoch-schedule). Era $`n`$ begins at slot $`E_n \cdot \text{EPOCH\_LENGTH}`$. An era must not change $`k`$ or $`f`$ ([Constants](cryptarchia-v1-protocol.md#constants)). The epoch length derives from them, so a change moves the first slot of every scheduled era. [Commit](cryptarchia-v1-protocol.md#commit) reads $`k`$, so a change makes commit and fork choice disagree on which blocks are immutable. The **era in force** is $`\textbf{era}(sl)`$ of the current slot.
 
 A schedule entry must never change once a release has published it. Changing it makes nodes running different releases apply different rules to the same slots, which is a fork. A defective era is corrected by a new era at a future epoch.
 
-An era defines rules, not the values set under them. A [Service Parameters](bedrock-service-declaration-protocol.md#service-parameters) entry changes a value within an era.
+An era defines rules. It does not fix the values those rules set; a [Service Parameters](bedrock-service-declaration-protocol.md#service-parameters) entry changes a value without an era change.
 
 ## Interpreting Chain Data
 
-A block, and everything it carries, is parsed, validated and executed under the rules of $`\textbf{era}(sl)`$ of the block's slot. An era must not move or re-encode the header fields up to and including `slot`: the slot selects the era, so it must parse before the era is known; otherwise a synchronization stream carrying blocks of two eras cannot be parsed.
+A block, and everything it carries, is parsed, validated and executed under the rules of $`\textbf{era}(sl)`$ of the block's slot. The header fields up to and including `slot` have the same encoding in every era. A node reads the slot to learn a block's era, so the slot must parse before the era is known; otherwise a synchronization stream carrying blocks of two eras cannot be parsed.
 
-A procedure that reads a span of the chain — [fork choice](fork-choice.md), [Fork Pruning](cryptarchia-v1-protocol.md#fork-pruning), [synchronization](cryptarchia-v1-bootstr-sync.md) — runs under the era in force.
+[Fork choice](fork-choice.md) compares two chains under the era of the slot of their latest common ancestor. The fork choice rule of an era reads only the block tree and the header fields up to and including `slot`; a rule that reads another field is undefined on the blocks of a later era that re-encodes it.
 
-A node must implement every era from $`\textbf{era}(sl_{B_\text{imm}})`$ to the era in force, where $`B_\text{imm}`$ is the [Latest Immutable Block](cryptarchia-v1-protocol.md#latest-immutable-block). A node that must validate a block whose slot lies in an era it does not implement must halt with an error to the operator. A block whose slot precedes that of $`B_\text{imm}`$ is discarded without a halt.
+A node must implement the rules of every era from $`\textbf{era}(sl_{B_\text{imm}})`$ to the era in force, where $`B_\text{imm}`$ is the [Latest Immutable Block](cryptarchia-v1-protocol.md#latest-immutable-block). A node that must validate a block whose slot lies in an era it does not implement must halt with an error to the operator. A block whose slot precedes that of $`B_\text{imm}`$ is discarded without a halt.
 
-When an era begins, a node must remove from its mempool every transaction that is not valid under the new era. Mempool admission applies the new era's rules, whichever era's protocol delivered the transaction.
+When an era begins, a node re-validates every transaction in its mempool under the new era's rules and removes those that fail. Mempool admission applies the new era's rules, whichever era's protocol delivered the transaction.
 
 ## Era Migration
 
@@ -84,8 +84,8 @@ During the [Era Transition Period](#era-transition-period) a node advertises and
 
 ## Horizon
 
-The horizon $`H`$ is an epoch number embedded in the node software beside the schedule. A schedule entry may be added only with a first epoch after the $`H`$ of every earlier release; an earlier release whose $`H`$ extends past that epoch interprets those slots under the predecessor era and forks. $`H`$ must not precede the first epoch of the last entry of the release's own schedule; a smaller $`H`$ halts the release before an era it implements begins.
+Each schedule carries a horizon $`H`$, an epoch number. $`H`$ must not be smaller than the first epoch of the schedule's last entry; a smaller $`H`$ halts the node no later than the first slot of its last era.
 
-From the first slot of epoch $`H+1`$, per the local clock, a node must halt with an error to the operator; until it has halted, it must not propose blocks and must not serve synchronization responses.
+From the first slot of epoch $`H+1`$, per the local clock, a node must not propose blocks, must not serve synchronization responses, and must halt with an error to the operator. The halt must not be triggered by information received from peers.
 
-The halt must not be triggered by information received from peers, such as advertised eras.
+An entry with a first epoch at or before the $`H`$ of a published release forks off the nodes of that release: they do not halt at the new boundary.
