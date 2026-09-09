@@ -27,7 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | Remove the protection against adaptive adversary from PoL. It impacts the PoL section of PoQ. Update the performance according to the new circuit. Remove old project name from DSTs | 2026-04-09 |
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
-| 1.2.0 | Add the proof of work branch: third selector value, `pow_quota` and `pow_blend_difficulty` public inputs, a private `pow_nonce` witness, and Lagrange branch selection | 2026-09-08 |
+| 1.2.0 | Add the proof of work branch: third selector value, `pow_quota` and `pow_blend_difficulty` public inputs, a private `pow_nonce` witness, and Lagrange branch selection; benchmark the three branch circuit | 2026-09-08 |
 
 
 # Introduction
@@ -251,4 +251,5 @@ The material used for the benchmarks is the following:
 - OS: Ubuntu 22.04.5 LTS
 - Kernel: 6.8.0-59-generic
 
-![Diagram](proof-of-quota/assets/2e9261aa-09df-8023-91a7-e7f6c11c4056.png)
+![Median proving time of the three branch circuit against the number of threads, ten runs](proof-of-quota/assets/proving-time-three-branch.png)
+
