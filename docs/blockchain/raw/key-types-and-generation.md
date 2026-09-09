@@ -26,8 +26,8 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
-| 1.0.2 | The NQK is the key of the declaration entry rather than a field of it, and one NQK and NSK are generated per declaration | 2026-08-19 |
-| 1.0.3 | The NSK public key is carried by the `provider_id` rather than being it | 2026-09-07 |
+| 1.0.2 | The NQK is the key of the declaration entry within its service rather than a field of it | 2026-09-09 |
+| 1.0.3 | The NSK public key is carried by the `provider_id` rather than being it | 2026-09-09 |
 
 # Introduction
 
@@ -51,15 +51,11 @@ A node generates a Non-ephemeral Quota Key (NQK) that is a ZkSignature ([Zero Kn
 
 The NQK is used to prove that the node is part of the set of core nodes as indicated through the SDP.
 
-A node generates one NQK per declaration.
-
 ## Non-ephemeral Signing Key
 
 A node generates a Non-ephemeral Signing Key (NSK) that is a Ed25519 key. Its public key is carried by the `provider_id` of the node's `DeclarationInfo`, the outcome of its participation in the Service Declaration Protocol (SDP — [Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
 
 The NSK is used to authenticate the node on the network level and to derive Non-ephemeral Encryption Key.
-
-A node generates one NSK per declaration.
 
 ## Ephemeral Signing Key
 

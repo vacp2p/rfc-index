@@ -513,7 +513,7 @@ The connections are established using libp2p with TLS version 1.3 (not older). T
 The Neighbor Distinction Process (NDP) enables the core node to distinguish between node types (core, edge) of its neighbors in the Blend Network. The process is straightforward:
 
 1. A node extracts `peer_id` from the TLS metadata of the accepted connection.
-2. If the `peer_id` is found in the set of `provider_id`s, then the neighbor is a core node; otherwise, the peer is an edge node.
+2. If the `peer_id` is found in the set of `provider_id`s of the Blend declarations, then the neighbor is a core node; otherwise, the peer is an edge node.
 
 ### Connectivity Maintenance
 

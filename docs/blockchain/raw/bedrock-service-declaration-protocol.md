@@ -33,8 +33,8 @@
 | 1.4.2 | Renamed locked notes into service notes: `locked_note_id` becomes `service_note_id` in the declaration and withdraw messages and in `DeclarationInfo` | 2026-08-27 |
 | 1.4.3 | Identifier uniqueness covers every stored declaration, not only activated ones, matching the implementation | 2026-09-01 |
 | 1.5.0 | Defined `active` as the epoch of the block that contained the latest accepted active message, initialised to `created + 2`, and `withdraw_at` as the epoch at which the node stops providing the service, matching the implementation. Added the participant-set exclusion rule and [Message Timing](#message-timing) | 2026-09-02 |
-| 1.6.0 | [RFC] The `zk_id` identifies a declaration; the derived `declaration_id` is removed | 2026-09-03 |
-| 1.7.0 | [RFC] A declaration carries no addresses; they are resolved through libp2p peer routing on the `provider_id` | 2026-09-03 |
+| 1.6.0 | [RFC] The service and the `zk_id` identify a declaration; the derived `declaration_id` is removed | 2026-09-09 |
+| 1.7.0 | [RFC] A declaration carries no addresses; they are resolved through libp2p peer routing on the `provider_id` | 2026-09-09 |
 
 # Introduction
 
@@ -202,11 +202,10 @@ The message is also signed by the `zk_id` key.
 
 ### **Declaration Storage**
 
-Only valid declaration messages can be stored on the ledger. A declaration covers exactly one service and is identified by the `zk_id` of the validator that created it. We define the `DeclarationInfo` as follows:
+Only valid declaration messages can be stored on the ledger. A declaration covers exactly one service and is identified by that service and the `zk_id` of the validator that created it. We define the `DeclarationInfo` as follows:
 
 ```python
 class DeclarationInfo:
-    service: ServiceType
     provider_id: PeerId
     service_note_id: NoteId
     created: EpochNumber
@@ -217,33 +216,32 @@ class DeclarationInfo:
 
 Where:
 
-- `service` defines the service type of the declaration;
 - `provider_id` is the `PeerId` of the validator, whose Ed25519 public key signs its messages;
 - `service_note_id` is the `NoteId` of the note that meets the minimum stake threshold;
 - `created` is the epoch of the block that contained the declaration;
 - `active` is the epoch of the block that contained the latest accepted active message, initialised to `created + 2` ([Message Timing](#message-timing));
 - `withdraw_at` is the epoch at which the node stops providing the service ([**Withdraw**](#withdraw)), and is `None` until the declaration is withdrawn;
-- `nonce` is 0 for the declaration message, and increases monotonically with every message sent for the `zk_id`.
+- `nonce` is 0 for the declaration message, and increases monotonically with every message sent for the declaration.
 
-All `DeclarationInfo` entries are held in `declarations`, indexed by `zk_id`.
+All `DeclarationInfo` entries are held in `declarations`, indexed by service and then by `zk_id`.
 
 ```python
-declarations: dict[ZkPublicKey, DeclarationInfo]
+declarations: dict[ServiceType, dict[ZkPublicKey, DeclarationInfo]]
 ```
 
 ### Identifier Uniqueness
 
-Within `declarations`, each of the following is bound to at most one `DeclarationInfo`:
+Within the declarations of one service, each of the following is bound to at most one `DeclarationInfo`:
 
 - the `zk_id`;
 - the `provider_id`;
 - the `service_note_id`.
 
-An identifier becomes available for reuse once its declaration has been removed (see [**Withdraw**](#withdraw)).
+The same identifier may be bound in several services. An identifier becomes available for reuse in a service once its declaration in that service has been removed (see [**Withdraw**](#withdraw)).
 
 ### Active Set
 
-The **active set** for an epoch $`n`$ is derived from the snapshot read for that epoch ([Snapshots](#snapshots)) by keeping the declarations for which both of the following hold:
+The **active set** of a service for an epoch $`n`$ is derived from that service's declarations in the snapshot read for that epoch ([Snapshots](#snapshots)) by keeping those for which both of the following hold:
 
 - activity has been reported recently enough: `active + inactivity_period >= n`;
 - the withdrawal has not taken effect: `withdraw_at` is `None`, or `n < withdraw_at`.
@@ -256,6 +254,7 @@ The construction of the active message is as follows:
 
 ```python
 class ActiveMessage:
+    service: ServiceType
     zk_id: ZkPublicKey
     nonce: Nonce
     metadata: Metadata
@@ -265,7 +264,7 @@ where `metadata` is service-specific node activeness metadata, encoded as the `M
 
 The message must be signed by the `zk_id` key.
 
-The `nonce` must increase monotonically by every message sent for the `zk_id`.
+The `nonce` must increase monotonically by every message sent for the declaration.
 
 An active message attests to a single past epoch during which the node provided the service. The service defines when the message may be sent (see [Active Message](blend-protocol.md#active-message) for the Blend Network).
 
@@ -277,13 +276,14 @@ The construction of the withdraw message is as follows:
 
 ```python
 class WithdrawMessage:
+    service: ServiceType
     zk_id: ZkPublicKey
     nonce: Nonce
 ```
 
 The message must be signed by the `zk_id` key.
 
-The `nonce` must increase monotonically by every message sent for the `zk_id`.
+The `nonce` must increase monotonically by every message sent for the declaration.
 
 ### Indexing
 
@@ -312,10 +312,10 @@ The Declare action associates a validator with a service it wants to provide. It
 The declaration message is considered valid when all of the following are met:
 
 - The `service_note_id` names an unspent note whose value meets the minimum stake threshold.
-- The `zk_id`, the `service_note_id` and the `provider_id` are each unbound ([Identifier Uniqueness](#identifier-uniqueness)).
+- The `zk_id`, the `service_note_id` and the `provider_id` are each unbound in the `service_type` of the message ([Identifier Uniqueness](#identifier-uniqueness)).
 - The `provider_id` carries the prefix `0x002408011220`, and the sender holds the private key corresponding to the Ed25519 public key it carries.
 
-If all of the above conditions are fulfilled, then the declaration is stored on the ledger under its `zk_id`; otherwise, the message is discarded.
+If all of the above conditions are fulfilled, then the declaration is stored on the ledger under its service and `zk_id`; otherwise, the message is discarded.
 
 ### Active
 
@@ -327,7 +327,7 @@ The SDP active action logic is:
 
 1. A node sends an `ActiveMessage` transaction.
 2. The `ActiveMessage` is verified by the SDP logic:
-    1. The `zk_id` returns an existing `DeclarationInfo`.
+    1. The `service` and the `zk_id` return an existing `DeclarationInfo`.
     2. The transaction containing `ActiveMessage` is signed by the `zk_id`.
     3. The `nonce` increases monotonically.
 3. If any of these conditions fail, discard the message and stop processing.
@@ -349,7 +349,7 @@ The logic of the withdraw action is:
 
 1. A node sends a `WithdrawMessage` transaction.
 2. The `WithdrawMessage` is verified by the SDP logic.
-    1. The `zk_id` returns an existing `DeclarationInfo`.
+    1. The `service` and the `zk_id` return an existing `DeclarationInfo`.
     2. The transaction containing `WithdrawMessage` is signed by the `zk_id`.
     3. The `withdraw_at` of the `DeclarationInfo` is `None`.
     4. The `nonce` increases monotonically.
@@ -365,8 +365,8 @@ The protocol must enable querying the ledger in at least the following manner:
 - `GetAllProviderIdSince(epoch)`, returns all `provider_id`s since the `epoch`.
 - `GetAllDeclarationInfo(epoch)`, returns all `DeclarationInfo` entries associated with the `epoch`.
 - `GetAllDeclarationInfoSince(epoch)`, returns all `DeclarationInfo` entries since the `epoch`.
-- `GetDeclarationInfo(zk_id)`, returns the `DeclarationInfo` entry identified by the `zk_id`.
-- `GetDeclarationInfo(provider_id)`, returns the `DeclarationInfo` entry whose `provider_id` matches.
+- `GetDeclarationInfo(service_type, zk_id)`, returns the `DeclarationInfo` entry identified by the `service_type` and the `zk_id`.
+- `GetDeclarationInfo(service_type, provider_id)`, returns the `DeclarationInfo` entry of the `service_type` whose `provider_id` matches.
 - `GetAllServiceParameters(epoch)`, returns all entries of the `ServiceParameters` store for the requested `epoch`.
 - `GetAllServiceParametersSince(epoch)`, returns all entries of the `ServiceParameters` store since the requested `epoch`.
 - `GetServiceParameters(service_type, epoch)`, returns the service parameter entry from the `ServiceParameters` store of a `service_type` for a specified `epoch`.
