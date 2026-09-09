@@ -189,4 +189,4 @@ The upper clamp is capped at $`p-1`$ in addition to the per-epoch step bound. Wi
 
 Note what this controller cannot see. Its input is transactions included in blocks, so messages that are never included — including messages sent purely to consume Blend capacity — do not raise it. It regulates admission against observed chain load, not against network load, and is therefore not by itself a defence against flooding the Blend network with messages that never reach a block.
 
-`BLEND_DIFFICULTY_BASE` is calibrated against a measurement of the work itself: about fifty seconds per solution on one core of the target machine, a Raspberry Pi 5, measured on that hardware.
+`BLEND_DIFFICULTY_BASE` is calibrated against a measurement of the work itself: about 38 seconds per solution in expectation on one core of the target machine, a Raspberry Pi 5, measured on that hardware.
