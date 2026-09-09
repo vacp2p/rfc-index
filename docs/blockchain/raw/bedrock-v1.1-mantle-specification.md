@@ -230,8 +230,6 @@ Mantle validators will ensure the following:
     tx_priority_tip = checked_uint64(tx_balance - tx_mandatory_fee)
     ```
 
-The state progression above has a consequence for the reserves the protocol maintains: an Operation validated against such a reserve sees it as the Operations preceding it have left it. A transaction carrying several claims against the proof of work reward pool therefore has each of them checked against the pool net of its predecessors, rather than all of them checked against the pool as it stood before the transaction began. Were they all checked against the same starting balance, every claim would pass a check the pool could not actually satisfy, and the shortfall would surface only as a failed subtraction during execution. This makes the pool guard in [CLAIM_POW_REWARD](#claim_pow_reward) sound within a transaction as well as between them.
-
 ## Execution
 
 *Given*
@@ -1611,7 +1609,7 @@ Validators must maintain the following state to process proof of work Operations
 
 ```python
 pow_reward_pool: TokenValue      # Reserve the rewards are paid from
-epoch_pow_reward: TokenValue     # sigma_e: reward per claim, fixed for the epoch
+epoch_pow_reward: TokenValue     # Reward per claim, fixed for the epoch
 difficulty_reward: PowTarget     # d_reward: the reward threshold, retargeted every block
 pow_nullifiers: set[zkhash]      # Spent solutions, retained for the acceptance window
 block_slots: dict[hash, SlotNumber]  # Slots of recently seen blocks, for the window check
@@ -1662,28 +1660,13 @@ class ClaimPowRewardOp:
     public_key: ZkPublicKey    # Key the reward note is paid to
 ```
 
-The puzzle ticket is derived from the payload:
-
-```python
-def get_puzzle_ticket(claim: ClaimPowRewardOp) -> zkhash:
-    return zkhash(
-        claim.public_key,
-        FiniteField(claim.block_hash, byte_order="little", modulus=p),
-        claim.epoch_nonce,
-    )
-```
-
-where `zkhash` is Poseidon2 and $`p`$ is the scalar field modulus, both given in [Common Cryptographic Components](common-cryptographic-components.md). A miner searches for a `public_key` whose ticket falls below the reward threshold; the corresponding secret key signs the claim and later spends the reward note. The secret key must be sampled with full entropy rather than enumerated, because it remains secret and authorises both.
-
-This derivation carries no domain separation tag.
-
 #### Proof
 
-  A [ZkSignature](#zero-knowledge-signature-scheme-zksignature) by the secret key corresponding to `public_key`, over the transaction's `mantle_txhash`. The puzzle solution itself carries no separate proof: it is re-derived from the payload and checked during validation.
+  A [ZkSignature](#zero-knowledge-signature-scheme-zksignature) by the secret key corresponding to `public_key`, over the transaction's `mantle_txhash`. The signature proves knowledge of that secret key, so a solution cannot be found by searching over public keys directly.
 
 #### Execution gas
 
-  Claim Operations have a fixed Execution Gas cost of `EXECUTION_CLAIM_POW_REWARD_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values. It is paid as part of the transaction's normal fee, which is typically settled from the reward note itself.
+  Claim Operations have a fixed Execution Gas cost of `EXECUTION_CLAIM_POW_REWARD_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 #### Validation
 
@@ -1697,7 +1680,7 @@ current_slot: SlotNumber           # slot of the block including this claim
 difficulty_reward: PowTarget       # d_reward, retargeted every block
 pow_nullifiers: set[zkhash]        # spent solutions, retained for WINDOW
 pow_reward_pool: TokenValue
-epoch_pow_reward: TokenValue       # sigma_e
+epoch_pow_reward: TokenValue
 ```
 
   *Validate*
@@ -1726,20 +1709,20 @@ assert puzzle_ticket not in pow_nullifiers
 assert ZkSignature_verify(mantle_txhash, claim_proof, [claim.public_key])
 ```
 
-  The nullifier of a claim is its puzzle ticket, which is determined by the payload and unique to a winning key:
+  The epoch nonces in step 3 are the Cryptarchia epoch nonce $`\eta`$ defined in [Epoch Nonce](cryptarchia-v1-protocol.md#epoch-nonce), for the current epoch and for the epoch before it.
+
+  The puzzle ticket in step 4 is derived from the payload:
 
 ```python
-def pow_nullifier(claim: ClaimPowRewardOp) -> zkhash:
-    return get_puzzle_ticket(claim)
+def get_puzzle_ticket(claim: ClaimPowRewardOp) -> zkhash:
+    return zkhash(
+        claim.public_key,
+        FiniteField(claim.block_hash, byte_order="little", modulus=p),
+        claim.epoch_nonce,
+    )
 ```
 
-  This Operation performs no fee or balance check of its own. The transaction's fee is settled at the transaction level as normal.
-
-  The first condition is what prevents the pool being drawn negative, and its two clauses fail in different circumstances. `epoch_pow_reward > 0` fails once the pool has fallen, over many epochs, below the point where the division in [Reward Pool](#reward-pool) rounds down to zero. `pow_reward_pool >= epoch_pow_reward` fails when the pool has been drained within a single epoch to less than one reward, which is possible because the reward is held fixed for the epoch while the pool it is paid from shrinks with every claim. Both are evaluated per claim, against the pool as it stands at that point in the block, so claiming stops the moment either fails and resumes only when the condition holds again. [Reward Pool](#reward-pool) sets out what each requires and how claiming recovers.
-
-  The epoch nonces in step 3 are the Cryptarchia epoch nonce $`\eta`$ defined in [Epoch Nonce](cryptarchia-v1-protocol.md#epoch-nonce) — the same value the consensus lottery uses — for the current epoch and for the epoch before it. Accepting the previous epoch's nonce lets a solution mined shortly before an epoch boundary be claimed shortly after it; accepting only the current nonce would void up to the final acceptance window's worth of honest work at every boundary. The allowance costs nothing elsewhere: staleness is bounded by the window on `block_hash` in step 2 whichever nonce a claim names, and there is no replay across the pair, because the ticket binds the nonce — a solution under one nonce is a different ticket from a solution under the other, each mined and nullified on its own. A claim built against any older epoch is rejected.
-
-  This does not make a solution unpredictable in advance. The epoch nonce is fixed part way through the *preceding* epoch and is public from that moment, so solutions for an epoch can be computed before it begins. What bounds a solution's age is the acceptance window on `block_hash`, which is $`W_b`$ blocks deep and therefore far tighter than an epoch.
+  where `zkhash` is Poseidon2 and $`p`$ is the scalar field modulus, both given in [Common Cryptographic Components](common-cryptographic-components.md). A miner searches for a `public_key` whose ticket satisfies step 4. The secret key must be sampled with full entropy rather than enumerated: it signs the claim and spends the reward note.
 
 #### Execution
 
@@ -1747,16 +1730,17 @@ def pow_nullifier(claim: ClaimPowRewardOp) -> zkhash:
 
 ```python
 claim: ClaimPowRewardOp
+puzzle_ticket: zkhash              # computed in validation step 4
 
 ledger: Ledger
 pow_reward_pool: TokenValue
-epoch_pow_reward: TokenValue       # sigma_e, fixed for the epoch
+epoch_pow_reward: TokenValue       # fixed for the epoch
 pow_nullifiers: set[zkhash]
 ```
 
   *Execution*
 
-  1. Add `pow_nullifier(claim)` to the `pow_nullifiers` set, so the solution cannot be claimed again. The entry is retained until the claim's referenced block leaves the acceptance window.
+  1. Add `puzzle_ticket` to the `pow_nullifiers` set. The entry is retained until the claim's referenced block leaves the acceptance window.
   2. Construct a single output note of value `epoch_pow_reward` under the public key given in the payload, and insert it into the Ledger:
       ```python
       output_note = Note(
@@ -1772,48 +1756,30 @@ pow_nullifiers: set[zkhash]
       pow_reward_pool = checked_uint64(pow_reward_pool - epoch_pow_reward)
       ```
 
-  This mirrors `LEADER_CLAIM`: a single output note of a protocol-determined value, inserted with no zero-knowledge proof of any input, with the source pool decremented by the same amount.
-
 #### Example
 
-A miner searches for a key whose ticket clears the reward threshold, then spends the resulting note to pay the fee of the very transaction that creates it. No tokens are required beforehand.
-
 ```python
-# Mine against a recent canonical block and the current epoch nonce.
-block_hash   = recent_canonical_block_hash()
-epoch_nonce  = get_current_epoch_nonce()
-reward_sk, reward_pk = pow_search(block_hash, epoch_nonce, difficulty_reward)
-
 claim = ClaimPowRewardOp(
-    epoch_nonce=epoch_nonce,
-    block_hash=block_hash,
-    public_key=reward_pk,
+    epoch_nonce=get_current_epoch_nonce(),
+    block_hash=recent_canonical_block_hash(),
+    public_key=reward_pk,          # a key whose ticket satisfies difficulty_reward
 )
 
-# The reward note's id is known before submission, because epoch_pow_reward is
-# fixed for the epoch and the payload determines the Operation id.
-claim_id       = derive_op_id(claim)
-reward_note    = Note(value=epoch_pow_reward, public_key=reward_pk)
-reward_note_id = derive_note_id(claim_id, 0, reward_note)
-
-# A following TRANSFER spends that note to pay the fee and keep the change.
-transfer = Transfer(inputs=[reward_note_id], outputs=[change_note])
+# The reward note is spendable by the following Operation, so it pays the fee
+reward_note_id = derive_note_id(derive_op_id(claim), 0,
+                                Note(value=epoch_pow_reward, public_key=reward_pk))
+transfer = Transfer(inputs=[reward_note_id], outputs=[<change_note>])
 
 tx = MantleTx(
     ops=[Op(opcode=CLAIM_POW_REWARD, payload=encode(claim)),
-         Op(opcode=TRANSFER,         payload=encode(transfer))],
+         Op(opcode=TRANSFER, payload=encode(transfer))],
 )
 
 SignedMantleTx(
     tx=tx,
-    op_proofs=[ZkSignature(reward_sk, mantle_txhash(tx)),
-               transfer.prove(reward_sk)],
+    op_proofs=[ZkSignature(reward_sk, mantle_txhash(tx)), transfer.prove(reward_sk)]
 )
 ```
-
-This makes a claim **self-funding**, and it works only because of two properties established elsewhere in this specification. The reward amount is fixed for the whole epoch, so the note's value — and therefore its identifier — can be computed before the transaction is submitted. And validation is interleaved with execution, so by the time the `TRANSFER` is validated the note it spends already exists.
-
-Both properties are required. If the reward varied within the epoch the wallet could not name the note in advance, and if validation ran entirely before execution the note would not exist when the `TRANSFER` was checked.
 
 ### Reward Pool
 
@@ -2090,8 +2056,6 @@ The indivisible unit is the lepton, and one LGO is $`10^{9}`$ lepta. `TokenValue
 
 One consequence for the arithmetic here: the per-block reserve release cap derived in [Block Rewards](block-rewards.md) is $`62500/657`$ LGO, which is not a whole number of lepta; where an integer is required it is rounded down, losing less than one lepton per block.
 
-The genesis reward pool is given as a fraction of the maximum supply in [Genesis](#genesis), so that it is independent of the unit in which the pool is counted.
-
 ### Note Id
 
 A note can be uniquely identified by the Operation that created it and its output number: `(op_id, output_number)` if each Operation are uniquely identifiable. For this reason, every Operation that output notes have a unique payload that is used to derive the Operation identifier. Because it is often useful to have a commitment to the note fields for use in ZK proofs (e.g., for PoL), we included the note in the note identifier derivation.
@@ -2221,10 +2185,6 @@ From the [[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md
 | EXECUTION_SDP_ACTIVE_GAS | 590 |
 | EXECUTION_LEADER_CLAIM_GAS | 580 |
 | EXECUTION_CLAIM_POW_REWARD_GAS | 590 |
-
-`EXECUTION_CLAIM_POW_REWARD_GAS` is the cost of one ZkSignature verification, the same basis as `EXECUTION_TRANSFER_GAS`: the ticket re-derivation and the window, nullifier and pool checks are negligible beside it. It is derived in [\[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md).
-
-The value bounds the fee a claim transaction must pay, and therefore bears on whether a claim is worth making at all: a claim whose fee exceeds its reward is never submitted.
 
 ## Zero Knowledge Signature Scheme (ZkSignature)
 
