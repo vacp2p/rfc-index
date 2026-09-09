@@ -55,11 +55,11 @@ An era does not fix the values of [Service Parameters](bedrock-service-declarati
 
 ## Interpreting Chain Data
 
-A block or proposal, and everything it carries, is parsed, validated and executed under the rules of $`\textbf{era}(sl)`$ of its slot. The header prefix up to and including `slot` ([Block Header](cryptarchia-v1-protocol.md#block-header)) is identical in every era, and every message that carries a block or proposal begins with the header in its [canonical encoding](bedrock-v1.1-block-construction.md#canonical-encoding). Otherwise a node cannot parse a block before it knows the block's era.
+A block or proposal, and everything it carries, is parsed, validated and executed under the rules of $`\textbf{era}(sl)`$ of its slot. `slot` is the first field of the header ([Block Header](cryptarchia-v1-protocol.md#block-header)) and has the same encoding in every era, and every message that carries a block or proposal begins with the header in its [canonical encoding](bedrock-v1.1-block-construction.md#canonical-encoding). Otherwise a node cannot parse a block before it knows the block's era.
 
-[Fork choice](fork-choice.md) compares two chains under the era of the slot of their $`\textbf{common\_ancestor}`$ ([Fork Pruning](cryptarchia-v1-protocol.md#fork-pruning)). The fork choice rule of an era reads only the block tree and the header prefix up to and including `slot`. Otherwise it is undefined on the blocks of a later era that re-encodes a field it reads.
+[Fork choice](fork-choice.md) compares two chains under the era of the slot of their $`\textbf{common\_ancestor}`$ ([Fork Pruning](cryptarchia-v1-protocol.md#fork-pruning)). The fork choice rule of an era reads only the block tree and the slot of each block. Otherwise it is undefined on the blocks of a later era that re-encodes a field it reads.
 
-A node must implement the rules of every era from $`\textbf{era}(sl_{B_\text{imm}})`$ to the era in force. A node whose software does not must halt at startup and on checkpoint import. A halted node stops every protocol and exits with an error to the operator.
+At startup and on checkpoint import, a node whose software does not implement the rules of every era from $`\textbf{era}(sl_{B_\text{imm}})`$ to the era in force must halt. A halted node stops every protocol and exits with an error to the operator.
 
 A node keeps in its mempool only transactions valid under the era in force. A transaction is parsed under the era of the topic that delivered it and admitted under the rules of the era in force.
 

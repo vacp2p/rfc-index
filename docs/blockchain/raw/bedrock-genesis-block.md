@@ -31,7 +31,7 @@
 | 1.1.3 | Replaced the `block_root` header field with `body_root`, taken over an empty uncle header list and the initial transaction, due to updated [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md). | 2026-08-06 |
 | 1.1.4 | Stated which validations apply when the Genesis Mantle Transaction is processed: the ordinary Mantle rules apply to every Operation, minus a closed list of exemptions that the absence of any state before Genesis makes impossible to satisfy. | 2026-08-25 |
 | 1.1.5 | Renamed locked notes into service notes: the Blend declarations of the Genesis Mantle Transaction name a `service_note_id` | 2026-08-27 |
-| 1.2.0 | Removed the `bedrock_version` header field ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
+| 1.2.0 | Removed the `bedrock_version` header field and moved `slot` first ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
 
 # Introduction
 
@@ -177,8 +177,8 @@ GENESIS_MANTLE_TX = MantleTx(
 
 The Genesis Block header fields are set to the following values:
 
-- `parent_block`: 0 (as this is the first block).
 - `slot`: 0 (the Genesis slot).
+- `parent_block`: 0 (as this is the first block).
 - `body_root`: the body commitment over an empty `uncle_headers` list (as the Genesis Block references no uncle, it encodes as a zero element count) and the Merkle root over the (single) initial transaction.
 - `proof_of_leadership`: Stubbed leadership proof.
   - `leader_voucher`: 0 (as there is no leader block reward for the initial block).
@@ -190,8 +190,8 @@ The Genesis Block header fields are set to the following values:
 
 ```python
 GENESIS_HEADER = Header(
-    parent_block=0,
     slot=0,
+    parent_block=0,
     body_root=body_root([], [GENESIS_MANTLE_TX]),
     proof_of_leadership=ProofOfLeadership(
         leader_voucher=bytes(32),
@@ -250,8 +250,8 @@ GENESIS_MANTLE_TX = MantleTx(
 )
 
 GENESIS_HEADER = Header(
-    parent_block=bytes(32),
     slot=0,
+    parent_block=bytes(32),
     body_root=body_root([], [GENESIS_MANTLE_TX]),
     proof_of_leadership=ProofOfLeadership(
         leader_voucher=bytes(32),

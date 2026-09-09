@@ -33,7 +33,7 @@
 | 1.2.0 | Added the `uncle_headers` field — the signed headers of the referenced uncles — to the [Proposal](#block-proposal) and to the newly defined [Block](#block), and replaced `block_root` with `body_root` in the [Header](#header), which commits to them, signatures included, as well as to the transactions. Due to updated [Cryptarchia Protocol](cryptarchia-v1-protocol.md) (uncle references). | 2026-08-06 |
 | 1.2.1 | Precise the state each transaction of a block is validated against: the transactions are validated and executed one after the other in the order they appear, each against the state the preceding ones left, which makes block validity order-dependent. Precise that a block whose validation fails at any point is not executed at all. | 2026-08-24 |
 | 1.3.0 | Compressed Block Proposal: 16-byte transaction reference prefixes and a variable-length `references` list, reducing the proposal from 34,574 bytes to at most 18,192. Added the [Canonical Encoding](#canonical-encoding) section. | 2026-08-18 |
-| 1.4.0 | Removed the `bedrock_version` header field ([Bedrock Eras](bedrock-eras.md)): the header is 296 bytes, a signed header 360, and the maximum proposal 18,187 bytes. | 2026-09-04 |
+| 1.4.0 | Removed the `bedrock_version` header field and moved `slot` to the first header field ([Bedrock Eras](bedrock-eras.md)): the header is 296 bytes, a signed header 360, and the maximum proposal 18,187 bytes. | 2026-09-04 |
 
 # Introduction
 
@@ -104,16 +104,16 @@ Note that this makes the random-padding requirement of [Payload Formatting](payl
 
 ```python
 class Header:                                # 296 bytes
-    parent_block: hash                       # 32 bytes
     slot: SlotNumber                         # 8 bytes
+    parent_block: hash                       # 32 bytes
     body_root: hash                          # 32 bytes
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 ```
 
 Where:
 
-- `parent_block` is the block ID ([Cryptarchia Protocol](cryptarchia-v1-protocol.md)) of the parent block, validated and accepted by the block builder. It is used for the derivation of the `AgedLedger` and `LatestLedger` values necessary for validating the PoL; the size of the `hash` is 32 bytes.
 - `slot` is the consensus slot number; the size of the `SlotNumber` type is 8 bytes.
+- `parent_block` is the block ID ([Cryptarchia Protocol](cryptarchia-v1-protocol.md)) of the parent block, validated and accepted by the block builder. It is used for the derivation of the `AgedLedger` and `LatestLedger` values necessary for validating the PoL; the size of the `hash` is 32 bytes.
 - `body_root` is the commitment to the block body — both the carried `uncle_headers` and the transactions. It is computed as defined in step 3 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation), which combines the serialized `uncle_headers` list with the root of the Merkle tree constructed from the **full** transaction hashes (defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction)) — the same hashes used for constructing the `mempool_transactions` references list; the size of the `hash` is 32 bytes. Because that Merkle root is taken over the full hashes, `body_root` uniquely binds the proposal to a specific ordered transaction selection even when two transactions share the same `references` prefix, and it also binds the *number* of references; see [Binding of the reference list](#binding-of-the-reference-list). Since the block ID is taken over the header, committing the uncle headers here is what makes two blocks with the same ID identical byte for byte.
 - `proof_of_leadership` is the proof confirming that the sender is the leader; defined below: [Proof of Leadership](#proof-of-leadership).
 
@@ -172,9 +172,9 @@ The encoding is canonical: every valid proposal has exactly one byte representat
 ```schema
 Proposal          = Header UncleHeaders References Ed25519Signature
 
-Header            = ParentBlock Slot BodyRoot ProofOfLeadership
-ParentBlock       = Hash32
+Header            = Slot ParentBlock BodyRoot ProofOfLeadership
 Slot              = UINT64
+ParentBlock       = Hash32
 BodyRoot          = Hash32
 
 UncleHeaders      = UncleCount *SignedHeader
@@ -197,7 +197,7 @@ This yields the following sizes, where `n` is the number of references:
 
 | Structure | Encoded size | Minimum | Maximum |
 | --- | --- | --- | --- |
-| `Header` | `32 + 8 + 32 + 224` | 296 | 296 |
+| `Header` | `8 + 32 + 32 + 224` | 296 | 296 |
 | `ProofOfLeadership` | `128 + 32 + 32 + 32` | 224 | 224 |
 | `SignedHeader` | `296 + 64` | 360 | 360 |
 | `UncleHeaders` | `1 + 360u` | 1 | 1,441 |
@@ -250,8 +250,8 @@ Only after the PoL is generated can the block proposal be constructed (see [Proo
 
 1. Initialize proposal metadata with the last known state of the blockchain. Set the:
   - `header`:
-    - `parent_block`
     - `slot`
+    - `parent_block`
     - `body_root` — left unset here; it is computed in step 4, once both parts of the body are known
     - `proof_of_leadership`:
       - `leader_voucher`
