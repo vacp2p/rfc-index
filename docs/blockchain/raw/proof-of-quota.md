@@ -28,7 +28,7 @@
 | 1.0.1 | Remove the protection against adaptive adversary from PoL. It impacts the PoL section of PoQ. Update the performance according to the new circuit. Remove old project name from DSTs | 2026-04-09 |
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.2.0 | Add the proof of work branch: third selector value, `pow_quota` and `pow_blend_difficulty` public inputs, `pow_sk` witness, Lagrange branch selection, and the binding and precomputation properties | 2026-08-31 |
-| 1.3.0 | Replace the proof of work secret key and its key derivation with a single private nonce, and give the puzzle ticket a domain separation tag | 2026-08-31 |
+| 1.3.0 | Replace the proof of work secret key and its key derivation with a single private nonce | 2026-09-08 |
 
 
 # Introduction
@@ -139,7 +139,7 @@ What the quota bounds differs by branch, because the nullifier is derived from a
   1. The prover knows a `pow_nonce` whose puzzle ticket satisfies the Blend threshold. The ticket is derived directly from the nonce together with the epoch nonce, and must be strictly below `pow_blend_difficulty`. Because a smaller threshold admits fewer tickets, a smaller `pow_blend_difficulty` makes the puzzle harder.
   2. The index is valid: `index < pow_quota`.
 
-  This branch uses no key. Nothing about this branch requires proving knowledge of a secret with key structure, only that the preimage of a winning ticket is known and never revealed. The nonce is that preimage. The ticket derivation carries its own domain separation tag, so the puzzle occupies a hash domain of its own and a preimage found for it is meaningless anywhere else.
+  This branch uses no key. Nothing about this branch requires proving knowledge of a secret with key structure, only that the preimage of a winning ticket is known and never revealed. The nonce is that preimage.
 
 **Step 5:** The prover derives a `key_nullifier` maintained by blend nodes during the epoch for message deduplication purpose.
 
@@ -205,9 +205,9 @@ is_leader = would_win_leadership(pol_epoch_nonce,
         pol_noteid_path_selectors)
 
 # Check if it's a valid proof of work solution. The ticket is derived directly
-# from the private nonce under its own domain separation tag, and the comparison
+# from the private nonce and the epoch nonce, and the comparison
 # is over the whole scalar field rather than a truncation of it.
-pow_ticket = zkhash(b"BLEND_POW_V1", pol_epoch_nonce, pow_nonce)
+pow_ticket = zkhash(pow_nonce, pol_epoch_nonce)
 is_winning_pow = pow_ticket < pow_blend_difficulty
 
 # Verify that it's a core node, a leader, or a valid proof of work solution.
@@ -244,7 +244,6 @@ The proof of work branch places no bound on how old a solution may be. The only 
 That value does not become known when its epoch starts. It is fixed at the beginning of the lottery constants finalization phase of the *preceding* epoch, as specified in [Epoch](cryptarchia-v1-protocol.md#epoch), and is public from that moment. An epoch is $`10\lfloor k/f \rfloor`$ slots and the nonce is fixed $`6\lfloor k/f \rfloor`$ slots into the preceding epoch, so it is known for the final $`4\lfloor k/f \rfloor`$ slots of that epoch — with the parameters in [Cryptarchia](cryptarchia-v1-protocol.md#constants), roughly three days of a seven and a half day epoch.
 
 `pow_blend_difficulty` for the epoch is fixed at the same snapshot as the nonce, as specified in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty), so the whole window has every public input of the proof available, and complete proofs — not only solutions — may be prepared ahead of the epoch; the reward path's freshness is enforced independently by its own acceptance window. A prover may therefore mine solutions for an epoch throughout that window and hold them until the epoch opens. Admission to the Blend network over the proof of work branch is consequently limited by the total work a prover can perform in that window and by `pow_quota`, rather than by any rate at which solutions may be presented.
-
 ## Proof Compression
 
 The proof confirming that the PoQ is correct must be compressed to a size of 128 bytes, where the `UncompressedProof` is comprising of 2  $`\mathbb{G}_1`$ and 1  $`\mathbb{G}_2`$ BN256 elements as presented below.
@@ -280,6 +279,6 @@ The material used for the benchmarks is the following:
 
 ![Diagram](proof-of-quota/assets/2e9261aa-09df-8023-91a7-e7f6c11c4056.png)
 
-The figure above measures the two branch circuit. The three branch circuit in its earlier, key-based form compiled to 20590 R1CS constraints. The nonce form removes the branch's key derivation and adds a domain separation constant, so its count is lower; it has not been re-measured, and the published figure should be read as an upper bound for the current circuit.
+The figure above measures the two branch circuit. The three branch circuit specified here is release v0.5.6 of the circuits repository, whose proving key holds 20123 R1CS constraints; its earlier key-based form compiled to 20590.
 
 A like for like proving time comparison against the figure above has not been produced: the measurements taken of the three branch circuit used a different statistic, sample count and thread range, so no conclusion about the change in proving time should be drawn from placing them side by side. The proof of work branch also has no benchmark of its own — the published measurements exercise the core and leadership branches only. Since all three branches are evaluated for every proof regardless of which one is selected, per proof cost is not expected to differ by branch, but this has not been measured.

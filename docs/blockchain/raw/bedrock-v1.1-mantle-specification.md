@@ -42,7 +42,7 @@
 | 1.11.0 | Track the configuration lineage of a channel: `ChannelState` gains `config_tip_hash` and the `CHANNEL_CONFIG` payload carries the `parent` configuration it extends, ordering configurations and preventing their replay | 2026-08-27 |
 | 1.11.1 | Renamed locked notes into service notes: `service_notes`, `ServiceNote` and `service_note_id` replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in | 2026-08-27 |
 | 1.12.0 | Specified the `SDP_ACTIVE` execution effects, matching the implementation: `active` is set to the epoch of the including block, and a message the activity logic rejects makes the Operation invalid. Set `withdraw_at` to `current_epoch + 2`, the epoch at which the node stops providing the service, and removed declarations at `withdraw_at` | 2026-09-02 |
-| 1.13.0 | Add the `CLAIM_POW_REWARD` Operation, the proof of work reward pool and its difficulty retargeting | 2026-08-31 |
+| 1.13.0 | Add the `CLAIM_POW_REWARD` Operation, the proof of work reward pool and its difficulty retargeting | 2026-09-08 |
 
 # Introduction
 
@@ -1605,7 +1605,7 @@ block_slots: dict[hash, SlotNumber]  # Slots of recently seen blocks, for the wi
 
 `PowTarget` is a scalar field element, and every operation on one is defined over its **canonical integer representative** in $`[0, p-1]`$. A field has no order and no floor division, so neither the comparison below nor the controller arithmetic in [Reward Difficulty](#reward-difficulty) and [Blend Difficulty](#blend-difficulty) is field arithmetic: a ticket is accepted when its representative is strictly below the target's, targets are multiplied and floor-divided as arbitrary-precision integers in accordance with [Arithmetic](#arithmetic), and each controller caps its result below $`p`$, so the representative converts back to a field element without modular reduction ever occurring. A **smaller** target is a **harder** puzzle.
 
-The reward pool is a reserve of tokens the protocol pays claims from. It is seeded once at genesis and refilled at each epoch boundary from a share of the fees collected over the previous epoch, as specified in [Reward Pool](#reward-pool). It is not created on demand: a claim transfers tokens that already exist into circulation, and cannot be executed if the pool cannot cover it.
+The reward pool is a reserve of tokens the protocol pays claims from. It is seeded once at genesis, as specified in [Reward Pool](#reward-pool). It is not created on demand: a claim transfers tokens that already exist into circulation, and cannot be executed if the pool cannot cover it.
 
 ### Acceptance Window
 
@@ -1653,19 +1653,19 @@ The puzzle ticket is derived from the payload:
 ```python
 def get_puzzle_ticket(claim: ClaimPowRewardOp) -> zkhash:
     return zkhash(
-        claim.epoch_nonce,
-        FiniteField(claim.block_hash, byte_order="little", modulus=p),
         claim.public_key,
+        FiniteField(claim.block_hash, byte_order="little", modulus=p),
+        claim.epoch_nonce,
     )
 ```
 
-where $`p`$ is the scalar field modulus given in [Common Cryptographic Components](common-cryptographic-components.md). A miner searches for a `public_key` whose ticket falls below the reward threshold; the corresponding secret key allows the reward note to be spent afterwards. The secret key must be sampled with full entropy rather than enumerated, because it both remains secret and authorises spending the reward.
+where `zkhash` is Poseidon2 and $`p`$ is the scalar field modulus, both given in [Common Cryptographic Components](common-cryptographic-components.md). A miner searches for a `public_key` whose ticket falls below the reward threshold; the corresponding secret key signs the claim and later spends the reward note. The secret key must be sampled with full entropy rather than enumerated, because it remains secret and authorises both.
 
 This derivation carries no domain separation tag.
 
 #### Proof
 
-  `None`. This Operation carries no signature and no zero-knowledge proof. The authorisation is the puzzle solution itself, which is re-derived from the payload and checked during validation. The corresponding entry in `op_proofs` is `None`.
+  A [ZkSignature](#zero-knowledge-signature-scheme-zksignature) by the secret key corresponding to `public_key`, over the transaction's `mantle_txhash`. The puzzle solution itself carries no separate proof: it is re-derived from the payload and checked during validation.
 
 #### Execution gas
 
@@ -1677,7 +1677,7 @@ This derivation carries no domain separation tag.
 
 ```python
 claim: ClaimPowRewardOp            # the CLAIM_POW_REWARD payload
-                                   # op_proof is None for this Operation
+claim_proof: ZkSignature           # the op_proofs entry for this Operation
 
 current_slot: SlotNumber           # slot of the block including this claim
 difficulty_reward: PowTarget       # d_reward, retargeted every block
@@ -1707,6 +1707,9 @@ assert puzzle_ticket < difficulty_reward
 # 5. The solution must not have been claimed before. The nullifier is the ticket,
 #    so the value computed in step 4 is reused.
 assert puzzle_ticket not in pow_nullifiers
+
+# 6. The claim must be signed by the key the reward is paid to.
+assert ZkSignature_verify(mantle_txhash, claim_proof, [claim.public_key])
 ```
 
   The nullifier of a claim is its puzzle ticket, which is determined by the payload and unique to a winning key:
@@ -1789,7 +1792,7 @@ tx = MantleTx(
 
 SignedMantleTx(
     tx=tx,
-    op_proofs=[None,                       # authorisation is the solution in the payload
+    op_proofs=[ZkSignature(reward_sk, mantle_txhash(tx)),
                transfer.prove(reward_sk)],
 )
 ```
@@ -1819,20 +1822,14 @@ def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
 
 The division rounds down, and what the flooring withholds is not lost: it remains in the pool, to be counted again at the next boundary. `TARGET_CLAIMS_PER_BLOCK` is the same value the reward difficulty steers toward, so the two uses are consistent by construction: the reward is sized for the rate the controller is targeting.
 
-At each epoch boundary, before any block of the new epoch is processed, the pool is credited with the refill accrued over the previous epoch and the per-claim reward is then recomputed from the refilled pool:
+At each epoch boundary, before any block of the new epoch is processed, the per-claim reward is recomputed from the pool:
 
 ```python
-POW_SHARE: uint64 = 10                    # beta, as the fraction POW_SHARE / SHARE_DEN
-SHARE_DEN: uint64 = 100
-
-def on_epoch_boundary(epoch_blocks: list[Block]):
-    pow_reward_pool = checked_uint64(pow_reward_pool + get_pow_pool_refill(epoch_blocks))
+def on_epoch_boundary():
     epoch_pow_reward = compute_epoch_pow_reward(pow_reward_pool)
 ```
 
-`get_pow_pool_refill` sums, over the blocks of the epoch that just ended, the fraction `POW_SHARE / SHARE_DEN` of the fees each block collected, as specified in [Proof of Work Reward Pool](overview-cryptoeconomics.md#proof-of-work-reward-pool). Those tokens are diverted before the fees reach the rewards pool rather than created, so refilling never adds to the supply; who bears the cost of the diversion is set out in that section.
-
-All arithmetic here is checked, in accordance with [Arithmetic](#arithmetic). The pool must not saturate: saturating at the maximum representable value would create tokens that were never allocated, which is precisely the failure the checked-arithmetic rule exists to prevent.
+All arithmetic here is checked, in accordance with [Arithmetic](#arithmetic).
 
 Fixing the reward for the whole epoch allows a wallet to compute a reward note's identifier before submitting a claim, and therefore what makes a self-funding claim possible at all. The pool is drawn down by claims within the epoch, but the per-claim value is not recomputed until the next boundary.
 
@@ -1844,7 +1841,7 @@ The rejection is not a special case. It is the first condition of [Validation](#
 
 At the specified constants no sequence of valid blocks can drain the pool within an epoch. The guard nevertheless remains normative, so that if a future change to `MAX_BLOCK_TXS` or to these constants reopened the path, the result would be that claiming stops, rather than that the pool goes negative or the protocol pays out tokens it does not hold.
 
-Claiming recovers by itself. At the next epoch boundary the refill is credited and `epoch_pow_reward` is recomputed from the refilled pool, so a pool that was drained to a fraction of one reward yields a correspondingly smaller reward in the epoch that follows, and claiming resumes at that lower value. The mechanism degrades to a smaller reward rather than stopping permanently, and it stops permanently only when the pool falls so far that the recomputed reward rounds down to zero.
+Claiming recovers by itself. At the next epoch boundary `epoch_pow_reward` is recomputed from the pool, so a pool that was drained to a fraction of one reward yields a correspondingly smaller reward in the epoch that follows, and claiming resumes at that lower value. The mechanism degrades to a smaller reward rather than stopping permanently, and it stops permanently only when the pool falls so far that the recomputed reward rounds down to zero.
 
 An epoch running at the target claim rate distributes exactly the fraction $`\rho`$ of the pool, whatever the target is set to; the target governs how many claims share the distribution, not its total.
 
@@ -1854,11 +1851,9 @@ The relationship the three must satisfy is that a claim's reward exceeds its fee
 
 ### Genesis
 
-The pool is seeded once, at genesis, with `POW_REWARD_POOL_GENESIS`, as specified in [Bedrock Genesis Block](bedrock-genesis-block.md). After that it changes only through the epoch-boundary refill and through claims.
+The pool is seeded once, at genesis, with `POW_REWARD_POOL_GENESIS`, as specified in [Bedrock Genesis Block](bedrock-genesis-block.md). After that it changes only through claims.
 
 The seed is **five thousandths of the maximum supply** $`S_{cap}`$, the hard cap of [Block Rewards](block-rewards.md).
-
-The seed is drawn from the initial token distribution rather than created for the purpose, so claiming redirects tokens that already exist and never raises issuance above what the emission model allows.
 
 ### Reward Difficulty
 
@@ -1867,7 +1862,6 @@ The seed is drawn from the initial token distribution rather than created for th
 ```python
 EMA_SMOOTHING_FACTOR: uint64 = 9      # F, the weight given to the previous estimate
 EMA_SMOOTHING_PRECISION: uint64 = 10  # P, the scale F is expressed against; F < P
-REWARD_TARGET_FLOOR: uint64 = 9       # ceil(F / (P - F)); derived below, not a tuning knob
 
 def compute_new_reward_difficulty(claims_in_block: uint64,
                                   current_target: PowTarget) -> PowTarget:
@@ -1881,22 +1875,16 @@ def compute_new_reward_difficulty(claims_in_block: uint64,
                     + EMA_SMOOTHING_FACTOR * TARGET_CLAIMS_PER_BLOCK)
     new_target = (TARGET_CLAIMS_PER_BLOCK * current_target
                   * EMA_SMOOTHING_PRECISION) // demand
-    # Clamped at both ends: capped so that converting back into the field cannot
-    # reduce modulo p and turn a very easy target into a very hard one, and
-    # floored so that zero -- which is absorbing -- stays unreachable, at the
-    # smallest value the empty-block easing still lifts under floor division.
-    return min(max(new_target, REWARD_TARGET_FLOOR), p - 1)
+    # Capped so that converting back into the field cannot reduce modulo p and
+    # turn a very easy target into a very hard one.
+    return min(new_target, p - 1)
 ```
 
 The ordering is part of consensus. Every claim in a block is validated against the target produced by the previous block's update; the update from a block's own accepted count is applied after the block is processed and governs the next block. Genesis supplies the value the first block is validated against.
 
 The controller holds no state of its own beyond the current target. Rather than remembering a running estimate of demand, it reconstructs one from the target in force, on the assumption that the target was calibrated to the intended rate. This keeps it a single value in consensus state.
 
-Two properties follow, and both matter for its safety. When a block accepts exactly the target number of claims the target is unchanged, so the intended rate is a fixed point. When a block accepts none, the numerator is floored at 1 and the target moves up by a factor of $`P/F`$ — bounded, and in the direction of making claiming easier, so a period without claims eases rather than locks; the floor below makes that hold all the way down. The smoothing means a single unusual block moves the target only slightly, so no separate per-block rate clamp is required.
-
-Both ends of the update are clamped, and the two clamps guard against different failures. The cap at $`p-1`$ keeps a run of empty blocks from pushing the representative out of the field. The floor guards the other end: the update is multiplicative in the current target, so **zero is absorbing twice over** — arithmetically, every subsequent update multiplies by it, and physically, no ticket lies strictly below a zero target, so the claims whose absence would ease it can never arrive — and the easing that exists to revive a too-hard target is the branch that multiplies by the stuck value. Nor would a floor of one suffice: under floor division the empty-block easing $`\lfloor t \cdot P/F \rfloor`$ returns $`t`$ unchanged for every $`t \lt F/(P-F)`$, so flooring at one would replace an absorbing point with an absorbing band. `REWARD_TARGET_FLOOR` is the smallest value the easing strictly lifts, $`\lceil F/(P-F) \rceil = 9`$ at the specified smoothing.
-
-The [Blend Difficulty](#blend-difficulty) controller needs no such floor: it is recomputed from `BLEND_DIFFICULTY_BASE` every epoch, and its clamp only bounds the step away from the previous value, so there is no multiplicative state for a collapse to absorb.
+Two properties follow, and both matter for its safety. When a block accepts exactly the target number of claims the target is unchanged, so the intended rate is a fixed point. When a block accepts none, the numerator is floored at 1 and the target moves up by a factor of $`P/F`$ — bounded, and in the direction of making claiming easier, so a period without claims eases rather than locks. The smoothing means a single unusual block moves the target only slightly, so no separate per-block rate clamp is required.
 
 The rate the controller observes is the rate of claims **included in blocks**, not the rate at which solutions are found. Solutions that are never included, because a block builder declined to include them or because block space was exhausted, are invisible to it. Difficulty therefore tracks accepted demand rather than offered demand, and the two diverge when block space is contended.
 
@@ -2086,7 +2074,7 @@ class Note:
 
 The indivisible unit is the lepton, and one LGO is $`10^{9}`$ lepta. `TokenValue` counts lepta: every quantity of that type — note values, balances, fees, prices and pool balances — is an integer number of lepta, and no representable amount is smaller than one lepton. The unit system, its derivation and the canonical naming are specified by *Logos Token: Units and Precision*, which this document defers to; amounts written in LGO here are a display convenience for $`10^{9}`$ lepta.
 
-Two consequences for the arithmetic here. The per-block reserve release cap derived in [Block Rewards](block-rewards.md) is $`62500/657`$ LGO, which is not a whole number of lepta either; where an integer is required it is rounded down, losing less than one lepton per block. And because the fee floor is one lepton rather than one LGO, the floor is a safeguard against a zero price becoming absorbing, several orders of magnitude below any price the markets would discover — not an economically meaningful price itself.
+One consequence for the arithmetic here: the per-block reserve release cap derived in [Block Rewards](block-rewards.md) is $`62500/657`$ LGO, which is not a whole number of lepta; where an integer is required it is rounded down, losing less than one lepton per block.
 
 The genesis reward pool is given as a fraction of the maximum supply in [Genesis](#genesis), so that it is independent of the unit in which the pool is counted.
 
@@ -2218,9 +2206,9 @@ From the [[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md
 | EXECUTION_SDP_WITHDRAW_GAS | 590 |
 | EXECUTION_SDP_ACTIVE_GAS | 590 |
 | EXECUTION_LEADER_CLAIM_GAS | 580 |
-| EXECUTION_CLAIM_POW_REWARD_GAS | 56 |
+| EXECUTION_CLAIM_POW_REWARD_GAS | 590 |
 
-`EXECUTION_CLAIM_POW_REWARD_GAS` is the cost of an Operation that verifies no proof and no signature: it re-derives a hash, compares it against a threshold, and performs a few lookups and insertions. It is priced with the other Operations whose cost is a single signature verification, which is a conservative over-estimate here, and is derived in [\[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md).
+`EXECUTION_CLAIM_POW_REWARD_GAS` is the cost of one ZkSignature verification, the same basis as `EXECUTION_TRANSFER_GAS`: the ticket re-derivation and the window, nullifier and pool checks are negligible beside it. It is derived in [\[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md).
 
 The value bounds the fee a claim transaction must pay, and therefore bears on whether a claim is worth making at all: a claim whose fee exceeds its reward is never submitted.
 

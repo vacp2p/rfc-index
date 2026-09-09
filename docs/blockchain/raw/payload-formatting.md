@@ -27,7 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.1.0 | Updated `Max_Body_Length` to 34574 bytes, the maximum block proposal size once a proposal carries the signed headers of the uncles it references (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)). | 2026-08-06 |
 | 1.1.1 | Updated `Max_Body_Length` to 18192 bytes, following the compression of transaction references to 16-byte prefixes and their encoding as a variable-length list (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)). | 2026-08-18 |
-| 1.2.0 | Add the transaction `body_type`, bound a carried transaction to `Max_Body_Length`, and state the fixed-length padding cost it inherits | 2026-08-31 |
+| 1.2.0 | Add the transaction `body_type`, bound a carried transaction to `Max_Body_Length`, and state the fixed-length padding cost it inherits | 2026-09-08 |
 
 # Introduction
 
@@ -69,7 +69,7 @@ We define the following values of the `body_type`:
 
 Any other value of type means that the message was not decapsulated correctly and must be discarded.
 
-The `body_type` determines where the content is delivered once a message is fully decapsulated, as defined in the [Blend Protocol](blend-protocol.md#processing): a block proposal is broadcast, and a transaction is both submitted to the node's mempool and broadcast.
+The `body_type` determines where the content is delivered once a message is fully decapsulated, as defined in the [Blend Protocol](blend-protocol.md#processing): a block proposal is broadcast, and a transaction is submitted to the node's mempool.
 
 The set of values above is therefore closed: a node that does not know a value drops the message rather than ignoring the field. Introducing a new `body_type` is a change to what the network accepts, not only to how a payload is encoded, and nodes must recognise a value before any node emits it.
 
