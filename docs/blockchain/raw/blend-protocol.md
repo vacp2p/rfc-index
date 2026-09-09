@@ -663,7 +663,7 @@ where $`y`$ is the number of distinct solutions held by the node $`n`$ that sati
 
 Setting $`Q_W = \beta_{max}`$ makes one solution sufficient for exactly one message. A quota unit is one blending operation, not one message: a message carries $`\beta_{max}`$ blending operations and therefore consumes $`\beta_{max}`$ keys, one per encapsulation. Expressing the quota as a multiple of $`\beta_{max}`$ rather than as a bare number keeps that relationship correct if the number of blending operations per message ever changes, and makes the messages-per-solution figure explicit rather than something a reader must derive.
 
-This is the quota that admits participants holding neither stake nor a declaration: the cost of reaching the Blend network without a prior relationship to the protocol is one puzzle solution per message, set by $`d_{blend}`$, whose baseline is chosen in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty).
+This is the quota that admits participants holding neither stake nor a declaration: the cost of reaching the Blend network without a prior relationship to the protocol is one puzzle solution per message, set by $`d_{blend}`$, whose baseline is chosen in [Blend Difficulty](proof-of-work.md#blend-difficulty).
 
 The puzzle is not the only per message cost: each of the $`\beta_{max}`$ encapsulations carries its own proof, generated whatever the quota is.
 
@@ -671,13 +671,7 @@ The rate at which this branch admits messages cannot be bounded in the way the o
 
 ### Blend Difficulty
 
-$`d_{blend}`$ is the threshold a puzzle ticket must fall below to satisfy the proof of work branch of the [Proof of Quota](#proof-of-quota). Because a smaller threshold admits a smaller fraction of tickets, a smaller $`d_{blend}`$ makes admission harder.
-
-It is a per epoch value, held constant for the whole epoch and identical for every proof produced within it. Both properties are required rather than incidental: the threshold is a public input to the proof, so a value that varied between provers, or within an epoch, would partition proofs into distinguishable classes and reveal which participants had produced which messages. Holding it constant for the epoch keeps the proof of work branch indistinguishable from the other two.
-
-The control objective for $`d_{blend}`$ belongs to this protocol, because what it regulates is the health of the anonymity set. When genuine traffic is plentiful the network already provides a large set to hide in, so permissionless admission can be restricted more tightly without harming privacy; when traffic is thin, admission should be made easier so that proof of work backed messages contribute to the set rather than being excluded from it. A threshold that is too tight starves the anonymity set; one that is too loose exposes the network to flooding by participants who need no stake to send.
-
-The value itself is a consensus quantity: it must be agreed by every node, so it is derived from on-chain observations and held in consensus state. It is fixed at the same snapshot as the epoch's nonce, during the preceding epoch, as specified in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty), which gives the load it is computed from and the bounds that make it resistant to manipulation. Publishing it together with the nonce keeps the proof precomputation window usable, since both are public inputs to the same proof.
+$`d_{blend}`$ is the threshold a puzzle ticket must fall below to satisfy the proof of work branch of the [Proof of Quota](#proof-of-quota). It is a consensus value, fixed for each epoch at the same snapshot as the epoch's nonce, and is derived in [Blend Difficulty](proof-of-work.md#blend-difficulty).
 
 ### Quota Application
 
