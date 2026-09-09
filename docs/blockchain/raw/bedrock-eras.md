@@ -28,8 +28,6 @@ The schedule is a strictly increasing list of epoch numbers. The first entry is 
 
 The era of an epoch $`ep`$ is $`\textbf{era}(ep) = \max\{n : E_n \le ep\}`$. The era of a slot $`sl`$ is the era of its epoch: $`\textbf{era}(sl) = \textbf{era}(\lfloor sl / \text{EPOCH\_LENGTH} \rfloor)`$, with the epoch length defined in [Epoch Schedule](cryptarchia-v1-protocol.md#epoch-schedule). Era $`n`$ begins at slot $`E_n \cdot \text{EPOCH\_LENGTH}`$. An era must not change the epoch length; a change moves the first slot of every scheduled era. The **era in force** is $`\textbf{era}(sl)`$ of the current slot.
 
-The era number is encoded as a `uint8` in every binary wire field that carries it. The schedule must not exceed 255 entries; a later era cannot be expressed in the wire fields.
-
 A schedule entry must never change once a release has published it. Changing it makes nodes running different releases apply different rules to the same slots, which is a fork. A defective era is corrected by a new era at a future epoch.
 
 An era defines rules, not the values set under them. A [Service Parameters](bedrock-service-declaration-protocol.md#service-parameters) entry changes a value within an era.
