@@ -18,15 +18,34 @@
 
 An era is a range of consecutive epochs ([Cryptarchia Protocol](cryptarchia-v1-protocol.md#epoch)) governed by one set of protocol rules.
 
+# Overview
+
+An era schedule embedded in the node software maps every epoch to an era. A node applies to a block the rules of the era of the block's slot, and to its network protocols the era of the slot given by its clock. Every era after the first defines a migration of the recorded chain state from its predecessor. When the era changes, a node runs the network protocols of both eras for a transition period, and every protocol identifier carries the era. A software release halts at its horizon, the last epoch it interprets.
+
 # Protocol
+
+## Constants
+
+| Symbol | Name | Description | Value |
+| --- | --- | --- | --- |
+| *none* | era schedule of mainnet | The first epochs of the eras of mainnet. | `[0]` |
+| *none* | era schedule of testnet | The first epochs of the eras of testnet. | `[0]` |
+
+## Notation
+
+| Symbol | Name | Description | Value |
+| --- | --- | --- | --- |
+| $`E_n`$ | first epoch of era $`n`$ | Entry $`n`$ (1-based) of the era schedule. | $`E_1 = 0`$ |
+| $`\textbf{era}(ep)`$ | era of an epoch | The era whose first epoch is the largest at or before $`ep`$. | $`\max\{n : E_n \le ep\}`$ |
+| $`\textbf{era}(sl)`$ | era of a slot | The era of the slot's epoch, with the epoch length of [Epoch Schedule](cryptarchia-v1-protocol.md#epoch-schedule). | $`\textbf{era}(\lfloor sl / \text{EPOCH\_LENGTH} \rfloor)`$ |
+| *none* | era in force | The era of the slot given by the local clock ([Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation)). | $`\textbf{era}(\textbf{wallclock\_time}().\textbf{to\_slot}())`$ |
+| $`H`$ | horizon | The last epoch a software release interprets, per network. | set per release |
+| $`T`$ | Transition Period | The Blend [Transition Period](blend-protocol.md#transition-period) of the era in force. | |
+| $`B_\text{imm}`$ | latest immutable block | See [Cryptarchia Protocol](cryptarchia-v1-protocol.md#latest-immutable-block). | |
 
 ## Era Schedule
 
-The era schedule is embedded in the node software and is not read from the chain. Each network has its own schedule. The schedule of mainnet and of testnet is `[0]`.
-
-The schedule is a strictly increasing list of epoch numbers. The first entry is 0. Entry $`n`$ (1-based) is the first epoch of era $`n`$, denoted $`E_n`$.
-
-The era of an epoch $`ep`$ is $`\textbf{era}(ep) = \max\{n : E_n \le ep\}`$. The era of a slot $`sl`$ is $`\textbf{era}(\lfloor sl / \text{EPOCH\_LENGTH} \rfloor)`$ ([Epoch Schedule](cryptarchia-v1-protocol.md#epoch-schedule)). The **era in force** is $`\textbf{era}(sl)`$ of the slot $`\textbf{wallclock\_time}().\textbf{to\_slot}()`$ ([Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation)).
+The era schedule is embedded in the node software and is not read from the chain. Each network has its own schedule. The schedule is a strictly increasing list of epoch numbers whose first entry is 0.
 
 An era must not change $`k`$, $`f`$ ([Constants](cryptarchia-v1-protocol.md#constants)) or the epoch length. Otherwise every later era boundary moves. An era must not change the comparison of chains that diverge by at most $`k`$ blocks ([Online Fork Choice Rule](fork-choice.md#online-fork-choice-rule)). Otherwise fork choice depends on the order in which forks were seen for the first $`k`$ blocks of the era.
 
@@ -40,9 +59,10 @@ A block or proposal, and everything it carries, is parsed, validated and execute
 
 [Fork choice](fork-choice.md) compares two chains under the era of the slot of their $`\textbf{common\_ancestor}`$ ([Fork Pruning](cryptarchia-v1-protocol.md#fork-pruning)). The fork choice rule of an era reads only the block tree and the header prefix up to and including `slot`. Otherwise it is undefined on the blocks of a later era that re-encodes a field it reads.
 
-A node must implement the rules of every era from $`\textbf{era}(sl_{B_\text{imm}})`$ to the era in force, where $`B_\text{imm}`$ is the [Latest Immutable Block](cryptarchia-v1-protocol.md#latest-immutable-block). A node whose software does not must halt at startup and on checkpoint import. A halted node stops every protocol and exits with an error to the operator.
+A node must implement the rules of every era from $`\textbf{era}(sl_{B_\text{imm}})`$ to the era in force. A node whose software does not must halt at startup and on checkpoint import. A halted node stops every protocol and exits with an error to the operator.
 
 A node keeps in its mempool only transactions valid under the era in force. A transaction is parsed under the era of the topic that delivered it and admitted under the rules of the era in force.
+
 
 ## Era Migration
 
@@ -59,9 +79,10 @@ The [Epoch State](cryptarchia-v1-protocol.md#epoch-state) of an epoch is compute
 
 The rules of an era verify the Activity Proofs and reward claims of the last epoch of the predecessor era as the predecessor's rules do. Otherwise the rewards of that epoch are lost.
 
+
 ## Era Transition Period
 
-The Era Transition Period is the first $`T`$ [rounds](blend-protocol.md#time) after the era in force changes, where $`T`$ is the Blend [Transition Period](blend-protocol.md#transition-period) of the era in force. It applies to the network layer only. $`T`$ must exceed the clock difference between any two honest nodes. Otherwise those nodes share no round in which both run one era's protocols.
+The Era Transition Period is the first $`T`$ [rounds](blend-protocol.md#time) after the era in force changes. It applies to the network layer only. $`T`$ must exceed the clock difference between any two honest nodes. Otherwise those nodes share no round in which both run one era's protocols.
 
 During the Era Transition Period a node must:
 
@@ -77,9 +98,10 @@ Every protocol identifier and gossipsub topic a Logos Blockchain specification d
 
 A node sends a message it generates over the identifiers of the era in force at generation. A node relays or releases a received or processed Blend message over the era of the connection it arrived on. A node publishes every block it accepts on the block topic of the era in force. A [synchronization](cryptarchia-v1-bootstr-sync.md#downloading-blocks) response carries blocks of any era.
 
+
 ## Horizon
 
-A software release carries a horizon $`H`$, an epoch number, for each network. $`H`$ must not be smaller than the last entry of the schedule. Otherwise the node halts at or before the first slot of its last era.
+$`H`$ must not be smaller than the last entry of the schedule. Otherwise the node halts at or before the first slot of its last era.
 
 When $`\textbf{wallclock\_time}().\textbf{to\_slot}()`$ reaches the first slot of epoch $`H+1`$, a node halts. The horizon halt must not be triggered by information received from peers.
 
