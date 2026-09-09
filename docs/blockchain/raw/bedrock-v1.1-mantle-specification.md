@@ -1608,7 +1608,7 @@ Validators must maintain the following state to process proof of work Operations
 ```python
 pow_reward_pool: TokenValue      # Reserve the rewards are paid from
 epoch_pow_reward: TokenValue     # Reward per claim, fixed for the epoch
-difficulty_reward: PowTarget     # d_reward: the reward threshold, retargeted every block
+difficulty_reward: PowTarget     # the reward threshold, retargeted every block
 pow_nullifiers: set[zkhash]      # Spent solutions, retained for the acceptance window
 block_slots: dict[hash, SlotNumber]  # Slots of recently seen blocks, for the window check
 ```
