@@ -31,7 +31,7 @@
 | 1.5.2 | Renamed locked notes into service notes and stated that the Input Gas covers the check that a note is neither a service nor a channel note | 2026-08-27 |
 | 1.5.3 | Adopted "active message" as the single name for the message | 2026-09-02 |
 | 1.5.4 | Renamed the `stake_manipulation_threshold` of the channel gas derivations into `transfer_threshold` and the Channel Stake Assignation section into Channel Transfer, following Mantle | 2026-08-31 |
-| 1.5.5 | [RFC] Align the SDP costs with declarations keyed by `zk_id`: no lock-period check, and a note backs one declaration | 2026-09-09 |
+| 1.5.5 | [RFC] Align the SDP costs with declarations keyed by service and `zk_id`: no lock-period check | 2026-09-09 |
 
 # Introduction
 
@@ -176,14 +176,14 @@ This gas amount covers the verification of multiple Eddsa25519 signatures and en
 
 ## SDP Declaration
 
-This gas covers multiple verification processes: confirming ownership of the service note through ZkSignature verification, validating the zk_id via a second ZkSignature, and establishing ownership of the provider_id through an Eddsa25519 signature. It also includes verification of the declaration format, confirmation of note existence, validation that the note is not already used, and verification of its amount. Additionally, it accounts for the computational costs associated with the note service locking mechanism and declaration management.
+This gas covers multiple verification processes: confirming ownership of the service note through ZkSignature verification, validating the zk_id via a second ZkSignature, and establishing ownership of the provider_id through an Eddsa25519 signature. It also includes verification of the declaration format, confirmation of note existence, validation that the note is not already used for the service, and verification of its amount. Additionally, it accounts for the computational costs associated with the note service locking mechanism and declaration management.
 
 Execution: ~ 646k CPU cycles.
 
 - Verification of the Ed25519 signature: 56,000 cycles.
 - Verification of the ZK signature: 590,000 cycles.
-- Verification that the `zk_id` is not already registered: negligible.
-- Verification that the `provider_id` is not already bound: negligible.
+- Verification that the `zk_id` is not already registered in the service: negligible.
+- Verification that the `provider_id` is not already bound in the service: negligible.
 - Verification of locator length: negligible.
 - Verification of service note existence: negligible.
 - Verification of service note value: negligible.
