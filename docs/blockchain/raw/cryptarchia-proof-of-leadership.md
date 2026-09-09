@@ -27,7 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-12-09 |
 | 1.1.0 | Remove the protection against adaptive adversary from PoL removing a non-enforced feature, simplifying work for engineers, improving UX and performances of PoL and PoQ. Update the performance according to the new circuit. Remove the notion of NOMOS in DSTs | 2026-01-29 |
 | 1.1.1 | Introduced a discussion for when the value of a participating note is way higher than the total estimated stake | 2026-06-24 |
-| 1.2.0 | [RFC] Dual-key notes: the note's STARK-field public key is a private input and enters the note identifier derivation | 2026-09-07 |
+| 1.2.0 | The note's STARK-field public key is a private input and enters the note identifier derivation | 2026-09-07 |
 
 # Introduction
 

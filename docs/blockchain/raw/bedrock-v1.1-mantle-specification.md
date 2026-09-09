@@ -26,24 +26,24 @@
 | --- | --- | --- |
 | 1.1.0 | Initial revision. | 2026-12-01 |
 | 1.2.0 | Removed DA references. Removed notions of Sovereignty and Rollups and used Zones for simplicity. Removed Nomos from specifications and DSTs. Added bridging and decentralized sequencing for channels. | 2026-01-01 |
-| 1.2.1 | [RFC] Improve Mantle Transaction hash. | 2026-03-25 |
+| 1.2.1 | Improve Mantle Transaction hash. | 2026-03-25 |
 | 1.3.0 | [[RFC] Make Ledger Transaction an Operation](mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.md). | 2026-04-02 |
 | 1.4.0 | [[RFC] Enforce NoteId uniqueness](mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.md). | 2026-04-24 |
 | 1.5.0 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md). | 2026-05-06 |
-| 1.6.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
+| 1.6.0 | Remove Concept of a Session | 2026-06-22 |
 | 1.7.0 | Factor out the multi eddsa threshold verification and added a validation step in channel config to check the new config threshold is lower or equal than the number of accredited keys | 2026-06-25 |
-| 1.8.0 | [RFC] Update channels to support proof of stake participation and test vectors for OpId and Mantle Transaction Hash | 2026-07-06 |
+| 1.8.0 | Update channels to support proof of stake participation and test vectors for OpId and Mantle Transaction Hash | 2026-07-06 |
 | 1.9.0 | Update the execution of `CHANNEL_DEPOSIT` to consume the inputs and recreate them in the channel, updating their NoteId avoid replay attacks in case of withdraw after a deposit | 2026-07-27 |
 | 1.9.1 | Rename the excess balance left after the mandatory fees into `tx_priority_tip` and convert it back into a `TokenValue` explicitly | 2026-08-05 |
 | 1.9.2 | Required checked arithmetic for all token value, balance, gas, and fee computations. | 2026-08-06 |
 | 1.10.0| Enforce non empty inputs for every operation not only transfer moving the assertion in the validation of input spendability | 2026-08-11 |
-| 1.10.1| [RFC] One canonical encoding for `ServiceType` and `Locator`: `ServiceType` is its one-byte discriminant and `Locator` is the multiaddr binary form. Added a `declaration_id` test vector | 2026-08-14 |
+| 1.10.1| One canonical encoding for `ServiceType` and `Locator`: `ServiceType` is its one-byte discriminant and `Locator` is the multiaddr binary form. Added a `declaration_id` test vector | 2026-08-14 |
 | 1.10.2| Precise the state validation reads: the Operations of a Mantle Transaction are validated and executed one after the other in the order they appear, each against the state the preceding ones left, and a Mantle Transaction against the state the transactions preceding it in the block left. Accumulated the transaction balance along that pass, replacing `get_transaction_balance` | 2026-08-24 |
 | 1.11.0 | Track the configuration lineage of a channel: `ChannelState` gains `config_tip_hash` and the `CHANNEL_CONFIG` payload carries the `parent` configuration it extends, ordering configurations and preventing their replay | 2026-08-27 |
 | 1.11.1 | Renamed locked notes into service notes: `service_notes`, `ServiceNote` and `service_note_id` replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in | 2026-08-27 |
 | 1.12.0 | Specified the `SDP_ACTIVE` execution effects, matching the implementation: `active` is set to the epoch of the including block, and a message the activity logic rejects makes the Operation invalid. Set `withdraw_at` to `current_epoch + 2`, the epoch at which the node stops providing the service, and removed declarations at `withdraw_at` | 2026-09-02 |
 | 1.13.0 | Removed the `None` case of `op_proofs`, every Operation carrying exactly one proof. A `CHANNEL_CONFIG` creating a channel is verified against a threshold of `0` and its proof carries no signature and no index. Execution Gas is derived from the Operation and the state it is validated against, the thresholds pricing the channel Operations being the ones held in the channel state | 2026-08-31 |
-| 1.14.0 | [RFC] Dual-key notes: every `Note`, the `LEADER_CLAIM` output and the SDP declaration commit to a STARK-field public key next to the BN254 one; the `NoteId` binds both; canonical-form validation of the new key; test vectors regenerated | 2026-09-07 |
+| 1.14.0 | Every `Note`, the `LEADER_CLAIM` output and the SDP declaration commit to a STARK-field public key next to the BN254 one; the `NoteId` binds both; test vectors regenerated | 2026-09-07 |
 
 # Introduction
 
@@ -1134,11 +1134,10 @@ declarations: dict[NoteId, DeclarationInfo]
       assert declaration_id(declaration) not in declarations
       ```
 
-  3. Ensure the locators list is non-empty and has no more than 8 entries, and that `stark_zk_id` is in canonical form, i.e. each of its four Goldilocks elements is below $`q`$ ([Common Cryptographic Components](common-cryptographic-components.md#rescue-prime-optimized-stark-field-hash-function)).
+  3. Ensure the locators list is non-empty and has no more than 8 entries.
       ```python
       assert len(declaration.locators) >= 1
       assert len(declaration.locators) <= 8
-      assert declaration.stark_zk_id.is_canonical()
       ```
 
   4. Ensure the service note exists and its value is sufficient for joining the service.
@@ -1537,7 +1536,6 @@ proof: ProofOfClaim
 ```python
 assert claim.voucher_nf not in voucher_nullifier_set
 assert claim.rewards_root == last_voucher_root
-assert claim.stark_public_key.is_canonical()
 validate_proof(claim, proof, mantle_txhash)
 ```
 
@@ -1734,19 +1732,17 @@ def derive_op_id(operation: Op) -> Hash:
     return h.digest()
 
 def derive_note_id(op_id: Hash, output_number: int, note: Note) -> NoteId:
-    spk = note.stark_public_key.elements()  # the four Goldilocks elements of the key, canonical (each < q)
+    spk = note.stark_public_key.elements()  # the four Goldilocks elements of the key, each < q
     return zkhash(
         FiniteField(b"NOTE_ID_V1", byte_order="little", modulus= p),
         FiniteField(op_id, byte_order="little", modulus= p),
         FiniteField(output_number, byte_order="little", modulus= p),
         FiniteField(note.value, byte_order="little", modulus= p),
         note.public_key,
-        FiniteField(spk[0] + spk[1] * 2**64, byte_order="little", modulus= p),  # new
-        FiniteField(spk[2] + spk[3] * 2**64, byte_order="little", modulus= p),  # new
+        FiniteField(spk[0] + spk[1] * 2**64, byte_order="little", modulus= p),
+        FiniteField(spk[2] + spk[3] * 2**64, byte_order="little", modulus= p),
     )
 ```
-
-The STARK-field public key enters the derivation as two field elements, its four Goldilocks elements packed in pairs. Each packed value is below $`2^{128} \lt p`$ and the packing is injective because the elements are canonical, so the note identifier commits to both keys.
 
 `op_id` is a classical 256-bit hash digest and must be reduced to a field element before being passed to the ZkHasher. We apply a direct modular reduction mod `p` (via `FiniteField(..., modulus=p)`). Since $`p \approx2^{-254}`$, the reduction is slightly non-uniform, values in $`[0, 2^{256} \mod p)`$ appear one extra time, but this is inconsequential in practice: the collision probability remains around $`2^{-254}`$, and `NoteId` uniqueness is not derived from uniformity of `op_id` over $`𝔽_p`$ but from the collision-resistance of the underlying hash and per-operation payload uniqueness.
 
@@ -1805,10 +1801,9 @@ class Ledger:
         for note in outputs:
             assert note.value > 0
             assert note.value <= 2**64-1
-            assert note.stark_public_key.is_canonical()  # every Goldilocks element < q, see Common Cryptographic Components
 ```
 
-The canonical-form check ([Common Cryptographic Components](common-cryptographic-components.md#rescue-prime-optimized-stark-field-hash-function)) makes the byte encoding of `stark_public_key` unique, so the [Note Id](#note-id) commits to exactly one byte string per key and a serialized note round-trips. No other validation rule reads the field.
+The [Mantle Transaction Encoding](mantle-transaction-encoding.md#common-structures) only admits a `stark_public_key` in canonical form, so the [Note Id](#note-id) commits to exactly one byte string per key. No validation rule reads the field.
 
 ### Consuming Input Notes Execution
 

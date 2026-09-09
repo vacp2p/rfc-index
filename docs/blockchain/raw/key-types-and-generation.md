@@ -25,8 +25,8 @@
 | **Version** | **Changes** | **Date** |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
-| 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
-| 1.1.0 | [RFC] Dual-key notes: the NQK is declared together with its STARK-field counterpart `stark_zk_id` | 2026-09-07 |
+| 1.0.1 | Remove Concept of a Session | 2026-06-22 |
+| 1.1.0 | The NQK is declared together with its STARK-field counterpart `stark_zk_id` | 2026-09-07 |
 
 # Introduction
 

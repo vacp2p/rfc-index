@@ -27,7 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-02-05 |
 | 1.0.1 | Updated project references to Logos Blockchain | 2026-04-17 |
 | 1.1.0 | Fixed the master key generation personalization string to a valid 16-byte value; aligned the public key derivation with the [Mantle specification](bedrock-v1.1-mantle-specification.md#zero-knowledge-signature-scheme-zksignature) (`KDF` DST, compression mode, applied to the Logos key); specified the final Poseidon2 step as hash mode with the `WALLET_ZK_SK_V1` DST; clarified that extended public keys derive no children | 2026-09-03 |
-| 1.2.0 | Dual-key notes: STARK-field key derivation from a one-way image of the same leaf as the `ZkSecretKey`; both keys in every payment request; a note is the wallet's only when both keys are | 2026-09-07 |
+| 1.2.0 | STARK-field key derivation from a one-way image of the same leaf as the `ZkSecretKey`; both keys in every payment request; a note is the wallet's only when both keys are | 2026-09-07 |
 
 # Introduction
 
@@ -140,6 +140,15 @@ stark_public_key = starkhash(*dst_elements(b"STARK_KDF_V1"), *sk_stark)         
 - $`sk_{stark}`$ is the STARK-field secret key of the leaf and MUST be protected exactly as the `ZkSecretKey`: it is the secret that proves ownership of the leaf's notes under a STARK-field proof system. Exposure of the leaf exposes both keys; exposure of one key exposes neither the leaf nor the other key, since both derivations are one-way and the STARK-field seed is itself a one-way image of the leaf.
 - `stark_public_key` is the field of the same name in every note the leaf owns and in the `LEADER_CLAIM` payload; `STARK_KDF_V1` plays for the STARK-field key the role `KDF` plays for the BN254 key. The `stark_zk_id` of a service declaration is derived the same way from the leaf that holds the `zk_id`.
 - Recovery needs nothing new: scanning by index derives both keys of a leaf together, and a wallet never stores a mapping between them.
+
+**Test vector.** For the leaf $`k_i`$ = `0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20` (the bytes `0x01` to `0x20`):
+
+| Step | Value |
+| --- | --- |
+| $`s_i`$ | `0xab7ef4bbc69f4dc568262a33994f780ac17d75ffcd6b687ef3b3b205b00cb9cc` |
+| $`g_0, g_1, g_2, g_3`$ | [14217195274584227499, 754440456991549032, 9108648778855185857, 14751836004578145267] (no limb reduced) |
+| $`sk_{stark}`$ | `0x9aa42c410f141e5e0d7b250152304b4c6f6f023c4cdd81822ce7ddc9d68d5f76` |
+| `stark_public_key` | `0xe1e74415b44f65781efa99656fe5df93916b6072ce87e2144eb79bbe81549364` |
 
 **Both keys or neither.** Nothing on the ledger proves that the two keys of a note belong to the same party; the ledger commits to the pair, and the wallet is the only place the pair is checked. Therefore:
 

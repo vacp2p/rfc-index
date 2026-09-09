@@ -25,15 +25,15 @@
 | **Version** | **Changes** | **Date** |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
-| 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
-| 1.2.0 | [RFC] Per-service uniqueness of `provider_id` and `zk_id` | 2026-07-08 |
+| 1.1.0 | Remove Concept of a Session | 2026-06-22 |
+| 1.2.0 | Per-service uniqueness of `provider_id` and `zk_id` | 2026-07-08 |
 | 1.3.0 | Length-prefix the `locators` list in the `declaration_id` preimage | 2026-07-30 |
-| 1.4.0 | [RFC] One canonical encoding for `ServiceType` and `Locator` | 2026-08-14 |
+| 1.4.0 | One canonical encoding for `ServiceType` and `Locator` | 2026-08-14 |
 | 1.4.1 | Replaced the `uint64` width given to the `epoch` fields with a reference to [`EpochNumber`](cryptarchia-v1-protocol.md#epoch), which is 32 bits | 2026-08-25 |
 | 1.4.2 | Renamed locked notes into service notes: `locked_note_id` becomes `service_note_id` in the declaration and withdraw messages and in `DeclarationInfo` | 2026-08-27 |
 | 1.4.3 | Identifier uniqueness covers every stored declaration, not only activated ones, matching the implementation | 2026-09-01 |
 | 1.5.0 | Defined `active` as the epoch of the block that contained the latest accepted active message, initialised to `created + 2`, and `withdraw_at` as the epoch at which the node stops providing the service, matching the implementation. Added the participant-set exclusion rule and [Message Timing](#message-timing) | 2026-09-02 |
-| 1.6.0 | [RFC] Dual-key notes: `DeclarationMessage` and `DeclarationInfo` carry a `stark_zk_id`, the declaration's STARK-field zero-knowledge identity, bound to at most one declaration | 2026-09-07 |
+| 1.6.0 | `DeclarationMessage` and `DeclarationInfo` carry a `stark_zk_id`, the declaration's STARK-field zero-knowledge identity, bound to at most one declaration | 2026-09-07 |
 
 # Introduction
 
