@@ -667,8 +667,6 @@ This is the quota that admits participants holding neither stake nor a declarati
 
 The puzzle is not the only per message cost: each of the $`\beta_{max}`$ encapsulations carries its own proof, generated whatever the quota is.
 
-The rate at which this branch admits messages cannot be bounded in the way the other two are. The core quota is bounded by $`N`$, which the SDP publishes, and the leadership quota by the total stake. The proof of work quota is bounded only by how much work the network's participants choose to perform, which is not observable in advance and not bounded by the protocol. Every quantity derived from a bound on total messages — most directly the nullifier cache size in [Relaying](#relaying) — must therefore be re-derived against $`d_{blend}`$ rather than against a count of registered nodes.
-
 ### Blend Difficulty
 
 $`d_{blend}`$ is the threshold a puzzle ticket must fall below to satisfy the proof of work branch of the [Proof of Quota](#proof-of-quota). It is a consensus value, fixed for each epoch at the same snapshot as the epoch's nonce, and is derived in [Blend Difficulty](proof-of-work.md#blend-difficulty).

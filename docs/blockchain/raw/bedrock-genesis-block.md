@@ -82,7 +82,7 @@ POW_REWARD_POOL_GENESIS: TokenValue   # Initial balance of the proof of work rew
 
 The seed is five thousandths of the maximum supply $`S_{cap}`$, as specified in [Reward Pool](proof-of-work.md#reward-pool).
 
-The pool holds a balance rather than notes, so unlike the stakeholder allocations above it does not appear as an output of the initial Transfer Operation. It is consensus state maintained by Mantle, and after genesis it changes only through claims.
+The pool holds a balance rather than notes, so unlike the stakeholder allocations above it does not appear as an output of the initial Transfer Operation. It is consensus state maintained as specified in [Reward Pool](proof-of-work.md#reward-pool), and after genesis it changes only through claims.
 
 The seed is not part of the Cryptarchia parameter inscription, because it is not a Cryptarchia parameter. It is established during [Mantle Ledger Initialization](#mantle-ledger-initialization).
 

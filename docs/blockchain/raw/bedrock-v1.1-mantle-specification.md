@@ -138,7 +138,7 @@ def checked_int128(value: int) -> int:
         return value
 ```
 
-The checked arithmetic above is sufficient for every token-denominated quantity, including where this specification sums fees over whole epochs: conservation bounds every such aggregate, since no set of transactions can pay more in fees than the tokens that exist, and the supply of $`10^{19}`$ lepta is below the `uint64` maximum. The proof of work difficulty arithmetic is the exception, and is specified in [Puzzle Target](proof-of-work.md#puzzle-target).
+The proof of work difficulty updates are the exception to these bounds; they are specified in [Puzzle Target](proof-of-work.md#puzzle-target).
 
 ## Mantle Transaction Fee
 
@@ -1850,12 +1850,6 @@ class Note:
     value: TokenValue   # uint64
     public_key: ZkPublicKey # 32 bytes
 ```
-
-### Denomination
-
-The indivisible unit is the lepton, and one LGO is $`10^{9}`$ lepta. `TokenValue` counts lepta: every quantity of that type — note values, balances, fees, prices and pool balances — is an integer number of lepta, and no representable amount is smaller than one lepton. The unit system, its derivation and the canonical naming are specified by *Logos Token: Units and Precision*, which this document defers to; amounts written in LGO here are a display convenience for $`10^{9}`$ lepta.
-
-One consequence for the arithmetic here: the per-block reserve release cap derived in [Block Rewards](block-rewards.md) is $`62500/657`$ LGO, which is not a whole number of lepta; where an integer is required it is rounded down, losing less than one lepton per block.
 
 ### Note Id
 
