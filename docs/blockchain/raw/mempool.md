@@ -27,7 +27,7 @@
 The mempool is a node's store of Mantle Transactions that have been submitted but are not yet in the canonical chain. It disseminates those transactions, supplies them to block building, and resolves the references a block proposal carries in place of transaction bodies.
 
 # Overview
-A transaction enters the mempool by local submission, by gossip, or by re-insertion after a fork switch. While it is pending, the node relays and broadcasts it on the mempool topic, offers it to block building, and resolves against it the prefix a block proposal carries. It leaves when a block carrying it enters the canonical chain, when block building finds it can never apply, or when it expires.
+A transaction enters the mempool by local submission, by gossip, or by re-insertion after a fork switch. While it is pending, the node relays and broadcasts it on the mempool topic, offers it to block building once it is confirmed, and resolves against it the prefix a block proposal carries. It leaves when a block carrying it enters the canonical chain, when block building finds it can never apply, or when it expires.
 
 # Construction
 ## Constants
