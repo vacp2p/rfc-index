@@ -218,7 +218,7 @@ A proposal the node decapsulates as the Blend exit node is not publicly dissemin
 
 The **sync view** $`T_\text{sync} \subseteq T`$ is the set of publicly disseminated blocks of $`T`$.
 
-The **sync chain** $`c_\text{sync}`$ is the chain the node's fork choice rule selects over $`T_\text{sync}`$; the **sync tip** is its tip. $`c_\text{sync}`$ is maintained like $`c_{loc}`$: each block is fed to the fork choice rule when it enters $`T_\text{sync}`$. It must not be computed by feeding blocks in the order they entered $`T`$, nor by truncating $`c_{loc}`$ to its public prefix. Blocks that become publicly disseminated together are fed in parent-to-child order.
+The **sync chain** $`c_\text{sync}`$ is the chain the node's fork choice rule selects over $`T_\text{sync}`$; the **sync tip** is its tip. $`c_\text{sync}`$ is maintained incrementally like $`c_{loc}`$: each block is fed to the fork choice rule when it enters $`T_\text{sync}`$. It must not be computed by feeding blocks in the order they entered $`T`$, nor by truncating $`c_{loc}`$ to its public prefix. Blocks that become publicly disseminated together are fed in parent-to-child order.
 
 A node observes the following rules:
 
