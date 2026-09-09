@@ -1707,8 +1707,6 @@ assert ZkSignature_verify(mantle_txhash, claim_proof, [claim.public_key])
 
   The epoch nonces in step 3 are the Cryptarchia epoch nonce $`\eta`$ defined in [Epoch Nonce](cryptarchia-v1-protocol.md#epoch-nonce), for the current epoch and for the epoch before it.
 
-  The puzzle ticket in step 4 is derived from the payload:
-
 ```python
 def get_puzzle_ticket(claim: ClaimPowRewardOp) -> zkhash:
     return zkhash(
