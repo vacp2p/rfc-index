@@ -69,7 +69,7 @@ The key must not be reused. Otherwise, the messages that reuse the same key can 
 
 A node obtains a Proof of Work Nonce (PWN) by searching for a nonce whose puzzle ticket falls below the Blend threshold for the epoch, as defined in [Proof of Quota](proof-of-quota.md). Unlike the keys above, it is not chosen but found: the node generates candidates until one satisfies the threshold, and the work of doing so is what the nonce represents.
 
-It is not a key at all. No public counterpart is derived from it, it signs nothing, and no key structure is required of it: the branch relies only on the preimage of a winning ticket being known and never revealed. The nonce is supplied to the PoQ circuit as a private witness and never appears in a message. It also stands in the secret's position of the nullifier derivation, which binds the solution's quota to whoever holds the nonce.
+No public counterpart is derived from it and it signs nothing. The nonce is supplied to the PoQ circuit as a private witness and never appears in a message. It also stands in the secret's position of the nullifier derivation, which binds the solution's quota to whoever holds the nonce.
 
 The PWN must be sampled with full entropy from the scalar field rather than enumerated from a starting point. Because the nonce remains secret and is the sole basis on which the quota is granted, a predictable generation procedure would let an observer reconstruct it and consume the remaining quota.
 

@@ -682,7 +682,7 @@ where $`y`$ is the number of distinct solutions held by the node $`n`$ that sati
 
 Setting $`Q_W = \beta_{max}`$ makes one solution sufficient for exactly one message. A quota unit is one blending operation, not one message: a message carries $`\beta_{max}`$ blending operations and therefore consumes $`\beta_{max}`$ keys, one per encapsulation. Expressing the quota as a multiple of $`\beta_{max}`$ rather than as a bare number keeps that relationship correct if the number of blending operations per message ever changes, and makes the messages-per-solution figure explicit rather than something a reader must derive.
 
-This is the quota that admits participants holding neither stake nor a declaration: the cost of reaching the Blend network without a prior relationship to the protocol is one puzzle solution per message, set by $`d_{blend}`$, whose baseline is chosen in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty).
+This is the quota that admits participants holding neither stake nor a declaration: the cost of reaching the Blend network without a prior relationship to the protocol is one puzzle solution per message, set by $`d_{blend}`$, whose baseline is chosen in [Blend Difficulty](proof-of-work.md#blend-difficulty).
 
 The puzzle is not the only per message cost: each of the $`\beta_{max}`$ encapsulations carries its own proof, generated whatever the quota is.
 
@@ -690,13 +690,7 @@ The rate at which this branch admits messages cannot be bounded in the way the o
 
 ### Blend Difficulty
 
-$`d_{blend}`$ is the threshold a puzzle ticket must fall below to satisfy the proof of work branch of the [Proof of Quota](#proof-of-quota). Because a smaller threshold admits a smaller fraction of tickets, a smaller $`d_{blend}`$ makes admission harder.
-
-It is a per epoch value, held constant for the whole epoch and identical for every proof produced within it. Both properties are required rather than incidental: the threshold is a public input to the proof, so a value that varied between provers, or within an epoch, would partition proofs into distinguishable classes and reveal which participants had produced which messages. Holding it constant for the epoch keeps the proof of work branch indistinguishable from the other two.
-
-The control objective for $`d_{blend}`$ belongs to this protocol, because what it regulates is the health of the anonymity set. When genuine traffic is plentiful the network already provides a large set to hide in, so permissionless admission can be restricted more tightly without harming privacy; when traffic is thin, admission should be made easier so that proof of work backed messages contribute to the set rather than being excluded from it. A threshold that is too tight starves the anonymity set; one that is too loose exposes the network to flooding by participants who need no stake to send.
-
-The value itself is a consensus quantity: it must be agreed by every node, so it is derived from on-chain observations and held in consensus state. It is fixed at the same snapshot as the epoch's nonce, during the preceding epoch, as specified in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty), which gives the load it is computed from and the bounds that make it resistant to manipulation. Publishing it together with the nonce keeps the proof precomputation window usable, since both are public inputs to the same proof.
+$`d_{blend}`$ is the threshold a puzzle ticket must fall below to satisfy the proof of work branch of the [Proof of Quota](#proof-of-quota). It is a consensus value, fixed for each epoch at the same snapshot as the epoch's nonce, and is derived in [Blend Difficulty](proof-of-work.md#blend-difficulty).
 
 ### Quota Application
 
@@ -899,15 +893,9 @@ The relaying logic is defined as follows:
     3. If the header of the message is incorrect, then discard the message and mark the neighbor as malicious and close the connection. We assume that an adversary cannot inject any spoofed message to the connection.
     4. If the PoQ nullifier $`\nu_i \in \mathbf H`$ from the public header of the message is already in the nullifier cache, then the message is a duplicate and must be discarded. This step only reads the cache: the nullifier is inserted only after steps 1.5 and 1.6 have both passed, at the moment the message is accepted for relaying. Cached entries are retained for the duration of the current epoch and the [Transition Period](#transition-period).
     5. If the signature $`\sigma_{K^{n}_{i}}(\mathbf P_i) \in \mathbf H`$ from the public header of the message is invalid, then the message must be discarded, and the neighbor must be marked malicious.
-    6. If the proof of quota $`\pi^{K^{n}_i}_{Q} \in \mathbf H`$ from the public header is invalid, then the message must be discarded and must not be relayed. The sender must be marked as spammy and its connection closed, in the same manner as for any other spam detected by the connectivity maintenance logic.
+    6. If the proof of quota $`\pi^{K^{n}_i}_{Q} \in \mathbf H`$ from the public header is invalid, then the message must be discarded, and the neighbor must be marked malicious.
 2. Release the message according to the [Releasing](#releasing) logic.
 3. Concurrently to the above step, add the message to the processing queue, where it is handled by the [Processing](#processing) logic.
-
-Step 1.6 applies to every received message, whatever its sender. It reverses the ordering used by earlier versions of this protocol, in which proof verification was deferred to [Processing](#processing) and therefore happened only after a message had already been relayed onward.
-
-The added per-hop verification latency lies within the delay budget of [Delaying](#delaying), whose maximum delay $`\Delta_{max}`$ dominates it.
-
-Deduplication by nullifier, step 1.4, remains before this check, but only as a lookup: insertion happens strictly after the proof has verified, so a cache entry attests that a fully verified message already used that nullifier and a lookup hit is a true duplicate. The lookup runs first because reading the cache is cheap and a hit makes the expensive verification unnecessary.
 
 The node must cache the PoQ nullifiers ($`\nu_i`$) of every message it relays — and only of messages it relays — for a duration of a single epoch plus the [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that the size of the cache must be at least:
 
