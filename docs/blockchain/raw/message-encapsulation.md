@@ -26,6 +26,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
+| 1.1.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 
 # Introduction
 
@@ -97,25 +98,25 @@ This document outlines the cryptographic notation, data structures, and algorith
 - $`H_{\mathbf N}()`$ is a domain-separated hash function dedicated to the node index selection (the implementation of the hash function is `blake2b`).
   ```python
   def hashds(domain=b"BlendNode", data: bytes) -> bytes:
-      return Blake2B.hash512(domain + data)
+      return Blake2B.hash256(domain + data)
   ```
 
 - $`H_\mathbf{I}()`$ is a domain-separated hash function dedicated to the initialization of the blend header (the implementation of the hash function is `blake2b`).
   ```python
   def hashds(domain=b"BlendInitialization", data: bytes) -> bytes:
-      return Blake2b.hash512(domain + data)
+      return Blake2b.hash256(domain + data)
   ```
 
 - $`H_\mathbf{b}()`$ is a domain-separated hash function dedicated to the blend header encryption operations (the implementation of the hash function is `blake2b`).
   ```python
   def hashds(domain=b"BlendHeader", data: bytes) -> bytes:
-      return Blake2b.hash512(domain + data)
+      return Blake2b.hash256(domain + data)
   ```
 
 - $`H_\mathbf{P}()`$ is a domain-separated hash function dedicated to the payload encryption operations (the implementation of the hash function is `blake2b`).
   ```python
   def hashds(domain=b"BlendPayload", data: bytes) -> bytes:
-      return Blake2b.hash512(domain + data)
+      return Blake2b.hash256(domain + data)
   ```
 
 - $`\beta_{max}`$ is the maximal number of blending headers in the private header.
@@ -123,14 +124,18 @@ This document outlines the cryptographic notation, data structures, and algorith
   ENCAPSULATION_COUNT: int
   ```
 
-- $`\text {CSPRBG}()`$ is a generalized cryptographically secure pseudo-random bytes generator, it is implemented as [BLAKE2b-Based PRNG Construction](common-cryptographic-components.md#blake2b-based-prng-construction).
-- $`\text {CSPRBG}()_{x}`$ is a cryptographically secure pseudo-random bytes generator whose output is restricted to $`x`$ bytes, it is implemented as [BLAKE2b-Based PRNG Construction](common-cryptographic-components.md#blake2b-based-prng-construction).
+- $`\text {CSPRBG}()`$ is a generalized cryptographically secure pseudo-random bytes generator, it is implemented as [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction).
+- $`\text {CSPRBG}()_{x}`$ is a cryptographically secure pseudo-random bytes generator whose output is restricted to $`x`$ bytes, it is implemented as [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction).
   ```python
   def pseudo_random(domain: bytes, key: bytes, size: int) -> bytes:
-      rand = BlakeRng.from_seed(hashds(domain, key)).generate(size)
+      rand = ChaCha20Rng.from_seed(hashds(domain, key)).generate(size)
       assert len(rand) == size
       return rand
   ```
+
+  The $`\text {CSPRBG}`$ seed is exactly 32 bytes: the domain-separated hash functions above return 32-byte digests, which are used directly as the seed.
+
+  Every $`\text {CSPRBG}`$ invocation in this specification generates at most a message-sized output, so the interoperability note of the [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction) applies: an RFC 8439 (IETF) ChaCha20 with a zero nonce is byte-for-byte compatible.
 
 - $`|t|`$ returns the length of the $`t`$ expressed in bytes.
 - $`\oplus`$ is a XOR operation.
