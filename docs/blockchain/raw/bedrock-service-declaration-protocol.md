@@ -34,6 +34,7 @@
 | 1.4.3 | Identifier uniqueness covers every stored declaration, not only activated ones, matching the implementation | 2026-09-01 |
 | 1.5.0 | Defined `active` as the epoch of the block that contained the latest accepted active message, initialised to `created + 2`, and `withdraw_at` as the epoch at which the node stops providing the service, matching the implementation. Added the participant-set exclusion rule and [Message Timing](#message-timing) | 2026-09-02 |
 | 1.6.0 | [RFC] The service and the `zk_id` identify a declaration; the derived `declaration_id` is removed | 2026-09-09 |
+| 1.7.0 | [RFC] A declaration carries no addresses; they are resolved through libp2p peer routing on the `provider_id` | 2026-09-09 |
 
 # Introduction
 
@@ -174,22 +175,12 @@ At any epoch `n`, the most recent report a snapshot can contain was included in 
 
 We define the following set of identifiers which are used for service-specific cryptographic operations:
 
-- `provider_id`: used to sign the SDP messages and to establish secure links between validators; it is `Ed25519PublicKey`.
+- `provider_id`: the libp2p node identity of the validator; it is a `PeerId`. The addresses it is reachable at are resolved through libp2p peer routing rather than carried by the protocol.
+
+A `PeerId` is defined by libp2p ([Peer Ids and Keys](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md)) as the identity multihash of the protobuf-encoded public key, for keys of at most 42 bytes. The SDP requires the `Ed25519` key type, so a `PeerId` is 38 bytes: the six-byte prefix `0x002408011220`, then the 32-byte Ed25519 public key. A `PeerId` whose prefix differs must be rejected: any other multihash code digests the key rather than carrying it, and a key that cannot be recovered can neither verify a signature nor derive an encryption key.
+
+The Ed25519 public key of a `provider_id` is its last 32 bytes. Signing and verification of SDP messages, and the derivation of the Non-ephemeral Encryption Key ([Key Types and Generation](key-types-and-generation.md)), use that key.
 - `zk_id`: used for zero-knowledge operations by the validator that includes rewarding ([Zero Knowledge Signature Scheme (ZkSignature)](bedrock-v1.1-mantle-specification.md#zero-knowledge-signature-scheme-zksignature)).
-
-### **Locators**
-
-A `Locator` is the address of a validator which is used to establish secure communication between validators. It follows the [multiaddr addressing scheme from libp2p](https://docs.libp2p.io/concepts/fundamentals/addressing/), but it must contain only the location part and must not contain the node identity (`peer_id`).
-
-The `provider_id` must be used as the node identity. Therefore, the `Locator` must be completed by adding the `provider_id` at the end of it, which makes the `Locator` usable in the context of libp2p.
-
-The canonical form of a `Locator` is the multiaddr **binary (byte) form**. Wherever a `Locator` is serialized — the transaction wire form ([Mantle Transaction Encoding](mantle-transaction-encoding.md)) — its binary form is used. The human-readable string form (e.g. `/ip4/203.0.113.10/tcp/4001`) is presentational only and must never appear in an encoding.
-
-The length of the binary form of a `Locator` is restricted to 329 bytes.
-
-**The canonical form makes deterministic ID generation work consistently.** The binary form carries no letter case and no textual shorthand, so two equal multiaddrs always share one byte representation; the string-form ambiguities (case, implicit defaults) cannot arise. Implementations that accept the string form as input must parse it into the binary form before any serialization or hashing, and every part of the address must be explicit (no implicit defaults).
-
-The canonical form makes a single `Locator` unambiguous, but it does not make a *list* of them unambiguous. The byte form of a multiaddr is self-describing, so concatenating two `Locator`s yields the byte form of a single longer one: `[/ip4/203.0.113.10/tcp/4001]` and `[/ip4/203.0.113.10, /tcp/4001]` are the same byte string. A list of `Locator`s must therefore be serialized as the `Locators` production of the [Mantle Transaction Encoding](mantle-transaction-encoding.md#sdp-operations): prefixed with its element count and with each element prefixed by its byte length.
 
 ### **Declaration Message**
 
@@ -198,13 +189,10 @@ The construction of the declaration message is as follows.
 ```python
 class DeclarationMessage:
     service_type: ServiceType
-    locators: list[Locator]
-    provider_id: Ed25519PublicKey
+    provider_id: PeerId
     zk_id: ZkPublicKey
     service_note_id: NoteId
 ```
-
-The `locators` list must be non-empty and its length must be limited to reduce the potential for abuse. Therefore, the length of the list cannot be longer than 8.
 
 The message must be signed by the `provider_id` key to prove ownership of the key that is used for network-level authentication of the validator.
 
@@ -218,8 +206,7 @@ Only valid declaration messages can be stored on the ledger. A declaration cover
 
 ```python
 class DeclarationInfo:
-    provider_id: Ed25519PublicKey
-    locators: list[Locator]
+    provider_id: PeerId
     service_note_id: NoteId
     created: EpochNumber
     active: EpochNumber
@@ -229,8 +216,7 @@ class DeclarationInfo:
 
 Where:
 
-- `provider_id` is the `Ed25519PublicKey` the validator signs its messages with;
-- `locators` is a copy of the `locators` from the `DeclarationMessage`;
+- `provider_id` is the `PeerId` of the validator, whose Ed25519 public key signs its messages;
 - `service_note_id` is the `NoteId` of the note that meets the minimum stake threshold;
 - `created` is the epoch of the block that contained the declaration;
 - `active` is the epoch of the block that contained the latest accepted active message, initialised to `created + 2` ([Message Timing](#message-timing));
@@ -327,8 +313,7 @@ The declaration message is considered valid when all of the following are met:
 
 - The `service_note_id` names an unspent note whose value meets the minimum stake threshold.
 - The `zk_id`, the `service_note_id` and the `provider_id` are each unbound in the `service_type` of the message ([Identifier Uniqueness](#identifier-uniqueness)).
-- The sender holds the private key corresponding to the `provider_id`.
-- The `locators` list is non-empty and not longer than 8 entries.
+- The `provider_id` carries the prefix `0x002408011220`, and the sender holds the private key corresponding to the Ed25519 public key it carries.
 
 If all of the above conditions are fulfilled, then the declaration is stored on the ledger under its service and `zk_id`; otherwise, the message is discarded.
 

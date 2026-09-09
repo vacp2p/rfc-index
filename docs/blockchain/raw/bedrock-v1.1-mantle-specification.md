@@ -44,6 +44,7 @@
 | 1.12.0 | Specified the `SDP_ACTIVE` execution effects, matching the implementation: `active` is set to the epoch of the including block, and a message the activity logic rejects makes the Operation invalid. Set `withdraw_at` to `current_epoch + 2`, the epoch at which the node stops providing the service, and removed declarations at `withdraw_at` | 2026-09-02 |
 | 1.13.0 | Removed the `None` case of `op_proofs`, every Operation carrying exactly one proof. A `CHANNEL_CONFIG` creating a channel is verified against a threshold of `0` and its proof carries no signature and no index. Execution Gas is derived from the Operation and the state it is validated against, the thresholds pricing the channel Operations being the ones held in the channel state | 2026-08-31 |
 | 1.14.0 | [RFC] Key SDP declarations by service and `zk_id`, a note backing one declaration per service | 2026-09-09 |
+| 1.15.0 | [RFC] `SDP_DECLARE` carries no addresses; the `Locator` structure is removed, and the `provider_id` is a `PeerId` whose Ed25519 key is recovered for verification | 2026-09-09 |
 
 # Introduction
 
@@ -1028,7 +1029,7 @@ Validators must keep the following state when implementing SDP Operations:
 
 ```python
 service_notes: dict[NoteId, dict[ServiceType, ZkPublicKey]]
-providers: dict[ServiceType, dict[Ed25519PublicKey, ZkPublicKey]]
+providers: dict[ServiceType, dict[PeerId, ZkPublicKey]]
 declarations: dict[ServiceType, dict[ZkPublicKey, DeclarationInfo]]
 ```
 
@@ -1042,13 +1043,6 @@ declarations by the identifier that is not their key, as `providers` does.
 class ServiceType(Enum):
     BN=0 # Blend Network; the one-byte discriminant is the canonical encoding
 
-class Locator(bytes):
-    # multiaddr binary form; the canonical encoding
-    # (see SDP: Locators)
-    def validate(self):
-        assert len(self) <= 329
-        assert validate_multiaddr(self)
-
 class MinStake:
     stake_threshold: int # stake value
     epoch: EpochNumber # epoch number
@@ -1057,9 +1051,20 @@ class ServiceParameters:
     inactivity_period: NumberOfEpochs # number of epochs
     epoch: EpochNumber                # epoch number at which the Service Parameters were set
 
+class PeerId(bytes):
+    # identity multihash of the protobuf-encoded Ed25519 public key
+    # (see SDP: Identifiers)
+    PREFIX = bytes.fromhex("002408011220")
+
+    def validate(self):
+        assert len(self) == 38
+        assert self[:6] == PeerId.PREFIX
+
+    def ed25519_key(self) -> bytes:
+        return self[6:]
+
 class DeclarationInfo:
-    locators: list[Locator]
-    provider_id: Ed25519PublicKey
+    provider_id: PeerId
     service_note_id: NoteId
     created: EpochNumber
     active: EpochNumber
@@ -1077,8 +1082,7 @@ The service registration follows the definition given in [**Declaration Message*
 ```python
 class DeclarationMessage:
     service_type: ServiceType
-    locators: list[Locator]
-    provider_id: Ed25519PublicKey
+    provider_id: PeerId
     zk_id: ZkPublicKey
     service_note_id: NoteId
 ```
@@ -1112,7 +1116,7 @@ proof: DeclarationProof
 min_stake: MinStake      # the (global) minimum stake setting
 ledger: Ledger           # the set of unspent notes
 service_notes: dict[NoteId, dict[ServiceType, ZkPublicKey]]
-providers: dict[ServiceType, dict[Ed25519PublicKey, ZkPublicKey]]
+providers: dict[ServiceType, dict[PeerId, ZkPublicKey]]
 declarations: dict[ServiceType, dict[ZkPublicKey, DeclarationInfo]]
 ```
 
@@ -1120,12 +1124,16 @@ declarations: dict[ServiceType, dict[ZkPublicKey, DeclarationInfo]]
 
   The declaration is verified according to [Declare](bedrock-service-declaration-protocol.md#declare).
 
-  1. Ensure ownership over the service note, `zk_id` and `provider_id`.
+  1. Ensure the `provider_id` carries a recoverable key, and ownership over the
+     service note, `zk_id` and `provider_id`.
       ```python
+      declaration.provider_id.validate()
       assert ZkSignature_verify(
           txhash, proof.zk_sig, [note.public_key, declaration.zk_id]
       )
-      assert Ed25519_verify(txhash, proof.provider_sig, provider_id)
+      assert Ed25519_verify(
+          txhash, proof.provider_sig, declaration.provider_id.ed25519_key()
+      )
       ```
 
   2. Ensure no identifier is already taken
@@ -1134,12 +1142,6 @@ declarations: dict[ServiceType, dict[ZkPublicKey, DeclarationInfo]]
       assert declaration.zk_id not in declarations[declaration.service_type]
       assert declaration.service_type not in service_notes.get(declaration.service_note_id, {})
       assert declaration.provider_id not in providers[declaration.service_type]
-      ```
-
-  3. Ensure the locators list is non-empty and has no more than 8 entries.
-      ```python
-      assert len(declaration.locators) >= 1
-      assert len(declaration.locators) <= 8
       ```
 
   4. Ensure the service note exists and its value is sufficient for joining the service.
@@ -1157,7 +1159,7 @@ declarations: dict[ServiceType, dict[ZkPublicKey, DeclarationInfo]]
 declaration: DeclarationMessage # the declaration we are executing
 current_epoch: EpochNumber
 service_notes: dict[NoteId, dict[ServiceType, ZkPublicKey]]
-providers: dict[ServiceType, dict[Ed25519PublicKey, ZkPublicKey]]
+providers: dict[ServiceType, dict[PeerId, ZkPublicKey]]
 ```
 
   *Execute*
@@ -1171,7 +1173,6 @@ providers: dict[ServiceType, dict[Ed25519PublicKey, ZkPublicKey]]
   2. Store the declaration as explained in [**Declaration Storage**](bedrock-service-declaration-protocol.md#declaration-storage).
       ```python
       declarations[declaration.service_type][declaration.zk_id] = DeclarationInfo(
-          locators=declaration.locators,
           provider_id=declaration.provider_id,
           service_note_id=declaration.service_note_id,
           created=current_epoch,
@@ -1194,8 +1195,7 @@ alice_note = Utxo(
 # Alice wishes to lock it to join the Blend network
 declaration=DeclarationMessage(
     service_type=ServiceType.BN,
-    locators=["/ip4/203.0.113.10/tcp/4001/p2p"],
-    provider_id=alice_provider_pk,
+    provider_id=alice_peer_id,
     zk_id=alice_pk_2,
     service_note_id=alice_note.id()
 )
@@ -1360,7 +1360,7 @@ same step.
 ```python
 current_epoch: EpochNumber
 service_notes: dict[NoteId, dict[ServiceType, ZkPublicKey]]
-providers: dict[ServiceType, dict[Ed25519PublicKey, ZkPublicKey]]
+providers: dict[ServiceType, dict[PeerId, ZkPublicKey]]
 declarations: dict[ServiceType, dict[ZkPublicKey, DeclarationInfo]]
 ```
 
@@ -1969,7 +1969,7 @@ The material used for the benchmarks is the following:
 
 To see what the payloads represent, refer to [Mantle Transaction Encoding](mantle-transaction-encoding.md).
 
-The `SDP_WITHDRAW` and `SDP_ACTIVE` payloads changed with this revision, so their `op_id`s and the hash of the transaction carrying them are marked `TBD` until they are regenerated from the encoding.
+The `SDP_DECLARE`, `SDP_WITHDRAW` and `SDP_ACTIVE` payloads changed with these revisions, so their `op_id`s and the hash of the transaction carrying them are marked `TBD` until they are regenerated from the encoding.
 
 ### Operation Id
 
@@ -1981,7 +1981,7 @@ The `SDP_WITHDRAW` and `SDP_ACTIVE` payloads changed with this revision, so thei
 | `CHANNEL_DEPOSIT`         | 0x1010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d65746164617461 | 0xf14ff0aad9bc5e8e30c5d1aa3710aaa1c1cc1f47c2c256e7d9e73104cb17ccaf |
 | `CHANNEL_WITHDRAW`        | 0x1212121212121212121212121212121212121212121212121212121212121212011300000000000000000000000000000000000000000000000000000000000000 | 0x503d0d08f9faef971864943103965d13be7159fe6e0361c8ea614c6d0431e59c |
 | `CHANNEL_TRANSFER`        | 0x14141414141414141414141414141414141414141414141414141414141414140115000000000000000000000000000000000000000000000000000000000000000116000000000000001700000000000000000000000000000000000000000000000000000000000000 | 0xfb24c17731954e8bbe1b0dedd69e4857c8083d1689aff331ba16f3ed5883f0ce |
-| `SDP_DECLARE`             | 0x00010b00047f00000191020bb8cd0353470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000 | 0x42e93fdce121a5ab4da3201a6fd2da1d42ca8b7d8c1a8c9e2a657a6cdc7aa468 |
+| `SDP_DECLARE`             | 0x0053470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000 | TBD |
 | `SDP_WITHDRAW`            | 0x001b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d00000000000000 | TBD |
 | `SDP_ACTIVE`              | 0x001e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020303030303030303030303030303030303030303030303030303030303030303 | TBD |
 | `LEADER_CLAIM`            | 0x200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000 | 0x0dc1a007fdd184b4553a83d166b749a621f5be2de4b3b0429ebf0520d1dd9a51 |
@@ -1991,4 +1991,4 @@ The `SDP_WITHDRAW` and `SDP_ACTIVE` payloads changed with this revision, so thei
 | Transaction | Payload | Transaction Hash                                                   |
 | - | - | - |
 | Empty transaction | 0x00 | 0x2eba3f667b80a508f3d44d149a1c27a90ea365a51e4fc8209289088142b364e5 |
-| Transaction with one of each operation | 0x0a000201000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020300000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000600000000000000000000000000000000000000000000000000000000000000100707070707070707070707070707070707070707070707070707070707070707000000000000000000000000000000000000000000000000000000000000000002001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00110e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c121010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d6574616461746113121212121212121212121212121212121212121212121212121212121212121201130000000000000000000000000000000000000000000000000000000000000014141414141414141414141414141414141414141414141414141414141414141401150000000000000000000000000000000000000000000000000000000000000001160000000000000017000000000000000000000000000000000000000000000000000000000000002000010b00047f00000191020bb8cd0353470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a0000000000000000000000000000000000000000000000000000000000000021001b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d0000000000000022001e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030330200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000 | TBD |
+| Transaction with one of each operation | 0x0a000201000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020300000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000600000000000000000000000000000000000000000000000000000000000000100707070707070707070707070707070707070707070707070707070707070707000000000000000000000000000000000000000000000000000000000000000002001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00110e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c121010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d657461646174611312121212121212121212121212121212121212121212121212121212121212120113000000000000000000000000000000000000000000000000000000000000001414141414141414141414141414141414141414141414141414141414141414140115000000000000000000000000000000000000000000000000000000000000000116000000000000001700000000000000000000000000000000000000000000000000000000000000200053470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a0000000000000000000000000000000000000000000000000000000000000021001b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d0000000000000022001e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030330200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000 | TBD |

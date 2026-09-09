@@ -33,6 +33,7 @@
 | 1.3.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 | 1.3.1 | Judged the active message window by the epoch of the including block, made the one-message-per-epoch rule per attested epoch, and made the transition-period delay a release constraint | 2026-09-02 |
 | 1.3.2 | An Active Message points to a declaration by `zk_id` | 2026-09-03 |
+| 1.3.3 | [RFC] Core node addresses are resolved through libp2p peer routing rather than retrieved from the SDP, and the `provider_id` is a `peer_id` | 2026-09-07 |
 
 # Introduction
 
@@ -149,7 +150,7 @@ In this section, we briefly discuss the way the network is created and maintaine
 
 The process of creating a network is called bootstrapping.
 
-At the beginning of an epoch, all core nodes retrieve a fresh set of core nodes’ connectivity information from the SDP protocol. Then each core node selects at random a set of other core nodes and connects to them through fully encrypted connections. After some time, when all core nodes connect to other core nodes, a new network is formed.
+A node joining the network first connects to the bootstrap nodes named in its configuration. At the beginning of an epoch, each core node retrieves the set of core node identities from the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)), which carries no addresses, and resolves the addresses of each `provider_id` through libp2p peer routing over the connections it already has. Then each core node selects at random a set of other core nodes and connects to them through fully encrypted connections. After some time, when all core nodes connect to other core nodes, a new network is formed.
 
 ### Minimal Network Size
 
@@ -298,7 +299,7 @@ Since the network is built based on two types of nodes, we define two network ty
 
 The bootstrapping defines the process of creating the network, which happens at the beginning of each epoch.
 
-1. A core node at the beginning of an epoch retrieves a set of core nodes’ information from the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
+1. A core node at the beginning of an epoch retrieves a set of core node identities from the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
 2. If the number of core nodes is below the minimum number of nodes ([Minimal Network Size](#minimal-network-size)), then stop and use regular broadcasting.
 3. It starts opening new connections.
     1. It selects at random (without replacement) a node from the set of core nodes.
@@ -317,7 +318,7 @@ The bootstrapping defines the process of creating the network, which happens at 
     1. The node with the lower public key value (`provider_id` from SDP) must close the outgoing connection to the node with the higher public key value.
     2. The node with the higher public key value (`provider_id` from SDP) must close the incoming connection from the node with the lower public key value.
 
-Public key values are compared lexicographically. Specifically, we use the libp2p [`peer_id`](https://docs.libp2p.io/concepts/fundamentals/peers/#peer-id) format of the `provider_id` and apply standard Base58 encoding ([`to_base58()`](https://docs.rs/libp2p/latest/libp2p/struct.PeerId.html#method.to_base58) libp2p function) for the comparison.
+The `provider_id` is a libp2p [`peer_id`](https://docs.libp2p.io/concepts/fundamentals/peers/#peer-id). Values are compared lexicographically under standard Base58 encoding ([`to_base58()`](https://docs.rs/libp2p/latest/libp2p/struct.PeerId.html#method.to_base58) libp2p function).
 
 **Maintenance**
 
@@ -346,7 +347,7 @@ Each core node defines individually the maximum number of edge connections allow
 
 The bootstrapping logic of an edge node:
 
-1. At the beginning of an epoch, the edge node retrieves a set of core nodes’ information from the SDP protocol.
+1. At the beginning of an epoch, the edge node retrieves a set of core node identities from the SDP protocol.
 2. If the number of core nodes is below the minimum number of nodes ([Minimal Network Size](#minimal-network-size)), then stop and use regular broadcasting.
 3. Whenever an edge node needs to send a message, it selects at random (without replacement) a node from that set.
 4. It establishes a secure connection with the selected node.
