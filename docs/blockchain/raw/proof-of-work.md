@@ -23,7 +23,7 @@
 
 # Introduction
 
-Posting a transaction to chain or sending a message through the Blend network requires tokens. A participant who arrives with nothing therefore cannot use the protocol.
+Posting a transaction to the chain or sending a message through the Blend network requires tokens. A participant who arrives with nothing therefore cannot use the protocol.
 
 Proof of work removes this obstacle. A participant who has computed a puzzle solution may use it to post transactions and to send messages through Blend. Neither use has a prerequisite beyond the computation itself. The cost is the electricity that computation burns, and it cannot be faked, since a valid ticket proves the work, and a validator checks it cheaply.
 
@@ -48,12 +48,11 @@ graph LR
     c --> t["pays for transactions"]
 ```
 
-The tokens come from a pool set aside at genesis. Nothing is minted for it, so mining does not inflate the supply. Each epoch pays out a fraction of what the pool still holds, therefore the reward is the same for every claim of that epoch, while the pool can pay it.
+The tokens come from a pool set aside at genesis. Nothing is minted for it, so mining does not inflate the supply. Each epoch pays out a fraction of what the pool still holds, so the reward is the same for every claim of that epoch, for as long as the pool can pay it.
 
 Each use has its own threshold, and a threshold sets how much work a solution costs. Every node computes both from what blocks carry, so no node trusts another for them.
 
 The reward threshold reads the claims in a block, the only sign of mining the chain has.
-
 
 ```mermaid
 graph LR
@@ -78,8 +77,6 @@ graph LR
 ```
 
 Here the branches end apart. Nothing absorbs the load, so a Blend message costs more work when blocks are full and less when they are quiet.
-
-
 
 # Protocol
 
