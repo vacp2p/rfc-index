@@ -32,6 +32,7 @@
 | 1.6.0 | Added the `Parent` of the `ChannelConfig` to follow Mantle | 2026-08-27 |
 | 1.6.1 | Renamed the `LockedNoteId` production of the SDP Operations into `ServiceNoteId` | 2026-08-27 |
 | 1.7.0 | Added the `ChannelConfigOpProof` and `ChannelTransferOpProof` variants and factored the three channel threshold proofs into `ChannelMultiSigProof`, carrying the index of the signing key alongside each signature | 2026-08-31 |
+| 1.8.0 | [RFC] SDP Operations address a declaration by `ServiceType` and `ZkId` instead of `DeclarationId`, and `SDPWithdraw` drops the redundant `ServiceNoteId` | 2026-09-09 |
 
 # Introduction
 
@@ -120,11 +121,10 @@ ProviderId    = Ed25519PublicKey
 ZkId          = ZkPublicKey
 ServiceNoteId = NoteId
 
-SDPWithdraw   = DeclarationId Nonce ServiceNoteId
-DeclarationId = Hash32
+SDPWithdraw   = ServiceType ZkId Nonce
 Nonce         = UINT64
 
-SDPActive     = DeclarationId Nonce Metadata
+SDPActive     = ServiceType ZkId Nonce Metadata
 Metadata      = UINT32 *BYTE  ; Service-specific node activeness metadata
 ```
 
