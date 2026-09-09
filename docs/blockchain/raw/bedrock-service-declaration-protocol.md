@@ -177,7 +177,7 @@ We define the following set of identifiers which are used for service-specific c
 
 - `provider_id`: the libp2p node identity of the validator; it is a `PeerId`. The addresses it is reachable at are resolved through libp2p peer routing rather than carried by the protocol.
 
-A `PeerId` is the identity multihash of the protobuf-encoded public key, and must use the `Ed25519` key type. It is therefore 38 bytes: the six-byte prefix `0x002408011220`, then the 32-byte Ed25519 public key. A `PeerId` whose prefix differs must be rejected: any other multihash code digests the key rather than carrying it, and a key that cannot be recovered can neither verify a signature nor derive an encryption key.
+A `PeerId` is defined by libp2p ([Peer Ids and Keys](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md)) as the identity multihash of the protobuf-encoded public key, for keys of at most 42 bytes. The SDP requires the `Ed25519` key type, so a `PeerId` is 38 bytes: the six-byte prefix `0x002408011220`, then the 32-byte Ed25519 public key. A `PeerId` whose prefix differs must be rejected: any other multihash code digests the key rather than carrying it, and a key that cannot be recovered can neither verify a signature nor derive an encryption key.
 
 The Ed25519 public key of a `provider_id` is its last 32 bytes. Signing and verification of SDP messages, and the derivation of the Non-ephemeral Encryption Key ([Key Types and Generation](key-types-and-generation.md)), use that key.
 - `zk_id`: used for zero-knowledge operations by the validator that includes rewarding ([Zero Knowledge Signature Scheme (ZkSignature)](bedrock-v1.1-mantle-specification.md#zero-knowledge-signature-scheme-zksignature)).

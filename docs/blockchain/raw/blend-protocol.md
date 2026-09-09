@@ -150,7 +150,7 @@ In this section, we briefly discuss the way the network is created and maintaine
 
 The process of creating a network is called bootstrapping.
 
-At the beginning of an epoch, all core nodes retrieve a fresh set of core node identities from the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)). The SDP carries no addresses. A node resolves the addresses of a `provider_id` through libp2p peer routing, which requires at least one reachable peer to start from; a node obtains those from its configuration. Then each core node selects at random a set of other core nodes and connects to them through fully encrypted connections. After some time, when all core nodes connect to other core nodes, a new network is formed.
+A node joining the network first connects to the bootstrap nodes named in its configuration. At the beginning of an epoch, each core node retrieves the set of core node identities from the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)), which carries no addresses, and resolves the addresses of each `provider_id` through libp2p peer routing over the connections it already has. Then each core node selects at random a set of other core nodes and connects to them through fully encrypted connections. After some time, when all core nodes connect to other core nodes, a new network is formed.
 
 ### Minimal Network Size
 
