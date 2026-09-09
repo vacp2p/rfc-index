@@ -455,7 +455,7 @@
     "title": "[Analysis] Gas Cost Determination",
     "status": "raw",
     "category": "Informational",
-    "updated": "2026-09-03",
+    "updated": "2026-09-09",
     "path": "blockchain/raw/analysis-gas-cost-determination.html"
   },
   {
@@ -554,7 +554,7 @@
     "title": "Mantle Transaction Encoding",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-08-31",
+    "updated": "2026-09-09",
     "path": "blockchain/raw/mantle-transaction-encoding.html"
   },
   {
@@ -1004,7 +1004,7 @@
     "title": "Mantle",
     "status": "raw",
     "category": "Informational",
-    "updated": "2026-09-03",
+    "updated": "2026-09-09",
     "path": "blockchain/raw/bedrock-v1.1-mantle-specification.html"
   },
   {

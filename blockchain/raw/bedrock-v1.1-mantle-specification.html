@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-09-09</strong> — <a href="https://github.com/logos-co/logos-lips/blob/4b9d1ca1794f1e1b47aa40582f7793e2f84ed999/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>4b9d1ca</code></a> — docs(blockchain): make every Operation carry a proof and gas independent of it (#431)</li>
 <li><strong>2026-09-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/e2e9e0fc0096e42153430689628c0d638d3c4cf4/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>e2e9e0f</code></a> — [RFC] The Epochs <code>active</code> and <code>withdraw_at</code> Record (#422)</li>
 <li><strong>2026-08-31</strong> — <a href="https://github.com/logos-co/logos-lips/blob/3cac48f3f3c7db46eddf3bbb70c1567d96e2b213/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>3cac48f</code></a> — docs(blockchain): rename locked notes to service notes (#423)</li>
 <li><strong>2026-08-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/48fbc82c3545f8512176ce7c707019aefce24650/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>48fbc82</code></a> — docs(blockchain): order channel configurations and prevent their replay (#396)</li>
@@ -230,6 +231,7 @@
 <tr><td>1.11.0</td><td>Track the configuration lineage of a channel: <code>ChannelState</code> gains <code>config_tip_hash</code> and the <code>CHANNEL_CONFIG</code> payload carries the <code>parent</code> configuration it extends, ordering configurations and preventing their replay</td><td>2026-08-27</td></tr>
 <tr><td>1.11.1</td><td>Renamed locked notes into service notes: <code>service_notes</code>, <code>ServiceNote</code> and <code>service_note_id</code> replace their locked counterparts, and the note kind is named after the role it plays rather than after the state it is left in</td><td>2026-08-27</td></tr>
 <tr><td>1.12.0</td><td>Specified the <code>SDP_ACTIVE</code> execution effects, matching the implementation: <code>active</code> is set to the epoch of the including block, and a message the activity logic rejects makes the Operation invalid. Set <code>withdraw_at</code> to <code>current_epoch + 2</code>, the epoch at which the node stops providing the service, and removed declarations at <code>withdraw_at</code></td><td>2026-09-02</td></tr>
+<tr><td>1.13.0</td><td>Removed the <code>None</code> case of <code>op_proofs</code>, every Operation carrying exactly one proof. A <code>CHANNEL_CONFIG</code> creating a channel is verified against a threshold of <code>0</code> and its proof carries no signature and no index. Execution Gas is derived from the Operation and the state it is validated against, the thresholds pricing the channel Operations being the ones held in the channel state</td><td>2026-08-31</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -273,7 +275,7 @@ def mantle_txhash(tx: MantleTx) -&gt; Hash:
 <p>A Mantle Transaction must include all relevant signatures and proofs for each Operation.</p>
 <pre><code class="language-python">class SignedMantleTx:
     tx: MantleTx
-    op_proofs: list[OpProof | None] # each Op has at most 1 associated proof
+    op_proofs: list[OpProof] # each Op has exactly 1 associated proof
 </code></pre>
 <p>Each proof (op proof and signature) must be cryptographically bound to the <code>MantleTx</code> through the <code>mantle_txhash</code> to prevent replay attacks. This binding is achieved by including the <code>MantleTx</code> hash reduced modulo <span class="math-inline" data-tex="p"></span> as a public input in every ZK proof.</p>
 <pre><code class="language-python">mantle_txhash_fr = FiniteField(mantle_txhash, byte_order="little", modulus = p)
@@ -297,6 +299,8 @@ def checked_int128(value: int) -&gt; int:
 <h2 id="mantle-transaction-fee"><a class="header" href="#mantle-transaction-fee">Mantle Transaction Fee</a></h2>
 <p>The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the <code>execution_base_fee</code>, and the total size of the encoded signed Mantle Transaction multiplied by the <code>permanent_storage_gas_price</code>. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [<a href="execution-market.html">Execution Market</a> and <a href="storage-markets.html">Storage Markets</a>.</p>
 <pre><code class="language-python">def mandatory_fees(signed_tx: SignedMantleTx,
+                   ledger: Ledger,
+                   channels: dict[ChannelId, ChannelState],
                    permanent_storage_gas_price: TokenValue, # Given by Storage Market
                    execution_gas_base_price: TokenValue) -&gt; uint64:  # Given by Execution Market
     mantle_tx = signed_tx.tx
@@ -305,12 +309,14 @@ def checked_int128(value: int) -&gt; int:
 
     for op in mantle_tx.ops:
         # Compute how much execution gas of this operation as defined
-        # in the gas determination Appendix
-        tx_execution_gas += execution_gas(op)
+        # in the gas determination Appendix, against the state this
+        # Operation is validated against
+        tx_execution_gas += execution_gas(op, ledger, channels)
     execution_base_fees = checked_uint64(tx_execution_gas * execution_gas_base_price)
 
     return checked_uint64(execution_base_fees + permanent_storage_fees)
 </code></pre>
+<p>The Execution Gas of an Operation is deterministically derived from that Operation and the state it is validated against.</p>
 <p>If the Mantle Transaction is unbalanced (meaning that the Transaction consume more value than it creates) and that the leftover balance cover more than the mandatory fees, the remaining is treated as execution tip fees.</p>
 <h2 id="validation"><a class="header" href="#validation"><strong>Validation</strong></a></h2>
 <p><em>Given</em></p>
@@ -327,7 +333,7 @@ execution_gas_base_price: TokenValue    # Given by Execution Market
 <p>Mantle validators will ensure the following:</p>
 <ol>
 <li>
-<p>We have a proof or a <code>None</code> value for each operation.</p>
+<p>We have exactly one proof for each Operation, of the variant that Operation requires.</p>
 <pre><code class="language-python">assert len(op_proofs) == len(ops)
 </code></pre>
 </li>
@@ -613,7 +619,7 @@ mempool.push(signed_tx)
                         # biggest without duplication
 </code></pre>
 <h4 id="execution-gas-1"><a class="header" href="#execution-gas-1">Execution Gas</a></h4>
-<p>Channel Config Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_CONFIG_GAS * configuration_threshold</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<p>Channel Config Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_CONFIG_GAS * configuration_threshold</code>, where <code>configuration_threshold</code> is the one held in the channel state, and <code>0</code> for a channel that does not exist yet. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
 <h4 id="validation-2"><a class="header" href="#validation-2">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">txhash: zkhash
@@ -647,6 +653,14 @@ else:
     # Channel will be created automatically upon execution
     # Ensure that this configuration is the genesis configuration
     assert config.parent == ZERO
+
+    # No key is accredited yet, so the threshold to verify against is 0
+    # and the proof must carry no signature and no index (see Appendix)
+    MultiEd25519_verify(txhash,
+                        proof.signatures,
+                        proof.indexes,
+                        [],
+                        0)
 </code></pre>
 <h4 id="execution-2"><a class="header" href="#execution-2">Execution</a></h4>
 <p><em>Given</em></p>
@@ -716,7 +730,7 @@ tx = MantleTx(
 
 signed_tx = SignedMantleTx(
     tx=tx,
-    op_proofs=[[Ed25519_sign(mantle_txhash(tx), old_sequencer_sk)], [0]],
+    op_proofs=[[[Ed25519_sign(mantle_txhash(tx), old_sequencer_sk)], [0]],
                transfer.prove(old_sequencer_sk)]
 )
 </code></pre>
@@ -829,7 +843,7 @@ signed_tx = SignedMantleTx(
                           # biggest without duplication
 </code></pre>
 <h4 id="execution-gas-3"><a class="header" href="#execution-gas-3">Execution Gas</a></h4>
-<p>Channel Withdraw Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_WITHDRAW_GAS * transfer_threshold</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<p>Channel Withdraw Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_WITHDRAW_GAS * transfer_threshold</code>, where <code>transfer_threshold</code> is the one held in the channel state. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
 <h4 id="validation-4"><a class="header" href="#validation-4">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">txhash: zkhash
@@ -910,7 +924,7 @@ signed_tx = SignedMantleTx(
                           # indexes must be ordered from smallest to biggest without duplication
 </code></pre>
 <h4 id="execution-gas-4"><a class="header" href="#execution-gas-4">Execution Gas</a></h4>
-<p><code>CHANNEL_TRANSFER</code> Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_TRANSFER_GAS * transfer_threshold</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<p><code>CHANNEL_TRANSFER</code> Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_TRANSFER_GAS * transfer_threshold</code>, where <code>transfer_threshold</code> is the one held in the channel state. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
 <h4 id="validation-5"><a class="header" href="#validation-5">Validation</a></h4>
 <p><em>Given</em></p>
 <pre><code class="language-python">txhash: zkhash
