@@ -1673,7 +1673,7 @@ claim: ClaimPowRewardOp            # the CLAIM_POW_REWARD payload
 claim_proof: ZkSignature           # the op_proofs entry for this Operation
 
 current_slot: SlotNumber           # slot of the block including this claim
-difficulty_reward: PowTarget       # d_reward, retargeted every block
+difficulty_reward: PowTarget       # retargeted every block
 pow_nullifiers: set[zkhash]        # spent solutions, retained for WINDOW
 pow_reward_pool: TokenValue
 epoch_pow_reward: TokenValue
