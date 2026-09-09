@@ -27,8 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | Remove the protection against adaptive adversary from PoL. It impacts the PoL section of PoQ. Update the performance according to the new circuit. Remove old project name from DSTs | 2026-04-09 |
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
-| 1.2.0 | Add the proof of work branch: third selector value, `pow_quota` and `pow_blend_difficulty` public inputs, `pow_sk` witness, Lagrange branch selection, and the binding and precomputation properties | 2026-08-31 |
-| 1.3.0 | Replace the proof of work secret key and its key derivation with a single private nonce | 2026-09-08 |
+| 1.2.0 | Add the proof of work branch: third selector value, `pow_quota` and `pow_blend_difficulty` public inputs, a private `pow_nonce` witness, and Lagrange branch selection | 2026-09-08 |
 
 
 # Introduction
@@ -47,7 +46,7 @@ The Proof of Quota (PoQ) verifies that a node's public key is within a limit for
 2. Proof of Leadership Quota (`PoQ_L`): Ensures that the leader node would win the proof of stake for **current Cryptarchia epoch** and hasn’t already produced more keys than the leadership quota `Q_L`. That doesn’t guarantee that the node is indeed winning because the PoQ doesn’t check if the note is unspent enabling generation of the proof ahead of time preventing extreme delays.
 3. Proof of Work Quota (`PoQ_W`): Ensures that the prover holds a puzzle solution below the Blend threshold `pow_blend_difficulty` and hasn’t already produced more keys than the proof of work quota `Q_W` for that solution. Unlike the other two, this branch requires no stake and no declaration, so it admits provers that hold neither.
 
-The final proof `PoQ` is valid if any of `PoQ_C`, `PoQ_L` or `PoQ_W` holds. Which of them held is not revealed: the selector is a private witness, so a proof of work backed message is indistinguishable from a core node's or a leader's.
+The final proof `PoQ` is valid if any of `PoQ_C`, `PoQ_L` or `PoQ_W` holds. Which of them held is not revealed: the selector is a private witness.
 
 ## Zero-Knowledge Proof Statement
 
@@ -64,23 +63,16 @@ class ProofOfQuotaPublic:
     leader_quota: int     # Allowed blending operations per election win (20 bits)
     core_root: zkhash     # Merkle root of zk_id of the core nodes
     pow_quota: int        # Allowed blending operations per proof of work solution (20 bits)
+    pol_ledger_aged: zkhash # Merkle root of the PoL eligible notes
     K_part_one: int       # First part of the signature public key (16 bytes)
     K_part_two: int       # Second part of the signature public key (16 bytes)
     pow_blend_difficulty: zkhash # Blend threshold a PoW ticket must be below
     pol_epoch_nonce: int  # PoL Epoch nonce
     pol_t0: int           # PoL constant t0
     pol_t1: int           # PoL constant t1
-    pol_ledger_aged: zkhash # Merkle root of the PoL eligible notes
 ```
 
-The proof's public signal vector is fixed by the circuit — the output first, then the public inputs in the order the circuit declares them, which places `pol_ledger_aged` sixth:
-
-```python
-[key_nullifier, core_quota, leader_quota, core_root, pow_quota, pol_ledger_aged,
- K_part_one, K_part_two, pow_blend_difficulty, pol_epoch_nonce, pol_t0, pol_t1]
-```
-
-A verifier must assemble the vector in exactly this order; any other rejects valid proofs. Neither the listing above nor the `public [...]` clause of the circuit's main component states this order — the first groups the values as the verifier's input structure declares them, and the second selects which signals are public without ordering them.
+The proof's public signal vector is fixed by the circuit: the output first, then the public inputs in the order listed above.
 
 `pow_blend_difficulty` is a per-epoch protocol value, identical for every proof produced in that epoch, so it carries no branch-specific signal and a verifier cannot infer from it which branch a given proof used. How its value is set for each epoch is not defined here; it is a consensus quantity supplied to the circuit, and its derivation is specified alongside the other Blend parameters.
 
@@ -108,10 +100,6 @@ class ProofOfQuotaWitness:
     pow_nonce: zkhash                     # Private nonce the prover ground to solve the puzzle
 ```
 
-The puzzle for the proof of work branch takes no block reference. The circuit has no means to establish that a given value is the hash of a real block, let alone a recent or canonical one, so any field element would be accepted and the prover would choose whichever suited it; the input would constrain nothing. What does bind a solution to a period is `pol_epoch_nonce`, and its limits are set out in [Precomputation of proof of work solutions](#precomputation-of-proof-of-work-solutions).
-
-This differs from the proof of work credential used to claim a token reward, which does carry a block reference. That reference is meaningful there because it is checked against the canonical chain outside any circuit, where the chain is available.
-
 Note that every inputs and outputs of zero-knowledge proofs are all scalar field elements.
 
 ### Constraints
@@ -120,9 +108,9 @@ Such that the following constraints hold:
 
 **Step 1**: The prover selects an `index` for the chosen key. This index must be lower than the allowed quota and not already used. This index is used to derive the key nullifier in step 5. Limiting the possible values of this index also limit the possible nullifier created which produce the desired effect: limiting the generation of keys to a certain quota. `index` is on 20 bits, so a quota may be at most $`2^{20} - 1`$.
 
-What the quota bounds differs by branch, because the nullifier is derived from a different secret in each. For the core and leadership branches the secret key is a long lived identity — an SDP declared `zk_id` and a note key respectively — so the bound is per node per `epoch`. For the proof of work branch the secret key is ground afresh for every solution, so **the bound is per solution, not per node**: a prover holding $`n`$ solutions may derive $`n \cdot`$ `pow_quota` distinct nullifiers, and nothing ties those solutions to a single identity.
+What the quota bounds differs by branch, because the nullifier of step 5 is derived from a different secret and period nonce in each. For the core branch the bound is per `core_sk` per `epoch`. For the leadership branch it is per note key per winning slot. For the proof of work branch it is per solution: a prover holding $`n`$ solutions may derive $`n \cdot`$ `pow_quota` distinct nullifiers.
 
-`pow_quota` is that per message blending count and not `1`. It is set to the number of blending operations in a single message, so that one solution buys exactly one message; see [Proof of Work Quota](blend-protocol.md#proof-of-work-quota). A quota unit is one encapsulation rather than one message, so this is a multiple of the per message blending count and not the value `1`.
+`pow_quota` is $`Q_W`$, as specified in [Proof of Work Quota](blend-protocol.md#proof-of-work-quota).
 
 **Step 2:**  If the prover indicated that the node is a core node for the proof, the proof checks that:
 
@@ -136,10 +124,8 @@ What the quota bounds differs by branch, because the nullifier is derived from a
 
 **Step 4:** If the prover indicated that the proof is backed by proof of work, the proof checks that:
 
-  1. The prover knows a `pow_nonce` whose puzzle ticket satisfies the Blend threshold. The ticket is derived directly from the nonce together with the epoch nonce, and must be strictly below `pow_blend_difficulty`. Because a smaller threshold admits fewer tickets, a smaller `pow_blend_difficulty` makes the puzzle harder.
+  1. The prover knows a `pow_nonce` whose puzzle ticket, derived from the nonce and the epoch nonce as given in [Pseudocode](#pseudocode), is strictly below `pow_blend_difficulty`.
   2. The index is valid: `index < pow_quota`.
-
-  This branch uses no key. Nothing about this branch requires proving knowledge of a secret with key structure, only that the preimage of a winning ticket is known and never revealed. The nonce is that preimage.
 
 **Step 5:** The prover derives a `key_nullifier` maintained by blend nodes during the epoch for message deduplication purpose.
 
@@ -152,23 +138,21 @@ key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
 
   - The `core_sk` as defined in the [Mantle specification](bedrock-v1.1-mantle-specification.md) if the node is a core node.
   - The secret key of the PoL note if it’s a leader node.
-  - The `pow_nonce` if the proof is backed by proof of work. The nonce stands in the secret key position: what the nullifier needs from this slot is an input that is secret and bound to the branch's admission right, and for this branch that is the nonce itself.
+  - The `pow_nonce` if the proof is backed by proof of work.
 
   and `period_nonce` is:
 
   - The `pol_epoch_nonce` if the node is a core node.
   - The winning slot of the PoL if it’s a leader node.
-  - The `pol_epoch_nonce` if the proof is backed by proof of work, the same value the core branch uses.
+  - The `pol_epoch_nonce` if the proof is backed by proof of work.
 
   Here we use two hashes because the selection randomness is used in the Proof of Selection in order to prove the ownership of a valid PoQ (see [Proof of Selection](blend-protocol.md#proof-of-selection)).
 
-  The proof of work branch reuses the core branch's period nonce. The core and proof of work branches therefore share a nonce domain, and their nullifiers are separated only by the secret key. That is sufficient because the two secrets are drawn from disjoint sources: an SDP declared identity in one case, a nonce found by grinding in the other.
-
-**Step 6**: The prover attaches a one-time signature key used in the blend protocol. This public key is split into two 16-byte parts: `K_part_one` and `K_part_two`. When written in little-endian byte order, the complete public key equals the concatenation `K_part_one||K_part_two`.
+**Step 6**: The prover attaches a one-time signature key used in the blend protocol. This public key is split into two 16-byte parts: `K_part_one` and `K_part_two`. When written in little-endian byte order, the complete public key equals the concatenation `K_part_one||K_part_two`. The circuit constrains no relation between this key and the branch secret: a proof is bound to its message by the proving system binding it to its public inputs, which include the key, and by the message header being signed under that key.
 
 ### Pseudocode
 
-The circuit selects between the three branches with the Lagrange basis polynomials `L1` and `L2` defined below, evaluated at the selector. Every value that differs by branch is written as `base + (leader_value - base) * L1 + (pow_value - base) * L2`, which evaluates to the correct branch's value and stays linear in each multiplication.
+The circuit selects between the three branches with the Lagrange basis polynomials `L1` and `L2` defined below, evaluated at the selector: `L1` is 1 when `selector = 1` and 0 at the other two values, and `L2` is 1 when `selector = 2` and 0 at the other two values. Every value that differs by branch is written as `core_value + (leader_value - core_value) * L1 + (pow_value - core_value) * L2`, where `core_value` is the core branch's value, so the expression evaluates to the selected branch's value.
 
 ```python
 # Verify selector is 0, 1 or 2. Note that a width check alone is insufficient:
@@ -227,16 +211,6 @@ selection_randomness = zkhash(
 key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
 ```
 
-Because the proving system fixes the circuit ahead of time, the selector cannot switch constraints off: all three branch predicates are evaluated for every proof, and every prover pays the cost of all three branches.
-
-## Binding a proof to its message
-
-The circuit does not constrain any relation between a branch's secret and the one-time signature key $`K_{\text{part\_one}} \| K_{\text{part\_two}}`$ attached in step 6. In particular, `pow_nonce` flows only into the puzzle ticket and the nullifier, and nothing derived from it is ever compared against $`K`$. Binding a proof to the message it accompanies comes from two properties outside the circuit instead.
-
-The first is that $`K`$ is a public input. The proving system binds a proof to the exact public inputs it was generated against, so a proof observed on one message cannot be reattached to a message carrying a different key: doing so requires generating a new proof, which requires the witness. The second is that the message header is signed under $`K`$, so a relayer that verifies the signature knows the sender holds the corresponding private key.
-
-Together these ensure a valid proof cannot be lifted from someone else's message and reused. What they do not give is any guarantee that the branch secret was held by the same party that sent the message. A prover that deliberately shares a winning `pow_nonce` lets the recipient produce proofs against their own $`K`$, up to the shared solution's remaining quota. This is a voluntary act with the same consequence as sharing a `core_sk`, and it is not defended against.
-
 ## Precomputation of proof of work solutions
 
 The proof of work branch places no bound on how old a solution may be. The only time dependent input to the puzzle is `pol_epoch_nonce`, so a solution is bound to an epoch and to nothing finer.
@@ -281,4 +255,3 @@ The material used for the benchmarks is the following:
 
 The figure above measures the two branch circuit. The three branch circuit specified here is release v0.5.6 of the circuits repository, whose proving key holds 20123 R1CS constraints; its earlier key-based form compiled to 20590.
 
-A like for like proving time comparison against the figure above has not been produced: the measurements taken of the three branch circuit used a different statistic, sample count and thread range, so no conclusion about the change in proving time should be drawn from placing them side by side. The proof of work branch also has no benchmark of its own — the published measurements exercise the core and leadership branches only. Since all three branches are evaluated for every proof regardless of which one is selected, per proof cost is not expected to differ by branch, but this has not been measured.

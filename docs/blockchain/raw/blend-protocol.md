@@ -880,15 +880,9 @@ The relaying logic is defined as follows:
     3. If the header of the message is incorrect, then discard the message and mark the neighbor as malicious and close the connection. We assume that an adversary cannot inject any spoofed message to the connection.
     4. If the PoQ nullifier $`\nu_i \in \mathbf H`$ from the public header of the message is already in the nullifier cache, then the message is a duplicate and must be discarded. This step only reads the cache: the nullifier is inserted only after steps 1.5 and 1.6 have both passed, at the moment the message is accepted for relaying. Cached entries are retained for the duration of the current epoch and the [Transition Period](#transition-period).
     5. If the signature $`\sigma_{K^{n}_{i}}(\mathbf P_i) \in \mathbf H`$ from the public header of the message is invalid, then the message must be discarded, and the neighbor must be marked malicious.
-    6. If the proof of quota $`\pi^{K^{n}_i}_{Q} \in \mathbf H`$ from the public header is invalid, then the message must be discarded and must not be relayed. The sender must be marked as spammy and its connection closed, in the same manner as for any other spam detected by the connectivity maintenance logic.
+    6. If the proof of quota $`\pi^{K^{n}_i}_{Q} \in \mathbf H`$ from the public header is invalid, then the message must be discarded, and the neighbor must be marked malicious.
 2. Release the message according to the [Releasing](#releasing) logic.
 3. Concurrently to the above step, add the message to the processing queue, where it is handled by the [Processing](#processing) logic.
-
-Step 1.6 applies to every received message, whatever its sender. It reverses the ordering used by earlier versions of this protocol, in which proof verification was deferred to [Processing](#processing) and therefore happened only after a message had already been relayed onward.
-
-The added per-hop verification latency lies within the delay budget of [Delaying](#delaying), whose maximum delay $`\Delta_{max}`$ dominates it.
-
-Deduplication by nullifier, step 1.4, remains before this check, but only as a lookup: insertion happens strictly after the proof has verified, so a cache entry attests that a fully verified message already used that nullifier and a lookup hit is a true duplicate. The lookup runs first because reading the cache is cheap and a hit makes the expensive verification unnecessary.
 
 The node must cache the PoQ nullifiers ($`\nu_i`$) of every message it relays — and only of messages it relays — for a duration of a single epoch plus the [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that the size of the cache must be at least:
 
