@@ -28,6 +28,7 @@
 | 1.0.1 | Remove the protection against adaptive adversary from PoL. It impacts the PoL section of PoQ. Update the performance according to the new circuit. Remove old project name from DSTs | 2026-04-09 |
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.2.0 | [RFC] Dual-key notes: the PoL note's STARK-field public key is a witness and enters the note identifier derivation | 2026-09-07 |
+
 # Introduction
 
 This document defines an implementation-friendly specification of the Proof of Quota (PoQ), which is introduced in [Proof of Quota](blend-protocol.md#proof-of-quota).

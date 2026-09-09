@@ -26,6 +26,7 @@
 | 1.0.2 | Clarification of the Poseidon2 function Add test values | 2026-05-07 |
 | 1.1.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 | 1.2.0 | [RFC] Dual-key notes: added Rescue-Prime Optimized over the Goldilocks field as the STARK-field hash function (`starkhash`) | 2026-09-07 |
+
 # Introduction
 
 The Logos Blockchain relies on a variety of cryptographic primitives to ensure security, privacy, and verifiability across its components. This document defines the common cryptographic building blocks used throughout the Logos Blockchain design.
