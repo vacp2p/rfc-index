@@ -252,6 +252,3 @@ The material used for the benchmarks is the following:
 - Kernel: 6.8.0-59-generic
 
 ![Diagram](proof-of-quota/assets/2e9261aa-09df-8023-91a7-e7f6c11c4056.png)
-
-The figure above measures the two branch circuit. The three branch circuit specified here is release v0.5.6 of the circuits repository, whose proving key holds 20123 R1CS constraints; its earlier key-based form compiled to 20590.
-
