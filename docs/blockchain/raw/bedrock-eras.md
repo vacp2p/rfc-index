@@ -22,63 +22,65 @@ An era is a range of consecutive epochs ([Cryptarchia Protocol](cryptarchia-v1-p
 
 ## Era Schedule
 
-The era schedule is embedded in the node software and is not read from the chain. Each network has its own schedule.
+The era schedule is embedded in the node software and is not read from the chain. Each network has its own schedule. The schedule of mainnet and of testnet is `[0]`.
 
 The schedule is a strictly increasing list of epoch numbers. The first entry is 0. Entry $`n`$ (1-based) is the first epoch of era $`n`$, denoted $`E_n`$.
 
-The era of an epoch $`ep`$ is $`\textbf{era}(ep) = \max\{n : E_n \le ep\}`$. The era of a slot $`sl`$ is $`\textbf{era}(\lfloor sl / \text{EPOCH\_LENGTH} \rfloor)`$. $`\text{EPOCH\_LENGTH}`$ is the [epoch length](cryptarchia-v1-protocol.md#epoch-schedule) in slots. The **era in force** is $`\textbf{era}(sl)`$ of the slot given by the local clock.
+The era of an epoch $`ep`$ is $`\textbf{era}(ep) = \max\{n : E_n \le ep\}`$. The era of a slot $`sl`$ is $`\textbf{era}(\lfloor sl / \text{EPOCH\_LENGTH} \rfloor)`$ ([Epoch Schedule](cryptarchia-v1-protocol.md#epoch-schedule)). The **era in force** is $`\textbf{era}(sl)`$ of the slot $`\textbf{wallclock\_time}().\textbf{to\_slot}()`$ ([Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation)).
 
-An era must not change $`k`$ or $`f`$ ([Constants](cryptarchia-v1-protocol.md#constants)). Otherwise every later era boundary moves.
+An era must not change $`k`$, $`f`$ ([Constants](cryptarchia-v1-protocol.md#constants)) or the epoch length. Otherwise every later era boundary moves. An era must not change the comparison of chains that diverge by at most $`k`$ blocks ([Online Fork Choice Rule](fork-choice.md#online-fork-choice-rule)). Otherwise fork choice depends on the order in which forks were seen for the first $`k`$ blocks of the era.
 
-A schedule entry must never change once a release has published it. Otherwise nodes running different releases fork.
+A schedule entry, the rules of its era and the migration into it must never change once a software release has published the entry. Otherwise nodes running different releases fork. A software release must not publish an entry whose epoch has begun. Otherwise a node that installs the release holds state executed under the wrong era.
 
-An era does not fix the values that [Service Parameters](bedrock-service-declaration-protocol.md#service-parameters) entries set. A new entry changes a value without an era change.
+An era does not fix the values of [Service Parameters](bedrock-service-declaration-protocol.md#service-parameters). A new `ServiceParameters` value changes a parameter without an era change.
 
 ## Interpreting Chain Data
 
-A block, and everything it carries, is parsed, validated and executed under the rules of $`\textbf{era}(sl)`$ of the block's slot. The header fields up to and including `slot` have the same encoding in every era. Otherwise a node cannot parse a block before it knows the block's era.
+A block or proposal, and everything it carries, is parsed, validated and executed under the rules of $`\textbf{era}(sl)`$ of its slot. The header prefix up to and including `slot` ([Block Header](cryptarchia-v1-protocol.md#block-header)) is identical in every era, and every message that carries a block or proposal begins with the header in its [canonical encoding](bedrock-v1.1-block-construction.md#canonical-encoding). Otherwise a node cannot parse a block before it knows the block's era.
 
-[Fork choice](fork-choice.md) compares two chains under the era of the slot of their latest common ancestor. The fork choice rule of an era reads only the block tree and the header fields up to and including `slot`. Otherwise it is undefined on the blocks of a later era that re-encodes a field it reads.
+[Fork choice](fork-choice.md) compares two chains under the era of the slot of their $`\textbf{common\_ancestor}`$ ([Fork Pruning](cryptarchia-v1-protocol.md#fork-pruning)). The fork choice rule of an era reads only the block tree and the header prefix up to and including `slot`. Otherwise it is undefined on the blocks of a later era that re-encodes a field it reads.
 
-A node must implement the rules of every era from $`\textbf{era}(sl_{B_\text{imm}})`$ to the era in force, where $`B_\text{imm}`$ is the [Latest Immutable Block](cryptarchia-v1-protocol.md#latest-immutable-block). A node that must validate a block whose slot lies in an era it does not implement must halt with an error to the operator. A block whose slot precedes that of $`B_\text{imm}`$ is discarded without a halt.
+A node must implement the rules of every era from $`\textbf{era}(sl_{B_\text{imm}})`$ to the era in force, where $`B_\text{imm}`$ is the [Latest Immutable Block](cryptarchia-v1-protocol.md#latest-immutable-block). A node whose software does not must halt at startup and on checkpoint import. A halted node stops every protocol and exits with an error to the operator.
 
-When the era in force changes, a node re-validates every transaction in its mempool under the new era's rules and removes those that fail. Mempool admission applies the rules of the era in force, whichever era's network protocol delivered the transaction.
+A node keeps in its mempool only transactions valid under the era in force. A transaction is parsed under the era of the topic that delivered it and admitted under the rules of the era in force.
 
 ## Era Migration
 
-Every era after the first defines a migration from its predecessor. A migration is a function of the recorded chain state alone. The recorded chain state is the [ledger](bedrock-v1.1-mantle-specification.md) state, the [Declaration Storage](bedrock-service-declaration-protocol.md#declaration-storage), and the [snapshots](bedrock-service-declaration-protocol.md#snapshots) taken but not yet consumed.
+Every era after the first defines a migration from its predecessor. A migration is a function of the recorded chain state alone. The recorded chain state is the state a Mantle Operation is validated against ([Validation](bedrock-v1.1-mantle-specification.md#validation)), the `stake_thresholds` ([Minimum Stake](bedrock-service-declaration-protocol.md#minimum-stake)) and `parameters` ([Service Parameters](bedrock-service-declaration-protocol.md#service-parameters)), and the [snapshots](bedrock-service-declaration-protocol.md#snapshots) of the current and later epochs.
 
 The migration must be:
 
 - **Total**: defined for every state reachable under the predecessor era. A migration undefined for a reachable state halts the network at the boundary.
 - **Identity by default**: every state component the new era does not redefine is unchanged.
 
-To validate or execute a block whose parent lies in an earlier era, a node first applies the intervening migrations, in order, to the state after the parent.
+A block reads the state after any block of an earlier era with the intervening migrations applied, in order. When the era in force changes, a node applies the same migrations to the state after its local chain tip; it re-validates its mempool and runs the network protocols of the new era against that state.
 
-The [Epoch State](cryptarchia-v1-protocol.md#epoch-state) of an epoch is computed under the rules of the epoch's era. A value it reads from an earlier epoch is used as it was derived, not recomputed.
+The [Epoch State](cryptarchia-v1-protocol.md#epoch-state) of an epoch is computed under the rules of the epoch's era. Where it reads the chain state as of a slot, it reads the state after the last block at or before that slot, migrated to the epoch's era. The Epoch State of an earlier epoch is used as it was derived.
+
+The rules of an era verify the Activity Proofs and reward claims of the last epoch of the predecessor era as the predecessor's rules do. Otherwise the rewards of that epoch are lost.
 
 ## Era Transition Period
 
-The Era Transition Period is the first $`T`$ [rounds](blend-protocol.md#time) after the era in force changes, where $`T`$ is the Blend [Transition Period](blend-protocol.md#transition-period). It applies to the network layer only.
+The Era Transition Period is the first $`T`$ [rounds](blend-protocol.md#time) after the era in force changes, where $`T`$ is the Blend [Transition Period](blend-protocol.md#transition-period) of the era in force. It applies to the network layer only. $`T`$ must exceed the clock difference between any two honest nodes. Otherwise those nodes share no round in which both run one era's protocols.
 
 During the Era Transition Period a node must:
 
-1. Run the network protocols of both eras.
+1. Accept and open connections on the identifiers of both eras.
 2. Validate a Blend message under the era of the connection it arrived on.
 3. Keep every input the predecessor era's message checks read until the period ends.
 
-After the Era Transition Period the node must drop the old era's network protocols and must not process its messages.
+After the Era Transition Period the node must drop the predecessor era's protocols and must not process its Blend messages. A synchronization stream open at the end of the period is served to its end.
 
 ## Network Protocol Identity
 
-Every libp2p protocol identifier and gossipsub topic is `/<network>/<era>/<protocol>`. `<network>` is `logos-blockchain` for mainnet and `logos-blockchain-testnet` for testnet. Any other network takes its own name. `<era>` is the decimal era number. `<protocol>` is the identifier the protocol's own specification defines.
+Every protocol identifier and gossipsub topic a Logos Blockchain specification defines is `/<network>/<era>/<protocol>`. `<network>` is `logos-blockchain` for mainnet and `logos-blockchain-testnet` for testnet. Any other network takes its own name. `<era>` is the decimal era number. `<protocol>` is the identifier the protocol's own specification defines.
 
-A node sends a message it generates, and every block, over the identifiers of the era in force. A node relays a Blend message over the era of the connection it arrived on. A [synchronization](cryptarchia-v1-bootstr-sync.md#downloading-blocks) response carries blocks of any era.
+A node sends a message it generates over the identifiers of the era in force at generation. A node relays or releases a received or processed Blend message over the era of the connection it arrived on. A node publishes every block it accepts on the block topic of the era in force. A [synchronization](cryptarchia-v1-bootstr-sync.md#downloading-blocks) response carries blocks of any era.
 
 ## Horizon
 
-Each schedule carries a horizon $`H`$, an epoch number. $`H`$ must not be smaller than the last entry of the schedule. Otherwise the node halts at or before the first slot of its last era.
+A software release carries a horizon $`H`$, an epoch number, for each network. $`H`$ must not be smaller than the last entry of the schedule. Otherwise the node halts at or before the first slot of its last era.
 
-From the first slot of epoch $`H+1`$ by the local clock, a node halts with an error to the operator. The halt must not be triggered by information received from peers.
+When $`\textbf{wallclock\_time}().\textbf{to\_slot}()`$ reaches the first slot of epoch $`H+1`$, a node halts. The horizon halt must not be triggered by information received from peers.
 
-If an entry is at or before the $`H`$ of a published release, the nodes of that release do not halt at the new boundary and fork.
+If an entry is at or before the $`H`$ of a published software release, the nodes of that release do not halt at the new boundary and fork.

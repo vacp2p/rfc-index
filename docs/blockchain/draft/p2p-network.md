@@ -67,8 +67,8 @@ The Logos Blockchain P2P network integrates a combination of libp2p's [Kademlia]
 
 The specific protocols to be negotiated are:
 
-- Kademlia: `/logos-blockchain/<era>/kad` for main network and `/logos-blockchain-testnet/<era>/kad` for public testnet.
-- Identify: `/logos-blockchain/<era>/identify` and `/logos-blockchain-testnet/<era>/identify` for public testnet.
+- Kademlia: `/logos-blockchain/<era>/kad` for mainnet and `/logos-blockchain-testnet/<era>/kad` for testnet.
+- Identify: `/logos-blockchain/<era>/identify` and `/logos-blockchain-testnet/<era>/identify` for testnet.
 
 `<era>` is defined in [Network Protocol Identity](../raw/bedrock-eras.md#network-protocol-identity).
 
