@@ -1716,8 +1716,6 @@ def get_puzzle_ticket(claim: ClaimPowRewardOp) -> zkhash:
     )
 ```
 
-  where `zkhash` is Poseidon2 and $`p`$ is the scalar field modulus, both given in [Common Cryptographic Components](common-cryptographic-components.md). A miner searches for a `public_key` whose ticket satisfies step 4. The secret key must be sampled with full entropy rather than enumerated: it signs the claim and spends the reward note.
-
 #### Execution
 
   *Given*
