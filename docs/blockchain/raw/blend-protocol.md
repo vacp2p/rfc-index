@@ -35,6 +35,7 @@
 | 1.4.0 | Add the proof of work quota and the Blend difficulty, verify the proof of quota before relaying any message, add a transaction as a data message payload, and align the nullifier retention period | 2026-09-08 |
 | 1.5.0 | [RFC] Detect the failure of the Blend network to deliver a data message and react to it, by directly broadcasting any payload the network has not delivered within the message traversal time. | 2026-09-04 |
 | 1.6.0 | Replaced the per-window statistical threshold on a connection with a share of messages a node reads from, and sends on, each connection in a round, and a liveness test on whether a neighbor delivers. Held the peering degree in live connections, at least two of them opened by the node. Restricted blacklisting to attributable faults. Sized the shares from the processing rate of the slowest node, derived the transactions the network carries from them, and made that rate the reference load of the Blend difficulty. | 2026-09-08 |
+| 1.7.0 | Derived the Blend difficulty from the median load reported in active messages, where load is a node's novel arrivals per served round against a core connection's share. Priced the edge share with an Equi-X proof of work each core node sets from the demand presented to it. Sized the proof of work branch within the transaction rate. | 2026-09-08 |
 
 # Introduction
 
@@ -107,7 +108,7 @@ To have a **truly privacy-preserving system, we need to apply both techniques si
 ## Time
 
 - *Epoch* is a period that is defined by the consensus. It lasts for $`648,000`$ slots, each slot lasting 1 second. A new block is proposed for each slot with a probability of $`1/30`$, which translates to $`21,600`$ blocks, as on average, every $`30`$ slots a single block is proposed.
-- *Round* is the primitive measure of time in the protocol. It defines a period during which a node can emit a new message. The definition of a round is also important for defining the message releasing logic, which handles the randomized emission delay for processed messages. In this version of the protocol, the length of the round is 1 second (an equivalent of a single slot).
+- *Round* is the primitive measure of time in the protocol. It defines a period during which a node can emit a new message. The definition of a round is also important for defining the message releasing logic, which handles the randomized emission delay for processed messages. In this version of the protocol, the length of the round is 1 second (an equivalent of a single slot), and a round is numbered by its slot.
 
 # Overview
 
@@ -119,7 +120,7 @@ The protocol works as follows:
 
 1. Core nodes form a network by establishing encrypted connections with other core nodes at random.
 2. A block proposer node selects several core nodes and creates a data message (containing a block proposal) that can be processed only by the set of selected core nodes (according to the order given by the block proposer node).
-3. The block proposer node sends the data message to its neighbors (core nodes). If the block proposer is an edge node, it connects to randomly selected core nodes to send the data message.
+3. The block proposer node sends the data message to its neighbors (core nodes). If the block proposer is an edge node, it connects to randomly selected core nodes and pays each one's admission price to send the data message.
 4. Core nodes disseminate (relay) the message to the rest of the network.
 5. Core nodes generate new cover messages every round, which are *blended* with other messages.
 6. When the data message reaches a blend node (designated core node), then it is processed by the node, that is:
@@ -162,6 +163,8 @@ If the minimal network size is not reached, nodes must not use the Blend protoco
 ### Maintenance
 
 A core node reads at most a share of messages from each connection per round, sized to what the slowest node the protocol targets can process, sends at most the same share on each, and keeps a connection only while its neighbor delivers. It maintains its peering degree and blacklists a neighbor only for a fault the neighbor is answerable for ([Connectivity Maintenance](#connectivity-maintenance)).
+
+An edge node pays for the service it asks of a core node: it presents a proof of work whose difficulty that core node sets from the demand it is meeting, as defined in [Edge Admission](#edge-admission) and [Edge Difficulty](#edge-difficulty).
 
 ## Messages
 
@@ -269,7 +272,7 @@ We address the above motivations in the following manner:
 ### Mechanics
 
 1. Every node during the epoch of the protocol collects some bits of information, which are called blending tokens, from processed messages.
-2. After the epoch, every node selects a single blending token that has a certain property: it is most similar to the next [Epoch Randomness](#epoch-randomness). This token is registered on the ledger.
+2. After the epoch, every node selects a single blending token that has a certain property: it is most similar to the next [Epoch Randomness](#epoch-randomness). This token is registered on the ledger, together with the load the node carried ([Load](#load)).
 3. Every node that submitted a token receives a **base** reward if the token’s similarity to the next epoch randomness is above a certain (predefined) threshold (called the activity threshold).
 4. Every node that submitted a token receives a **premium** reward if the token is in the set of the most similar tokens (as defined below) to the next epoch randomness.
 
@@ -428,7 +431,7 @@ Every active core node receives a reward. The activity of a node is verified in 
 
 1. Generate a proof of its activity for a specific epoch as defined in [Activity Proof](#activity-proof). The proof confirms that the node was processing messages during the epoch. The node activity confirmation is probabilistic, and the odds increase with the number of collected blending tokens.
 2. Use SDP active functionality ([Active](bedrock-service-declaration-protocol.md#active)) to request a reward as described in [Rewarding Distribution Logic](#rewarding-distribution-logic), that is:
-    1. Create an [Active Message](#active-message).
+    1. Create an [Active Message](#active-message), carrying the node's load ([Load](#load)).
     2. Send it as an active message ([Active Message](bedrock-service-declaration-protocol.md#active-message)).
 3. The reward is calculated as defined in [Reward Calculation](#reward-calculation), that is:
     1. The number of correct active messages is calculated.
@@ -461,6 +464,11 @@ Every active core node receives a reward. The activity of a node is verified in 
 - $`\text {CSPRNG}()`$ is a cryptographically secure pseudo-random number generator, implemented as a [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction);
 - $`\eta`$ denotes the network absorption, the maximum time a message spends crossing the network on one hop;
 - $`T_M`$ denotes the message traversal time, the time a message takes to cross the network;
+- $`F_W`$ denotes the rate at which messages backed by a proof of work are generated, and $`\varphi`$ the share of $`F_T`$ the network is sized to carry on that branch;
+- $`\ell_n`$ denotes the load of a core node $`n`$, and $`\ell_n^q`$ its quantized form, as defined in [Load](#load);
+- $`A_n`$ and $`S_n`$ denote the novel messages a core node $`n`$ receives over a set of rounds and the rounds of that set it served, as defined in [Load](#load);
+- $`d_{edge}^n`$ denotes the Equi-X effort target the core node $`n`$ demands of edge nodes, as defined in [Edge Difficulty](#edge-difficulty);
+- $`P_n`$ denotes the distinct tokens presented to the core node $`n`$ that passed checks 1 to 3 of [Edge Admission](#edge-admission), as defined in [Edge Difficulty](#edge-difficulty);
 
 ## Global Parameters
 
@@ -479,6 +487,12 @@ Every active core node receives a reward. The activity of a node is verified in 
 - $`\Phi_{CC}=4`$, the peering degree ([Connectivity Maintenance](#connectivity-maintenance)). $`3 \le \Phi_{CC} \le 5`$. Below $`3`$ a node opens no connection of its own; above $`5`$ nodes must open more connections than nodes can accept, and dials are refused.
 - $`V = 156`$ messages per second the slowest node the protocol targets processes, one below the $`157`$ measured on one core of a Raspberry Pi 5 ([benchmark](https://github.com/logos-blockchain/research/tree/blend-header-verification-benchmark/tools/benchmarks/blend-header-verification)).
 - $`r_1 = 20`$ messages a node reads from a core connection per round, and $`r_E = 24`$ connections with edge nodes it accepts per round: $`r_1 = \lfloor (2V/3) / (\Phi_{CC} + 1) \rfloor`$ and $`r_E = 2V/3 - \Phi_{CC} \cdot r_1`$, so a node at its peering degree reads two thirds of $`V`$, and at one above it $`(\Phi_{CC} + 1) \cdot r_1 + r_E = 124 \le V`$ ([Expected Traffic](#expected-traffic)).
+- $`\varphi = 1/4`$, the share of $`F_T`$ the network is sized to carry on the proof of work branch ([Expected Traffic](#expected-traffic)). $`\varphi`$ must be below $`1`$: the loop gain of [Blend Difficulty](#blend-difficulty) is the share of the novel traffic the proof of work branch carries, $`\varphi \cdot F_T \cdot \beta_{max} / F_1 = 0.2`$ at the sized rates, and the value alternates between two levels once that share reaches $`1`$.
+- $`\ell^* = \lfloor (16 \cdot F_1 + r_1) / (2 \cdot r_1) \rfloor = 6`$, the load set point: the level of [Load](#load) at the expected rate $`F_1`$ ([Expected Traffic](#expected-traffic)).
+- $`L^{Min} = \lceil \ell^* \cdot \varphi \rceil = 2`$, the lowest load the [Blend Difficulty](#blend-difficulty) controller reads. A smaller value loosens the threshold past $`F_T`$, which the condition of [Expected Traffic](#expected-traffic) forbids.
+- $`T_R = 600`$ rounds, the challenge rotation period ([Edge Admission](#edge-admission)). $`T_R`$ must divide $`E`$, so that a window lies in exactly one epoch; a window that straddled two epochs would have no single epoch randomness.
+- $`G = 60`$ rounds, the price grace window ([Edge Admission](#edge-admission)). $`G`$ must be at least the p95 solving time at $`d_{edge}^{Max}`$ on the slowest targeted edge device — measured, about $`28`$ s on one core of the target machine at $`1000`$; below that, a solver that began against a quoted target can be refused on completion.
+- $`d_{edge}^{Min} = 300`$ and $`d_{edge}^{Max} = 1000`$, the bounds of the edge effort target ([Edge Difficulty](#edge-difficulty)).
 - $`T_E=1`$ round, the time an edge node is given to send its message, as derived in [Connectivity Maintenance](#connectivity-maintenance).
 - $`T_H=2`$ rounds, the time a core node handshake is given to complete, which covers the round trips of the transport handshake and of the [Neighbor Distinction Process](#neighbor-distinction-process).
 
@@ -504,7 +518,7 @@ Implementations should choose a default based on the deployment they operate in,
 
 ### Connection Details
 
-The connections are established using libp2p with TLS version 1.3 (not older). The cryptographic scheme is Ed25519 with ephemeral keys**.** The libp2p protocol name is `/logos-blockchain/blend/1.0.0` for mainnet and `/logos-blockchain-testnet/blend/1.0.0` for testnet.
+The connections are established using libp2p with TLS version 1.3 (not older). The cryptographic scheme is Ed25519 with ephemeral keys**.** The libp2p protocol name is `/logos-blockchain/blend/2.0.0` for mainnet and `/logos-blockchain-testnet/blend/2.0.0` for testnet.
 
 ### Neighbor Distinction Process
 
@@ -523,9 +537,25 @@ $$
 F_1 = \left( \max\left(F_C \cdot (1 + R_C),\ F_D \cdot (1 + R_D)\right) + F_T \right) \cdot \beta_{max} = 16.0
 $$
 
-Flooding delivers each message once per neighbor, so $`F_1`$ must be below $`r_1`$; at $`r_1`$ a backlog on a connection never drains. $`F_T`$ is sized so that a backlog of one round's share drains, at $`r_1 - F_1`$ per round, within the time a message may spend at one hop, $`\Delta_{max} + \eta`$ ([Transition Period](#transition-period)): $`F_1 = r_1 \cdot (1 - 1 / (\Delta_{max} + \eta)) = 16`$. Messages backed by a proof of work count within $`F_T`$, which is the reference load of [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty).
+Flooding delivers each message once per neighbor, so $`F_1`$ must be below $`r_1`$; at $`r_1`$ a backlog on a connection never drains. $`F_T`$ is sized so that a backlog of one round's share drains, at $`r_1 - F_1`$ per round, within the time a message may spend at one hop, $`\Delta_{max} + \eta`$ ([Transition Period](#transition-period)): $`F_1 = r_1 \cdot (1 - 1 / (\Delta_{max} + \eta)) = 16`$. Messages backed by a proof of work count within $`F_T`$, which is the reference load of [Blend Difficulty](#blend-difficulty): writing $`F_W`$ for the rate they are generated at and $`F_{tx}`$ for the rate of the messages carrying a transaction backed by the other quotas, $`F_{tx} + F_W \leq F_T`$. The network is sized at $`F_W = \varphi \cdot F_T`$.
 
 A node reads at most $`(\Phi_{CC} + 1) \cdot r_1 + r_E = 124`$ messages in a round, which must not exceed $`V`$, and verifies the public header of novel messages only ([Relaying](#relaying)). At $`19318`$ bytes per message ([Message Formatting](message-formatting.md)) that is $`2.4`$ MB/s.
+
+### Load
+
+The load of a core node over a set of rounds is the number of novel messages it received per served round, divided by a core connection's share $`r_1`$:
+
+$$
+\ell_n = \dfrac{A_n}{r_1 \cdot S_n}
+$$
+
+where $`A_n`$ is the number of novel messages the node received over those rounds, and $`S_n`$ is the number of those rounds during which it provided the service for the whole round. A node that served no whole round in the set reports $`\ell_n^q = 0`$.
+
+A node reports its load quantized to sixteen levels, rounded to nearest:
+
+$$
+\ell_n^q = \min\left(15,\ \left\lfloor \dfrac{16 \cdot A_n + r_1 \cdot S_n}{2 \cdot r_1 \cdot S_n} \right\rfloor\right)
+$$
 
 ### Connectivity Maintenance
 
@@ -560,8 +590,8 @@ A failure of the authenticated stream is a violation of the framing of the strea
 
 **Edge Nodes**
 
-1. A core node holds at most $`\Phi_{CE}^{Max}`$ connections with edge nodes at once, and accepts at most $`r_E`$ of them in a round. A connection offered above either is closed.
-2. A connection with an edge node is closed once the edge node has sent its message, or once $`T_E`$ has elapsed from accepting it. $`T_E`$ covers one encapsulated message of $`19318`$ bytes ([Message Formatting](message-formatting.md)), which takes $`0.15`$ s over a $`1`$ Mbit/s link; a further $`20\%`$ for framing and $`0.5`$ s of latency keep the total under one round.
+1. A core node holds at most $`\Phi_{CE}^{Max}`$ connections with edge nodes at once, and serves at most $`r_E`$ of them in a round ([Edge Admission](#edge-admission)). A connection offered above $`\Phi_{CE}^{Max}`$ is closed.
+2. A connection with an edge node is closed once the edge node has sent its message, or once $`T_E`$ has elapsed from accepting it. $`T_E`$ covers the door quote, the token and one encapsulated message of $`19318`$ bytes ([Message Formatting](message-formatting.md)), which takes $`0.15`$ s over a $`1`$ Mbit/s link; a further $`20\%`$ for framing and $`0.5`$ s of latency keep the total under one round. The quote and the token add $`36`$ bytes, and the edge node does not wait for the quote ([Edge Admission](#edge-admission)).
 3. An edge node whose message fails header verification has its connection closed. It is not blacklisted.
 
 **Logging**
@@ -573,6 +603,47 @@ A node logs:
 - every period during which it holds fewer than $`\Phi_{CC} - 1`$ live connections with core nodes, or fewer than $`\Phi_{CC} - 2`$ that it opened.
 
 Each entry carries the identity of the neighbor and the reason.
+
+### Edge Admission
+
+A core node prices its edge service with an [Equi-X](common-cryptographic-components.md#4-client-puzzles) effort target $`d_{edge}^n`$, set by the node as defined in [Edge Difficulty](#edge-difficulty).
+
+The challenge of the node $`n`$ for the window $`w = \lfloor t / T_R \rfloor`$, where $`t`$ is the number of the current round ([Time](#time)):
+
+$$
+C_n^w = H(\text{"BLEND\_EDGE\_V1"} \| provider\_id_n \| R_e \| w)
+$$
+
+where $`H`$ is Hash ([BLAKE2b](common-cryptographic-components.md#blake2bgeneral-purpose-hashing), 32-byte output) with the leading domain separation tag, $`provider\_id_n`$ is the node's `provider_id` as its 32 bytes, $`R_e`$ is the epoch randomness of the epoch $`e`$ the window lies in ([Epoch Randomness](#epoch-randomness)), and $`w`$ is encoded as 8 bytes little-endian.
+
+On identifying a neighbor as an edge node ([Neighbor Distinction Process](#neighbor-distinction-process)), the node sends its **door quote**: $`d_{edge}^n`$ as 4 bytes little-endian, then $`w`$ as 8 bytes little-endian. The edge node sends its token — 24 bytes, serialized as defined in [Equi-X](common-cryptographic-components.md#4-client-puzzles) — followed by its message; it need not await the quote, which prices the retry of a token that falls short. An edge node holding no satisfying token closes the connection, and connects again once it holds one.
+
+The node serves the connection when all of the following hold, checked in this order:
+
+1. The token verifies against $`C_n^w`$ or $`C_n^{w-1}`$.
+2. Its achieved effort is at least the lowest value $`d_{edge}^n`$ took during the past $`G`$ rounds.
+3. The pair of the token's challenge and nonce is not in the spent-token cache.
+4. Fewer than $`r_E`$ edge connections have been served in the current round.
+
+On serving, the node inserts the pair into the spent-token cache and receives the message. The cache check, the insertion and the count are one indivisible step, so one token takes at most one of a round's services. On any failure the node closes the connection. A refusal at check 4 attributes nothing to the peer and records nothing; the peer may connect again.
+
+The spent-token cache holds the pairs of the current and the previous window and discards entries of older windows. Its size is bounded by $`2 \cdot r_E \cdot T_R`$ entries. A node that restarts resumes as one starting fresh: it holds no pairs, and $`d_{edge}^n`$ returns to $`d_{edge}^{Min}`$.
+
+### Edge Difficulty
+
+Each core node sets $`d_{edge}^n`$ for itself. $`P_n`$ is the number of **distinct** tokens presented during a set of rounds that passed checks 1 to 3 of [Edge Admission](#edge-admission), whether or not check 4 served them: a token counts once, however often it is presented.
+
+Starting at $`d_{edge}^{Min}`$, the target is retargeted every $`W`$ rounds against $`P_n`$ and the served rounds $`S_n`$ over those rounds:
+
+1. If $`P_n \gt 2 \cdot r_E \cdot S_n`$, then $`d_{edge}^n \leftarrow \min(2 \cdot d_{edge}^n,\ d_{edge}^{Max})`$.
+2. If $`P_n \lt r_E \cdot S_n`$, then $`d_{edge}^n \leftarrow \max(\lfloor 3 \cdot d_{edge}^n / 4 \rfloor,\ d_{edge}^{Min})`$.
+3. Otherwise it is unchanged.
+
+The decay threshold must be at least $`r_E \cdot S_n`$: below it a node would hold a raised price while refusing nobody. The raise threshold must be at least twice the decay threshold: a doubling of $`d_{edge}^n`$ halves the rate a solver of fixed capacity presents, so a narrower band would drop demand below the decay threshold and the price would oscillate.
+
+$`d_{edge}^{Max}`$ must keep the time to solve three tokens (the reference redundancy $`\Phi_{EC} = 3`$) on the target machine within the message traversal time $`T_M`$ ([Transition Period](#transition-period)); above it, an edge node that wins a leader election and must solve at its slot releases its proposal later than its slot by the solving time, and no rule recovers the delay. At $`1000`$, the measured mean on a Raspberry Pi 5 is $`2.4`$ s per token, about $`7`$ s for three.
+
+$`d_{edge}^{Min}`$ is calibrated so that holding one node's edge service at $`r_E`$ costs about twenty cores of the fastest measured solver: at $`300`$, one token costs $`0.79`$ s on such a core.
 
 ### Transition Period
 
@@ -597,7 +668,7 @@ The transition period must not be shorter than the message traversal time. A nod
 When a new **epoch** begins:
 
 - The node validates message proofs against both new and past epoch-related public input for the duration of TP. This allows past-epoch messages to safely transit through the network, as their validity is bound to the epoch in which they were generated.
-- This includes the Blend threshold $`d_{blend}`$: a proof is accepted if it satisfies the threshold of the epoch whose public inputs it was generated against. A message from the past epoch is therefore judged against the past epoch's threshold and not the new one, which is required for correctness — a message that was valid when it was sent must not become invalid in flight merely because the threshold tightened at the boundary. The consequence is that during the Transition Period the network admits messages meeting either threshold, so the more permissive of the two governs for its duration. Since TP is $`30`$ rounds against an epoch of $`648000`$, and the threshold is bounded in how far it may move at a boundary, this widening is short and small.
+- This includes the Blend threshold $`d_{blend}`$: a proof is accepted if it satisfies the threshold of the epoch whose public inputs it was generated against.
 - The node must open new connections to process new messages for the new epoch.
 - The node needs to maintain old connections and process all messages received from these connections for the duration of TP. A connection held for the past epoch does not count towards $`\Phi_{CC}`$.
 
@@ -681,21 +752,40 @@ where $`y`$ is the number of distinct solutions held by the node $`n`$ that sati
 
 Setting $`Q_W = \beta_{max}`$ makes one solution sufficient for exactly one message. A quota unit is one blending operation, not one message: a message carries $`\beta_{max}`$ blending operations and therefore consumes $`\beta_{max}`$ keys, one per encapsulation. Expressing the quota as a multiple of $`\beta_{max}`$ rather than as a bare number keeps that relationship correct if the number of blending operations per message ever changes, and makes the messages-per-solution figure explicit rather than something a reader must derive.
 
-This is the quota that admits participants holding neither stake nor a declaration: the cost of reaching the Blend network without a prior relationship to the protocol is one puzzle solution per message, set by $`d_{blend}`$, whose baseline is chosen in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty).
+This is the quota that admits participants holding neither stake nor a declaration: the cost of reaching the Blend network without a prior relationship to the protocol is one puzzle solution per message, set by $`d_{blend}`$ ([Blend Difficulty](#blend-difficulty)).
 
 The puzzle is not the only per message cost: each of the $`\beta_{max}`$ encapsulations carries its own proof, generated whatever the quota is.
 
-The rate at which this branch admits messages cannot be bounded in the way the other two are. The core quota is bounded by $`N`$, which the SDP publishes, and the leadership quota by the total stake. The proof of work quota is bounded only by how much work the network's participants choose to perform, which is not observable in advance and not bounded by the protocol. Every quantity derived from a bound on total messages — most directly the nullifier cache size in [Relaying](#relaying) — must therefore be re-derived against $`d_{blend}`$ rather than against a count of registered nodes.
+The rate of this branch is sized and bounded in [Expected Traffic](#expected-traffic) and steered by [Blend Difficulty](#blend-difficulty).
 
 ### Blend Difficulty
 
 $`d_{blend}`$ is the threshold a puzzle ticket must fall below to satisfy the proof of work branch of the [Proof of Quota](#proof-of-quota). Because a smaller threshold admits a smaller fraction of tickets, a smaller $`d_{blend}`$ makes admission harder.
 
-It is a per epoch value, held constant for the whole epoch and identical for every proof produced within it. Both properties are required rather than incidental: the threshold is a public input to the proof, so a value that varied between provers, or within an epoch, would partition proofs into distinguishable classes and reveal which participants had produced which messages. Holding it constant for the epoch keeps the proof of work branch indistinguishable from the other two.
+It is a per epoch value, held constant for the whole epoch and identical for every proof produced within it, as a public input to the [Proof of Quota](proof-of-quota.md).
 
-The control objective for $`d_{blend}`$ belongs to this protocol, because what it regulates is the health of the anonymity set. When genuine traffic is plentiful the network already provides a large set to hide in, so permissionless admission can be restricted more tightly without harming privacy; when traffic is thin, admission should be made easier so that proof of work backed messages contribute to the set rather than being excluded from it. A threshold that is too tight starves the anonymity set; one that is too loose exposes the network to flooding by participants who need no stake to send.
+Every node derives the value for an epoch from the active messages the ledger holds, enumerated by the epoch of the block that contained them ([Indexing](bedrock-service-declaration-protocol.md#indexing)). Those blocks are final during the preceding epoch, before that epoch's nonce is fixed, so the value is available to provers no later than the other public inputs of the proof.
 
-The value itself is a consensus quantity: it must be agreed by every node, so it is derived from on-chain observations and held in consensus state. It is fixed at the same snapshot as the epoch's nonce, during the preceding epoch, as specified in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty), which gives the load it is computed from and the bounds that make it resistant to manipulation. Publishing it together with the nonce keeps the proof precomputation window usable, since both are public inputs to the same proof.
+The input is the load reported in the Blend active messages that attest the epoch three epochs before the one the value applies to ([Active Message](#active-message)). The value for epoch $`s`$ is `d_blend(s)`, a function of that one report set:
+
+```python
+BLEND_DIFFICULTY_BASE: PowTarget = p // 2**19  # Threshold at the load set point
+
+def d_blend(s: EpochNumber) -> PowTarget:
+    if s < 3:                             # no attested epoch exists yet
+        return BLEND_DIFFICULTY_BASE
+    reports = reported_loads(s - 3)       # the load values of the accepted active
+                                          # messages attesting epoch s-3
+    if len(reports) == 0:
+        return BLEND_DIFFICULTY_BASE
+    load = sorted(reports)[(len(reports) - 1) // 2]   # lower median
+    # The floor bounds the loosening at the rate Expected Traffic permits.
+    return (BLEND_DIFFICULTY_BASE * l_star) // max(L_MIN, load)
+```
+
+`l_star` and `L_MIN` are $`\ell^*`$ and $`L^{Min}`$ ([Global Parameters](#global-parameters)). The value therefore lies in $`[\text{BASE} \cdot \ell^* / 15,\ \text{BASE} \cdot \ell^* / L^{Min}]`$. `BLEND_DIFFICULTY_BASE` is calibrated against a measurement of the work: about fifty seconds per solution on one core of the target machine, a Raspberry Pi 5.
+
+`PowTarget` arithmetic is over canonical integer representatives ([Proof of Work Operations](bedrock-v1.1-mantle-specification.md#proof-of-work-operations)); a smaller target is a harder puzzle.
 
 ### Quota Application
 
@@ -1000,7 +1090,7 @@ To better understand the context of the constructions defined in this section re
 
 ### Epoch Randomness
 
-The rewarding protocol requires a common and unbiased randomness. We assume that it is provided by the consensus once per epoch.
+The protocol requires a common and unbiased randomness, for rewarding and for the edge challenge ([Edge Admission](#edge-admission)). The randomness of an epoch is the epoch's nonce ([Epoch](cryptarchia-v1-protocol.md#epoch)). Wherever it enters a byte string, it is serialized as its canonical integer representative in 32 bytes little-endian.
 
 ### Activity Proof
 
@@ -1083,19 +1173,20 @@ The `metadata` field is the concatenation of the following fields, in order:
 | Field | Size (bytes) | Value |
 | --- | --- | --- |
 | `metadata_type` | 1 | `0x01`, identifying the payload as Blend service activity metadata |
-| `version` | 1 | `0x01`, the version of the Blend [Activity Proof](#activity-proof) format |
+| `version` | 1 | `0x02`, the version of the Blend [Activity Proof](#activity-proof) format |
 | `epoch_number` | 4 | the epoch $`e`$ the proof attests to, encoded as little-endian |
 | `signing_key` | 32 | the public key $`K^{n}_{l}`$ used to verify the two proofs below |
 | `proof_of_quota` | 160 | $`\pi_{Q}^{K^{n}_{l}}`$, serialized as defined in [Proof of Quota](proof-of-quota.md) |
 | `proof_of_selection` | 32 | $`\pi_{S}^{K^{n}_{l},l}`$ |
+| `load` | 1 | $`\ell_n^q`$, the node's quantized load over the rounds of the epoch $`e`$ ([Load](#load)) |
 
-The total size of the `metadata` field is therefore $`230`$ bytes.
+The total size of the `metadata` field is therefore $`231`$ bytes.
 
 The two leading bytes serve distinct purposes and must not be conflated. The `metadata_type` byte selects how the service-specific `metadata` field is interpreted, so that the SDP active message can carry activity metadata for services other than Blend. The `version` byte versions the Blend Activity Proof format itself, independently of that selector.
 
-The `metadata_type` must be equal to `0x01`; if not, then discard the message. The `version` must be equal to `0x01`; if not, then discard the message.
+The `metadata_type` must be equal to `0x01`; if not, then discard the message. The `version` must be equal to `0x02`; if not, then discard the message. The `load` must be at most `15`; if not, then discard the message.
 
-The active message is stored on the ledger.
+The active message is stored on the ledger. It must remain readable until [Blend Difficulty](#blend-difficulty) has read it, three epochs after the epoch it attests.
 
 The active message is used for calculating the node reward.
 

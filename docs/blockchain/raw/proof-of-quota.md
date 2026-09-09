@@ -29,6 +29,7 @@
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.2.0 | Add the proof of work branch: third selector value, `pow_quota` and `pow_blend_difficulty` public inputs, `pow_sk` witness, Lagrange branch selection, and the binding and precomputation properties | 2026-08-31 |
 | 1.3.0 | Replace the proof of work secret key and its key derivation with a single private nonce | 2026-09-08 |
+| 1.3.1 | Repointed the provenance of `pow_blend_difficulty` to the Blend Protocol; its availability follows the active messages the ledger holds, before the epoch nonce | 2026-09-08 |
 
 
 # Introduction
@@ -82,7 +83,7 @@ The proof's public signal vector is fixed by the circuit — the output first, t
 
 A verifier must assemble the vector in exactly this order; any other rejects valid proofs. Neither the listing above nor the `public [...]` clause of the circuit's main component states this order — the first groups the values as the verifier's input structure declares them, and the second selects which signals are public without ordering them.
 
-`pow_blend_difficulty` is a per-epoch protocol value, identical for every proof produced in that epoch, so it carries no branch-specific signal and a verifier cannot infer from it which branch a given proof used. How its value is set for each epoch is not defined here; it is a consensus quantity supplied to the circuit, and its derivation is specified alongside the other Blend parameters.
+`pow_blend_difficulty` carries no branch-specific signal — it is identical for every proof of the epoch — so a verifier cannot infer from it which branch a given proof used. It is a consensus quantity supplied to the circuit, derived in [Blend Difficulty](blend-protocol.md#blend-difficulty).
 
 ### Witness
 
@@ -243,7 +244,7 @@ The proof of work branch places no bound on how old a solution may be. The only 
 
 That value does not become known when its epoch starts. It is fixed at the beginning of the lottery constants finalization phase of the *preceding* epoch, as specified in [Epoch](cryptarchia-v1-protocol.md#epoch), and is public from that moment. An epoch is $`10\lfloor k/f \rfloor`$ slots and the nonce is fixed $`6\lfloor k/f \rfloor`$ slots into the preceding epoch, so it is known for the final $`4\lfloor k/f \rfloor`$ slots of that epoch — with the parameters in [Cryptarchia](cryptarchia-v1-protocol.md#constants), roughly three days of a seven and a half day epoch.
 
-`pow_blend_difficulty` for the epoch is fixed at the same snapshot as the nonce, as specified in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty), so the whole window has every public input of the proof available, and complete proofs — not only solutions — may be prepared ahead of the epoch; the reward path's freshness is enforced independently by its own acceptance window. A prover may therefore mine solutions for an epoch throughout that window and hold them until the epoch opens. Admission to the Blend network over the proof of work branch is consequently limited by the total work a prover can perform in that window and by `pow_quota`, rather than by any rate at which solutions may be presented.
+`pow_blend_difficulty` for the epoch is derived from active messages the ledger holds, as specified in [Blend Difficulty](blend-protocol.md#blend-difficulty); their blocks are final before the nonce is fixed, so the whole window has every public input of the proof available, and complete proofs — not only solutions — may be prepared ahead of the epoch; the reward path's freshness is enforced independently by its own acceptance window. A prover may therefore mine solutions for an epoch throughout that window and hold them until the epoch opens. Admission to the Blend network over the proof of work branch is consequently limited by the total work a prover can perform in that window and by `pow_quota`, rather than by any rate at which solutions may be presented.
 ## Proof Compression
 
 The proof confirming that the PoQ is correct must be compressed to a size of 128 bytes, where the `UncompressedProof` is comprising of 2  $`\mathbb{G}_1`$ and 1  $`\mathbb{G}_2`$ BN256 elements as presented below.
