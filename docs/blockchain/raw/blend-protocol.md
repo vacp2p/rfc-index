@@ -32,7 +32,7 @@
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
 | 1.3.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 | 1.3.1 | Judged the active message window by the epoch of the including block, made the one-message-per-epoch rule per attested epoch, and made the transition-period delay a release constraint | 2026-09-02 |
-| 1.4.0 | Versioned by eras: the message and Activity Proof `version` bytes are removed, the libp2p protocol name carries the era, and a message is released on the connections of the era it arrived on ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
+| 1.4.0 | Versioned by eras: the message and Activity Proof `version` bytes are removed, the libp2p protocol name carries the network and the era, and a message is released on the connections of the era it arrived on ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
 | 1.4.1 | Followed `Max_Payload_Length` to 18190 bytes after the removal of the `bedrock_version` header field ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
 
 # Introduction
@@ -505,7 +505,7 @@ Implementations should choose a default based on the deployment they operate in,
 
 ### Connection Details
 
-The connections are established using libp2p with TLS version 1.3 (not older). The cryptographic scheme is Ed25519 with ephemeral keys**.** The libp2p protocol name is `/logos-blockchain/blend/<era>` for mainnet and `/logos-blockchain-testnet/blend/<era>` for testnet ([Network Protocol Identity](bedrock-eras.md#network-protocol-identity)).
+The connections are established using libp2p with TLS version 1.3 (not older). The cryptographic scheme is Ed25519 with ephemeral keys**.** The libp2p protocol name is `/logos-blockchain/<era>/blend` for mainnet and `/logos-blockchain-testnet/<era>/blend` for testnet ([Network Protocol Identity](bedrock-eras.md#network-protocol-identity)).
 
 ### Neighbor Distinction Process
 

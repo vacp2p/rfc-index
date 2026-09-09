@@ -76,9 +76,9 @@ The Era Transition Period applies to the network layer only.
 
 ## Network Protocol Identity
 
-Every libp2p protocol identifier and gossipsub topic carries the era number in place of a version: `/logos-blockchain/<protocol>/<era>` for mainnet and `/logos-blockchain-testnet/<protocol>/<era>` for testnet, with `<era>` the decimal era number.
+Every libp2p protocol identifier and gossipsub topic is `/<network>/<era>/<protocol>`. `<network>` names the network: `logos-blockchain` for mainnet, `logos-blockchain-testnet` for testnet; any other network — a devnet, a deliberate fork — takes its own name and its own schedule. `<era>` is the decimal era number.
 
-The era in an identifier is the era in force, not the era of the data carried.
+A message is sent over the identifiers of the era it belongs to: a Blend message over the era of the connection it arrived on, a generated message and a block over the era in force. A synchronization request and its response use the era in force; the blocks they carry are of any era.
 
 During the [Era Transition Period](#era-transition-period) a node advertises and accepts the identifiers of both eras.
 
