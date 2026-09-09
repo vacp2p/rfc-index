@@ -59,9 +59,7 @@ The [Epoch State](cryptarchia-v1-protocol.md#epoch-state) of an epoch is compute
 
 ## Era Transition Period
 
-The Era Transition Period is the first $`T_\text{era} = 30`$ [rounds](blend-protocol.md#time) after the era in force changes. It applies to the network layer only.
-
-$`T_\text{era}`$ must not be smaller than $`T`$, the Blend [Transition Period](blend-protocol.md#transition-period). Otherwise Blend payloads in flight at the boundary are dropped.
+The Era Transition Period is the first $`T`$ [rounds](blend-protocol.md#time) after the era in force changes, where $`T`$ is the Blend [Transition Period](blend-protocol.md#transition-period). It applies to the network layer only.
 
 During the Era Transition Period a node must:
 
