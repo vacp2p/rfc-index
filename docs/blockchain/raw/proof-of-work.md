@@ -66,7 +66,7 @@ def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
     return (pow_reward_pool * EPOCH_POW_DISTRIBUTION_RATE_NUM) // denominator
 ```
 
-`EXPECTED_BLOCKS_PER_EPOCH` is the expected number of blocks in an epoch defined in [Cryptarchia](cryptarchia-v1-protocol.md#epoch-schedule), $`10k`$, restated here because it enters consensus arithmetic; a change there changes it here identically. The constants are mainnet values; a test network may substitute values sized to its expected activity. The division rounds down, and the remainder stays in the pool.
+`EXPECTED_BLOCKS_PER_EPOCH` is the epoch length in slots of [Epoch Schedule](cryptarchia-v1-protocol.md#epoch-schedule) times the slot activation coefficient $`f`$, $`10k`$; a change to either changes it here identically. The constants are mainnet values; a test network may substitute values sized to its expected activity. The division rounds down, and the remainder stays in the pool.
 
 At each epoch boundary, before any block of the new epoch is processed, the reward per claim is recomputed from the pool and held for the epoch:
 
