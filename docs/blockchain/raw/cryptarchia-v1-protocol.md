@@ -35,7 +35,7 @@
 | 1.2.3 | Update the test vectors to reflect the parent added in the `CHANNEL_CONFIG` payload | 2026-08-27 |
 | 1.2.4 | Reordered the `ProofOfLeadership` fields to the wire order defined by the [Canonical Encoding](bedrock-v1.1-block-construction.md#canonical-encoding), and noted that the [Block ID](#block-id) preimage absorbs the same fields in a different order by design. The `Header` layout and the `block_id` preimage are otherwise unchanged. | 2026-08-28 |
 | 1.3.0 | Versioning and upgrade activation moved to eras, and uncles restricted to the era of the referencing block ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
-| 1.4.0 | Removed the `bedrock_version` header field: the era of the slot identifies the rules ([Bedrock Eras](bedrock-eras.md)); the header is 296 bytes and a signed header 360, and the test vectors are regenerated. | 2026-09-04 |
+| 1.4.0 | Removed the `bedrock_version` header field ([Bedrock Eras](bedrock-eras.md)): the header is 296 bytes and a signed header 360, and the test vectors are regenerated. | 2026-09-04 |
 
 # Introduction
 
@@ -448,7 +448,7 @@ We say $`\textbf{valid\_header}(B)`$ returns True if all of the following constr
     Ensure that the leader who won the lottery is actually proposing this block since PoL’s are not bound to blocks directly.
 
 9. $`\forall\,(U, \sigma_U) \in uncle\_headers:\ \textbf{valid\_uncle}(U, \sigma_U, B) = True`$
-  Ensure every carried uncle is valid, as defined by the rules of [Uncle References](#uncle-references). A block carrying an entry that fails any of them is rejected.
+  Ensure every carried uncle is valid, as defined by the rules of [Uncle References](#uncle-references).
 
   The list bound `len(uncle_headers) <= MAX_UNCLES` is a constraint of the serialization schema, rejected at decode time (a block that does not parse is no block), and so is not restated here. Duplicate entries are permitted: each is validated independently and a repeat passes exactly as the first occurrence does.
 
@@ -555,7 +555,7 @@ Cryptarchia depends on honest nodes having relatively in-sync clocks. We are cur
 
 ## Test Vectors
 
-The transaction Merkle root is one of the two inputs to the `body_root` defined in step 3 of [Block Header Validation](#block-header-validation), alongside the serialized carried `uncle_headers`.
+The vectors below give `merkle_root(transactions)` and `body_root` as defined in step 3 of [Block Header Validation](#block-header-validation), and `block_id` as defined in [Block ID](#block-id).
 
 | Input | Output |
 |-|-|

@@ -33,7 +33,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-01-20 |
 | 1.0.1 | Rename Nomos to Logos Blockchain | 2026-04-17 |
-| 1.1.0 | Protocol identifiers and gossipsub topics carry the network name and the era number ([Bedrock Eras](../raw/bedrock-eras.md)). | 2026-09-04 |
+| 1.1.0 | Protocol identifiers and gossipsub topics carry the era number in place of the version ([Bedrock Eras](../raw/bedrock-eras.md)). | 2026-09-04 |
 
 # Introduction
 
@@ -70,7 +70,7 @@ The specific protocols to be negotiated are:
 - Kademlia: `/logos-blockchain/<era>/kad` for main network and `/logos-blockchain-testnet/<era>/kad` for public testnet.
 - Identify: `/logos-blockchain/<era>/identify` and `/logos-blockchain-testnet/<era>/identify` for public testnet.
 
-The leading segment names the network and `<era>` is the era number ([Network Protocol Identity](../raw/bedrock-eras.md#network-protocol-identity)).
+`<era>` is defined in [Network Protocol Identity](../raw/bedrock-eras.md#network-protocol-identity).
 
 The Logos Blockchain team acknowledges that the current Kademlia DHT implementation is only optimal for the V1 solution, as it is a heavier protocol for the limited utility the Logos Blockchain actually requires. However, it remains a viable interim approach. An ideal protocol would feature:
 

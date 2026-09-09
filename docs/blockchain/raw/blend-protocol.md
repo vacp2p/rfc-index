@@ -32,8 +32,8 @@
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
 | 1.3.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
 | 1.3.1 | Judged the active message window by the epoch of the including block, made the one-message-per-epoch rule per attested epoch, and made the transition-period delay a release constraint | 2026-09-02 |
-| 1.4.0 | Versioned by eras: the message and Activity Proof `version` bytes are removed, the libp2p protocol name carries the network and the era, and a message is released on the connections of the era it arrived on ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
-| 1.4.1 | Followed `Max_Payload_Length` to 18190 bytes after the removal of the `bedrock_version` header field ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
+| 1.4.0 | Removed the message and Activity Proof `version` bytes, put the era in the libp2p protocol name, and linked the era rules for the transition period and for releasing ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
+| 1.4.1 | Updated `Max_Payload_Length` to 18190 bytes in the overhead calculation, following the removal of the `bedrock_version` header field ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
 
 # Introduction
 
@@ -903,7 +903,7 @@ The process of releasing messages involves the following steps:
 - As soon as a **data** message is generated, one random unreleased (future) **cover** message must be removed from the release schedule to maintain the node’s statistical indistinguishability.
 - If more than one message needs to be released for the same round, they must be randomly shuffled before release.
 
-A message is released on the connections of the era of the protocol it was received on; a generated message on the connections of the era in force ([Network Protocol Identity](bedrock-eras.md#network-protocol-identity)).
+The era of the connections a message is released on is defined in [Network Protocol Identity](bedrock-eras.md#network-protocol-identity).
 
 The cover and data message generation processes are **independent**, and there is a non-zero probability that more than one message will be scheduled for the same round. Therefore, the number of messages that can be released during a single round is **not restricted**.
 

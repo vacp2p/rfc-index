@@ -27,8 +27,8 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | Corrected `Max_Payload_Length` to 34577 bytes, so that it again matches the `Max_Body_Length` of [Payload Formatting](payload-formatting.md) plus the 3-byte payload header. | 2026-08-06 |
 | 1.0.2 | Expressed `Max_Payload_Length` as `Max_Body_Length + 3` rather than a literal, so that it tracks the payload body size automatically; it is 18195 bytes at the `Max_Body_Length` that follows from the compressed transaction references of [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md). | 2026-08-18 |
-| 1.1.0 | Removed the `version` byte from the public header; the era-qualified protocol name carries the era ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
-| 1.1.1 | Followed `Max_Payload_Length` to 18190 bytes after the removal of the `bedrock_version` header field ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
+| 1.1.0 | Removed the `version` byte from the public header ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
+| 1.1.1 | Updated `Max_Payload_Length` to 18190 bytes, following the removal of the `bedrock_version` header field ([Bedrock Eras](bedrock-eras.md)). | 2026-09-04 |
 
 # Introduction
 
@@ -38,7 +38,7 @@ In this document we are reusing notation from [Notation](message-encapsulation.m
 
 # Overview
 
-The message contains a header and a payload. The message contains a drop or a non-drop payload. The length of a payload is fixed to prevent adversaries from distinguishing types of messages based on their length.
+The message contains a header and a payload. The payload is a drop or a non-drop payload. The length of a payload is fixed to prevent adversaries from distinguishing types of messages based on their length.
 
 # Construction
 
