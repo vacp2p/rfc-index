@@ -27,8 +27,11 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.1.1 | Updated the block proposal message size to 34574 bytes in the encapsulation-overhead calculation, following the addition of carried uncle headers in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md). | 2026-08-06 |
+| 1.1.2 | Denominated the encapsulation-overhead calculation against `Max_Payload_Length` (18195 bytes), the payload that is actually encapsulated, rather than the body it contains, following the compression of transaction references (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)). | 2026-08-18 |
 | 1.2.0 | Define the token evaluation under a low core quota, and specify the Active Message metadata layout. | 2026-08-19 |
 | 1.2.1 | Pointed the `EpochNumber` of the activity proof at its definition in [Epoch](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
+| 1.3.0 | [RFC] Replace the BLAKE2b-Based PRNG with ChaCha20 (ChaCha20Rng) | 2026-08-28 |
+| 1.3.1 | Judged the active message window by the epoch of the including block, made the one-message-per-epoch rule per attested epoch, and made the transition-period delay a release constraint | 2026-09-02 |
 
 # Introduction
 
@@ -431,11 +434,11 @@ Every active core node receives a reward. The activity of a node is verified in 
 1. Generate a proof of its activity for a specific epoch as defined in [Activity Proof](#activity-proof). The proof confirms that the node was processing messages during the epoch. The node activity confirmation is probabilistic, and the odds increase with the number of collected blending tokens.
 2. Use SDP active functionality ([Active](bedrock-service-declaration-protocol.md#active)) to request a reward as described in [Rewarding Distribution Logic](#rewarding-distribution-logic), that is:
     1. Create an [Active Message](#active-message).
-    2. Send it as a part of the reward message ([Active Message](bedrock-service-declaration-protocol.md#active-message)).
+    2. Send it as an active message ([Active Message](bedrock-service-declaration-protocol.md#active-message)).
 3. The reward is calculated as defined in [Reward Calculation](#reward-calculation), that is:
-    1. The number of correct activity messages is calculated.
+    1. The number of correct active messages is calculated.
     2. The number of correct and winning messages is calculated, where a winning message is defined by a lottery mechanism.
-    3. Every node that sends a correct activity message receives a base reward.
+    3. Every node that sends a correct active message receives a base reward.
     4. Every node that sends a correct and winning message receives a premium reward.
 4. The rewards are distributed by the mechanisms provided by the [Service Reward Distribution Protocol](bedrock-service-reward-distribution.md).
 
@@ -464,7 +467,7 @@ Every active core node receives a reward. The activity of a node is verified in 
 - $`R_D`$ denote a redundancy parameter for data messages, defining the number of “replications” of the same message;
 - $`\mathcal{N} = \text{SDP}(s)`$ denote a set of core nodes providing the Blend service for the epoch $`e`$ returned by the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md));
 - $`N = |\mathcal N|`$ denote a number of core nodes providing the Blend service;
-- $`\text {CSPRNG}()`$ is a cryptographically secure pseudo-random number generator, implemented as a [BLAKE2b-Based PRNG Construction](common-cryptographic-components.md#blake2b-based-prng-construction);
+- $`\text {CSPRNG}()`$ is a cryptographically secure pseudo-random number generator, implemented as a [ChaCha20-Based PRNG Construction](common-cryptographic-components.md#chacha20-based-prng-construction);
 
 ## Global Parameters
 
@@ -591,9 +594,9 @@ Where:
 - $`R_C`$ denotes a redundancy parameter for cover messages, increasing the number of core node messages a node can send;
 - $`N`$ denote a number of core nodes providing the Blend service for the epoch returned by the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
 
-The division must be rounded **up**. Rounding down would collapse $`Q_C`$ to $`0`$ as soon as $`N > C \cdot (\beta_C + R_C \cdot \beta_C)`$ — that is, as soon as the network outgrows the expected number of blending operations for cover messages. Every core node would then be issued an empty key pool and cover traffic would stop entirely, removing the protocol's anonymity guarantee exactly when the network is largest. Rounding up costs at most $`N-1`$ additional messages network-wide per epoch.
+The division must be rounded **up**. Rounding down would collapse $`Q_C`$ to $`0`$ as soon as $`N \gt C \cdot (\beta_C + R_C \cdot \beta_C)`$ — that is, as soon as the network outgrows the expected number of blending operations for cover messages. Every core node would then be issued an empty key pool and cover traffic would stop entirely, removing the protocol's anonymity guarantee exactly when the network is largest. Rounding up costs at most $`N-1`$ additional messages network-wide per epoch.
 
-The parameters must additionally satisfy $`C \cdot \beta_C > 0`$. Together with rounding up, this guarantees $`Q_C \geq 1`$ for every epoch.
+The parameters must additionally satisfy $`C \cdot \beta_C \gt 0`$. Together with rounding up, this guarantees $`Q_C \geq 1`$ for every epoch.
 
 Additionally, we introduce the total core quota, which defines the total number of generated cover messages that the whole network can emit (independently of the number of nodes):
 
@@ -784,7 +787,7 @@ A node $`n`$ constructs a message $`\mathbf M = (\mathbf H, \mathbf h, \mathbf P
 
 3. $`\mathbf P`$ is a payload.
 
->**Encapsulation Overhead Calculation:** Assuming that we use Groth16 SNARKs as a proving system, we need $`160`$ bytes per PoQ ($`128`$ for proof and $`32`$ for nullifier) quota. Which gives us $`289`$ bytes per hop (proof of quota $`160`$ bytes + proof of selection $`32`$ bytes + public key $`32`$ bytes + signature $`64`$ bytes + last flag $`1`$ byte) plus $`256`$ bytes for the public header. Which for $`3`$ hops gives us $`1123`$ bytes in total. That increases the block proposal message defined in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md), of $`34574`$ bytes (the padded `Max_Body_Length` of [Payload Formatting](payload-formatting.md)) by $`\approx 3\%`$.
+>**Encapsulation Overhead Calculation:** Assuming that we use Groth16 SNARKs as a proving system, we need $`160`$ bytes per PoQ ($`128`$ for proof and $`32`$ for nullifier) quota. Which gives us $`289`$ bytes per hop (proof of quota $`160`$ bytes + proof of selection $`32`$ bytes + public key $`32`$ bytes + signature $`64`$ bytes + last flag $`1`$ byte) plus $`256`$ bytes for the public header. Which for $`3`$ hops gives us $`1123`$ bytes in total. That is added to the payload being encapsulated, which is `Max_Payload_Length` = $`18195`$ bytes ([Message Formatting](message-formatting.md)): the padded `Max_Body_Length` of [Payload Formatting](payload-formatting.md), set from the maximum size of the block proposal defined in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md), plus the 3-byte payload header. The encapsulation therefore adds $`\approx 6.2\%`$.
 
 ### Formatting
 
@@ -976,7 +979,7 @@ $$
 
   The comparison is inclusive: a token whose distance equals $`{\mathcal A}_{\epsilon}`$ satisfies the proof. The difficulty of the lottery is tuned through the sensitivity parameter $`\theta`$ of the [Activity Threshold](#activity-threshold), not through the choice of comparison operator.
 
-  The requirement $`C \cdot \beta_C > 0`$ (see [Core Quota](#core-quota)) guarantees $`Q_C \geq 1`$ and therefore $`Q^{Total}_C \geq N \geq 1`$. It follows that $`\log_2(Q^{Total}_C+1) \geq 1`$ and hence $`\epsilon \geq 8`$: the digest is always at least one byte wide, which the `blake2b` algorithm requires.
+  The requirement $`C \cdot \beta_C \gt 0`$ (see [Core Quota](#core-quota)) guarantees $`Q_C \geq 1`$ and therefore $`Q^{Total}_C \geq N \geq 1`$. It follows that $`\log_2(Q^{Total}_C+1) \geq 1`$ and hence $`\epsilon \geq 8`$: the digest is always at least one byte wide, which the `blake2b` algorithm requires.
 
 The Hamming distance verification prevents nodes from the grinding or pre-computation attacks due to the unpredictability of the randomness of the next epoch. Even if a node knows the value of the randomness in advance, it will not increase its chance for getting a reward as the node does not control the process of generating blending tokens. However, a dishonest node could use that knowledge to refrain from sending a message with a token that has a potential (probabilistic, not deterministic) of granting a premium reward for the recipient blend node.
 
@@ -1019,7 +1022,7 @@ We assume that setting $`\theta = 1`$ is enough to eliminate nodes that have not
 
 The difference $`\chi - \nu - \theta`$ is negative whenever $`\chi \leq \nu + \theta`$, which happens when the total number of blending tokens is small relative to the network size. Because $`\chi \approx \log_2(Q^{Total}_C)`$ and $`\nu \approx \log_2(N)`$, this regime is reached when the per-node quota $`Q_C`$ is of the order of $`2^{\theta}`$ or smaller. A negative value is not a meaningful Hamming distance, so the threshold is clamped at $`0`$: the lottery becomes maximally difficult instead of undefined. At $`{\mathcal A}_{\epsilon} = 0`$ an activity proof is still attainable, but only for a blending token whose $`\epsilon`$-bit digest matches the digest of the epoch randomness exactly.
 
-The clamped regime is a degenerate operating point rather than a target: it makes rewards nearly unreachable for honest nodes and, in the limit, admits every node at once. Parameters should therefore be chosen so that $`\chi > \nu + \theta`$, which holds comfortably for the expected deployment values.
+The clamped regime is not a target: at $`{\mathcal A}_{\epsilon} = 0`$ rewards are nearly unreachable. Parameters must be chosen so that $`\chi \gt \nu + \theta`$.
 
 ### Active Message
 
@@ -1048,7 +1051,7 @@ The active message is used for calculating the node reward.
 
 The active message is constructed after the current epoch, when the next epoch randomness is known.
 
-The active message for epoch $`e`$ must only be sent during epoch $`e+1`$; otherwise, it must be rejected.
+The active message for epoch $`e`$ must be included in a block of epoch $`e+1`$; otherwise, it must be rejected.
 
 The node $`l`$ selects the activity proof to include in the active message such that the Hamming distance between the proof and the new randomness is minimal.
 
@@ -1056,7 +1059,7 @@ $$
 \pi_{A}^{l,t,e} = \min_{\Delta_{\mathcal H}}(\mathrm{true}(\pi_{A}^{i,t,e}))
 $$
 
-The ledger must only accept a single active message per-node per-epoch. Any duplicate must be rejected.
+The ledger must only accept a single active message per node per attested epoch. Any duplicate must be rejected.
 
 ### Reward Calculation
 
@@ -1087,7 +1090,7 @@ The reward is paid out to the node $`n`$ based on the node's activity declaratio
 The rewards are distributed according to [Service Reward Distribution Protocol](bedrock-service-reward-distribution.md). Here we are briefly sketching the main idea of the reward distribution protocol. For more details refer to the above document.
 
 1. To receive a reward, a node must send an Active Message as described in the [Active Message](bedrock-service-declaration-protocol.md#active-message), where the `metadata` field is encoded as defined in [Active Message](#active-message). The node must point to a single declaration (`declaration_id`) and use a single provider identity (`provider_id`) for constructing the Active Message. Any reuse of the `provider_id` must make the Active Message invalid.
-2. The Active Message must be sent after the end of an epoch ($`e`$), that is, during the next epoch ($`e+1`$), and after the epoch transition period as defined in the [Transition Period](#transition-period) section. The delay allows nodes to include blending tokens collected during the epoch transition period for rewarding purposes.
+2. The Active Message must not be released before the epoch transition period of epoch $`e+1`$ has elapsed ([Transition Period](#transition-period)).
 3. When the following epoch begins ($`e+2`$) Mantle distributes rewards ([Service Reward Distribution Protocol](bedrock-service-reward-distribution.md)). This delay is required to calculate the partition of rewards as defined in the above section.
 4. If a node does not send the Active Message on time, then it will not receive a reward.
 
@@ -1149,7 +1152,7 @@ TTL — peering degree 6:
 
 ## Statistical Analysis of Selection Bias of Modulo Operation
 
-Applying a modulo $`N`$ operation to the output of a pseudorandom number generator (here the Blake2b hash function) with a large range (here from $`0`$ to $`2^{256}-1`$), introduces a statistical bias when mapping to the smaller domain $`\{0,1,\ldots,N-1\}`$. This bias arises because $`2^{256}`$ is typically not divisible by $`N`$, meaning that some residues modulo $`N`$ will occur slightly more often than others. Specifically, let $`R:=2^{256}`$, then $`R=q\cdot N+r`$ with $`0 \leq r \lt N`$. The first $`r`$ values modulo $`N`$ will appear $`q+1`$ times, while the remaining $`N-r`$ values will appear $`q`$ times. Thus, the maximum bias between two values $`a\leq r`$ and $`b \gt r`$ in $`\{0,1,\ldots,N-1\}`$ is:
+Applying a modulo $`N`$ operation to the output of a pseudorandom number generator (here the ChaCha20 keystream) with a large range (here from $`0`$ to $`2^{64}-1`$, since the selection draws $`8`$ bytes), introduces a statistical bias when mapping to the smaller domain $`\{0,1,\ldots,N-1\}`$. This bias arises because $`2^{64}`$ is typically not divisible by $`N`$, meaning that some residues modulo $`N`$ will occur slightly more often than others. Specifically, let $`R:=2^{64}`$, then $`R=q\cdot N+r`$ with $`0 \leq r \lt N`$. The first $`r`$ values modulo $`N`$ will appear $`q+1`$ times, while the remaining $`N-r`$ values will appear $`q`$ times. Thus, the maximum bias between two values $`a\leq r`$ and $`b \gt r`$ in $`\{0,1,\ldots,N-1\}`$ is:
 
 $$
 |Pr[a]-Pr[b]| \leq \left| \frac{q+1}{R} - \frac{q}{R} \right| = \frac{1}{R}
@@ -1157,7 +1160,7 @@ $$
 
 Where $`Pr[a]`$ is the probability that $`a`$ is the result of the modulo $`N`$ operation and $`Pr[b]`$ the probability that $`b`$ is the result of the modulo $`N`$ operation.
 
-The maximum per-value bias is exactly $`\frac{1}{R}`$, regardless of $`N`$, as long as $`N \lt R`$. That means no single output differs from uniform by more than $`2^{-256}`$.
+The maximum per-value bias is exactly $`\frac{1}{R}`$, regardless of $`N`$, as long as $`N \lt R`$. That means no single output differs from uniform by more than $`2^{-64}`$.
 
 But now we consider total variation distance, a better global metric of distinguishability between the true distribution and uniform. This is:
 
@@ -1185,4 +1188,4 @@ TV&=\frac{1}{2} \left( r \cdot \left( \frac{1}{R} - \frac{r}{NR} \right) + (N-r)
 \end{aligned}
 $$
 
-So the distribution deviation is less than $`\frac{N}{R}`$ which is cryptographically negligible when $`\frac{N}{R} \leq 2^{-128}`$. Since $`R=2^{256} \implies N \leq 2^{128}`$. Since the number of nodes participating in Blend is expected to be less than 10 million (less than $`N=2^{24}`$) we can safely skip the rejection process necessary to draw random numbers uniformly in $`\{0,1,\ldots,N-1\}`$.
+So the distribution deviation is less than $`\frac{N}{R}`$. Since the number of nodes participating in Blend is expected to be less than 10 million (less than $`N=2^{24}`$), the total variation distance is at most $`\frac{2^{24}}{2^{64}} = 2^{-40}`$. Distinguishing the selection distribution from uniform then requires on the order of $`2^{40}`$ observed selections, far beyond what any observer collects in practice, so we can safely skip the rejection process necessary to draw random numbers uniformly in $`\{0,1,\ldots,N-1\}`$.

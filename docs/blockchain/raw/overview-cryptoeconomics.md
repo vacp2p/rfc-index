@@ -26,7 +26,8 @@
 | 1.1.0 | Reflect the upward rounding of the fee market price updates | 2026-07-28 |
 | 1.2.0 | Reflect the downward rounding of the leader share | 2026-08-05 |
 | 1.2.1 | Changing from burning/minting to pooling/distributing/releasing | 2026-08-25 |
-| 1.2.2 | Align with the reviewed Block Rewards, Execution Market and Anonymous Leaders Reward specs | 2026-08-27 |
+| 1.2.2 | Stated that the minimum stake of a service is locked in a service note | 2026-08-27 |
+| 1.2.3 | Align with the reviewed Block Rewards, Execution Market and Anonymous Leaders Reward specs | 2026-08-27 |
 
 > **Disclaimer**:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -71,7 +72,7 @@ In this section we present an overview of the cryptoeconomical aspects of the Lo
 
 ## Minimum Stake
 
-To provide a service, a node must lock a minimum number of tokens to be considered valid. This stake is locked through the [Service Declaration Protocol](bedrock-service-declaration-protocol.md) and can be withdrawn after the node stops providing the service. The minimum stake enhances economic security by increasing the cost of connecting to the network, which makes Sybil attacks more expensive. While the stake value must be sufficiently high for security, it also raises the barrier to network participation, potentially reducing decentralization. We therefore aim to balance security needs with decentralization goals. The [\[Analysis\] Static Minimum Stake Estimation for Service Declaration Protocol](analysis-static-minimum-stake-estimation-for-service-declaration-protocol.md) defines the methodology on how to calculate the minimum stake value.
+To provide a service, a node must lock in a service note a minimum number of tokens to be considered valid. This stake is locked through the [Service Declaration Protocol](bedrock-service-declaration-protocol.md) and can be withdrawn after the node stops providing the service. The minimum stake enhances economic security by increasing the cost of connecting to the network, which makes Sybil attacks more expensive. While the stake value must be sufficiently high for security, it also raises the barrier to network participation, potentially reducing decentralization. We therefore aim to balance security needs with decentralization goals. The [\[Analysis\] Static Minimum Stake Estimation for Service Declaration Protocol](analysis-static-minimum-stake-estimation-for-service-declaration-protocol.md) defines the methodology on how to calculate the minimum stake value.
 
 ## Gas
 

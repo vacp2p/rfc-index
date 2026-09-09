@@ -30,6 +30,7 @@
 | 1.1.2 | Encode `genesis_time` as a u32 unix timestamp instead of an ISO 8601 datetime. Encode the `chain_id` length prefix as a u8 instead of a u64. | 2026-07-06 |
 | 1.1.3 | Replaced the `block_root` header field with `body_root`, taken over an empty uncle header list and the initial transaction, due to updated [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md). | 2026-08-06 |
 | 1.1.4 | Stated which validations apply when the Genesis Mantle Transaction is processed: the ordinary Mantle rules apply to every Operation, minus a closed list of exemptions that the absence of any state before Genesis makes impossible to satisfy. | 2026-08-25 |
+| 1.1.5 | Renamed locked notes into service notes: the Blend declarations of the Genesis Mantle Transaction name a `service_note_id` | 2026-08-27 |
 
 # Introduction
 
@@ -83,7 +84,7 @@ BLEND_DECLARATIONS = [
         msg=DeclarationMessage(
             ServiceType.BLEND, ["ip://1.1.1.1:3000"], PROVIDER_ID_0, ZK_ID_0
         ),
-        locked_note_id=STAKE_DISTRIBUTION_TX.output_note_id(0)
+        service_note_id=STAKE_DISTRIBUTION_TX.output_note_id(0)
     ),
     # ... 32 total declarations
 ]
@@ -238,7 +239,7 @@ CRYPTARCHIA_INSCRIPTION = Inscribe(
 BLEND_DECLARATIONS = [
     Declaration(
         msg=DeclarationMessage(ServiceType.BLEND, ["ip://1.1.1.1:3000"], PROVIDER_ID_0, ZK_ID_0),
-        locked_note_id=STAKE_DISTRIBUTION.output_note_id(0)
+        service_note_id=STAKE_DISTRIBUTION.output_note_id(0)
     ),
     # ... more declarations
 ]
@@ -315,7 +316,7 @@ To initialize the Epoch State, we derive the epoch variables from the genesis bl
 
 Blend network is initialized through normal Mantle Transaction execution. The `SDP_DECLARE` Operations in the Genesis Mantle Transaction will create the initial set of providers in each service.
 
-Beyond their proofs, the declarations carry no exemption: each is validated as [SDP_DECLARE](bedrock-v1.1-mantle-specification.md#sdp_declare) requires, against the state the Operations preceding it left, and executed with `created` set to epoch 0, the epoch the Genesis block belongs to. The locked note a declaration names is an output of the Transfer Operation that precedes it, which is why the Operation order of the Genesis Mantle Transaction is normative, and the minimum stake that note is measured against is the one the node implementation starts with, the Genesis block encoding no service parameter.
+Beyond their proofs, the declarations carry no exemption: each is validated as [SDP_DECLARE](bedrock-v1.1-mantle-specification.md#sdp_declare) requires, against the state the Operations preceding it left, and executed with `created` set to epoch 0, the epoch the Genesis block belongs to. The service note a declaration names is an output of the Transfer Operation that precedes it, which is why the Operation order of the Genesis Mantle Transaction is normative, and the minimum stake that note is measured against is the one the node implementation starts with, the Genesis block encoding no service parameter.
 
 The number of declarations is a property of the Genesis block rather than of any single Operation, and is the one [Initial Service Declarations](#initial-service-declarations) requires.
 
