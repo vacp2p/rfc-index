@@ -138,7 +138,7 @@ def checked_int128(value: int) -> int:
         return value
 ```
 
-The checked arithmetic above is sufficient for every token-denominated quantity, including where this specification sums fees over whole epochs: conservation bounds every such aggregate, since no set of transactions can pay more in fees than the tokens that exist, and the supply of $`10^{19}`$ lepta is below the `uint64` maximum. The proof of work difficulty arithmetic is the exception, and is specified in [Proof of Work](proof-of-work.md#proof-of-work-target).
+The checked arithmetic above is sufficient for every token-denominated quantity, including where this specification sums fees over whole epochs: conservation bounds every such aggregate, since no set of transactions can pay more in fees than the tokens that exist, and the supply of $`10^{19}`$ lepta is below the `uint64` maximum. The proof of work difficulty arithmetic is the exception, and is specified in [Puzzle Target](proof-of-work.md#puzzle-target).
 
 ## Mantle Transaction Fee
 
@@ -1613,39 +1613,11 @@ pow_nullifiers: set[zkhash]      # Spent solutions, retained for the acceptance 
 block_slots: dict[hash, SlotNumber]  # Slots of recently seen blocks, for the window check
 ```
 
-`PowTarget`, and the maintenance of `pow_reward_pool`, `epoch_pow_reward` and `difficulty_reward` between blocks, are specified in [Proof of Work](proof-of-work.md).
-
-### Acceptance Window
-
-A claim references a recent block by hash. The reference is checked against the slot of the block including the claim, so that a solution cannot be presented arbitrarily long after it was found:
-
-```python
-EXPECTED_BLOCKS_PER_WINDOW: uint64 = 10   # W_b: window depth, in expected blocks
-
-def accept_claim_pow_op(claim: ClaimPowRewardOp, current_slot: SlotNumber) -> bool:
-    block = get_block_from_hash(claim.block_hash)   # None if unknown or not canonical
-    if block is None:
-        return False
-    return 0 <= current_slot - block.slot <= WINDOW
-```
-
-The window is measured in slots, but it is **specified in blocks** and derived from the slot activation coefficient $`f`$ given in [Constants](cryptarchia-v1-protocol.md#constants):
-
-$$
-\mathrm{WINDOW} = \left\lfloor \frac{W_b}{f} \right\rfloor
-$$
-
-With $`W_b = 10`$ and $`f = 1/30`$ this is $`300`$ slots.
-
-Because block production is a lottery, $`W_b`$ is an expectation rather than a bound. A run of empty slots means fewer than $`W_b`$ blocks fall inside the window, and a dense run means more.
-
-The window also bounds how long nullifiers must be retained. A solution referencing a block that has aged out of the window is rejected by this check regardless of whether its nullifier is still held, so nullifier entries may be discarded once their referenced block leaves the window. Retention is therefore proportional to $`W_b`$, and enlarging the window enlarges every validator's nullifier set in proportion.
-
-Because `get_block_from_hash` resolves against the canonical chain, a claim whose referenced block is reorganised out becomes invalid. A claim already propagated but not yet included may therefore stop being includable, and must be re-mined against a block that is still canonical. Note that $`W_b`$ is far shallower than the security parameter $`k`$, so a block inside the window is not yet immutable and this case is expected rather than exceptional.
+`PowTarget`, the acceptance window, and the maintenance of `pow_reward_pool`, `epoch_pow_reward` and `difficulty_reward` between blocks are specified in [Proof of Work](proof-of-work.md).
 
 ### CLAIM_POW_REWARD
 
-This Operation claims a reward from the proof of work reward pool by presenting a puzzle solution.
+This Operation claims a reward from the proof of work [reward pool](proof-of-work.md#reward-pool) by presenting a puzzle solution.
 
 #### Payload
 
@@ -1669,15 +1641,21 @@ class ClaimPowRewardOp:
   *Given*
 
 ```python
+mantle_txhash: zkhash
 claim: ClaimPowRewardOp            # the CLAIM_POW_REWARD payload
 claim_proof: ZkSignature           # the op_proofs entry for this Operation
 
 current_slot: SlotNumber           # slot of the block including this claim
+epoch_nonce_current: zkhash        # Cryptarchia epoch nonce of the current epoch
+epoch_nonce_previous: zkhash       # and of the epoch before it
+WINDOW: SlotNumber                 # the acceptance window, in slots
 difficulty_reward: PowTarget       # retargeted every block
 pow_nullifiers: set[zkhash]        # spent solutions, retained for WINDOW
 pow_reward_pool: TokenValue
 epoch_pow_reward: TokenValue
 ```
+
+  The epoch nonces are the Cryptarchia epoch nonce $`\eta`$ of [Epoch Nonce](cryptarchia-v1-protocol.md#epoch-nonce), and `WINDOW` is derived in [Acceptance Window](proof-of-work.md#acceptance-window).
 
   *Validate*
 
@@ -1687,33 +1665,24 @@ assert epoch_pow_reward > 0
 assert pow_reward_pool >= epoch_pow_reward
 
 # 2. The referenced block must be canonical and within the acceptance window.
-assert accept_claim_pow_op(claim, current_slot)
+block = get_block_from_hash(claim.block_hash)   # None if unknown or not canonical
+assert block is not None
+assert 0 <= current_slot - block.slot <= WINDOW
 
 # 3. The solution must have been found against the current or the previous epoch.
-assert claim.epoch_nonce in (get_current_epoch_nonce(),   # the Cryptarchia epoch nonce
-                             get_previous_epoch_nonce())
+assert claim.epoch_nonce in (epoch_nonce_current, epoch_nonce_previous)
 
 # 4. The ticket must satisfy the reward threshold.
-puzzle_ticket = get_puzzle_ticket(claim)
+puzzle_ticket = zkhash(claim.public_key,
+                       FiniteField(claim.block_hash, byte_order="little", modulus=p),
+                       claim.epoch_nonce)
 assert puzzle_ticket < difficulty_reward
 
-# 5. The solution must not have been claimed before. The nullifier is the ticket,
-#    so the value computed in step 4 is reused.
+# 5. The solution must not have been claimed before. The nullifier is the ticket.
 assert puzzle_ticket not in pow_nullifiers
 
 # 6. The claim must be signed by the key the reward is paid to.
 assert ZkSignature_verify(mantle_txhash, claim_proof, [claim.public_key])
-```
-
-  The epoch nonces in step 3 are the Cryptarchia epoch nonce $`\eta`$ defined in [Epoch Nonce](cryptarchia-v1-protocol.md#epoch-nonce), for the current epoch and for the epoch before it.
-
-```python
-def get_puzzle_ticket(claim: ClaimPowRewardOp) -> zkhash:
-    return zkhash(
-        claim.public_key,
-        FiniteField(claim.block_hash, byte_order="little", modulus=p),
-        claim.epoch_nonce,
-    )
 ```
 
 #### Execution
@@ -1732,7 +1701,7 @@ pow_nullifiers: set[zkhash]
 
   *Execution*
 
-  1. Add `puzzle_ticket` to the `pow_nullifiers` set. The entry is retained until the claim's referenced block leaves the acceptance window.
+  1. Add `puzzle_ticket` to the `pow_nullifiers` set. The entry is retained until the claim's referenced block leaves the [acceptance window](proof-of-work.md#acceptance-window).
   2. Construct a single output note of value `epoch_pow_reward` under the public key given in the payload, and insert it into the Ledger:
       ```python
       output_note = Note(
